@@ -1,0 +1,32 @@
+// Import govuk
+@use "../../node_modules/govuk-frontend/dist/govuk" as *;
+
+// Import dfe
+@forward '../../node_modules/dfe-frontend/packages/dfefrontend';
+
+// Import MOJ
+@import '../../node_modules/@ministryofjustice/frontend/moj/all';
+
+// Override font
+@import url('https://rsms.me/inter/inter.css');
+$govuk-font-family: 'Inter', sans-serif; // Override govuk font
+* {
+  font-family: $govuk-font-family !important; // Override all fonts to match
+}
+
+.govuk-header__link .govuk-header__logotype{
+  height: 30px;
+}
+
+.govuk-header__link:focus .govuk-header__logotype{
+  content: url(/assets/images/department-for-education_black.png);
+  height: 30px;
+}
+
+// Override widths
+.govuk-width-container {
+  @include govuk-width-container;
+  --w: 1200px;
+  --m: 1em;
+  margin-inline: max(   var(--m),50cqw - var(--w)/2);
+}

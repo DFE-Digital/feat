@@ -1,0 +1,56 @@
+﻿@page
+@model SubjectListModel
+@{
+    ViewBag.Title = "What subjects or courses do you have in mind?";
+}
+
+@* ReSharper disable once Razor.SectionNotResolved *@
+@section BeforeContent {
+    <govuk-back-link href="@Url.Page("Subjects")">Back</govuk-back-link>
+}
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<p class="govuk-body">
+   This is optional but the more you tell us the better your search results will be.
+</p>
+<p class="govuk-body">
+    Add anything you think could help us find you relevant courses. For example:
+</p>
+<ul class="govuk-list govuk-list--bullet">
+    <li class="govuk-body">maths</li>
+    <li class="govuk-body">social sciences</li>
+    <li class="govuk-body">anything creative</li>
+</ul>
+
+<form method="post">
+    <govuk-fieldset class="moj-add-another__item">
+        <govuk-input for="Subject" input-class="govuk-input govuk-!-width-full" spellcheck="false">
+            <govuk-input-label class="govuk-label--m">
+                Enter a subject
+            </govuk-input-label>
+            <govuk-input-hint>
+                You can enter one thing at a time, then press 'Add another' if you want to include more. Enter anything from a single word to a full sentence.
+            </govuk-input-hint>
+        </govuk-input>
+    </govuk-fieldset>
+
+
+    <div class="govuk-button-group">
+        <govuk-button type="submit">Continue</govuk-button>
+        <a href="@Url.PageLink("JobsOrCareers")" class="govuk-link">Skip this step</a>
+    </div>
+</form>
+
+@* ReSharper disable once Razor.SectionNotResolved *@
+@section Scripts {
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    document.getElementById("Search_Latitude").value = position.coords.latitude;
+                    document.getElementById("Search_Longitude").value = position.coords.longitude;
+                    document.forms[0].submit();
+                });
+            }
+        }
+    </script>
+}

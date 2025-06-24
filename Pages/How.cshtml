@@ -1,0 +1,26 @@
+﻿@page
+@using feat.web.Enums
+@model HowModel
+@{
+    ViewBag.Title = "How would you like to search?";
+}
+
+@* ReSharper disable once Razor.SectionNotResolved *@
+@section BeforeContent {
+    <govuk-back-link href="@Url.Page("Location")">Back</govuk-back-link>
+}
+<form method="post">
+    <govuk-radios for="SearchMethod">
+        <govuk-radios-fieldset>
+            <govuk-radios-fieldset-legend class="govuk-heading-l" is-page-heading="true">@ViewBag.Title</govuk-radios-fieldset-legend>
+            @foreach (var option in Enum.GetValues<SearchMethod>())
+            {
+                <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
+            }
+        </govuk-radios-fieldset>
+    </govuk-radios>
+    <div class="govuk-button-group">
+        <govuk-button type="submit">Continue</govuk-button>
+        <a href="@Url.PageLink("Location")" class="govuk-link">Skip this step</a>
+    </div>
+</form>

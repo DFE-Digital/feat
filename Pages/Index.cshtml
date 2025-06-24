@@ -1,0 +1,34 @@
+﻿@page
+@using feat.web.Enums
+@model IndexModel
+@{
+    ViewBag.Title = "Tell us how old you are";
+}
+
+@* ReSharper disable once Razor.SectionNotResolved *@
+@section BeforeContent {
+    <govuk-back-link href="@Url.Page("Index")">Back</govuk-back-link>
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<p class="govuk-body">Some education and training courses are not available to everyone.</p>
+<p class="govuk-body">This can be because of age or other eligibility requirements or having to live in a particular area.</p>
+<p class="govuk-body">To display options which are relevant we need to know your current situation.</p>
+
+<form method="post">
+    <govuk-radios for="AgeGroup">
+        <govuk-radios-fieldset>
+            <govuk-radios-fieldset-legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                What is your age group?
+            </govuk-radios-fieldset-legend>
+            @foreach (var option in Enum.GetValues<AgeGroup>())
+            {
+                <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
+            }
+        </govuk-radios-fieldset>
+    </govuk-radios>
+    <div class="govuk-button-group">
+        <govuk-button type="submit">Continue</govuk-button>
+        <a href="@Url.PageLink("Location")" class="govuk-link">Skip this step</a>
+    </div>
+</form>
