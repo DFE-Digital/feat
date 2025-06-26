@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace feat.web.Pages;
 
-public class SubjectsModel(ILogger<SubjectsModel> logger) : PageModel
+public class CareersModel(ILogger<CareersModel> logger) : PageModel
 {
     [BindProperty]
-    public string? Subject { get; set; }
+    public string? Career { get; set; }
     
     public required Search Search { get; set; }
     
@@ -20,7 +20,7 @@ public class SubjectsModel(ILogger<SubjectsModel> logger) : PageModel
         if (!Search.Updated)
             return RedirectToPage("Index");
         
-        Search.SetPage("Subjects");
+        Search.SetPage("Interests");
         HttpContext.Session.Set("Search", Search);
         
         return Page();
@@ -31,21 +31,21 @@ public class SubjectsModel(ILogger<SubjectsModel> logger) : PageModel
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         
         
-        if (!string.IsNullOrEmpty(Subject) && !Search.Subjects.Contains(Subject))
+        if (!string.IsNullOrEmpty(Career) && !Search.Careers.Contains(Career))
         {
-                Search.Subjects.Add(Subject);
+                Search.Careers.Add(Career);
         }
 
-        if (Search.Subjects.Count == 0)
+        if (Search.Careers.Count == 0)
         {
-            ModelState.AddModelError("Subject", "Please enter at least one subject or click \"Skip this step\"");
+            ModelState.AddModelError("Career", "Please enter at least one job or career, or click \"Skip this step\"");
             return Page();       
         }
         
         Search.Updated = true;
         HttpContext.Session.Set("Search", Search);
 
-        return RedirectToPage("Careers");
+        return RedirectToPage("CourseType");
     }
 
     public IActionResult OnPostRemove(int index)
@@ -53,7 +53,7 @@ public class SubjectsModel(ILogger<SubjectsModel> logger) : PageModel
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         try
         {
-            Search.Subjects.RemoveAt(index);
+            Search.Careers.RemoveAt(index);
             HttpContext.Session.Set("Search", Search);
         }
         catch (Exception ex)
@@ -71,19 +71,19 @@ public class SubjectsModel(ILogger<SubjectsModel> logger) : PageModel
         if (!ModelState.IsValid)
             return Page();
 
-        if (string.IsNullOrEmpty(Subject))
+        if (string.IsNullOrEmpty(Career))
         {
-            ModelState.AddModelError("Subject", "Please enter a subject or click \"Skip this step\"");
+            ModelState.AddModelError("Career", "Please enter a career or click \"Skip this step\"");
             return Page();
         }
 
-        if (!Search.Subjects.Contains(Subject))
-            Search.Subjects.Add(Subject);
+        if (!Search.Careers.Contains(Career))
+            Search.Careers.Add(Career);
 
         HttpContext.Session.Set("Search", Search);
         
         ModelState.Clear();
-        Subject = string.Empty;
+        Career = string.Empty;
         
         return Page();
     }

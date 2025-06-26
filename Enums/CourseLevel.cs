@@ -10,6 +10,6 @@ public enum CourseLevel
     GCSE = 1 << 0,
     [Display(Name = "A Level, T Level, or equivalent")]
     ALevel = 2 << 1,
-    [Display(Name = "I'd like to see both")]
+    [Display(Name = "Show me both")]
     Both = GCSE | ALevel
 }

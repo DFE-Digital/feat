@@ -1,11 +1,11 @@
 // Import govuk
-@use "../../node_modules/govuk-frontend/dist/govuk" as *;
+@use "../../node_modules/govuk-frontend/dist/govuk" as govuk;
 
 // Import dfe
-@forward '../../node_modules/dfe-frontend/packages/dfefrontend';
+@use '../../node_modules/dfe-frontend/packages/dfefrontend' as dfe;
 
 // Import MOJ
-@import '../../node_modules/@ministryofjustice/frontend/moj/all';
+@use '../../node_modules/@ministryofjustice/frontend/moj/all' as moj;
 
 // Override font
 @import url('https://rsms.me/inter/inter.css');
@@ -25,8 +25,6 @@ $govuk-font-family: 'Inter', sans-serif; // Override govuk font
 
 // Override widths
 .govuk-width-container {
-  @include govuk-width-container;
-  --w: 1200px;
-  --m: 1em;
-  margin-inline: max(   var(--m),50cqw - var(--w)/2);
+  @include govuk.govuk-width-container;
+  max-width: 1200px;
 }

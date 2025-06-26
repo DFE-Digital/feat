@@ -1,0 +1,42 @@
+﻿@page
+@using feat.web.Enums
+@using feat.web.Models
+@model SituationModel
+@{
+    ViewBag.Title = "Your current situation";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage("Situation"))">Back</govuk-back-link>
+}
+
+<h1 class="govuk-heading-l">@ViewBag.Title</h1>
+    
+<p class="govuk-body">Some education and training courses are not available to everyone.</p>
+<p class="govuk-body">This can be because of age or other eligibility requirements, or having to live in a particular area.</p>
+<p class="govuk-body">To display options whih are relevant, we need to kow your current situation.</p>
+
+<form method="post">
+    <govuk-radios for="AgeGroup">
+        <govuk-radios-fieldset>
+            <govuk-radios-fieldset-legend class="govuk-heading-m">How old are you?</govuk-radios-fieldset-legend>
+            @foreach (var option in Enum.GetValues<AgeGroup>())
+            {
+                <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
+            }
+        </govuk-radios-fieldset>
+    </govuk-radios>
+    <govuk-radios for="SearchType">
+        <govuk-radios-fieldset>
+            <govuk-radios-fieldset-legend class="govuk-heading-m">What do you want to do?</govuk-radios-fieldset-legend>
+            @foreach (var option in Enum.GetValues<SearchType>())
+            {
+                <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
+            }
+        </govuk-radios-fieldset>
+    </govuk-radios>
+    <div class="govuk-button-group">
+        <govuk-button type="submit">Continue</govuk-button>
+        <a asp href="@Url.PageLink("How")" class="govuk-link">Skip this step</a>
+    </div>
+</form>

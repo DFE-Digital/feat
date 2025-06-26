@@ -1,18 +1,9 @@
 ﻿@page
 @using feat.web.Enums
-@model HowModel
+@model CourseLevelModel
 @{
-    ViewBag.Title = "How would you like to search?";
-    SearchMethod[] options;
+    ViewBag.Title = "What level courses or apprenticeships are you looking for?";
     
-    if (Model.Search.AgeGroup is AgeGroup.UnderEighteen && Model.Search.SearchType is SearchType.FE or SearchType.Return)
-    {
-        options = [SearchMethod.Nearby, SearchMethod.Guided];
-    }
-    else
-    {
-        options = Enum.GetValues<SearchMethod>();
-    }
 }
 
 
@@ -21,10 +12,10 @@
 }
 
 <form method="post">
-    <govuk-radios for="SearchMethod">
+    <govuk-radios for="CourseLevel">
         <govuk-radios-fieldset>
             <govuk-radios-fieldset-legend class="govuk-heading-l" is-page-heading="true">@ViewBag.Title</govuk-radios-fieldset-legend>
-            @foreach (var option in options)
+            @foreach (var option in Enum.GetValues<CourseLevel>())
             {
                 <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
             }
