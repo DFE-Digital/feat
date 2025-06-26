@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using feat.web.Enums;
 using feat.web.Extensions;
 using feat.web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -6,10 +7,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace feat.web.Pages;
 
-public class SubjectsModel(ILogger<SubjectsModel> logger) : PageModel
+public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
 {
     [BindProperty]
-    public string? Subject { get; set; }
+    public string? Interest { get; set; }
     
     public required Search Search { get; set; }
     
@@ -20,7 +21,7 @@ public class SubjectsModel(ILogger<SubjectsModel> logger) : PageModel
         if (!Search.Updated)
             return RedirectToPage("Index");
         
-        Search.SetPage("Subjects");
+        Search.SetPage("Interests");
         HttpContext.Session.Set("Search", Search);
         
         return Page();
@@ -31,21 +32,26 @@ public class SubjectsModel(ILogger<SubjectsModel> logger) : PageModel
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         
         
-        if (!string.IsNullOrEmpty(Subject) && !Search.Subjects.Contains(Subject))
+        if (!string.IsNullOrEmpty(Interest) && !Search.Interests.Contains(Interest))
         {
-                Search.Subjects.Add(Subject);
+                Search.Interests.Add(Interest);
         }
 
-        if (Search.Subjects.Count == 0)
+        if (Search.Interests.Count == 0)
         {
-            ModelState.AddModelError("Subject", "Please enter at least one subject or click \"Skip this step\"");
+            ModelState.AddModelError("Interest", "Please enter at least one interest");
             return Page();       
         }
         
         Search.Updated = true;
         HttpContext.Session.Set("Search", Search);
 
-        return RedirectToPage("Careers");
+        if (Search.SearchMethod == SearchMethod.Guided)
+        {
+            return RedirectToPage("QualificationLevel");
+        }
+
+        return RedirectToPage("Location");
     }
 
     public IActionResult OnPostRemove(int index)
@@ -53,7 +59,7 @@ public class SubjectsModel(ILogger<SubjectsModel> logger) : PageModel
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         try
         {
-            Search.Subjects.RemoveAt(index);
+            Search.Interests.RemoveAt(index);
             HttpContext.Session.Set("Search", Search);
         }
         catch (Exception ex)
@@ -71,19 +77,19 @@ public class SubjectsModel(ILogger<SubjectsModel> logger) : PageModel
         if (!ModelState.IsValid)
             return Page();
 
-        if (string.IsNullOrEmpty(Subject))
+        if (string.IsNullOrEmpty(Interest))
         {
-            ModelState.AddModelError("Subject", "Please enter a subject or click \"Skip this step\"");
+            ModelState.AddModelError("Interest", "Please enter an interest");
             return Page();
         }
 
-        if (!Search.Subjects.Contains(Subject))
-            Search.Subjects.Add(Subject);
+        if (!Search.Interests.Contains(Interest))
+            Search.Interests.Add(Interest);
 
         HttpContext.Session.Set("Search", Search);
         
         ModelState.Clear();
-        Subject = string.Empty;
+        Interest = string.Empty;
         
         return Page();
     }

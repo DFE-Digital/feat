@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using feat.web.Extensions;
 using feat.web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -6,30 +5,28 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace feat.web.Pages;
 
-public class SubjectListModel(ILogger<SubjectListModel> logger) : PageModel
+public class SummaryModel : PageModel
 {
-
-    public void OnGet()
+    public required Search Search { get; set; }
+    
+    public IActionResult OnGet()
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+        if (!Search.Updated)
+            return RedirectToPage("Index");
+
+        Search.SetPage("Summary");
+        HttpContext.Session.Set("Search", Search);
+        
+        return Page();
     }
-    
-    [BindProperty]
-    public string? Subject { get; set; }
-    
-    public required Search Search { get; set; }
 
     public IActionResult OnPost()
     {
-        if (!ModelState.IsValid)
-            return Page();
-        
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-        
-        
-
+        Search.Updated = true;
         HttpContext.Session.Set("Search", Search);
-
-        return RedirectToPage("JobsOrCareers");
+        
+        return RedirectToPage("Results");
     }
 }

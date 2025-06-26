@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace feat.web.Pages;
 
-public class HowModel (ILogger<HowModel> logger) : PageModel
+public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) : PageModel
 {
     [BindProperty]
-    [Required(ErrorMessage = "Please select how you would like to search")]
-    public SearchMethod? SearchMethod { get; set; }
+    [Required(ErrorMessage = "Please select the level of qualification you are looking for")]
+    public QualificationLevel? QualificationLevel { get; set; }
     
     public required Search Search { get; set; }
     
@@ -19,10 +19,10 @@ public class HowModel (ILogger<HowModel> logger) : PageModel
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         
-        if (Search.SearchMethod.HasValue)
-            SearchMethod = Search.SearchMethod;
+        if (Search.QualificationLevel.HasValue)
+            QualificationLevel = Search.QualificationLevel;
 
-        Search.SetPage("How");
+        Search.SetPage("QualificationLevel");
         HttpContext.Session.Set("Search", Search);
         
         return Page();
@@ -35,21 +35,11 @@ public class HowModel (ILogger<HowModel> logger) : PageModel
             return Page();
 
         Search.Updated = true;
-        if (SearchMethod.HasValue) Search.SearchMethod = SearchMethod.Value;
+        if (QualificationLevel.HasValue) Search.QualificationLevel = QualificationLevel.Value;
 
         HttpContext.Session.Set("Search", Search);
 
-        if (SearchMethod is Enums.SearchMethod.ByName)
-        {
-            return RedirectToPage("Interests");
-        }
-        
-        if (SearchMethod is Enums.SearchMethod.Guided && Search.AgeGroup is AgeGroup.UnderEighteen)
-        {
-            return RedirectToPage("Subjects");
-        }
-
-        return RedirectToPage("Location");
+        return RedirectToPage("Summary");
 
     }
 }

@@ -1,6 +1,8 @@
 "use strict";
 
 const sass = require("gulp-sass")(require('sass'));
+const sourcemaps = require('gulp-sourcemaps');
+
 const { task, series, dest, src, parallel } = require("gulp");
     
 
@@ -37,8 +39,9 @@ task('moj-assets', function() {
 
 task("sass", function () {
     return src(paths.src + '/scss/**/*.scss')
+        .pipe(sourcemaps.init())
         .pipe(sass({
-            style: 'development',
+            // style: 'compressed',
             quietDeps: true,
         }).on('error', sass.logError))
         .pipe(dest(paths.dist + '/css'))

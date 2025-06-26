@@ -1,12 +1,12 @@
 ﻿@page
-@model SubjectsModel
+@model CareersModel
 @{
-    ViewBag.Title = "What subjects or courses are you interested in?";
+    ViewBag.Title = "Are there any jobs or careers you're interested in working in?";
 }
 
 
 @section BeforeContent {
-    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage("Subjects"))">Back</govuk-back-link>
+    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage("Careers"))">Back</govuk-back-link>
 }
 
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
@@ -17,20 +17,20 @@
     Add anything you think could help us find you relevant courses. For example:
 </p>
 <ul class="govuk-list govuk-list--bullet">
-    <li>maths</li>
-    <li>social sciences</li>
-    <li>anything creative</li>
+    <li>bricklaying</li>
+    <li>construction</li>
+    <li>something in the public sector</li>
 </ul>
 
 
 <form method="post">
-    @for(var subject = 0; subject < Model.Search.Subjects.Count; subject++)
+    @for(var career = 0; career < Model.Search.Careers.Count; career++)
     {
         <fieldset class="govuk-fieldset moj-add-another__item">
             <div class="govuk-form-group">
-                <govuk-input name="search.subject[@subject]" input-class="govuk-input--width-20" spellcheck="true" value="@Model.Search.Subjects[subject]" disabled="true">
+                <govuk-input name="search.career[@career]" input-class="govuk-input--width-20" spellcheck="true" value="@Model.Search.Careers[career]" disabled="true">
                     <govuk-input-label class="govuk-heading-m">
-                        Enter a subject (optional)
+                        Enter a job or career (optional)
                     </govuk-input-label>
                     <govuk-input-hint>
                         You can enter one thing at a time, then press 'Add another' if you want to include more.<br/>
@@ -38,15 +38,15 @@
                     </govuk-input-hint>
                 </govuk-input>
             </div>
-            <govuk-button name="Index" value="@subject" asp-page-handler="Remove" type="submit" class="govuk-button govuk-button--secondary moj-add-another__remove-button">Remove</govuk-button>
+            <govuk-button name="Index" value="@career" asp-page-handler="Remove" type="submit" class="govuk-button govuk-button--secondary moj-add-another__remove-button">Remove</govuk-button>
         </fieldset>
     }
     <fieldset class="govuk-fieldset moj-add-another__item">
        
         <div class="govuk-form-group">
-            <govuk-input for="Subject" input-class="govuk-input--width-20" spellcheck="true">
+            <govuk-input for="Career" input-class="govuk-input--width-20" spellcheck="true">
                 <govuk-input-label class="govuk-heading-m">
-                    Enter a subject (optional)
+                    Enter a job or career (optional)
                 </govuk-input-label>
                 <govuk-input-hint>
                     You can enter one thing at a time, then press 'Add another' if you want to include more.<br/>
@@ -59,6 +59,5 @@
 
     <div class="govuk-button-group">
         <govuk-button type="Submit" asp-page-handler="Continue">Continue</govuk-button>
-        <a asp-page="Careers" class="govuk-link">Skip this step</a>       
-    </div>
-</form>
+        <a asp-page="CourseType" class="govuk-link">Skip this step</a>       
+    </div></form>

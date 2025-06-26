@@ -10,31 +10,55 @@ namespace feat.web.Pages;
 public class LocationModel(ILogger<LocationModel> logger) : PageModel
 {
 
-    public void OnGet()
+    [BindProperty]
+    public string? Location { get; set; }
+    
+    [BindProperty]
+    public Distance? Distance { get; set; }
+    
+    public required Search Search { get; set; }
+    
+    public IActionResult OnGet()
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+        if (!Search.Updated)
+            return RedirectToPage("Index");
+        
         if (Search.Distance.HasValue)
             Distance = Search.Distance;
         if (!string.IsNullOrEmpty(Search.Location))
             Location = Search.Location;
+        
+        Search.SetPage("Location");
+        HttpContext.Session.Set("Search", Search);
+        
+        return Page();
     }
-    
-    [BindProperty]
-    [Required(ErrorMessage = "Please enter a location, or click \"Skip this step\"")]
-    public string? Location { get; set; }
-    
-    [BindProperty]
-    [Required(ErrorMessage = "Please select how far you would be happy to travel, or click \"Skip this step\"")]
-    public Distance? Distance { get; set; }
-    
-    public required Search Search { get; set; }
 
     public IActionResult OnPost()
     {
+        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+
+        // If its anything other than HE, we need to validate distance and location
+        if (Search.SearchType != SearchType.HE)
+        {
+            if (string.IsNullOrEmpty(Location))
+                ModelState.AddModelError("Location", "Please enter a location");
+            if (!Distance.HasValue)
+                ModelState.AddModelError("Distance", "Please select how far you would be happy to travel");
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(Location))
+                ModelState.AddModelError("Location", "Please enter a location or click \"Skip this step\"");
+        }
+
+        
+        
         if (!ModelState.IsValid)
             return Page();
         
-        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+        Search.Updated = true;
         
         if (!string.IsNullOrEmpty(Location)) Search.Location = Location;
         if (Distance != null) Search.Distance = Distance.Value;
@@ -42,6 +66,14 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
 
         HttpContext.Session.Set("Search", Search);
 
-        return RedirectToPage("How");
+        if (Search.AgeGroup is AgeGroup.UnderEighteen && Search.SearchType is SearchType.FE or SearchType.Return)
+        {
+            return RedirectToPage("How");
+        }
+        
+        if (Search.Interests.Any() || Search.Subjects.Any() || Search.Careers.Any())
+            return RedirectToPage("Summary");
+
+        return RedirectToPage("Interests");
     }
 }

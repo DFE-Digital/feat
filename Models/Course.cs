@@ -1,4 +1,7 @@
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace feat.web.Models;
 
 public class Course
@@ -84,71 +87,16 @@ public class Course
     
     public string Id { get; set; }
 
-    public void CalculateDistance(Geolocation location)
+    public string ToJSON()
     {
-        if (Latitude.HasValue && Longitude.HasValue)
+        var json = JsonSerializer.Serialize(this, new JsonSerializerOptions()
         {
-            Distance = KilometersToMiles(CalculateDistance(
-                new Geolocation() { Latitude = Latitude.Value, Longitude = Longitude.Value },
-                location)
-            );
-        }
-        else
-        {
-            Distance = 0;
-        }
-    }
-    
-    private bool ToBoolean(string value)
-    {
-        return value switch
-        {
-           "1" or "y" or "Y" or "Yes" or "true" or "True" or "TRUE" => true,
-            _ => false
-        };
-    }
+            WriteIndented = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+            Converters = { new JsonStringEnumConverter() }
+        });
 
-    private string? CleanString(string? value)
-    {
-        
-        value = value switch
-        {
-            "" or null or "na" or "nan" or "unknown" or "Unknown"
-                or "D_No Aim Title" => null,
-            _ => value
-        };
-        
-        value = value?.Trim();
-        value = value?.Replace("_x000D_", Environment.NewLine);
-
-        return value;
+        return json;
     }
-    
-    private double CalculateDistance(Geolocation point1, Geolocation point2)
-    {
-        double R = 6371;
-        var lat = GetRadians(point2.Latitude - point1.Latitude);
-        var lng = GetRadians(point2.Longitude - point1.Longitude);
-        var h1 = Math.Sin(lat / 2) * Math.Sin(lat / 2) +
-                 Math.Cos(GetRadians(point1.Latitude)) * Math.Cos(GetRadians(point2.Latitude)) *
-                 Math.Sin(lng / 2) * Math.Sin(lng / 2);
-        var h2 = 2 * Math.Asin(Math.Min(1, Math.Sqrt(h1)));
-        return R * h2;
-    }
-
-    private double KilometersToMiles(double value)
-    {
-        if (value > 0)
-        {
-            return value / 1.60934;
-        }
-
-        return 0;
-    }
-
-    private static double GetRadians(double value)
-    {
-        return value * Math.PI / 180;
-    }
-    
 }

@@ -5,12 +5,10 @@ namespace feat.web.Enums;
 
 public enum AgeGroup
 {
-    [Display(Name = $"Under 18 years old")]
+    [Display(Name = $"Younger than 18")]
     UnderEighteen,
-    [Display(Name = $"Between 18-21 years old")]
-    EighteenToTwentyOne,
-    [Display(Name = $"Under 24 years old")]
-    UnderTwentyFour,
-    [Display(Name = $"Over 24 years old")]
-    OverTwentyFour,
+    [Display(Name = $"Between 18 and 24 years old")]
+    EighteenToTwentyFour,
+    [Display(Name = $"Older than 24")]
+    OverTwentyFour
 }

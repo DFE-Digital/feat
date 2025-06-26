@@ -1,10 +1,16 @@
+using System.Text.Json.Serialization;
 using feat.web.Repositories;
 using GovUk.Frontend.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.Configure<RouteOptions>(option =>
+{
+    option.LowercaseUrls = true;
+    option.LowercaseQueryStrings = true;
+});
+
 builder.Services.AddGovUkFrontend(options =>
 {
     options.Rebrand = true;
@@ -12,9 +18,25 @@ builder.Services.AddGovUkFrontend(options =>
     options.CompiledContentPath = "/js";
     options.StaticAssetsContentPath = "/assets";
 });
+builder.Services.AddRazorPages().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.WriteIndented = true;
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
 
 // Setup our HTTP client
-builder.Services.AddHttpClient("httpClient");
+builder.Services.AddHttpClient("httpClient")
+    .ConfigurePrimaryHttpMessageHandler(() =>
+    {
+        return new HttpClientHandler()
+        {
+            AllowAutoRedirect = true,
+            UseDefaultCredentials = false
+        };
+    });
 builder.Services.AddSingleton<HttpClientRepository>();
 
 // Setup our session

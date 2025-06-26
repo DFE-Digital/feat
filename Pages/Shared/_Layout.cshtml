@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="~/css/application.css" />
 }
 
+
 @section BodyStart {
+    <!--
     <govuk-cookie-banner aria-label="Cookies on Find Education and Training">
         <govuk-cookie-banner-message>
             <govuk-cookie-banner-message-heading>Cookies on Find Education and Training</govuk-cookie-banner-message-heading>
@@ -24,7 +26,9 @@
             </govuk-cookie-banner-message-actions>
         </govuk-cookie-banner-message>
     </govuk-cookie-banner>
+    -->
 }
+
 
 @section Header {
     <header class="govuk-header" data-module="govuk-header">
@@ -47,7 +51,6 @@
 }
 
 @RenderSection("BeforeContent", required: false)
-
 
 @RenderBody()
 

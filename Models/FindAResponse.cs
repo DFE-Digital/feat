@@ -9,12 +9,5 @@ public class FindAResponse
     public long? Total { get; set; }
 
     public List<Course> Courses { get; set; } = [];
-
-    public void CalculateDistances(Geolocation location)
-    {
-        foreach (var course in Courses)
-        {
-            course.CalculateDistance(location);
-        }
-    }
+    
 }

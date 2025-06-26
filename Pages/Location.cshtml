@@ -2,48 +2,41 @@
 @using feat.web.Enums
 @model LocationModel
 @{
-    ViewBag.Title = "Tell us about your location";
+    ViewBag.Title = "Where do you want to study?";
 }
 
-@* ReSharper disable once Razor.SectionNotResolved *@
+
 @section BeforeContent {
-    <govuk-back-link href="@Url.Page("Index")">Back</govuk-back-link>
+    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage("Location"))">Back</govuk-back-link>
 }
 
 <h1 class="govuk-heading-l">@ViewBag.Title</h1>
+<p class="govuk-body">We need to know where you live as some courses or training are only available in certain areas.</p>
+<p class="govuk-body">If you enter a location that is different to where you live, you should check whether you need to live in the area (often referred to as being 'a resident') to do the course.</p>
 
 <form method="post">
     <govuk-input for="Location" input-class="govuk-input--width-20" spellcheck="false">
-        <govuk-input-label class="govuk-label--m">Enter a town, city or postcode</govuk-input-label>
+        <govuk-input-label class="govuk-label--m">Enter a town, city or postcode@(Model.Search.SearchType == SearchType.HE ? " (optional)" : "")</govuk-input-label>
     </govuk-input>
-    <govuk-radios for="Distance">
-        <govuk-radios-fieldset>
-            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                How far would you be happy to travel?
-            </govuk-radios-fieldset-legend>
-            @foreach (var option in Enum.GetValues<Distance>())
-            {
-                <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
-            }
-        </govuk-radios-fieldset>
-    </govuk-radios>
+    @if (Model.Search.SearchType != SearchType.HE)
+    {
+        <govuk-radios for="Distance">
+            <govuk-radios-fieldset>
+                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                    How far would you be happy to travel?
+                </govuk-radios-fieldset-legend>
+                @foreach (var option in Enum.GetValues<Distance>())
+                {
+                    <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
+                }
+            </govuk-radios-fieldset>
+        </govuk-radios>
+    }
     <div class="govuk-button-group">
         <govuk-button type="submit">Continue</govuk-button>
-        <a href="@Url.PageLink("How")" class="govuk-link">Skip this step</a>
+        @if (Model.Search.SearchType == SearchType.HE)
+        {
+            <a asp href="@Url.PageLink("Summary")" class="govuk-link">Skip this step</a>       
+        }
     </div>
 </form>
-
-@* ReSharper disable once Razor.SectionNotResolved *@
-@section Scripts {
-    <script>
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    document.getElementById("Search_Latitude").value = position.coords.latitude;
-                    document.getElementById("Search_Longitude").value = position.coords.longitude;
-                    document.forms[0].submit();
-                });
-            }
-        }
-    </script>
-}
