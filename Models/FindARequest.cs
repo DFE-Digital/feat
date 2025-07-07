@@ -23,4 +23,5 @@ public class FindARequest
 
     public int PageSize { get; set; } = 10;
 
+    public bool Debug { get; set; } = false;
 }

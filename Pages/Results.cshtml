@@ -176,6 +176,9 @@
         <button type="button" class="govuk-button" id="apply-filters">
           Apply filters
         </button>
+        <!-- BEGIN FACETS
+        @Json.Serialize(Model?.FindAResponse?.Facets)
+        END FACETS -->
       </div>
     </div>
   </div>
@@ -186,6 +189,7 @@
     <div id="active-filters">
       <h2 id="active-filters-heading" class="govuk-heading-m" style="display: none;">You've searched for:</h2>
       <div id="selected-filters" class="remove-filters"></div>
+     
     </div>
 
     <div id="search-results">

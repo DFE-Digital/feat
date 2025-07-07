@@ -54,28 +54,6 @@
               </p>
             </dd>
           </div>
-        <!--
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">
-            Course type
-          </dt>
-          <dd class="govuk-summary-list__value">
-            <strong class="govuk-tag govuk-tag--orange" style="margin-bottom: 10px;">
-              @Model.CourseType
-            </strong>
-            <details class="govuk-details">
-              <summary class="govuk-details__summary">
-                <span class="govuk-details__summary-text">
-                  What is an @Model.CourseType?
-                </span>
-              </summary>
-              <div class="govuk-details__text">
-                <p>Lorem Ipsum</p>
-              </div>
-            </details>
-          </dd>
-        </div>
-        -->
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">
               Start date
@@ -115,7 +93,6 @@
               @Model.StudyMode
             </dd>
           </div>
-          <!-- @Json.Serialize(Model) -->
           <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">
               Who is this course for?
@@ -124,6 +101,10 @@
               @Model.WhoThisCourseIsFor
             </dd>
           </div>
+          @if (Model.DebugInfo is not null)
+          {
+            <!-- @Json.Serialize(Model) -->
+          }
         </dl>
         
         

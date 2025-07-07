@@ -1,8 +1,14 @@
 using System.Text.Json.Serialization;
+using feat.web.Configuration;
 using feat.web.Repositories;
+using feat.web.Services;
 using GovUk.Frontend.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add configuration
+builder.Services.Configure<SearchOptions>(
+    builder.Configuration.GetSection(SearchOptions.Search));
 
 // Add services to the container.
 builder.Services.Configure<RouteOptions>(option =>
@@ -15,7 +21,9 @@ builder.Services.AddGovUkFrontend(options =>
 {
     options.Rebrand = true;
     options.FrontendPackageHostingOptions = FrontendPackageHostingOptions.None;
+#pragma warning disable CS0618 // Type or member is obsolete
     options.CompiledContentPath = "/js";
+#pragma warning restore CS0618 // Type or member is obsolete
     options.StaticAssetsContentPath = "/assets";
 });
 builder.Services.AddRazorPages().AddJsonOptions(options =>
@@ -38,6 +46,7 @@ builder.Services.AddHttpClient("httpClient")
         };
     });
 builder.Services.AddSingleton<HttpClientRepository>();
+builder.Services.AddSingleton<ISearchService, SearchService>();
 
 // Setup our session
 builder.Services.AddDistributedMemoryCache();

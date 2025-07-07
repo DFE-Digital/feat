@@ -19,6 +19,10 @@ public class Search
     
     public SearchType? SearchType { get; set; }
 
+    public bool IncludeOnlineCourses { get; set; } = true;
+    
+    public bool Debug { get; set; } = false;
+
     public string? Location { get; set; }
 
     public List<string> Interests { get; set; } = [];
@@ -63,12 +67,13 @@ public class Search
         return new FindARequest
         {
             Query = Query ?? string.Empty,
-            IncludeOnlineCourses = false,
+            IncludeOnlineCourses = IncludeOnlineCourses,
             Location = Location,
             Radius = Distance.HasValue ? (int)Distance.Value : 1000,
             OrderBy = OrderBy.Relevance,
             Page = 1,
-            PageSize = 20
+            PageSize = 20,
+            Debug = Debug
         };
     }
 
