@@ -86,6 +86,8 @@ public class Course
     public string? EmployerName { get; set; }
     
     public string Id { get; set; }
+    
+    public object? DebugInfo { get; set; }
 
     public string ToJSON()
     {

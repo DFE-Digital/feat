@@ -15,12 +15,13 @@ public class ResultsModel(ISearchService searchService) : PageModel
     public FindAResponse? FindAResponse { get; set; }
     
     
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync([FromQuery] bool debug = false)
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         if (!Search.Updated)
             return RedirectToPage("Index");
 
+        Search.Debug = debug;
         Search.SetPage("Results");
         HttpContext.Session.Set("Search", Search);
 
