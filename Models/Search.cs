@@ -63,7 +63,7 @@ public class Search
         return new FindARequest
         {
             Query = Query ?? string.Empty,
-            IncludeOnlineCourses = false,
+            IncludeOnlineCourses = true,
             Location = Location,
             Radius = Distance.HasValue ? (int)Distance.Value : 1000,
             OrderBy = OrderBy.Relevance,
