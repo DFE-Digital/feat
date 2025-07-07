@@ -10,4 +10,6 @@ public class FindAResponse
 
     public List<Course> Courses { get; set; } = [];
     
+    public IList<Facet> Facets { get; set; } = new List<Facet>();
+    
 }
