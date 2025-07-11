@@ -1,5 +1,7 @@
 name: Run Azure Login with the Service Principal secret
-
+on: 
+  workflow_dispatch:
+  
 jobs:
   test:
     runs-on: ubuntu-latest
