@@ -13,7 +13,7 @@ on:
           - 'production'
   
 jobs:
-  test:
+  Login:
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.event.inputs.environment }}
