@@ -1,0 +1,18 @@
+name: Run Azure Login with the Service Principal secret
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Azure Login action
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        enable-AzPSSession: true
+    
+    - name: Azure CLI script
+      uses: azure/cli@v2
+      with:
+        azcliversion: latest
+        inlineScript: |
+          az group show --name "s213d01-uks-backend"
