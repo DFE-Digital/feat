@@ -1,0 +1,15 @@
+﻿services:
+  feat.web:
+    image: feat.web
+    build:
+      context: .
+      dockerfile: ../web/feat.web/Dockerfile
+    depends_on:
+      - feat.api
+      
+  feat.api:
+    image: feat.api
+    build:
+      context: .
+      dockerfile: ../api/feat.api/Dockerfile
+
