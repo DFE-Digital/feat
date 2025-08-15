@@ -23,6 +23,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "feat.web", "web\feat.web\fe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ingestion", "ingestion", "{466E77EF-CAE3-44A4-8A09-EA7F3CCE6A10}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution files", "solution files", "{C30A3A8F-F294-4B06-B7E6-4F707BD3FC63}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		.dockerignore = .dockerignore
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
