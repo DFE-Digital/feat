@@ -21,8 +21,4 @@
       <ProjectReference Include="..\..\common\feat.common\feat.common.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Controllers\" />
-    </ItemGroup>
-
 </Project>

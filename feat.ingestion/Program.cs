@@ -1,0 +1,1 @@
+﻿Console.WriteLine("FEAT ingestion service started.");
