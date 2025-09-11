@@ -1,15 +1,31 @@
 ﻿services:
-  feat.web:
-    image: feat.web
+  feat.api:
     build:
-      context: .
-      dockerfile: ../web/feat.web/Dockerfile
+      context: ..
+      dockerfile: api/feat.api/Dockerfile
+    ports:
+      - "5240:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  feat.web:
+    build:
+      context: ..
+      dockerfile: web/feat.web/Dockerfile
+    ports:
+      - "5143:8081"
     depends_on:
       - feat.api
-      
-  feat.api:
-    image: feat.api
-    build:
-      context: .
-      dockerfile: ../api/feat.api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - API_BASE_URL=http://feat.api:8080
 
+  feat.ingestion:
+    build:
+      context: ..
+      dockerfile: feat.ingestion/Dockerfile
+    depends_on:
+      - feat.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    profiles: ["manual"]

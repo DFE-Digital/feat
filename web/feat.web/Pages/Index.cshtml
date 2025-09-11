@@ -1,0 +1,20 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Find Education and Training";
+}
+
+<div class="text-center mt-5">
+    <h1 class="display-4 mb-4">Find Education and Training</h1>
+
+    <form method="get" class="d-flex justify-content-center">
+        <input type="text"
+               name="q"
+               class="form-control w-50"
+               placeholder="Search..." />
+
+        <button type="submit" class="btn btn-primary ms-2">
+            Search
+        </button>
+    </form>
+</div>
