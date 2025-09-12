@@ -1,7 +1,6 @@
 name: Deploy Azure Infrastructure
 
 on:
-  push: # Temp for testing while in branch
   workflow_dispatch:
     inputs:
       environment:
