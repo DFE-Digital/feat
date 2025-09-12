@@ -1,7 +1,7 @@
 ﻿services:
   feat.api:
     build:
-      context: ..
+      context: ../..
       dockerfile: api/feat.api/Dockerfile
     ports:
       - "5240:8080"
@@ -10,7 +10,7 @@
 
   feat.web:
     build:
-      context: ..
+      context: ../..
       dockerfile: web/feat.web/Dockerfile
     ports:
       - "5143:8081"
@@ -22,8 +22,8 @@
 
   feat.ingestion:
     build:
-      context: ..
-      dockerfile: feat.ingestion/Dockerfile
+      context: ../..
+      dockerfile: ingestion/feat.ingestion/Dockerfile
     depends_on:
       - feat.api
     environment:
