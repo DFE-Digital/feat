@@ -1,12 +1,14 @@
 name: Deploy Azure Infrastructure
 
 on:
+  push: # Temp for testing while in branch
   workflow_dispatch:
     inputs:
       environment:
         description: "Target environment"
         required: true
         type: choice
+        default: test
         options:
           - development
           - test
