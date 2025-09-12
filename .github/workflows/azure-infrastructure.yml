@@ -1,7 +1,7 @@
-name: Deploy Azure Infrastructure
+name: Deploy Infrastructure
 
 on:
-  push: # Temp for testing while in branch
+  push:
   workflow_dispatch:
     inputs:
       environment:
@@ -14,28 +14,26 @@ on:
           - test
 
 jobs:
-  terraform:
-    name: "Deploy Infrastructure"
+  deploy:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment }}
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: "Checkout repository"
+        uses: actions/checkout@v3
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Azure Login
-        uses: azure/login@v2
+      - name: "Login to Azure"
+        uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Terraform Init
+      - name: "Set up Terraform"
+        uses: hashicorp/setup-terraform@v2
+
+      - name: "Terraform Init"
         run: terraform init
 
-      - name: Terraform Plan
+      - name: "Terraform Plan"
         run: terraform plan -var-file=${{ github.event.inputs.environment }}.tfvars
 
-      - name: Terraform Apply
+      - name: "Terraform Apply"
         run: terraform apply -auto-approve -var-file=${{ github.event.inputs.environment }}.tfvars
