@@ -71,36 +71,3 @@ resource "azurerm_linux_web_app" "website" {
     "DOCKER_REGISTRY_SERVER_PASSWORD"     = azurerm_container_registry.this.admin_password
   }
 }
-
-# Ingestion Service Container Group
-resource "azurerm_container_group" "ingestion" {
-  name                = "dfe-feat-${var.env}-uks-cg-ingestion"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  os_type             = "Linux"
-
-  container {
-    name   = "ingestion"
-    image  = var.ingestion_image
-    cpu    = "0.5"
-    memory = "1.0"
-    commands = [
-      "/bin/sh",
-      "-c",
-      "echo 'Running ingestion service'"
-    ]
-  }
-
-  ip_address_type = "None"
-  restart_policy  = "Never"
-
-  image_registry_credential {
-    server   = azurerm_container_registry.this.login_server
-    username = azurerm_container_registry.this.admin_username
-    password = azurerm_container_registry.this.admin_password
-  }
-
-  tags = {
-    environment = var.env
-  }
-}
