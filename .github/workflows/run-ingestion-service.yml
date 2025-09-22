@@ -1,0 +1,96 @@
+name: Run Ingestion Service
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - development
+          - test
+
+  schedule:
+    - cron: '0 4 * * *'  # Daily at 04:00
+
+jobs:
+  build-and-deploy:
+    name: "Build, Run & Clean Up Ingestion Service"
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Log in to Azure"
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: "Log in to ACR"
+        run: |
+          az acr login --name ${{ secrets.ACR_NAME }}
+
+      - name: "Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v3
+
+      - name: "Build and Push Ingestion Image"
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./ingestion/feat.ingestion/Dockerfile
+          push: true
+          tags: ${{ secrets.ACR_LOGIN_SERVER }}/feat-ingestion:${{ github.sha }}
+
+      - name: "Delete Container Instance (if exists)"
+        run: |
+          az container delete \
+            --resource-group ${{ secrets.RESOURCE_GROUP }} \
+            --name dfe-feat-${{ github.event.inputs.environment }}-uks-ci-ingestion \
+            --yes || echo "No existing ingestion container instance."
+
+      - name: "Create Container Instance"
+        run: |
+          az container create \
+            --resource-group ${{ secrets.RESOURCE_GROUP }} \
+            --name dfe-feat-${{ github.event.inputs.environment }}-uks-ci-ingestion \
+            --image ${{ secrets.ACR_LOGIN_SERVER }}/feat-ingestion:${{ github.sha }} \
+            --registry-login-server ${{ secrets.ACR_LOGIN_SERVER }} \
+            --registry-username ${{ secrets.ACR_USERNAME }} \
+            --registry-password ${{ secrets.ACR_PASSWORD }} \
+            --os-type Linux \
+            --restart-policy Never \
+            --cpu 1 \
+            --memory 2 \
+            --output table
+
+      - name: "Wait for Container to Finish"
+        run: |
+          status=""
+          echo "Waiting for container to finish..."
+          while [ "$status" != "Succeeded" ] && [ "$status" != "Failed" ]; do
+            status=$(az container show \
+              --resource-group ${{ secrets.RESOURCE_GROUP }} \
+              --name dfe-feat-${{ github.event.inputs.environment }}-uks-ci-ingestion \
+              --query "instanceView.state" -o tsv)
+            echo "Current container state: $status"
+            if [ "$status" != "Succeeded" ] && [ "$status" != "Failed" ]; then
+              sleep 5
+            fi
+          done
+
+      - name: "Get Container Logs"
+        run: |
+          echo "Container logs:"
+          az container logs \
+            --resource-group ${{ secrets.RESOURCE_GROUP }} \
+            --name dfe-feat-${{ github.event.inputs.environment }}-uks-ci-ingestion
+
+      - name: "Delete Container Instance"
+        run: |
+          az container delete \
+            --resource-group ${{ secrets.RESOURCE_GROUP }} \
+            --name dfe-feat-${{ github.event.inputs.environment }}-uks-ci-ingestion \
+            --yes
