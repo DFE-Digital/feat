@@ -6,19 +6,16 @@ output "website_url" {
   value = azurerm_linux_web_app.website.default_hostname
 }
 
-output "ingestion_container_name" {
-  value = azurerm_container_group.ingestion.name
-}
 
 // Output the Azure resource group and location details 
 output "resource_group_name" {
-  value = azurerm_resource_group.this.name
+  value = azurerm_resource_group.feat-rg.name
   description = "Name of the resource group"
 }
 
 output "resource_group_location" {
   description = "Location of the created resource group"
-  value       = azurerm_resource_group.this.location
+  value       = azurerm_resource_group.feat-rg.location
 }
 
 // Postgres related outputs 

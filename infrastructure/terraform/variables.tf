@@ -3,6 +3,12 @@ variable "env" {
   type        = string
 }
 
+variable "prefix" {
+    description = "Prefix for resource names"
+    type        = string
+    default     = "s213"
+}
+
 variable "location" {
   description = "Azure region"
   type        = string
@@ -16,11 +22,6 @@ variable "api_image" {
 
 variable "website_image" {
   description = "Docker image for Website"
-  type        = string
-}
-
-variable "ingestion_image" {
-  description = "Docker image for Ingestion Service"
   type        = string
 }
 

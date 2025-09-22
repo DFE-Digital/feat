@@ -1,9 +1,9 @@
 
 resource "azurerm_postgresql_flexible_server" "feat_psg_server" {
-  name                = "dfe-feat-${var.env}-pg-flx-srv"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
-  version = "16" #"17"
+  name                = "${var.prefix}-pg-flx-srv"
+  resource_group_name = azurerm_resource_group.feat-rg.name
+  location            = azurerm_resource_group.feat-rg.location
+  version = "17"
 
   delegated_subnet_id = azurerm_subnet.postgres_subnet.id
   private_dns_zone_id = azurerm_private_dns_zone.default.id
@@ -33,7 +33,7 @@ resource "azurerm_postgresql_flexible_server" "feat_psg_server" {
 }
 
 resource "azurerm_postgresql_flexible_server_database" "feat_pg_ingestion_db" {
-  name      = "dfe-feat-${var.env}-pg-ingestion-db"   //name      = "dfe-feat-${var.env}-pg-db"
+  name      = "${var.prefix}-pg-ingestion-db"
   server_id = azurerm_postgresql_flexible_server.feat_psg_server.id
   collation = "en_US.utf8"
   charset   = "UTF8"

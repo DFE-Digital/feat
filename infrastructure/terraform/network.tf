@@ -1,18 +1,18 @@
 
 resource "azurerm_virtual_network" "dfe_feat_vnet" {
-  name                = "dfe-feat-${var.env}-vnet"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  name                = "${var.prefix}-vnet"
+  location            = azurerm_resource_group.feat-rg.location
+  resource_group_name = azurerm_resource_group.feat-rg.name
   address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_network_security_group" "postgres-nsg" {
-  name                = "dfe-feat-${var.env}-postgres-nsg"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  name                = "${var.prefix}-postgres-nsg"
+  location            = azurerm_resource_group.feat-rg.location
+  resource_group_name = azurerm_resource_group.feat-rg.name
 
   security_rule {
-    name                       = "securityruletest123"
+    name                       = "defaultSecurityrule"
     priority                   = 100
     direction                  = "Inbound"
     access                     = "Allow"
@@ -25,9 +25,9 @@ resource "azurerm_network_security_group" "postgres-nsg" {
 }
 
 resource "azurerm_subnet" "postgres_subnet" {
-  name                 = "dfe-feat-${var.env}-postgres-subnet"
+  name                 = "${var.prefix}-postgres-subnet"
   virtual_network_name = azurerm_virtual_network.dfe_feat_vnet.name
-  resource_group_name  = azurerm_resource_group.this.name
+  resource_group_name  = azurerm_resource_group.feat-rg.name
   address_prefixes     = ["10.0.2.0/24"]
 
   delegation {
@@ -47,15 +47,15 @@ resource "azurerm_subnet_network_security_group_association" "default" {
 }
 
 resource "azurerm_private_dns_zone" "default" {
-  name                = "dfe-feat-${var.env}-pdz.postgres.database.azure.com"
-  resource_group_name = azurerm_resource_group.this.name
+  name                = "${var.prefix}-pdz.postgres.database.azure.com"
+  resource_group_name = azurerm_resource_group.feat-rg.name
 
   depends_on = [azurerm_subnet_network_security_group_association.default]
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "default" {
-  name                  = "dfe-feat-${var.env}-pdzvnetlink.com"
+  name                  = "${var.prefix}-pdzvnetlink.com"
   private_dns_zone_name = azurerm_private_dns_zone.default.name
   virtual_network_id    = azurerm_virtual_network.dfe_feat_vnet.id
-  resource_group_name   = azurerm_resource_group.this.name
+  resource_group_name   = azurerm_resource_group.feat-rg.name
 }
