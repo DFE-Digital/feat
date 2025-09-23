@@ -59,3 +59,21 @@ resource "azurerm_private_dns_zone_virtual_network_link" "default" {
   virtual_network_id    = azurerm_virtual_network.dfe_feat_vnet.id
   resource_group_name   = azurerm_resource_group.feat-rg.name
 }
+
+# subnets for API and Website App Services 
+
+resource "azurerm_subnet" "api_subnet" {
+  name                 = "${var.prefix}-api-subnet"
+  resource_group_name  = azurerm_resource_group.feat-rg.name
+  virtual_network_name = azurerm_virtual_network.dfe_feat_vnet.name
+  address_prefixes     = ["10.0.3.0/24"]
+  service_endpoints    = ["Microsoft.Web"]
+}
+
+resource "azurerm_subnet" "website_subnet" {
+  name                 = "${var.prefix}-website-subnet"
+  resource_group_name  = azurerm_resource_group.feat-rg.name
+  virtual_network_name = azurerm_virtual_network.dfe_feat_vnet.name
+  address_prefixes     = ["10.0.4.0/24"]
+  service_endpoints    = ["Microsoft.Web"]
+}
