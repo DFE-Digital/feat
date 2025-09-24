@@ -10,5 +10,4 @@ ingestion_image = "mcr.microsoft.com/dotnet/runtime:9.0"
 sql_admin_username = ""    # Set admin username
 sql_admin_password = ""    # Set admin password
 
-
-subscription_id = "00000000-0000-0000-0000-000000000000" # Set subscription ID
+subscription_id = ""        # Set subscription ID

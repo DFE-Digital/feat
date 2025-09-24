@@ -25,16 +25,10 @@ variable "website_image" {
   type        = string
 }
 
-variable "ingestion_image" {
-  description = "Docker image for Ingestion"
-  type        = string
-  default     = "mcr.microsoft.com/dotnet/runtime:9.0"  
-}
 
 variable "subscription_id" {
   description = "The Azure subscription ID."
-  type        = string
-  #default     = "00000000-0000-0000-0000-000000000000"   
+  type        = string     
 }
 
 variable "sql_admin_username" {

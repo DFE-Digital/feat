@@ -59,15 +59,7 @@ output "mssql_server_fqdn" {
   value       = azurerm_mssql_server.feat_mssql_server.fully_qualified_domain_name
   description = "The fully qualified domain name of the SQL Server."
 }
-output "mssql_admin_username" {
-  value       = var.sql_admin_username
-  description = "The administrator username of the SQL logical server."
-}
-output "mssql_admin_password" {
-  sensitive   = true
-  value       = var.sql_admin_password
-  description = "The administrator password of the SQL logical server."
-}
+
 
 # Azure Search Service related outputs
 output "search_service_name" {
