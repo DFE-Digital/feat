@@ -1,0 +1,19 @@
+# Node.js dependencies
+node_modules/
+
+# Playwright artifacts
+test-results/
+playwright-report/
+trace.zip
+
+# Environment files
+.env
+.env.local
+.DS_Store
+
+# Build output
+dist/
+build/
+
+# Other testing outputs
+coverage/
