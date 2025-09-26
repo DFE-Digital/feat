@@ -1,22 +1,22 @@
 
 namespace feat.ingestion.Models;
 
-public enum Attendance_Pattern_Enum
+public enum AttendancePattern
 {
-    Full_Time,
-    Part_Time,
+    FullTime,
+    PartTime,
     Flexible 
 }
 
-public enum Entry_Type_Enum
+public enum EntryType
 {
     Course,
     Apprenticeship,
-    Work_Experience,
+    WorkExperience,
     Training
 }   
 
-public enum Entry_Level_Enum
+public enum EntryLevel
 {
     Entry,
     Intermediate,
@@ -24,14 +24,14 @@ public enum Entry_Level_Enum
     Higher
 }
 
-public enum Study_Mode_Enum
+public enum StudyMode
 {
-    Full_Time,
-    Part_Time,
-    Distance_Learning
+    FullTime,
+    PartTime,
+    DistanceLearning
 }
 
-public enum Wage_Unit_Enum
+public enum WageUnit
 {
     Day,
     Week,

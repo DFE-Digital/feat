@@ -1,33 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace feat.ingestion.Models;
 
-public class Entry : BaseEntity
+[Table("Entry")]
+public class Entry
 {
+    [Key]
+    public Guid Id { get; set; } 
+
+    [Column(TypeName = "datetime")]
+    public required DateTime Created { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? Updated { get; set; } 
+
     public required Guid ProviderId { get; set; }
+    
+    [ForeignKey("ProviderId")]
+    public Provider Provider { get; set; } = null!;
+    
+    [StringLength(255)]
+    public required string Reference { get; set; } = null!;
+    
+    [StringLength(255)]
+    public string? SecondaryReference { get; set; }
+    
+    [StringLength(255)]
+    public string Title { get; set; } = null!;
 
-    public required string Reference { get; set; }
+    [StringLength(4000)]
+    public string? Description { get; set; }
 
-    public string? Secondary_Reference { get; set; }
+    public required bool FlexibleStart { get; set; }
 
-    public required string Title { get; set; }
+    public AttendancePattern? AttendancePattern { get; set; }   // Enum: FullTime, PartTime, Flexible, Other
 
-    public string? Description { get; set; } 
+    [Column("URL")]
+    [StringLength(2083)] 
+    public required string Url { get; set; } = null!;
 
-    public required bool Flexible_Start { get; set; }
+    public DateTime? SourceUpdated { get; set; }
 
-    public Attendance_Pattern_Enum Attendance_Pattern { get; set; } 
+    [StringLength(2083)]
+    public string? EntryRequirements { get; set; }
 
-    public required string URL { get; set; }  
+    public EntryType? Type { get; set; }    // Enum: Apprenticeship, Traineeship, T Level
 
-    public DateTime? Source_Updated { get; set; }
+    public EntryLevel? Level { get; set; }  // Enum: Intermediate, Advanced, Higher, Degree, Professional
 
-    public string? Entry_Requirements { get; set; }
+    [InverseProperty("Entry")]
+    public ICollection<EntryCost> EntryCosts { get; set; } = new List<EntryCost>();
 
-    public Entry_Type_Enum Type { get; set; } 
+    [InverseProperty("Entry")]
+    public ICollection<EntryInstance> EntryInstances { get; set; } = new List<EntryInstance>();
+    
+    [InverseProperty("Entry")]
+    public ICollection<EntryLocation> EntryLocations { get; set; } = new List<EntryLocation>();
 
-    public Entry_Level_Enum Level { get; set; } 
+    [InverseProperty("Entry")]
+    public ICollection<EntrySector> EntrySectors { get; set; } = new List<EntrySector>();
 
-    // [ForeignKey("ProviderId")]
+    [InverseProperty("Entry")]
+    public ICollection<UniversityCourse> UniversityCourses { get; set; } = new List<UniversityCourse>();
+    
+    [InverseProperty("Entry")]
+    public ICollection<Vacancy> Vacancies { get; set; } = new List<Vacancy>();
 }

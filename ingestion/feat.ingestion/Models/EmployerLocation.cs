@@ -1,12 +1,23 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 namespace feat.ingestion.Models;
 
-public class Employer_Location : Base
+
+[Table("EmployerLocation")]
+public class EmployerLocation
 {
-    public required Guid EmployerId { get; set; }
+    [Key]
+    public Guid Id { get; set; }
 
-    public required Guid LocationId { get; set; }
+    public Guid EmployerId { get; set; }
 
-    //[ForeignKey("EmployerId")]
-    //[ForeignKey("LocationId")]
-}
+    [ForeignKey("EmployerId")]
+    [InverseProperty("EmployerLocations")]
+    public Employer Employer { get; set; } = null!;
+    
+    public Guid LocationId { get; set; }
+    
+    [ForeignKey("LocationId")]
+    [InverseProperty("EmployerLocations")]
+    public Location Location { get; set; } = null!;
+} 
