@@ -1,16 +1,22 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 namespace feat.ingestion.Models;
 
 [Table("Sector")]
 public class Sector
 {
-    public Guid Id { get; set; }
+    [Key]
+    public Guid Id { get; set; } 
 
-    public DateTime Created { get; set; }
+    [Column(TypeName = "datetime")]
+    public required DateTime Created { get; set; }
 
-    public DateTime? Updated { get; set; }
+    [Column(TypeName = "datetime")]
+    public DateTime? Updated { get; set; } 
 
-    public string Name { get; set; } = null!;
+    [StringLength(255)]
+    public required string Name { get; set; } = null!;
 
+    [StringLength(255)]
     public ICollection<EntrySector> EntrySectors { get; set; } = new List<EntrySector>();
 }

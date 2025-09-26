@@ -1,18 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace feat.ingestion.Models;
 
 [Table("EntrySector")]
 public class EntrySector
 {
+    [Key]
     public Guid Id { get; set; }
 
     public Guid EntryId { get; set; }
 
     public Guid SectorId { get; set; }
 
+    [ForeignKey("EntryId")]
+    [InverseProperty("EntrySectors")]
     public Entry Entry { get; set; } = null!;
 
+    [ForeignKey("SectorId")]
+    [InverseProperty("EntrySectors")]
     public Sector Sector { get; set; } = null!;
 }
-    //[ForeignKey("EntryId")]
-    //[ForeignKey("SectorId")]

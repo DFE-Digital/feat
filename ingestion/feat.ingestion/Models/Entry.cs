@@ -8,49 +8,64 @@ namespace feat.ingestion.Models;
 [Table("Entry")]
 public class Entry
 {
-    public Guid Id { get; set; }
+    [Key]
+    public Guid Id { get; set; } 
 
-    public DateTime Created { get; set; }
+    [Column(TypeName = "datetime")]
+    public required DateTime Created { get; set; }
 
-    public DateTime? Updated { get; set; }
+    [Column(TypeName = "datetime")]
+    public DateTime? Updated { get; set; } 
 
-    public Guid ProviderId { get; set; }
+    public required Guid ProviderId { get; set; }
     
-    public string Reference { get; set; } = null!;
+    [ForeignKey("ProviderId")]
+    public Provider Provider { get; set; } = null!;
     
+    [StringLength(255)]
+    public required string Reference { get; set; } = null!;
+    
+    [StringLength(255)]
     public string? SecondaryReference { get; set; }
     
+    [StringLength(255)]
     public string Title { get; set; } = null!;
 
+    [StringLength(4000)]
     public string? Description { get; set; }
 
-    public bool FlexibleStart { get; set; }
+    public required bool FlexibleStart { get; set; }
 
-    public AttendancePattern? AttendancePattern { get; set; } // Enum: FullTime, PartTime, Flexible, Other
+    public AttendancePattern? AttendancePattern { get; set; }   // Enum: FullTime, PartTime, Flexible, Other
 
-    public string Url { get; set; } = null!;
+    [Column("URL")]
+    [StringLength(2083)] 
+    public required string Url { get; set; } = null!;
 
     public DateTime? SourceUpdated { get; set; }
 
+    [StringLength(2083)]
     public string? EntryRequirements { get; set; }
 
-    public EntryType? Type { get; set; } // Enum: Apprenticeship, Traineeship, T Level
+    public EntryType? Type { get; set; }    // Enum: Apprenticeship, Traineeship, T Level
 
-    public EntryLevel? Level { get; set; } // Enum: Intermediate, Advanced, Higher, Degree, Professional
+    public EntryLevel? Level { get; set; }  // Enum: Intermediate, Advanced, Higher, Degree, Professional
 
+    [InverseProperty("Entry")]
     public ICollection<EntryCost> EntryCosts { get; set; } = new List<EntryCost>();
 
+    [InverseProperty("Entry")]
     public ICollection<EntryInstance> EntryInstances { get; set; } = new List<EntryInstance>();
-
+    
+    [InverseProperty("Entry")]
     public ICollection<EntryLocation> EntryLocations { get; set; } = new List<EntryLocation>();
 
+    [InverseProperty("Entry")]
     public ICollection<EntrySector> EntrySectors { get; set; } = new List<EntrySector>();
 
-    public Provider Provider { get; set; } = null!;
-
+    [InverseProperty("Entry")]
     public ICollection<UniversityCourse> UniversityCourses { get; set; } = new List<UniversityCourse>();
-
+    
+    [InverseProperty("Entry")]
     public ICollection<Vacancy> Vacancies { get; set; } = new List<Vacancy>();
 }
-
-// [ForeignKey("ProviderId")]
