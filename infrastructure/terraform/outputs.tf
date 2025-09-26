@@ -18,16 +18,6 @@ output "resource_group_location" {
   value       = azurerm_resource_group.feat-rg.location
 }
 
-// Postgres related outputs 
-output "azurerm_postgresql_flexible_server" {
-  value = azurerm_postgresql_flexible_server.feat_psg_server.name
-  description = "PostgreSQL Flexible Server name"
-}
-
-output "postgresql_flexible_server_database_name" {
-  value = azurerm_postgresql_flexible_server_database.feat_pg_ingestion_db.name
-  description = "Database name"
-}
 
 // Virtual network related outputs
 output "azurerm_virtual_network" {
@@ -36,12 +26,12 @@ output "azurerm_virtual_network" {
 }
 
 output "azurerm_network_security_group" {
-  value = azurerm_network_security_group.postgres-nsg.name
+  value = azurerm_network_security_group.feat-nsg.name
   description = "Network security group name"
 }
 
 output "azurerm_subnet" {
-  value = azurerm_subnet.postgres_subnet.name
+  value = azurerm_subnet.feat_main_subnet.name
   description = "Subnet name"
 }
 
@@ -55,13 +45,24 @@ output "azurerm_private_dns_zone_virtual_network_link" {
   description = "Private DNS Zone Virtual Network Link name"
 }
 
-// For dev only - do not use in production
-output "postgresql_flexible_server_admin_login" {
-  value = azurerm_postgresql_flexible_server.feat_psg_server.administrator_login
+
+# MsSql related outputs
+output "mssql_server_name" {
+  value       = azurerm_mssql_server.feat_mssql_server.name
+  description = "The name of the SQL Server."
+}
+output "mssql_database_name" {
+  value       = azurerm_mssql_database.mssql_db.name
+  description = "The name of the SQL Database."
+}
+output "mssql_server_fqdn" {
+  value       = azurerm_mssql_server.feat_mssql_server.fully_qualified_domain_name
+  description = "The fully qualified domain name of the SQL Server."
 }
 
-output "postgresql_flexible_server_admin_password" {
-  sensitive = true
-  value     = azurerm_postgresql_flexible_server.feat_psg_server.administrator_password
-}
 
+# Azure Search Service related outputs
+output "search_service_name" {
+  value       = azurerm_search_service.feat_search_service.name
+  description = "The name of the Azure Search Service."
+}
