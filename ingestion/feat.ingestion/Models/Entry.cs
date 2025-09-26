@@ -1,33 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace feat.ingestion.Models;
 
-public class Entry : BaseEntity
+[Table("Entry")]
+public class Entry
 {
-    public required Guid ProviderId { get; set; }
+    public Guid Id { get; set; }
 
-    public required string Reference { get; set; }
+    public DateTime Created { get; set; }
 
-    public string? Secondary_Reference { get; set; }
+    public DateTime? Updated { get; set; }
 
-    public required string Title { get; set; }
+    public Guid ProviderId { get; set; }
+    
+    public string Reference { get; set; } = null!;
+    
+    public string? SecondaryReference { get; set; }
+    
+    public string Title { get; set; } = null!;
 
-    public string? Description { get; set; } 
+    public string? Description { get; set; }
 
-    public required bool Flexible_Start { get; set; }
+    public bool FlexibleStart { get; set; }
 
-    public Attendance_Pattern_Enum Attendance_Pattern { get; set; } 
+    public AttendancePattern? AttendancePattern { get; set; } // Enum: FullTime, PartTime, Flexible, Other
 
-    public required string URL { get; set; }  
+    public string Url { get; set; } = null!;
 
-    public DateTime? Source_Updated { get; set; }
+    public DateTime? SourceUpdated { get; set; }
 
-    public string? Entry_Requirements { get; set; }
+    public string? EntryRequirements { get; set; }
 
-    public Entry_Type_Enum Type { get; set; } 
+    public EntryType? Type { get; set; } // Enum: Apprenticeship, Traineeship, T Level
 
-    public Entry_Level_Enum Level { get; set; } 
+    public EntryLevel? Level { get; set; } // Enum: Intermediate, Advanced, Higher, Degree, Professional
 
-    // [ForeignKey("ProviderId")]
+    public ICollection<EntryCost> EntryCosts { get; set; } = new List<EntryCost>();
+
+    public ICollection<EntryInstance> EntryInstances { get; set; } = new List<EntryInstance>();
+
+    public ICollection<EntryLocation> EntryLocations { get; set; } = new List<EntryLocation>();
+
+    public ICollection<EntrySector> EntrySectors { get; set; } = new List<EntrySector>();
+
+    public Provider Provider { get; set; } = null!;
+
+    public ICollection<UniversityCourse> UniversityCourses { get; set; } = new List<UniversityCourse>();
+
+    public ICollection<Vacancy> Vacancies { get; set; } = new List<Vacancy>();
 }
+
+// [ForeignKey("ProviderId")]

@@ -1,12 +1,18 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations.Schema;
 namespace feat.ingestion.Models;
 
-public class Provider_Location : Base
+[Table("ProviderLocation")]
+public class ProviderLocation
 {
-    public required Guid ProviderId { get; set; }
+    public Guid Id { get; set; }
 
-    public required Guid LocationId { get; set; }
+    public Guid ProviderId { get; set; }
 
+    public Guid LocationId { get; set; }
+
+    public Location Location { get; set; } = null!;
+
+    public Provider Provider { get; set; } = null!;
+}
     //[ForeignKey("LocationId")]
     //[ForeignKey("ProviderId")]
-}

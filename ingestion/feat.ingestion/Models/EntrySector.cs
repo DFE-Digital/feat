@@ -1,12 +1,18 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations.Schema;
 namespace feat.ingestion.Models;
 
-public class Entry_Sector : Base
+[Table("EntrySector")]
+public class EntrySector
 {
-    public required Guid EntryId { get; set; }
+    public Guid Id { get; set; }
 
-    public required Guid SectorId { get; set; }
+    public Guid EntryId { get; set; }
 
+    public Guid SectorId { get; set; }
+
+    public Entry Entry { get; set; } = null!;
+
+    public Sector Sector { get; set; } = null!;
+}
     //[ForeignKey("EntryId")]
     //[ForeignKey("SectorId")]
-}

@@ -1,11 +1,18 @@
-﻿namespace feat.ingestion.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+namespace feat.ingestion.Models;
 
-public class Entry_Location : Base
+[Table("EntryLocation")]
+public class EntryLocation
 {
-    public required Guid EntryId { get; set; }
+    public Guid Id { get; set; }
 
-    public required Guid LocationId { get; set; }
+    public Guid EntryId { get; set; }
 
-    // [ForeignKey("EntryId")]
-    //[ForeignKey("LocationId")]
+    public Guid LocationId { get; set; }
+
+    public Entry Entry { get; set; } = null!;
+
+    public Location Location { get; set; } = null!;
 }
+// [ForeignKey("EntryId")]
+//[ForeignKey("LocationId")]

@@ -1,8 +1,22 @@
-﻿
+﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace feat.ingestion.Models;
 
-public class Employer : BaseEntity
+[Table("Employer")]
+public class Employer 
 {
-    public required string Name { get; set; } 
+    public Guid Id { get; set; }
+
+    public DateTime Created { get; set; }
+
+    public DateTime? Updated { get; set; }
+
+    public string Name { get; set; } = null!;
+
+    public ICollection<EmployerLocation> EmployerLocations { get; set; } = new List<EmployerLocation>();
+
+    public ICollection<Vacancy> Vacancies { get; set; } = new List<Vacancy>();
     
 }

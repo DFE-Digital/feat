@@ -1,18 +1,28 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations.Schema;
 namespace feat.ingestion.Models;
 
-public class Provider : BaseEntity
+[Table("Provider")]
+public class Provider
 {
-    public string? PUBUKPRN { get; set; } 
+    public Guid Id { get; set; }
 
-    public string? UKPRN { get; set; } 
+    public DateTime Created { get; set; }
 
-    public required string Name { get; set; } 
+    public DateTime? Updated { get; set; }
 
-    public string? Legal_Entity_Name { get; set; } 
+    public string? Pubukprn { get; set; }
 
-    public string? Trading_Name { get; set; }
+    public string? Ukprn { get; set; }
 
-    public string? Other_Names { get; set; }
+    public string Name { get; set; } = null!;
 
+    public string? LegalEntityName { get; set; }
+
+    public string? TradingName { get; set; }
+
+    public string? OtherNames { get; set; }
+
+    public ICollection<Entry> Entries { get; set; } = new List<Entry>();
+
+    public ICollection<ProviderLocation> ProviderLocations { get; set; } = new List<ProviderLocation>();
 }
