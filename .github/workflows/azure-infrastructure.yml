@@ -39,4 +39,7 @@ jobs:
         run: terraform plan -var-file=${{ github.event.inputs.environment }}.tfvars
 
       - name: "Terraform Apply"
-        run: terraform apply -auto-approve -var-file=${{ github.event.inputs.environment }}.tfvars
+        run: terraform apply -auto-approve \
+          -var sql_admin_username=${{ secrets.SQL_ADMIN_USERNAME }} \
+          -var sql_admin_password=${{ secrets.SQL_ADMIN_PASSWORD }} \
+          -var-file=${{ github.event.inputs.environment }}.tfvars
