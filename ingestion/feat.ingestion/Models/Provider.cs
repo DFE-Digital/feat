@@ -1,18 +1,40 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 namespace feat.ingestion.Models;
 
-public class Provider : BaseEntity
+[Table("Provider")]
+public class Provider
 {
-    public string? PUBUKPRN { get; set; } 
+    [Key]
+    public Guid Id { get; set; } 
 
-    public string? UKPRN { get; set; } 
+    [Column(TypeName = "datetime")]
+    public required DateTime Created { get; set; }
 
-    public required string Name { get; set; } 
+    [Column(TypeName = "datetime")]
+    public DateTime? Updated { get; set; } 
 
-    public string? Legal_Entity_Name { get; set; } 
+    [Column("PUBUKPRN")]
+    public string? Pubukprn { get; set; }
 
-    public string? Trading_Name { get; set; }
+    [Column("UKPRN")]
+    public string? Ukprn { get; set; }
 
-    public string? Other_Names { get; set; }
+    [StringLength(255)]
+    public required string Name { get; set; } = null!;
 
+    [StringLength(255)]
+    public string? LegalEntityName { get; set; }
+
+    [StringLength(255)]
+    public string? TradingName { get; set; }
+
+    [StringLength(255)]
+    public string? OtherNames { get; set; }
+
+    [InverseProperty("Provider")]
+    public ICollection<Entry> Entries { get; set; } = new List<Entry>();
+
+    [InverseProperty("Provider")]
+    public ICollection<ProviderLocation> ProviderLocations { get; set; } = new List<ProviderLocation>();
 }

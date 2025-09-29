@@ -1,31 +1,63 @@
-﻿using NetTopologySuite.Geometries;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using NetTopologySuite.Geometries;
 
 namespace feat.ingestion.Models;
 
-public class Location : BaseEntity
+[Table("Location")]
+public class Location
 {
-    public string? Name { get; set; } 
+    [Key]
+    public Guid Id { get; set; } 
 
-    public string? Address1 { get; set; } 
+    [Column(TypeName = "datetime")]
+    public required DateTime Created { get; set; }
 
-    public string? Address2 { get; set; } 
+    [Column(TypeName = "datetime")]
+    public DateTime? Updated { get; set; } 
 
+    [StringLength(255)]
+    public string? Name { get; set; }
+
+    [StringLength(255)]
+    public string? Address1 { get; set; }
+
+    [StringLength(255)]
+    public string? Address2 { get; set; }
+
+    [StringLength(255)]
     public string? Address3 { get; set; }
 
+    [StringLength(255)]
     public string? Address4 { get; set; }
 
+    [StringLength(60)]
     public string? County { get; set; }
 
+    [StringLength(255)]
     public string? Email { get; set; }
+    
+    [Column(TypeName = "Location")]
+    public Point? GeoLocation { get; set; }       // Geography Point (Latitude, Longitude)
 
-    public Point? LocationPoint { get; set; } // Postgres PostGIS type 
-
+    [StringLength(10)]
     public string? Postcode { get; set; }
 
-    public string? Telephone { get; set; } 
+    [StringLength(20)]
+    public string? Telephone { get; set; }
 
+    [StringLength(255)]
     public string? Town { get; set; }
-    
+
+    [StringLength(2083)] // Maximum length for a URL
     public string? Url { get; set; }
-    
+
+    [InverseProperty("Location")]
+    public ICollection<EmployerLocation> EmployerLocations { get; set; } = new List<EmployerLocation>();
+
+    [InverseProperty("Location")]
+    public ICollection<EntryLocation> EntryLocations { get; set; } = new List<EntryLocation>();
+
+    [InverseProperty("Location")]
+    public ICollection<ProviderLocation> ProviderLocations { get; set; } = new List<ProviderLocation>();
 }
