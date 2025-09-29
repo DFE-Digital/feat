@@ -4,10 +4,10 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ingestion/feat.ingestion.csproj", "ingestion/"]
-RUN dotnet restore "ingestion/feat.ingestion.csproj"
+COPY ["ingestion/feat.ingestion/feat.ingestion.csproj", "ingestion/feat.ingestion/"]
+RUN dotnet restore "ingestion/feat.ingestion/feat.ingestion.csproj"
 COPY . .
-WORKDIR "/src/ingestion"
+WORKDIR "/src/ingestion/feat.ingestion"
 RUN dotnet build "./feat.ingestion.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
