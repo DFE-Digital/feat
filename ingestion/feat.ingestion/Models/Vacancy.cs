@@ -1,22 +1,32 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace feat.ingestion.Models;
 
-public class Vacancy : Base
+[Table("Vacancy")]
+public class Vacancy
 {
-    public required Guid EntryId { get; set; }
+    [Key] 
+    public Guid Id { get; set; }
 
-    public required Guid EmployerId { get; set; }
+    public Guid EntryId { get; set; }
 
-    public short? Positions { get; set; }           // smallint
+    public Guid EmployerId { get; set; }
 
-    public decimal? Wage { get; set; }
+    public short? Positions { get; set; }
 
-    public Wage_Unit_Enum Wage_Unit { get; set; }
+    [Column(TypeName = "money")] public decimal? Wage { get; set; }
 
-    public byte? Hours_Per_Week { get; set; }       // tinyint 
+    public WageUnit? WageUnit { get; set; }
 
-    public DateTime? Closing_Date { get; set; }
+    public byte? HoursPerWeek { get; set; }
 
-    //[ForeignKey("EmployerId")]
-    //[ForeignKey("EntryId")]
+    [Column(TypeName = "datetime")] public DateTime? ClosingDate { get; set; }
+
+    [ForeignKey("EmployerId")]
+    [InverseProperty("Vacancies")]
+    public Employer Employer { get; set; } = null!;
+
+    [ForeignKey("EntryId")]
+    [InverseProperty("Vacancies")]
+    public Entry Entry { get; set; } = null!;
 }
