@@ -1,14 +1,23 @@
+using feat.api.Models;
+using feat.api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace feat.api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SearchController : ControllerBase
+public class SearchController(ISearchService searchService) : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get()
+    public async Task<ActionResult<SearchResponse>> Search([FromQuery] SearchRequest request)
     {
-        return Ok();
+        var result = await searchService.SearchAsync(request);
+
+        if (result == null)
+        {
+            return NotFound();
+        }
+        
+        return Ok(result);
     }
 }
