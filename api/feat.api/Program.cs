@@ -1,8 +1,17 @@
+using feat.api.Configuration;
+using feat.api.Services;
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<AzureOptions>(
+    builder.Configuration.GetSection("Azure"));
+
+builder.Services.AddOpenApi();
 
 builder.Services.AddControllers();
 
-builder.Services.AddOpenApi();
+builder.Services.AddSingleton<ISearchService, SearchService>();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -11,15 +20,13 @@ builder.WebHost.ConfigureKestrel(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if(app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
+//app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
