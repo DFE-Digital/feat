@@ -55,7 +55,7 @@ jobs:
           context: .
           file: ./web/feat.web/Dockerfile
           push: true
-          tags: $ACR_LOGIN_SERVER/feat-web:${{ github.sha }}
+          tags: ${{ env.ACR_LOGIN_SERVER }}/feat-web:${{ github.sha }}
 
       - name: Update Website App Service
         run: |
