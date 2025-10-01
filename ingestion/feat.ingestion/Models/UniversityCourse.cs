@@ -15,7 +15,6 @@ public class UniversityCourse
 
     public bool? Honours { get; set; }
 
-    [Column("NHS")]
     public bool? Nhs { get; set; }
 
     public bool? Sandwich { get; set; }

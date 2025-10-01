@@ -9,10 +9,8 @@ public class Employer
     [Key]
     public Guid Id { get; set; } 
 
-    [Column(TypeName = "datetime")]
     public required DateTime Created { get; set; }
 
-    [Column(TypeName = "datetime")]
     public DateTime? Updated { get; set; } 
 
     [StringLength(255)]

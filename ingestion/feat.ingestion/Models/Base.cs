@@ -5,14 +5,15 @@ namespace feat.ingestion.Models;
 public class Base
 {
     [Key]
+    [Column(Order = 0)]
     public Guid Id { get; set; }     
 }
 
 public class BaseEntity : Base
 {
-    [Column(TypeName = "datetime", Order = 1)]
+    [Column(Order = 1)]
     public required DateTime Created { get; set; }
 
-    [Column(TypeName = "datetime", Order = 2)]
+    [Column(Order = 2)]
     public DateTime? Updated { get; set; } 
 }

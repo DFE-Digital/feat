@@ -10,10 +10,8 @@ public class Location
     [Key]
     public Guid Id { get; set; } 
 
-    [Column(TypeName = "datetime")]
     public required DateTime Created { get; set; }
 
-    [Column(TypeName = "datetime")]
     public DateTime? Updated { get; set; } 
 
     [StringLength(255)]
@@ -34,10 +32,9 @@ public class Location
     [StringLength(60)]
     public string? County { get; set; }
 
-    [StringLength(255)]
+    [StringLength(500)]
     public string? Email { get; set; }
     
-    [Column(TypeName = "Location")]
     public Point? GeoLocation { get; set; }       // Geography Point (Latitude, Longitude)
 
     [StringLength(10)]
@@ -46,7 +43,7 @@ public class Location
     [StringLength(20)]
     public string? Telephone { get; set; }
 
-    [StringLength(255)]
+    [StringLength(100)]
     public string? Town { get; set; }
 
     [StringLength(2083)] // Maximum length for a URL

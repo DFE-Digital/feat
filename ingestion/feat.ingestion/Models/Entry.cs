@@ -11,10 +11,8 @@ public class Entry
     [Key]
     public Guid Id { get; set; } 
 
-    [Column(TypeName = "datetime")]
     public required DateTime Created { get; set; }
 
-    [Column(TypeName = "datetime")]
     public DateTime? Updated { get; set; } 
 
     public required Guid ProviderId { get; set; }
@@ -23,15 +21,14 @@ public class Entry
     public Provider Provider { get; set; } = null!;
     
     [StringLength(255)]
-    public required string Reference { get; set; } = null!;
+    public required string Reference { get; set; } = string.Empty; 
     
     [StringLength(255)]
     public string? SecondaryReference { get; set; }
     
     [StringLength(255)]
-    public string Title { get; set; } = null!;
+    public required string Title { get; set; } = null!;
 
-    [StringLength(4000)]
     public string? Description { get; set; }
 
     public required bool FlexibleStart { get; set; }
