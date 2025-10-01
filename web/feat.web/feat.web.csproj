@@ -25,4 +25,9 @@
       <ProjectReference Include="..\..\common\feat.common\feat.common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="GeographicLib.NET" Version="2.3.2" />
+      <PackageReference Include="GovUk.Frontend.AspNetCore" Version="3.3.0" />
+    </ItemGroup>
+
 </Project>
