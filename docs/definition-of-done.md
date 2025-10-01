@@ -13,6 +13,8 @@ A user story, task, or bug fix is only considered **Done** when it meets all the
 - [ ] Jira user story linked to an Epic  
 - [ ] Branch naming follows agreed conventions  
 - [ ] Commit messages follow agreed conventions  
+- [ ] Meets agreed non-functional requirements (NFRs) for performance, scalability, and reliability  
+- [ ] Accessibility considerations addressed from design through to implementation  
 
 ## Testing & Quality
 - [ ] Unit tests are written and passing  
@@ -21,12 +23,15 @@ A user story, task, or bug fix is only considered **Done** when it meets all the
 - [ ] Manual exploratory testing completed for edge cases and usability  
 - [ ] All linked defects resolved or triaged with agreed mitigations  
 - [ ] Evidence provided in test reports or dashboards  
+- [ ] Accessibility testing completed (WCAG 2.2 AA compliance)  
+- [ ] Cross-browser/device testing completed where relevant  
 
 ## Documentation
 - [ ] Code is commented where necessary for clarity  
 - [ ] API contracts, schemas, and models are updated  
 - [ ] User-facing documentation updated if relevant
 - [ ] Knowledge shared with the team (eg. Confluence, show & tell)  
+- [ ] Testing evidence attached to Jira ticket (screenshots, logs, dashboards, test reports)  
 
 ## Security
 - [ ] No new security vulnerabilities introduced  
