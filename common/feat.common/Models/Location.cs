@@ -32,7 +32,7 @@ public class Location
     [StringLength(60)]
     public string? County { get; set; }
 
-    [StringLength(500)]
+    [StringLength(320)]
     public string? Email { get; set; }
     
     public Point? GeoLocation { get; set; }       // Geography Point (Latitude, Longitude)
