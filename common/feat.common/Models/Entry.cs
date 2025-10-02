@@ -27,7 +27,7 @@ public class Entry
     public string? SecondaryReference { get; set; }
     
     [StringLength(255)]
-    public required string Title { get; set; } = null!;
+    public required string Title { get; set; } = string.Empty;
 
     public string? Description { get; set; }
 
@@ -37,7 +37,7 @@ public class Entry
 
     [Column("URL")]
     [StringLength(2083)] 
-    public required string Url { get; set; } = null!;
+    public required string Url { get; set; } = string.Empty;
 
     public DateTime? SourceUpdated { get; set; }
 

@@ -14,7 +14,7 @@ public class Employer
     public DateTime? Updated { get; set; } 
 
     [StringLength(255)]
-    public required string Name { get; set; } = null!;
+    public required string Name { get; set; } = string.Empty;
 
     [InverseProperty("Employer")] 
     public ICollection<EmployerLocation> EmployerLocations { get; set; } = new List<EmployerLocation>();

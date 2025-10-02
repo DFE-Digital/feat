@@ -14,7 +14,7 @@ public class Sector
     public DateTime? Updated { get; set; } 
 
     [StringLength(255)]
-    public required string Name { get; set; } = null!;
+    public required string Name { get; set; } = string.Empty;
 
     public ICollection<EntrySector> EntrySectors { get; set; } = new List<EntrySector>();
 }
