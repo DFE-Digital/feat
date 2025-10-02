@@ -1,7 +1,7 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-namespace feat.ingestion.Models;
+
+namespace feat.common.Models;
 
 [Table("EntryCost")]
 public class EntryCost

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace feat.ingestion.Models;
+namespace feat.common.Models;
 
 [Table("UniversityCourse")]
 public class UniversityCourse
@@ -15,7 +15,6 @@ public class UniversityCourse
 
     public bool? Honours { get; set; }
 
-    [Column("NHS")]
     public bool? Nhs { get; set; }
 
     public bool? Sandwich { get; set; }

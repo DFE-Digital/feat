@@ -1,5 +1,4 @@
-using System;
-using feat.ingestion.Models;
+using feat.common.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
 
@@ -8,7 +7,7 @@ namespace feat.ingestion.Data;
 
 public class IngestionDbContext : DbContext
 {
-    public DbSet<Models.Employer> Employers { get; set; }
+    public DbSet<Employer> Employers { get; set; }
     
     public DbSet<EmployerLocation> EmployerLocations { get; set; }
 

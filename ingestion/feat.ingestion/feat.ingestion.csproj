@@ -28,4 +28,8 @@
       </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\common\feat.common\feat.common.csproj" />
+    </ItemGroup>
+
 </Project>

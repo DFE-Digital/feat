@@ -3,6 +3,12 @@ variable "env" {
   type        = string
 }
 
+variable "product" {
+  description = "Name of the project"
+  type        = string
+  default     = "Find Education and Training"
+}
+
 variable "prefix" {
     description = "Prefix for resource names"
     type        = string
@@ -15,20 +21,14 @@ variable "location" {
   default     = "uksouth"
 }
 
-variable "api_image" {
-  description = "Docker image for API"
+variable "api_image_name" {
   type        = string
+  description = "The repository name and tag for the API container."
 }
 
-variable "website_image" {
-  description = "Docker image for Website"
+variable "website_image_name" {
   type        = string
-}
-
-
-variable "subscription_id" {
-  description = "The Azure subscription ID."
-  type        = string     
+  description = "The repository name and tag for the website container."
 }
 
 variable "sql_admin_username" {

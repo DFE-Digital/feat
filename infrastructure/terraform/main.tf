@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.45" 
+      version = "~> 4.45"
     }
   }
 }
@@ -14,13 +14,27 @@ provider "azurerm" {
 
 # Resource Group
 resource "azurerm_resource_group" "feat-rg" {
-  name     = "${var.prefix}-uks-rg"
+  name     = "${var.prefix}-rg"
   location = var.location
+
+  tags = {
+    Environment = var.env
+    Product     = var.product
+  }
 }
 
-# App Service Plan
-resource "azurerm_service_plan" "feat-asp" {
-  name                = "${var.prefix}-uks-asp"
+# App Service Plan (Web)
+resource "azurerm_service_plan" "feat-web-asp" {
+  name                = "${var.prefix}-web-asp"
+  location            = azurerm_resource_group.feat-rg.location
+  resource_group_name = azurerm_resource_group.feat-rg.name
+  os_type             = "Linux"
+  sku_name            = "B1"
+}
+
+# App Service Plan (Ingestion)
+resource "azurerm_service_plan" "feat-ing-asp" {
+  name                = "${var.prefix}-ing-asp"
   location            = azurerm_resource_group.feat-rg.location
   resource_group_name = azurerm_resource_group.feat-rg.name
   os_type             = "Linux"
@@ -29,7 +43,7 @@ resource "azurerm_service_plan" "feat-asp" {
 
 # Azure Container Registry
 resource "azurerm_container_registry" "feat-registry" {
-  name                = "dfefeat${var.env}uksacr"
+  name                = "${var.prefix}acr"
   resource_group_name = azurerm_resource_group.feat-rg.name
   location            = azurerm_resource_group.feat-rg.location
   sku                 = "Basic"
@@ -37,38 +51,49 @@ resource "azurerm_container_registry" "feat-registry" {
 }
 
 # Linux Web App - API
-resource "azurerm_linux_web_app" "api" {
-  name                = "${var.prefix}-uks-app-api"
+resource "azurerm_linux_web_app" "feat-api" {
+  name                = "${var.prefix}-app-api"
   location            = azurerm_resource_group.feat-rg.location
   resource_group_name = azurerm_resource_group.feat-rg.name
-  service_plan_id     = azurerm_service_plan.feat-asp.id
-  
-  
-  site_config {}
+  service_plan_id     = azurerm_service_plan.feat-web-asp.id
+
+  site_config {
+    application_stack {
+      docker_image_name        = var.api_image_name
+      docker_registry_url      = "https://${azurerm_container_registry.feat-registry.login_server}"
+      docker_registry_username = azurerm_container_registry.feat-registry.admin_username
+      docker_registry_password = azurerm_container_registry.feat-registry.admin_password
+    }
+  }
 
   app_settings = {
-    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
-    "DOCKER_CUSTOM_IMAGE_NAME"            = var.api_image
-    "DOCKER_REGISTRY_SERVER_URL"          = azurerm_container_registry.feat-registry.login_server
-    "DOCKER_REGISTRY_SERVER_USERNAME"     = azurerm_container_registry.feat-registry.admin_username
-    "DOCKER_REGISTRY_SERVER_PASSWORD"     = azurerm_container_registry.feat-registry.admin_password
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
   }
+
+  https_only = true
+  depends_on = [azurerm_service_plan.feat-web-asp]
 }
 
 # Linux Web App - Website
-resource "azurerm_linux_web_app" "website" {
-  name                = "${var.prefix}-uks-app-web"
+resource "azurerm_linux_web_app" "feat-website" {
+  name                = "${var.prefix}-app-web"
   location            = azurerm_resource_group.feat-rg.location
   resource_group_name = azurerm_resource_group.feat-rg.name
-  service_plan_id     = azurerm_service_plan.feat-asp.id
-  
-  site_config {}
+  service_plan_id     = azurerm_service_plan.feat-web-asp.id
+
+  site_config {
+    application_stack {
+      docker_image_name        = var.website_image_name
+      docker_registry_url      = "https://${azurerm_container_registry.feat-registry.login_server}"
+      docker_registry_username = azurerm_container_registry.feat-registry.admin_username
+      docker_registry_password = azurerm_container_registry.feat-registry.admin_password
+    }
+  }
 
   app_settings = {
-    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
-    "DOCKER_CUSTOM_IMAGE_NAME"            = var.website_image
-    "DOCKER_REGISTRY_SERVER_URL"          = azurerm_container_registry.feat-registry.login_server
-    "DOCKER_REGISTRY_SERVER_USERNAME"     = azurerm_container_registry.feat-registry.admin_username
-    "DOCKER_REGISTRY_SERVER_PASSWORD"     = azurerm_container_registry.feat-registry.admin_password
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
   }
+
+  https_only = true
+  depends_on = [azurerm_service_plan.feat-web-asp]
 }
