@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-namespace feat.ingestion.Models;
+
+namespace feat.common.Models;
 
 [Table("Vacancy")]
 public class Vacancy
@@ -14,13 +15,14 @@ public class Vacancy
 
     public short? Positions { get; set; }
 
-    [Column(TypeName = "money")] public decimal? Wage { get; set; }
+    [Column(TypeName = "money")] 
+    public decimal? Wage { get; set; }
 
     public WageUnit? WageUnit { get; set; }
 
-    public byte? HoursPerWeek { get; set; }
-
-    [Column(TypeName = "datetime")] public DateTime? ClosingDate { get; set; }
+    public int? HoursPerWeek { get; set; }
+    
+    public DateTime? ClosingDate { get; set; }
 
     [ForeignKey("EmployerId")]
     [InverseProperty("Vacancies")]

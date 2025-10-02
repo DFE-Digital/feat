@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace feat.ingestion.Models;
+namespace feat.common.Models;
 
 [Table("EntryInstance")]
 public class EntryInstance
@@ -9,20 +9,20 @@ public class EntryInstance
     [Key]
     public Guid Id { get; set; }
 
-    [Column(TypeName = "datetime")]
     public DateTime Created { get; set; }
 
-    [Column(TypeName = "datetime")]
     public DateTime? Updated { get; set; }
 
     public Guid EntryId { get; set; }
 
-    [Column(TypeName = "datetime")]
-    public DateTime StartDate { get; set; }
+    public DateTime? StartDate { get; set; }
 
-    public TimeOnly Duration { get; set; }
+    public TimeSpan? Duration { get; set; }
 
     public StudyMode? StudyMode { get; set; }       // e.g., Full-time, Part-time, DistanceLearning
+    
+    [StringLength(255)]
+    public required string Reference { get; set; } = string.Empty; 
 
     [ForeignKey("EntryId")]
     [InverseProperty("EntryInstances")]

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace feat.ingestion.Models;
+namespace feat.common.Models;
 
 [Table("Employer")]
 public class Employer 
@@ -9,14 +9,12 @@ public class Employer
     [Key]
     public Guid Id { get; set; } 
 
-    [Column(TypeName = "datetime")]
     public required DateTime Created { get; set; }
 
-    [Column(TypeName = "datetime")]
     public DateTime? Updated { get; set; } 
 
     [StringLength(255)]
-    public required string Name { get; set; } = null!;
+    public required string Name { get; set; } = string.Empty;
 
     [InverseProperty("Employer")] 
     public ICollection<EmployerLocation> EmployerLocations { get; set; } = new List<EmployerLocation>();

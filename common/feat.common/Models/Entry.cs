@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace feat.ingestion.Models;
+namespace feat.common.Models;
 
 [Table("Entry")]
 public class Entry
@@ -11,10 +11,8 @@ public class Entry
     [Key]
     public Guid Id { get; set; } 
 
-    [Column(TypeName = "datetime")]
     public required DateTime Created { get; set; }
 
-    [Column(TypeName = "datetime")]
     public DateTime? Updated { get; set; } 
 
     public required Guid ProviderId { get; set; }
@@ -23,15 +21,14 @@ public class Entry
     public Provider Provider { get; set; } = null!;
     
     [StringLength(255)]
-    public required string Reference { get; set; } = null!;
+    public required string Reference { get; set; } = string.Empty; 
     
     [StringLength(255)]
     public string? SecondaryReference { get; set; }
     
     [StringLength(255)]
-    public string Title { get; set; } = null!;
+    public required string Title { get; set; } = string.Empty;
 
-    [StringLength(4000)]
     public string? Description { get; set; }
 
     public required bool FlexibleStart { get; set; }
@@ -40,7 +37,7 @@ public class Entry
 
     [Column("URL")]
     [StringLength(2083)] 
-    public required string Url { get; set; } = null!;
+    public required string Url { get; set; } = string.Empty;
 
     public DateTime? SourceUpdated { get; set; }
 
