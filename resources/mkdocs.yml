@@ -1,4 +1,4 @@
-site_name: Care Leavers Documentation
+site_name: Find Education and Training Documentation
 theme:
   name: material
   custom_dir: resources/tech_docs_template
