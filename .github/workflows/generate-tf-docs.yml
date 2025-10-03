@@ -19,7 +19,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Generate TF Documentation and push
-        uses: terraform-docs/gh-actions@v1.4.1
+        uses: terraform-docs/gh-actions@v1.2.2
         with:
           working-dir: "infrastructure/terraform"
           output-file: ../../docs/architecture/terraform.md
