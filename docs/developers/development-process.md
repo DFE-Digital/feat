@@ -47,4 +47,4 @@ These are the preliminary development processes for developers and QAs. These pr
 6. Create pull request
 7. Move Jira ticket the 'Ready for Review'.
 8. Pull request approved and merged, by at least a Dev, QA or Technical Architect
-9. Mark ticket as 'Done'.site. Pass or fail.
+9. Mark ticket as 'Done'. Pass or fail.
