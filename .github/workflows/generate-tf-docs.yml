@@ -22,15 +22,9 @@ jobs:
         uses: terraform-docs/gh-actions@v1.4.1
         with:
           working-dir: "infrastructure/terraform"
-          output-file: ../../docs/terraform.md
+          output-file: ../../docs/architecture/terraform.md
           output-method: replace
           git-push: 'true'
           
-      - name: Commit and Push Documentation
-        run: |
-          git config --global user.name "Documentation Bot"
-          git config --global user.email "documentation-bot-bot@users.noreply.github.com"
-          git commit -am "Update documentation"
-          git push
-        continue-on-error: true
+    
 
