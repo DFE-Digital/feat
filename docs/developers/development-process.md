@@ -11,8 +11,8 @@ These are the preliminary development processes for developers and QAs. These pr
    
    e.g.
    
-   feat/FEAT-XXX/{title}
-   bug/FEAT-XXX/{title}
+   feat/FAB-XXX/{title}
+   bug/FAB-XXX/{title}
    ```
 3. Run tests to make sure you know everything is working before you start.
 4. Implement the necessary changes
@@ -20,7 +20,7 @@ These are the preliminary development processes for developers and QAs. These pr
 6. Commit changes
     1. Message format: 
       ```
-      FEAT-XXX {message}
+      FAB-XXX {message}
       
       {details}
       ```
@@ -38,12 +38,12 @@ These are the preliminary development processes for developers and QAs. These pr
     2. Define general test fix, load testing, etc. ticket(s).
 2. Move Jira ticket the 'In Progress'.
 3. Define branch. Format:
-   1. task/FEAT-XXX/{title} (for test fixes, modifications, etc.)
-   2. test/FEAT-XXX/{title} (for running complex tests, e.g. performance, load, security, etc. testing)
+   1. task/FAB-XXX/{title} (for test fixes, modifications, etc.)
+   2. test/FAB-XXX/{title} (for running complex tests, e.g. performance, load, security, etc. testing)
 4. Implement the necessary changes
    1. Add test modifications
 5. Commit changes
-   1. Message format: "FEAT-XXX {message}"
+   1. Message format: "FAB-XXX {message}"
 6. Create pull request
 7. Move Jira ticket the 'Ready for Review'.
 8. Pull request approved and merged, by at least a Dev, QA or Technical Architect
