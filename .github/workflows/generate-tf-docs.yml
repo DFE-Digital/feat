@@ -1,0 +1,25 @@
+name: Generate - Terraform Documentation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    paths: [ "infrastructure/terraform/**" ]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Generate TF Documentation and push
+        uses: terraform-docs/gh-actions@v1.4.1
+        with:
+          working-dir: ./infrastructure/terraform
+          output-file: ../../docs/architecture/terraform.md
+          output-method: inject
+          git-push: "true"
