@@ -21,7 +21,7 @@ jobs:
       - name: Generate TF Documentation and push
         uses: terraform-docs/gh-actions@v1.4.1
         with:
-          working-dir: .
-          output-file: docs/architecture/terraform.md
+          working-dir: infrastructure/
+          output-file: ../docs/architecture/terraform.md
           output-method: inject
           git-push: "true"
