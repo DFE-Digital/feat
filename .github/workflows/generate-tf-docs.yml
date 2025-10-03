@@ -23,6 +23,7 @@ jobs:
         with:
           working-dir: "infrastructure/terraform"
           output-method: replace
+          git-push: 'true'
           
       - name: Commit and Push Documentation
         run: |
