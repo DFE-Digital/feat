@@ -1,5 +1,5 @@
 
-namespace feat.ingestion.Models;
+namespace feat.common.Models;
 
 public enum AttendancePattern
 {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-namespace feat.ingestion.Models;
 
+namespace feat.common.Models;
 
 [Table("EmployerLocation")]
 public class EmployerLocation

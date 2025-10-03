@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-namespace feat.ingestion.Models;
+
+namespace feat.common.Models;
 
 [Table("Provider")]
 public class Provider
@@ -8,10 +9,8 @@ public class Provider
     [Key]
     public Guid Id { get; set; } 
 
-    [Column(TypeName = "datetime")]
     public required DateTime Created { get; set; }
 
-    [Column(TypeName = "datetime")]
     public DateTime? Updated { get; set; } 
 
     [Column("PUBUKPRN")]
@@ -29,7 +28,7 @@ public class Provider
     [StringLength(255)]
     public string? TradingName { get; set; }
 
-    [StringLength(255)]
+    [StringLength(1000)]
     public string? OtherNames { get; set; }
 
     [InverseProperty("Provider")]
