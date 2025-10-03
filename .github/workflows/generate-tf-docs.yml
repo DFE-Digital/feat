@@ -19,12 +19,15 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Generate TF Documentation and push
-        uses: terraform-docs/gh-actions@v1.2.2
+        uses: terraform-docs/gh-actions@v1.4.1
         with:
           working-dir: "infrastructure/terraform"
           output-file: ../../docs/architecture/terraform.md
           output-method: replace
           git-push: 'true'
+          git-commit-message: 'Update terraform.md with terraform docs'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
           
     
 
