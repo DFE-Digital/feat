@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
-  push:
-    paths: [ "infrastructure/terraform/**" ]
+  pull_request: 
+    paths: [ "infrastructure/terraform/**", "**/generate-tf-docs.yml" ]
 
 jobs:
   docs:
@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Generate TF Documentation and push
         uses: terraform-docs/gh-actions@v1.4.1
