@@ -14,12 +14,12 @@ jobs:
       contents: write
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Generate TF Documentation and push
         uses: terraform-docs/gh-actions@v1.4.1
         with:
           working-dir: ./infrastructure/terraform
-          output-file: ./docs/architecture/Terraform.md
+          output-file: ./docs/architecture/terraform.md
           output-method: inject
           git-push: "true"
