@@ -23,5 +23,5 @@ jobs:
         with:
           working-dir: infrastructure/terraform
           output-file: /docs/architecture/terraform.md
-          output-method: inline
+          output-method: inject
           git-push: "true"
