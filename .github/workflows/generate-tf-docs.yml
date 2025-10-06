@@ -2,7 +2,7 @@ name: Generate - Terraform Documentation
 
 on:
   workflow_dispatch:
-  pull: 
+  pull_request: 
     branches:
       - main
     paths: [ "infrastructure/terraform/**", "**/generate-tf-docs.yml" ]
