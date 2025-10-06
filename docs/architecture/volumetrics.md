@@ -25,7 +25,3 @@ TODO: Sort volumetrics
 | Normal    | xx               | ~x requests/sec     |
 | Spike     | yy               | ~y requests/sec     |
 | Stress    | zzz              | ~zz requests/sec    |
-
-
-
-

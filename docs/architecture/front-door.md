@@ -1,6 +1,6 @@
 # Azure Front Door
 
-To protect the site from intrusion and general threats, as well as handling things like SSL certifictes, we are using Front Door combined with the Web Application Firewall
+To protect the site from intrusion and general threats, as well as handling things like SSL certificates, we are using Front Door combined with the Web Application Firewall.
 
 ## Threat Blocking
 
