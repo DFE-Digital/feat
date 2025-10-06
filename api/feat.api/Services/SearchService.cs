@@ -1,9 +1,5 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Azure;
-using Azure.AI.OpenAI;
-using Azure.Core.Serialization;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Models;
 using feat.api.Configuration;
@@ -24,40 +20,14 @@ public class SearchService : ISearchService
     
     public SearchService(
         IOptionsMonitor<AzureOptions> options,
-        ApiClient apiClient)
+        ApiClient apiClient,
+        SearchClient aiSearchClient,
+        EmbeddingClient embeddingClient)
     {
         _azureOptions = options.CurrentValue;
         _apiClient = apiClient;
-        
-        var serializerOptions = new JsonSerializerOptions
-        {
-            Converters =
-            {
-                new JsonStringEnumConverter(),
-                new MicrosoftSpatialGeoJsonConverter()
-            },
-        };
-        
-        var searchEndpoint = new Uri(_azureOptions.AiSearchUrl);
-        var searchCredential = new AzureKeyCredential(_azureOptions.AiSearchKey);
-        var searchClientOptions = new SearchClientOptions
-        {
-            Serializer = new JsonObjectSerializer(serializerOptions),
-            Diagnostics =
-            {
-                IsLoggingContentEnabled = true,
-                IsTelemetryEnabled = true,
-            },
-        };
-        
-        _aiSearchClient = new SearchClient(
-            searchEndpoint, _azureOptions.AiSearchIndex, searchCredential, searchClientOptions);
-        
-        var embeddingsEndpoint = new Uri(_azureOptions.OpenAiEndpoint);
-        var openAiCredential = new AzureKeyCredential(_azureOptions.OpenAiKey);
-        var openAiClient = new AzureOpenAIClient(embeddingsEndpoint, openAiCredential);
-        
-        _embeddingClient = openAiClient.GetEmbeddingClient(_azureOptions.OpenAiEmbeddingClientName);
+        _aiSearchClient = aiSearchClient;
+        _embeddingClient = embeddingClient;
     }
     
     public async Task<SearchResponse?> SearchAsync(SearchRequest request)
@@ -69,8 +39,8 @@ public class SearchService : ISearchService
             geoLocation = await GetGeoLocationAsync(request.Location);
         }
         
-        var filter = "";
-        var orderBy = "";
+        string filter;
+        var orderBy = string.Empty;
         var radiusInKm = request.Radius * 1.60934;
         
         if (geoLocation != null)
