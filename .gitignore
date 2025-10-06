@@ -354,3 +354,11 @@ MigrationBackup/
 
 # Terraform
 .terraform/
+
+# MacOS Files, eg DS_Store
+._*
+.DS_Store
+.fseventsd
+.TemporaryItems
+.Trashes
+.Spotlight-V100
