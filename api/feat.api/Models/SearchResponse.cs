@@ -9,4 +9,6 @@ public class SearchResponse
     public long? TotalCount { get; set; }
 
     public List<Course> Courses { get; set; } = [];
+    
+    public IList<Facet> Facets { get; set; } = new List<Facet>();
 }

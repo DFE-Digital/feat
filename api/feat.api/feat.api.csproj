@@ -5,12 +5,15 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>78ab6cab-0de0-4323-9b1d-2c785f5154cd</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
         <PackageReference Include="Azure.Search.Documents" Version="11.6.1" />
+        <PackageReference Include="GeographicLib.NET" Version="2.3.2" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
+        <PackageReference Include="Microsoft.Azure.Core.Spatial" Version="1.1.0" />
         <PackageReference Include="Scalar.AspNetCore" Version="2.8.5" />
     </ItemGroup>
 
