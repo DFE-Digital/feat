@@ -1,7 +1,8 @@
 site_name: Find Education and Training Documentation
+docs_dir: ../docs
 theme:
   name: material
-  custom_dir: resources/tech_docs_template
+  custom_dir: tech_docs_template
   logo: logos/govuk-icon-512.png
   favicon: favicons/favicon.ico
   features:

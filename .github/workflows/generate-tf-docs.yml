@@ -2,10 +2,10 @@ name: Generate - Terraform Documentation
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *'
-  push:
-    paths: [ "infrastructure/terraform/**" ]
+  push: 
+    branches:
+      - main
+    paths: [ "infrastructure/terraform/**", "**/generate-tf-docs.yml" ]
 
 jobs:
   docs:
@@ -15,11 +15,17 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Generate TF Documentation and push
         uses: terraform-docs/gh-actions@v1.4.1
         with:
-          working-dir: ./infrastructure/terraform
+          find-dir: "infrastructure/terraform"
           output-file: ../../docs/architecture/terraform.md
-          output-method: inject
-          git-push: "true"
+          output-method: replace
+          
+      - name: Commit terraform documentation changes
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: Apply terraform changes
