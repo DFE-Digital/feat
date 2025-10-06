@@ -24,8 +24,12 @@ jobs:
           find-dir: "infrastructure/terraform"
           output-file: ../../docs/architecture/terraform.md
           output-method: replace
-          git-push: 'true'
-          git-commit-message: 'Update terraform.md with terraform docs'
+          
+      - name: Commit terraform documentation changes
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: Apply terraform changes
+          
 
           
     
