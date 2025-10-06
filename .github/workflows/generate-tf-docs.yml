@@ -2,9 +2,9 @@ name: Generate - Terraform Documentation
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * *'
-  pull_request: 
+  push: 
+    branches:
+      - main
     paths: [ "infrastructure/terraform/**", "**/generate-tf-docs.yml" ]
 
 jobs:
