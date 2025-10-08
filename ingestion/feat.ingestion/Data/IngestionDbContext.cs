@@ -1,6 +1,7 @@
 using feat.common.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
+using Microsoft.Extensions.Configuration;
 
 
 namespace feat.ingestion.Data;
@@ -33,9 +34,13 @@ public class IngestionDbContext : DbContext
 
     public DbSet<Vacancy> Vacancies { get; set; }
     
-    public IngestionDbContext()
+    private readonly string _connectionString = String.Empty;
+
+    public IngestionDbContext(string connection)
     {
+        _connectionString = connection;
     }
+
     public IngestionDbContext(DbContextOptions<IngestionDbContext> options)
         : base(options)
     {
@@ -45,8 +50,7 @@ public class IngestionDbContext : DbContext
     {
         if (!optionsBuilder.IsConfigured)
         {
-            string connectionString = "connection string for database from secrets or environment variable";
-            optionsBuilder.UseSqlServer(connectionString, x=> x.UseNetTopologySuite());
+            optionsBuilder.UseSqlServer(_connectionString, x=> x.UseNetTopologySuite());
         }
     }
 }
