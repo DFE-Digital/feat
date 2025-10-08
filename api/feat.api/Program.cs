@@ -64,7 +64,7 @@ builder.Services.AddSingleton<EmbeddingClient>(sp =>
     var openAiClient = new AzureOpenAIClient(
         new Uri(options.OpenAiEndpoint), new AzureKeyCredential(options.OpenAiKey));
     
-    return openAiClient.GetEmbeddingClient(options.OpenAiEmbeddingClientName);
+    return openAiClient.GetEmbeddingClient("text-embedding-3-large");
 });
 
 builder.Services.AddScoped<ISearchService, SearchService>();

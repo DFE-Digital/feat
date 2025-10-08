@@ -5,16 +5,12 @@ public class AzureOptions
     public string OpenAiKey { get; set; } = string.Empty;
     
     public string OpenAiEndpoint { get; set; } = string.Empty;
-
-    public string OpenAiEmbeddingClientName { get; set; } = string.Empty;
     
     public string AiSearchKey { get; set; } = string.Empty;
     
     public string AiSearchUrl { get; set; } = string.Empty;
     
     public string AiSearchIndex { get; set; } = string.Empty;
-
-    public string AiSearchIndexSemanticConfigName { get; set; } = string.Empty;
 
     public string AiSearchIndexScoringProfile { get; set; } = string.Empty;
     
