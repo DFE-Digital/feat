@@ -22,6 +22,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    
+    ApplyNewDatabaseMigrations(app);
 }
 
 app.UseHttpsRedirection();
@@ -31,4 +33,18 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+return;
 
+void ApplyNewDatabaseMigrations(WebApplication webApp)
+{
+    using (var scope = webApp.Services.CreateScope())
+    {
+        var ingestionDbContext = scope.ServiceProvider.GetRequiredService<IngestionDbContext>();
+
+        var pendingMigrations = ingestionDbContext.Database.GetPendingMigrations();
+        if (pendingMigrations.Any())
+        {
+            ingestionDbContext.Database.Migrate();            
+        }
+    }
+}
