@@ -67,8 +67,8 @@ builder.Services.AddSingleton<EmbeddingClient>(sp =>
     return openAiClient.GetEmbeddingClient(options.OpenAiEmbeddingClientName);
 });
 
-builder.Services.AddSingleton<ISearchService, SearchService>();
-builder.Services.AddSingleton<ApiClient>();
+builder.Services.AddScoped<ISearchService, SearchService>();
+builder.Services.AddScoped<IApiClient, ApiClient>();
 
 builder.Services.AddHttpClient(ExternalApi.Postcode, client =>
 {
