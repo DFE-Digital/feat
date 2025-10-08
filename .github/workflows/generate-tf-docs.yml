@@ -2,7 +2,7 @@ name: Generate - Terraform Documentation
 
 on:
   workflow_dispatch:
-  push: 
+  pull_request: 
     branches:
       - main
     paths: [ "infrastructure/terraform/**", "**/generate-tf-docs.yml" ]
@@ -29,3 +29,8 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: Apply terraform changes
+          
+
+          
+    
+
