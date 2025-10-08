@@ -1,6 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using feat.api.Data;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+var connectionString = builder.Configuration.GetConnectionString("IngestionConnection");
+builder.Services.AddDbContext<IngestionDbContext>(options =>
+    options.UseSqlServer(connectionString, x => x.UseNetTopologySuite()));
 
 builder.Services.AddOpenApi();
 
@@ -23,3 +31,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
