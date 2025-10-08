@@ -151,7 +151,7 @@ public class SearchService : ISearchService
                 OrderBy = { orderBy },
                 SemanticSearch = new SemanticSearchOptions()
                 {
-                    SemanticConfigurationName = _azureOptions.AiSearchIndexSemanticConfigName,
+                    SemanticConfigurationName = "Course-Name-and-Description",
                 },
                 SearchMode = SearchMode.Any,
                 HighlightFields =
