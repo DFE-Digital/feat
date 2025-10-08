@@ -4,7 +4,7 @@ using NetTopologySuite.Geometries;
 
 #nullable disable
 
-namespace feat.api.Migrations
+namespace feat.ingestion.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreateIngestionDb : Migration

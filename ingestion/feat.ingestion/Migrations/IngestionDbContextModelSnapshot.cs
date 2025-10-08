@@ -3,21 +3,18 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
-using feat.api.Data;
+using feat.ingestion.Data;
 
 #nullable disable
 
-namespace feat.api.Migrations
+namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    [Migration("20251008114010_InitialCreateIngestionDb")]
-    partial class InitialCreateIngestionDb
+    partial class IngestionDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
