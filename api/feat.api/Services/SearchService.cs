@@ -14,13 +14,13 @@ namespace feat.api.Services;
 public class SearchService : ISearchService
 {
     private readonly AzureOptions _azureOptions;
-    private readonly ApiClient _apiClient;
+    private readonly IApiClient _apiClient;
     private readonly SearchClient _aiSearchClient;
     private readonly EmbeddingClient _embeddingClient;
     
     public SearchService(
         IOptionsMonitor<AzureOptions> options,
-        ApiClient apiClient,
+        IApiClient apiClient,
         SearchClient aiSearchClient,
         EmbeddingClient embeddingClient)
     {
@@ -82,12 +82,16 @@ public class SearchService : ISearchService
             Page = request.Page,
             PageSize = request.PageSize,
             Courses = [],
-            Facets = searchResults.Facets.Where(f => f.Value.Any()).Select(f => new Facet(f.Key, f.Value)).ToList()
+            Facets = searchResults.Facets?
+                         .Where(f => f.Value?.Any() == true)
+                         .Select(f => new Facet(f.Key, f.Value))
+                         .ToList()
+                     ?? new List<Facet>()
         };
 
         await foreach (var searchResult in search.Value.GetResultsAsync())
         {
-            var course = new Course(searchResult.Document, searchResult.SemanticSearch.RerankerScore, geoLocation);
+            var course = new Course(searchResult.Document, searchResult.SemanticSearch?.RerankerScore, geoLocation);
             result.Courses.Add(course);
         }
 
@@ -105,7 +109,7 @@ public class SearchService : ISearchService
         string? sessionId)
     {
         var embedding = await _embeddingClient.GenerateEmbeddingAsync(query);
-        var embeddings = embedding.Value.ToFloats();
+        var vector = embedding.Value.ToFloats();
         
         return await _aiSearchClient.SearchAsync<AiSearchCourse>(
             query,
@@ -117,7 +121,7 @@ public class SearchService : ISearchService
                 {
                     Queries =
                     {
-                        new VectorizedQuery(embeddings)
+                        new VectorizedQuery(vector)
                         {
                             KNearestNeighborsCount = _azureOptions.Knn,
                             Fields = { "COURSE_NAME_Vector", "DESCRIPTION_Vector", "ENTRY_Vector", "SECTOR_Vector", "SSAT1_Vector", "SSAT2_Vector"},

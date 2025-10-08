@@ -19,7 +19,7 @@ public class SearchRequest
     
     public double Radius { get; set; } = 1000;
     
-    public bool IncludeOnlineCourses { get; set; } = false;
+    public bool IncludeOnlineCourses { get; set; }
     
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public OrderBy OrderBy { get; set; } = OrderBy.Relevance;
