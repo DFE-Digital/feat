@@ -1,3 +1,6 @@
+
+using Microsoft.EntityFrameworkCore;
+using feat.api.Data;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Azure;
@@ -28,6 +31,10 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+
+var connectionString = builder.Configuration.GetConnectionString("IngestionConnection");
+builder.Services.AddDbContext<IngestionDbContext>(options =>
+    options.UseSqlServer(connectionString, x => x.UseNetTopologySuite()));
 
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
