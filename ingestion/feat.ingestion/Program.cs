@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using feat.ingestion;
 using feat.ingestion.Data;
 
@@ -17,34 +18,30 @@ var config = configBuilder.Build();
 var ingestionOptions = new IngestionOptions();
 config.GetSection("IngestionOptions").Bind(ingestionOptions);
 
-if (string.IsNullOrEmpty(ingestionOptions.Environment) || 
+if (string.IsNullOrEmpty(ingestionOptions.Environment) ||
     string.IsNullOrEmpty(ingestionOptions.ConnectionString))
 {
     Console.WriteLine("FEAT Environment variable missing.");
     return;
 }
 
+string connectionString = ingestionOptions.ConnectionString;
+
+
+// Set up DI
+var services = new ServiceCollection();
+services.AddDbContext<IngestionDbContext>(options =>
+    options.UseSqlServer(connectionString, optionsBuilder => optionsBuilder.UseNetTopologySuite()));
+services.AddTransient<IMigrationsHandler, MigrationsHandler>();
+
+ServiceProvider serviceProvider = services.BuildServiceProvider();
+
 if (ingestionOptions.Environment.Equals("Development", StringComparison.InvariantCultureIgnoreCase))
 {
     try
-    {
-        string connection = ingestionOptions.ConnectionString;
-        
-        using (var dbContext = new IngestionDbContext(connection))
-        {
-            var pendingMigrations = dbContext.Database.GetPendingMigrations();
-            if (pendingMigrations.Any())
-            {
-                Console.WriteLine("FEAT ingestion migrations found.");  
-                dbContext.Database.Migrate();
-                
-                Console.WriteLine("FEAT ingestion migrations have been applied."); 
-            }
-            else
-            {
-                Console.WriteLine("FEAT ingestion no migrations found.");
-            }
-        }
+    {        
+        var migrationsHandler = serviceProvider.GetService<IMigrationsHandler>();
+        migrationsHandler?.RunPendingMigrations();
     }
     catch (Exception e)
     {
@@ -52,3 +49,5 @@ if (ingestionOptions.Environment.Equals("Development", StringComparison.Invarian
     }
 }
 
+
+Console.WriteLine("FEAT ingestion service end.");

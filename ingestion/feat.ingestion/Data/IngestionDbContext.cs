@@ -34,23 +34,11 @@ public class IngestionDbContext : DbContext
 
     public DbSet<Vacancy> Vacancies { get; set; }
     
-    private readonly string _connectionString = String.Empty;
-
-    public IngestionDbContext(string connection)
-    {
-        _connectionString = connection;
-    }
-
+    
     public IngestionDbContext(DbContextOptions<IngestionDbContext> options)
         : base(options)
     {
+        
     }
     
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseSqlServer(_connectionString, x=> x.UseNetTopologySuite());
-        }
-    }
 }
