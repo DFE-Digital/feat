@@ -8,8 +8,8 @@ on:
         required: true
         type: choice
         options:
-          - development
-          - test
+          - Development
+          - Test
 
 jobs:
   build-and-deploy:
