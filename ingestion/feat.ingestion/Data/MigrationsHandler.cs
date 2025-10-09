@@ -26,13 +26,13 @@ public class MigrationsHandler : IMigrationsHandler
                 Console.WriteLine("FEAT ingestion migrations found.");
                 _dbContext.Database.Migrate();
 
-                Console.WriteLine("FEAT ingestion migrations have been applied.");
-                return true;
+                Console.WriteLine("FEAT ingestion migrations applied.");
             }
             else
             {
                 Console.WriteLine("FEAT ingestion no migrations found.");
             }
+            return true;
         }
         catch (Exception e)
         {
