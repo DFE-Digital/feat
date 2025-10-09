@@ -151,7 +151,7 @@ public class SearchService : ISearchService
                 OrderBy = { orderBy },
                 SemanticSearch = new SemanticSearchOptions()
                 {
-                    SemanticConfigurationName = "Course-Name-and-Description",
+                    SemanticConfigurationName = "semantic-title-description",
                 },
                 SearchMode = SearchMode.Any,
                 HighlightFields =

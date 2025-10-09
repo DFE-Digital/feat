@@ -1,16 +1,15 @@
 name: Run Azure Login with the Service Principal secret
+
 on:
   workflow_dispatch:
     inputs:
       environment:
-        type: choice
-        description: 'Environment to deploy to'
+        description: "Target environment"
         required: true
-        default: 'development'
+        type: choice
         options:
-          - 'development'
-          - 'test'
-          - 'production'
+          - Development
+          - Test
 
 jobs:
   Login:

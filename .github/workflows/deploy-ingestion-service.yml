@@ -8,8 +8,8 @@ on:
         required: true
         type: choice
         options:
-          - development
-          - test
+          - Development
+          - Test
 
   schedule:
     - cron: '0 4 * * *'  # Daily at 04:00
