@@ -37,12 +37,17 @@ task('moj-assets', function() {
         .pipe(dest(paths.dist + 'assets'));
 });
 
+task('moj-css', function() {
+    return src('node_modules/@ministryofjustice/frontend/moj/moj-frontend.min.css', { sourcemaps: true })
+        .pipe(dest(paths.dist + 'css'));
+});
+
 task("sass", function () {
     return src(paths.src + '/scss/*.scss')
         .pipe(sourcemaps.init())
         .pipe(sass({
             // style: 'compressed',
-            quietDeps: true,
+            quietDeps: true
         }).on('error', sass.logError))
         .pipe(dest(paths.dist + '/css'))
     // .pipe(connect.reload());
@@ -54,13 +59,14 @@ task("images", function() {
 })
 
 task("dev", series(
-        "govuk-assets",
-        "dfe-js",
-        "dfe-assets",
-        "moj-js",
-        "moj-assets",
-        "images",
-        "sass"     
-    ));
+    "govuk-assets",
+    "dfe-js",
+    "dfe-assets",
+    "moj-js",
+    "moj-assets",
+    "moj-css",
+    "images",
+    "sass"     
+));
 
 task("default", series("dev"))

@@ -4,9 +4,6 @@
 // Import dfe
 @use '../../node_modules/dfe-frontend/packages/dfefrontend' as dfe;
 
-// Import MOJ
-@forward "../../node_modules/@ministryofjustice/frontend/moj/all";
-
 // Override font
 @import url('https://rsms.me/inter/inter.css');
 $govuk-font-family: 'Inter', sans-serif; // Override govuk font
