@@ -1,10 +1,9 @@
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using feat.web.Enums;
 
 namespace feat.web.Models;
 
-public class FindARequest
+public class SearchRequest
 {
     public required string Query { get; set; }
 

@@ -10,7 +10,7 @@ public class ResultsModel(ISearchService searchService) : PageModel
 {
     public required Search Search { get; set; }
     
-    public FindAResponse? FindAResponse { get; set; }
+    public SearchResponse? SearchResponse { get; set; }
     
     public async Task<IActionResult> OnGetAsync([FromQuery] bool debug = false)
     {
@@ -24,7 +24,7 @@ public class ResultsModel(ISearchService searchService) : PageModel
         Search.SetPage("Results");
         HttpContext.Session.Set("Search", Search);
 
-        FindAResponse = await searchService.Search(Search, HttpContext.Session.Id);
+        SearchResponse = await searchService.Search(Search, HttpContext.Session.Id);
         
         return Page();
     }

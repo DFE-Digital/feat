@@ -18,12 +18,12 @@ public class SearchService : ISearchService
         _options = options;
     }
 
-    public async Task<FindAResponse> Search(Search search, string sessionId)
+    public async Task<SearchResponse> Search(Search search, string sessionId)
     {
-        var request = search.ToFindARequest();
+        var request = search.ToSearchRequest();
         request.SessionId = sessionId;
         
         var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search").ToString();
-        return await _apiClient.PostAsync<FindAResponse>(ApiClientNames.Feat, endpoint, request);
+        return await _apiClient.PostAsync<SearchResponse>(ApiClientNames.Feat, endpoint, request);
     }
 }
