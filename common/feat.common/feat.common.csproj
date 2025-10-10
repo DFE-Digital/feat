@@ -19,4 +19,10 @@
       </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Microsoft.Extensions.Http">
+        <HintPath>..\..\..\..\..\.dotnet\shared\Microsoft.AspNetCore.App\9.0.8\Microsoft.Extensions.Http.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

@@ -1,13 +1,22 @@
 using System.Text.Json.Serialization;
+using feat.common;
 using feat.web.Configuration;
-using feat.web.Repositories;
 using feat.web.Services;
 using GovUk.Frontend.AspNetCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add layered configuration
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
 // Add configuration
-builder.Services.Configure<SearchOptions>(builder.Configuration.GetSection(SearchOptions.Search));
+builder.Services.Configure<SearchOptions>(builder.Configuration.GetSection("Search"));
 
 // Add services to the container.
 builder.Services.Configure<RouteOptions>(option =>
@@ -29,19 +38,19 @@ builder.Services.AddRazorPages().AddJsonOptions(options =>
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
+builder.Services.AddScoped<IApiClient, ApiClient>();
+builder.Services.AddScoped<ISearchService, SearchService>();
 
-// Setup our HTTP client
-builder.Services.AddHttpClient("httpClient")
-    .ConfigurePrimaryHttpMessageHandler(() =>
+builder.Services.AddHttpClient(ApiClientNames.Feat, (sp, client) =>
     {
-        return new HttpClientHandler()
-        {
-            AllowAutoRedirect = true,
-            UseDefaultCredentials = false
-        };
+        var options = sp.GetRequiredService<IOptions<SearchOptions>>().Value;
+        client.BaseAddress = new Uri(options.ApiBaseUrl);
+    })
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        AllowAutoRedirect = true,
+        UseDefaultCredentials = false
     });
-builder.Services.AddSingleton<HttpClientRepository>();
-builder.Services.AddSingleton<ISearchService, SearchService>();
 
 // Setup our session
 builder.Services.AddDistributedMemoryCache();

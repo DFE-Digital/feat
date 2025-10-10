@@ -1,6 +1,7 @@
 using Azure.Search.Documents;
 using feat.api.Configuration;
 using feat.api.Services;
+using feat.common;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using NUnit.Framework;
