@@ -8,9 +8,14 @@ namespace feat.api.Controllers;
 [Route("api/[controller]")]
 public class SearchController(ISearchService searchService) : ControllerBase
 {
-    [HttpGet]
-    public async Task<ActionResult<SearchResponse>> Search([FromQuery] SearchRequest request)
+    [HttpPost]
+    public async Task<ActionResult<SearchResponse>> Search([FromBody] SearchRequest? request)
     {
+        if (request == null)
+        {
+            return BadRequest("Request body is required.");
+        }
+
         var result = await searchService.SearchAsync(request);
 
         if (result == null)

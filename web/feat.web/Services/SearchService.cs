@@ -23,7 +23,7 @@ public class SearchService : ISearchService
         var request = search.ToFindARequest();
         request.SessionId = sessionId;
         
-        var url = _options.Value.ApiBaseUrl;
-        return await _apiClient.PostAsync<FindAResponse>(ApiClientNames.Feat, url, request);
+        var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search").ToString();
+        return await _apiClient.PostAsync<FindAResponse>(ApiClientNames.Feat, endpoint, request);
     }
 }
