@@ -15,6 +15,7 @@ FROM node:20 AS node
 WORKDIR /src
 COPY "web/feat.web/package.json" "web/feat.web/Gulpfile.js" ./
 COPY "web/feat.web/AssetSrc/" "AssetSrc/"
+RUN npm install --ignore-scripts
 RUN npm install --ignore-scripts -g gulp
 RUN gulp dev
 
