@@ -6,6 +6,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["api/feat.api/feat.api.csproj", "api/feat.api/"]
+COPY ["common/feat.common/feat.common.csproj", "common/feat.common/"]
 RUN dotnet restore "api/feat.api/feat.api.csproj"
 COPY . .
 WORKDIR "/src/api/feat.api"
