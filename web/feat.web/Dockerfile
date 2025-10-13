@@ -13,7 +13,7 @@ WORKDIR "/src/web/feat.web"
 RUN dotnet build "./feat.web.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM node:24 AS node
-WORKDIR /src/web/feat.web
+WORKDIR /src
 COPY "web/feat.web/package.json" "web/feat.web/package-lock.json" "web/feat.web/Gulpfile.js" ./
 COPY "web/feat.web/AssetSrc/" "./AssetSrc/"
 RUN npm install --ignore-scripts
@@ -27,6 +27,6 @@ RUN dotnet publish "./feat.web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /
 
 FROM base AS final
 WORKDIR /app
-COPY --from=node /src/web/feat.web/wwwroot ./wwwroot
+COPY --from=node /src/wwwroot ./wwwroot
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "feat.web.dll"]
