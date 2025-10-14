@@ -5,5 +5,5 @@ namespace feat.web.Services;
 
 public interface ISearchService
 {
-    Task<FindAResponse> Search(Search search, string sessionId);
+    Task<SearchResponse> Search(Search search, string sessionId);
 }

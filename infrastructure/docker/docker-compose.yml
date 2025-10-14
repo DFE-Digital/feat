@@ -18,7 +18,7 @@
       - feat.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - API_BASE_URL=http://feat.api:8080
+      - Search__ApiBaseUrl=http://feat.api:8080
 
   feat.ingestion:
     build:

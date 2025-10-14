@@ -31,7 +31,6 @@ public class Search
     
     public List<string> Careers { get; set; } = [];
     
-    
     public CourseType? CourseType { get; set; }
     
     public CourseLevel? CourseLevel { get; set; }
@@ -40,7 +39,6 @@ public class Search
         get
         {
             var mergedList = Interests.Union(Subjects).Union(Careers).ToList();
-            
             
             if (mergedList.Count == 0)
             {
@@ -62,9 +60,9 @@ public class Search
         }
     }
 
-    public FindARequest ToFindARequest()
+    public SearchRequest ToSearchRequest()
     {
-        return new FindARequest
+        return new SearchRequest
         {
             Query = Query ?? string.Empty,
             IncludeOnlineCourses = IncludeOnlineCourses,
@@ -88,8 +86,6 @@ public class Search
             var index = History.LastIndexOf(page);
             History.RemoveRange(index, History.Count - index);
         }
-        
-        
     }
 
     public string GetBackPage(string page)

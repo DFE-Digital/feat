@@ -362,3 +362,6 @@ MigrationBackup/
 .TemporaryItems
 .Trashes
 .Spotlight-V100
+
+# Local dev overrides
+appsettings.Local.json
