@@ -17,12 +17,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Microsoft.Extensions.Http">
-        <HintPath>..\..\..\..\..\.dotnet\shared\Microsoft.AspNetCore.App\9.0.8\Microsoft.Extensions.Http.dll</HintPath>
-      </Reference>
+      <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
     </ItemGroup>
 
 </Project>
