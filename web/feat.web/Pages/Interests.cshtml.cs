@@ -9,8 +9,13 @@ namespace feat.web.Pages;
 
 public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
 {
-    [BindProperty]
-    public string? Interest { get; set; }
+    //[BindProperty] public int NumberofOptions { get; set; } = 3;
+
+    [BindProperty] 
+    public List<string> UserInterests { get; set; } = new List<string>();
+    
+    [BindProperty] 
+    public bool FirstOptionMandatory { get; set; } = false;
     
     public required Search Search { get; set; }
     
@@ -21,6 +26,14 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
         if (!Search.Updated)
             return RedirectToPage("Index");
         
+        UserInterests = Search.Interests;
+        
+        // If selected distance > 30 miles, 
+        if (string.IsNullOrEmpty(Search.Location) || Search.Distance == null || Search.Distance == Distance.ThirtyPlus)
+        {
+            FirstOptionMandatory = true;
+        }
+
         Search.SetPage("Interests");
         HttpContext.Session.Set("Search", Search);
         
@@ -30,12 +43,19 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
     public IActionResult OnPostContinue()
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-        
-        
+
+        foreach (var interest in UserInterests)
+        {
+            if (!string.IsNullOrEmpty(interest) && !Search.Interests.Contains(interest))
+            {
+                Search.Interests.Add(interest);
+            }
+        }
+/*
         if (!string.IsNullOrEmpty(Interest) && !Search.Interests.Contains(Interest))
         {
-                Search.Interests.Add(Interest);
-        }
+            Search.Interests.Add(Interest);
+        }*/
 
         if (Search.Interests.Count == 0)
         {
@@ -51,7 +71,7 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
             return RedirectToPage("QualificationLevel");
         }
 
-        return RedirectToPage("Location");
+        return RedirectToPage("Location");// Where to Go Next? ... Defo Not location
     }
 
     public IActionResult OnPostRemove(int index)
@@ -77,20 +97,29 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
         if (!ModelState.IsValid)
             return Page();
 
-        if (string.IsNullOrEmpty(Interest))
+        if (!UserInterests.Any()) // .IsNullOrEmpty(Interest))
         {
             ModelState.AddModelError("Interest", "Please enter an interest");
             return Page();
         }
 
-        if (!Search.Interests.Contains(Interest))
-            Search.Interests.Add(Interest);
-
+        //if (!Search.Interests.Contains(Interest))
+        //    Search.Interests.Add(Interest);
+        foreach (var interest in UserInterests)
+        {
+            if (!string.IsNullOrEmpty(interest) && !Search.Interests.Contains(interest))
+            {
+                Search.Interests.Add(interest);
+            }
+        }
+        
         HttpContext.Session.Set("Search", Search);
         
         ModelState.Clear();
-        Interest = string.Empty;
+        //Interest = string.Empty;
+        UserInterests = new List<string>();
         
         return Page();
     }
+
 }
