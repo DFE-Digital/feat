@@ -22,8 +22,4 @@ public class IngestionDbContext : DbContext
     public IngestionDbContext(DbContextOptions<IngestionDbContext> options): base(options)
     {   
     }
-    
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-    {
-    }
 }

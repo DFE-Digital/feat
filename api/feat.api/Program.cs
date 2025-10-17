@@ -7,9 +7,9 @@ using Azure;
 using Azure.AI.OpenAI;
 using Azure.Core.Serialization;
 using Azure.Search.Documents;
-using feat.api.Configuration;
 using feat.api.Services;
 using feat.common;
+using feat.common.Configuration;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
 using Scalar.AspNetCore;
@@ -22,7 +22,7 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 builder.Services.Configure<AzureOptions>(
-    builder.Configuration.GetSection("Azure"));
+    builder.Configuration.GetSection(AzureOptions.Name));
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -30,6 +30,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.JsonSerializerOptions.Converters.Add(new MicrosoftSpatialGeoJsonConverter());
 });
 
 var connectionString = builder.Configuration.GetConnectionString("IngestionConnection");

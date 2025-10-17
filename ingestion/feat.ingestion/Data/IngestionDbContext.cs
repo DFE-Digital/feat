@@ -6,8 +6,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace feat.ingestion.Data;
 
-public class IngestionDbContext : DbContext
+public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : DbContext(options)
 {
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        options.UseSqlServer(b => b.MigrationsAssembly("feat.ingestion"));
+    }
+
     public DbSet<Employer> Employers { get; set; }
     
     public DbSet<EmployerLocation> EmployerLocations { get; set; }
@@ -33,12 +38,4 @@ public class IngestionDbContext : DbContext
     public DbSet<UniversityCourse> UniversityCourses { get; set; }
 
     public DbSet<Vacancy> Vacancies { get; set; }
-    
-    
-    public IngestionDbContext(DbContextOptions<IngestionDbContext> options)
-        : base(options)
-    {
-        
-    }
-    
 }

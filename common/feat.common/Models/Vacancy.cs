@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using feat.common.Models.Enums;
 
 namespace feat.common.Models;
 
