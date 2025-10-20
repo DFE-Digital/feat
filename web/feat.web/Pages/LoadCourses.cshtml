@@ -1,0 +1,204 @@
+@page
+@using feat.web.Models
+@model feat.web.Pages.LoadCoursesModel
+@{
+  ViewBag.Title = "Explore your options after school or college - GOV.UK"; 
+  var totalResults = Model.SearchResponse?.TotalCount ?? 0;
+  ViewBag.FlowTitle = $"Showing {totalResults} result{(totalResults == 1 ? "" : "s")}";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.LoadCourses))">Back</govuk-back-link>
+}
+
+<div class="govuk-grid-column-full">
+  <h1 class="govuk-heading-l">Your search results</h1>
+  <p class="govuk-body-l">@ViewBag.FlowTitle</p>
+
+  <p><a href="clear-session-and-go">Search again</a></p><!-- TODO: Link to clear session and go to start of flow -->
+  <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+</div>
+
+<!-- Below Original -->
+<div class="govuk-grid-row">
+
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-l">@ViewBag.FixedTitle</h1>
+  </div>
+
+  <div class="govuk-grid-column-one-third">
+    <hr class="govuk-section-break govuk-section-break--s govuk-section-break">
+    
+    <div class="filter-container">
+      <div class="filter-search-terms">
+
+        <form id="filter-form" class="govuk-form-group" style="margin-bottom: 10px;">
+
+          <div class="filter-heading">
+
+            <h2 class="govuk-heading-m" style="margin-bottom: 12px;">Filter</h2>
+
+          </div>
+    
+        </form></div>
+
+      <div class="filter-buttons">
+
+        <button type="button" class="govuk-button" id="apply-filters">
+          Apply filters
+        </button>
+
+        <p><a href="#" id="clear-filters" class="govuk-link">Clear all filters</a></p>
+
+      </div>
+
+
+
+      <div class="filter-list">
+
+        <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default" data-govuk-accordion-init=""><div class="govuk-accordion__controls"><button type="button" class="govuk-accordion__show-all" aria-expanded="false"><span class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down"></span><span class="govuk-accordion__show-all-text">Show all sections</span></button></div>
+          <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+              
+                <button type="button" aria-controls="accordion-default-content-1" class="govuk-accordion__section-button" aria-expanded="false" aria-label="Qualification type , Show this section"><span class="govuk-accordion__section-heading-text" id="accordion-default-heading-1"><span class="govuk-accordion__section-heading-text-focus">
+                  Qualification type
+                </span></span><span class="govuk-visually-hidden govuk-accordion__section-heading-divider">, </span><span class="govuk-accordion__section-toggle" data-nosnippet=""><span class="govuk-accordion__section-toggle-focus"><span class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down"></span><span class="govuk-accordion__section-toggle-text">Show</span></span></span></button></h2>
+            </div>
+            <div id="accordion-default-content-1" class="govuk-accordion__section-content" hidden="until-found">
+              <div class="gem-c-option-select__container js-options-container" style="height: 254.333px;">
+                <div class="gem-c-option-select__container-inner js-auto-height-inner">
+                  <span id="option-select-checkboxes-count-" class="gem-c-option-select__count govuk-visually-hidden" aria-live="polite" data-single="option found" data-multiple="options found" data-selected="selected">
+                  </span>
+                  <fieldset class="govuk-fieldset" aria-describedby="filters-hint">
+                    <div class="govuk-checkboxes govuk-checkboxes--small">
+                      <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="filter-a-level" name="filter" type="checkbox" value="A Level">
+                        <label class="govuk-label govuk-checkboxes__label" for="filter-a-level">A Level</label>
+                      </div>
+                      <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="filter-apprenticeship" name="filter" type="checkbox" value="Apprenticeship">
+                        <label class="govuk-label govuk-checkboxes__label" for="filter-apprenticeship">Apprenticeship</label>
+                      </div>
+                      <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="filter-btec" name="filter" type="checkbox" value="BTEC">
+                        <label class="govuk-label govuk-checkboxes__label" for="filter-btec">BTEC</label>
+                      </div>
+                      <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="filter-diploma" name="filter" type="checkbox" value="Diploma">
+                        <label class="govuk-label govuk-checkboxes__label" for="filter-diploma">Diploma</label>
+                      </div>
+                      <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="filter-diploma" name="filter" type="checkbox" value="Diploma">
+                        <label class="govuk-label govuk-checkboxes__label" for="filter-diploma">Degree</label>
+                      </div>
+                      <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="filter-t-level" name="filter" type="checkbox" value="T Level">
+                        <label class="govuk-label govuk-checkboxes__label" for="filter-t-level">T Level</label>
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+              
+                <button type="button" aria-controls="accordion-default-content-2" class="govuk-accordion__section-button" aria-expanded="false" aria-label="Location , Show this section"><span class="govuk-accordion__section-heading-text" id="accordion-default-heading-2"><span class="govuk-accordion__section-heading-text-focus">
+                  Location
+                </span></span><span class="govuk-visually-hidden govuk-accordion__section-heading-divider">, </span><span class="govuk-accordion__section-toggle" data-nosnippet=""><span class="govuk-accordion__section-toggle-focus"><span class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down"></span><span class="govuk-accordion__section-toggle-text">Show</span></span></span></button></h2>
+            </div>
+            <div id="accordion-default-content-2" class="govuk-accordion__section-content" hidden="until-found">
+              <label for="option-select-filter-location" class="govuk-label">
+                Enter a postcode, town or city
+              </label>
+              <input name="option-select-filter-location" id="option-select-filter-location" class="govuk-input" type="text" aria-describedby="option-select-checkboxes-count-" aria-controls="option-select-checkboxes-">
+              <p></p>
+              <div class="govuk-form-group">
+                <label class="govuk-label" for="sort">
+                  Within
+                </label>
+                <select class="govuk-select" id="sort" name="sort">
+                  <option value="published">1 mile</option>
+                  <option value="updated" selected="">2 miles</option>
+                  <option value="views">5 miles</option>
+                  <option value="comments">10 miles</option>
+                  <option value="comments">Over 20 miles</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+              
+                <button type="button" aria-controls="accordion-default-content-3" class="govuk-accordion__section-button" aria-expanded="false" aria-label="Subject or career keywords , Show this section"><span class="govuk-accordion__section-heading-text" id="accordion-default-heading-4"><span class="govuk-accordion__section-heading-text-focus">
+                  Subject or career keywords
+                </span></span><span class="govuk-visually-hidden govuk-accordion__section-heading-divider">, </span><span class="govuk-accordion__section-toggle" data-nosnippet=""><span class="govuk-accordion__section-toggle-focus"><span class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down"></span><span class="govuk-accordion__section-toggle-text">Show</span></span></span></button></h2>
+            </div>
+            <div id="accordion-default-content-4" class="govuk-accordion__section-content" hidden="until-found">
+              <div class="govuk-form-group">
+                <label class="govuk-label" for="subject-filter">
+                  Subject or career keywords
+                </label>
+                <input class="govuk-input" id="subject-filter" name="subject-filter" type="text">
+              </div>
+            </div>
+          </div>
+          <div class="govuk-accordion__section">
+            <div class="govuk-accordion__section-header">
+              <h2 class="govuk-accordion__section-heading">
+              
+                <button type="button" aria-controls="accordion-default-content-4" class="govuk-accordion__section-button" aria-expanded="false" aria-label="Level , Show this section"><span class="govuk-accordion__section-heading-text" id="accordion-default-heading-3"><span class="govuk-accordion__section-heading-text-focus">
+                  Level
+                </span></span><span class="govuk-visually-hidden govuk-accordion__section-heading-divider">, </span><span class="govuk-accordion__section-toggle" data-nosnippet=""><span class="govuk-accordion__section-toggle-focus"><span class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down"></span><span class="govuk-accordion__section-toggle-text">Show</span></span></span></button></h2>
+            </div>
+            <div id="accordion-default-content-3" class="govuk-accordion__section-content" hidden="until-found">
+              <fieldset class="govuk-fieldset" aria-describedby="filters-hint">
+                <div class="govuk-checkboxes govuk-checkboxes--small">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="filter-level-1" name="filter" type="checkbox" value="Level 1 or 2 (like GCSEs)">
+                    <label class="govuk-label govuk-checkboxes__label" for="filter-level-1">Level 1 or 2 (like GCSEs)</label>
+                  </div>
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="filter-level-3" name="filter" type="checkbox" value="Level 3 (like BTECs and A Levels)">
+                    <label class="govuk-label govuk-checkboxes__label" for="filter-level-3">Level 3 (like BTECs and A Levels)</label>
+                  </div>
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="filter-level-4" name="filter" type="checkbox" value="Level 4 to 7 (like diplomas and degrees)">
+                    <label class="govuk-label govuk-checkboxes__label" for="filter-level-4">Level 4 to 7 (like diplomas and degrees)</label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="govuk-button" id="apply-filters">
+          Apply filters
+        </button>
+        <!-- BEGIN FACETS
+        @Json.Serialize(Model.SearchResponse?.Facets)
+        END FACETS -->
+      </div>
+    </div>
+  </div>
+  
+
+
+  <div class="govuk-grid-column-two-thirds">
+    <div id="active-filters">
+      <h2 id="active-filters-heading" class="govuk-heading-m" style="display: none;">You've searched for:</h2>
+      <div id="selected-filters" class="remove-filters"></div>
+     
+    </div>
+
+    <div id="search-results">
+      @foreach (var result in Model.SearchResponse?.Courses)
+      {
+        await Html.RenderPartialAsync("Partials/Course", result);
+      }
+    </div>
+  </div>
+</div>
