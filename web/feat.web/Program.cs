@@ -43,6 +43,7 @@ builder.Services.AddRazorPages().AddJsonOptions(options =>
     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+builder.Services.AddDirectoryBrowser();
 
 builder.Services.AddScoped<IApiClient, ApiClient>();
 builder.Services.AddScoped<ISearchService, SearchService>();

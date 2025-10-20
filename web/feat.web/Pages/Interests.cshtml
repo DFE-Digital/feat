@@ -5,8 +5,7 @@
 @model InterestsModel
 @{
     ViewBag.Title = "Explore your options after school or college - GOV.UK";
-    ViewBag.FixedTitle = "What courses, subjects, jobs, or careers are you interested in?";
-    
+    ViewBag.SectionTitle = "What courses, subjects, jobs, or careers are you interested in?";
 }
 
 
@@ -14,11 +13,7 @@
     <govuk-back-link href="@Url.Page(Model.Search.GetBackPage("Interests"))">Back</govuk-back-link>
 }
 
-@{
-    int numberofInterests = 3;
-}
-
-<h1 class="govuk-heading-l">@ViewBag.FixedTitle</h1>
+<h1 class="govuk-heading-l">@ViewBag.SectionTitle</h1>
 <p class="govuk-body">
     You can be as specific as you like. For example:
 </p>
@@ -29,25 +24,56 @@
 </ul>
 <p>If you skip this question, the search results will be everything in your chosen location.</p>
 
-<!--  -->
-<form method="post">
+<!--  UserInterests-->
+<form method="post" >
     
     <fieldset class="govuk-fieldset moj-add-another__item">
         <div class="govuk-form-group">
             
-            @for (int i = 0; i < numberofInterests; i++)
-            {
-                int icount = i + 1;
-                
-                <govuk-input name="UserInterests[@i]" input-class="govuk-input--width-20" spellcheck="true"
-                             value="@(Model.UserInterests != null && Model.UserInterests.Count > icount ? Model.UserInterests[i] : string.Empty)">
-                    <govuk-input-label class="govuk-heading-m">
-                        Interest @i @( (icount == 1 && Model.FirstOptionMandatory) ? string.Empty : "(Optional)" )
-                    </govuk-input-label>
-                </govuk-input>
-            }
+            <govuk-input input-class="govuk-input--width-20" spellcheck="true" for="UserInterest1"
+                         id="UserInterests1"
+                         value="@(Model.UserInterest1)">
+                <govuk-input-label class="govuk-heading-m">
+                    Interest 1 @(Model.FirstOptionMandatory ? string.Empty : "(Optional)" )
+                </govuk-input-label>
+            </govuk-input>
+            <govuk-input input-class="govuk-input--width-20" spellcheck="true" for="UserInterest2"  
+                         id="UserInterests2"
+                         value="@(Model.UserInterest2)">
+                <govuk-input-label class="govuk-heading-m">
+                    Interest 2 (Optional)
+                </govuk-input-label>
+            </govuk-input>
+            <govuk-input input-class="govuk-input--width-20" spellcheck="true" for="UserInterest3"  
+                         id="UserInterests3"
+                         value="@(Model.UserInterest3)">
+                <govuk-input-label class="govuk-heading-m">
+                    Interest 3 (Optional)
+                </govuk-input-label>
+            </govuk-input>
+            
         </div>
     </fieldset>
-
-    <govuk-button type="Submit" asp-page-handler="Continue">Continue</govuk-button>
+    <div class="govuk-button-group">
+        <govuk-button type="submit">Continue</govuk-button>
+    </div>
 </form>
+
+@{
+    /* Alternative approach using a loop to generate input fields
+     
+    int numberofInterests = 3;
+
+    for (int i = 0; i < numberofInterests; i++)
+    {
+        int fieldCount = i + 1;
+
+        <govuk-input id="UserInterests[@i]" input-class="govuk-input--width-20" spellcheck="true" for="UserInterests"
+                     value="@(Model.UserInterests != null && Model.UserInterests.Count > fieldCount ? Model.UserInterests[i] : null)">
+            <govuk-input-label class="govuk-heading-m">
+                Interest @fieldCount @((fieldCount == 1 && Model.FirstOptionMandatory) ? string.Empty : "(Optional)")
+            </govuk-input-label>
+        </govuk-input>
+    }
+    */
+}

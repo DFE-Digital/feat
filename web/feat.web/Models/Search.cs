@@ -5,13 +5,15 @@ namespace feat.web.Models;
 
 public class Search
 {
+    //For navigation.
+    private List<string> History { get; set; } = [];
+    
     public bool Updated { get; set; } = true;
     
-    public List<string> History { get; set; } = [];
     
     public AgeGroup? AgeGroup { get; set; }
     
-    public QualificationLevel? QualificationLevel { get; set; }
+    public List<QualificationLevel> QualificationLevels { get; set; } = new();
 
     public Distance? Distance { get; set; }
     
@@ -34,6 +36,10 @@ public class Search
     public CourseType? CourseType { get; set; }
     
     public CourseLevel? CourseLevel { get; set; }
+    
+    // private field to prevent re-entrancy
+    private bool _pageIsChanging = false;
+    private bool _pageBackIsChanging = false;
     
     public string? Query {
         get
@@ -77,28 +83,76 @@ public class Search
 
     public void SetPage(string page)
     {
-        if (!History.Contains(page))
+        try
         {
-            History.Add(page);
+            if (_pageIsChanging)
+                return;
+            _pageIsChanging = true;
+
+            page = page.Trim().ToLower();
+            if (!History.Contains(page))
+            {
+                History.Add(page);
+            }
+            else
+            {
+                var index = History.LastIndexOf(page);
+                History.RemoveRange(index, History.Count - index);
+            }
         }
-        else
+        catch (Exception e)
         {
-            var index = History.LastIndexOf(page);
-            History.RemoveRange(index, History.Count - index);
+            Console.WriteLine(e);
+            throw;
+        }
+        finally
+        {
+            _pageIsChanging = false;
         }
     }
-
+    
     public string GetBackPage(string page)
     {
-        if (!History.Contains(page))
+        try
         {
-            return History.LastOrDefault() ?? "Index";
-        }
+            if (_pageBackIsChanging)
+                return string.Empty;
+            _pageBackIsChanging = true;
 
-        var index = History.LastIndexOf(page);
-        if (index == 0)
-            return "Index";
-        
-        return History[index - 1];
+            page = page.Trim().ToLower();
+            if (!History.Contains(page))
+            {
+                return History.LastOrDefault() ?? "Index";
+            }
+
+            var index = History.LastIndexOf(page);
+            if (index == 0)
+                return "Index";
+
+            return History[index - 1];
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        finally
+        {
+            _pageBackIsChanging = false;
+        }
+        return string.Empty;
     }
+}
+
+public static class PageName
+{
+    public static string Index = "Index";
+    public static string Location = "Location";
+    public static string Interests = "Interests";
+    public static string QualificationLevel = "QualificationLevel";
+    public static string Age = "Age";
+    public static string CheckAnswers = "CheckAnswers"; // was "Summary";
+    
+    public static string LoadCourses = "LoadCourses"; // List of Courses page in Liams v8 
+    
+    
 }

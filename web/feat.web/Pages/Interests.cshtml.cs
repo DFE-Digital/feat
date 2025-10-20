@@ -9,117 +9,89 @@ namespace feat.web.Pages;
 
 public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
 {
-    //[BindProperty] public int NumberofOptions { get; set; } = 3;
-
-    [BindProperty] 
-    public List<string> UserInterests { get; set; } = new List<string>();
+    [BindProperty]
+    public string? UserInterest1 { get; set; } = string.Empty;
+    
+    [BindProperty]
+    public string? UserInterest2 { get; set; }
+    
+    [BindProperty]
+    public string? UserInterest3 { get; set; }
     
     [BindProperty] 
     public bool FirstOptionMandatory { get; set; } = false;
     
     public required Search Search { get; set; }
-    
+
     public IActionResult OnGet()
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-        
+
         if (!Search.Updated)
-            return RedirectToPage("Index");
-        
-        UserInterests = Search.Interests;
-        
+            return RedirectToPage(PageName.Index);
+
+        // Populate the three individual interest fields
+        if (Search.Interests.Count > 0 &&
+            !string.IsNullOrEmpty(Search.Interests[0]))
+        {
+            UserInterest1 = Search.Interests[0];
+        }
+        if (Search.Interests.Count > 1 &&
+            !string.IsNullOrEmpty(Search.Interests[1]))
+        {
+            UserInterest2 = Search.Interests[1];
+        }
+        if (Search.Interests.Count > 2 &&
+            !string.IsNullOrEmpty(Search.Interests[2]))
+        {
+            UserInterest3 = Search.Interests[2];
+        }
+
         // If selected distance > 30 miles, 
-        if (string.IsNullOrEmpty(Search.Location) || Search.Distance == null || Search.Distance == Distance.ThirtyPlus)
+        if (string.IsNullOrEmpty(Search.Location) ||
+            Search.Distance == null || Search.Distance == Distance.ThirtyPlus)
         {
             FirstOptionMandatory = true;
         }
 
-        Search.SetPage("Interests");
+        Search.SetPage(PageName.Interests);
         HttpContext.Session.Set("Search", Search);
-        
+
         return Page();
     }
-    
-    public IActionResult OnPostContinue()
+
+    public IActionResult OnPost() 
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
-        foreach (var interest in UserInterests)
+        if (string.IsNullOrEmpty(Search.Location) ||
+            Search.Distance == null || Search.Distance == Distance.ThirtyPlus)
         {
-            if (!string.IsNullOrEmpty(interest) && !Search.Interests.Contains(interest))
+            FirstOptionMandatory = true;
+            
+            if (string.IsNullOrWhiteSpace(UserInterest1))
             {
-                Search.Interests.Add(interest);
+                ModelState.AddModelError("UserInterest1", "Please enter an interest");
             }
         }
-/*
-        if (!string.IsNullOrEmpty(Interest) && !Search.Interests.Contains(Interest))
-        {
-            Search.Interests.Add(Interest);
-        }*/
 
-        if (Search.Interests.Count == 0)
-        {
-            ModelState.AddModelError("Interest", "Please enter at least one interest");
-            return Page();       
-        }
+        if (!ModelState.IsValid)
+            return Page(); 
         
+        Search.Interests.Clear();
+        
+        List<string> interests = new List<string>();
+        if (!string.IsNullOrEmpty(UserInterest1))
+            interests.Add(UserInterest1);
+        if (!string.IsNullOrEmpty(UserInterest2))
+            interests.Add(UserInterest2);
+        if (!string.IsNullOrWhiteSpace(UserInterest3))
+            interests.Add(UserInterest3);
+        Search.Interests = interests;
+
         Search.Updated = true;
         HttpContext.Session.Set("Search", Search);
-
-        if (Search.SearchMethod == SearchMethod.Guided)
-        {
-            return RedirectToPage("QualificationLevel");
-        }
-
-        return RedirectToPage("Location");// Where to Go Next? ... Defo Not location
+        
+        return RedirectToPage(PageName.QualificationLevel); 
     }
-
-    public IActionResult OnPostRemove(int index)
-    {
-        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-        try
-        {
-            Search.Interests.RemoveAt(index);
-            HttpContext.Session.Set("Search", Search);
-        }
-        catch (Exception ex)
-        {
-            // Do nothing
-        }
-
-        return Page();
-    }
-
-    public IActionResult OnPostAdd()
-    {
-        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-        
-        if (!ModelState.IsValid)
-            return Page();
-
-        if (!UserInterests.Any()) // .IsNullOrEmpty(Interest))
-        {
-            ModelState.AddModelError("Interest", "Please enter an interest");
-            return Page();
-        }
-
-        //if (!Search.Interests.Contains(Interest))
-        //    Search.Interests.Add(Interest);
-        foreach (var interest in UserInterests)
-        {
-            if (!string.IsNullOrEmpty(interest) && !Search.Interests.Contains(interest))
-            {
-                Search.Interests.Add(interest);
-            }
-        }
-        
-        HttpContext.Session.Set("Search", Search);
-        
-        ModelState.Clear();
-        //Interest = string.Empty;
-        UserInterests = new List<string>();
-        
-        return Page();
-    }
-
 }
