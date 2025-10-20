@@ -6,6 +6,7 @@ using feat.api.Configuration;
 using feat.api.Enums;
 using feat.api.Models;
 using feat.api.Models.External;
+using feat.common;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
 
@@ -172,7 +173,7 @@ public class SearchService : ISearchService
         if (isPostcode)
         {
             var response = await _apiClient
-                .GetAsync<PostcodeResult>(ExternalApi.Postcode, $"postcodes/{location}");
+                .GetAsync<PostcodeResult>(ApiClientNames.Postcode, $"postcodes/{location}");
             
             if (response.Result != null)
             {
@@ -186,7 +187,7 @@ public class SearchService : ISearchService
         else
         {
             var response = await _apiClient
-                .GetAsync<PlaceResult>(ExternalApi.Postcode, $"places/?q={location}&limit=1");
+                .GetAsync<PlaceResult>(ApiClientNames.Postcode, $"places/?q={location}&limit=1");
             
             if (response?.Result?.Count > 0)
             {

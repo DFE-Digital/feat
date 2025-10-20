@@ -7,9 +7,9 @@ using Azure;
 using Azure.AI.OpenAI;
 using Azure.Core.Serialization;
 using Azure.Search.Documents;
-using feat.api;
 using feat.api.Configuration;
 using feat.api.Services;
+using feat.common;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
 using Scalar.AspNetCore;
@@ -77,7 +77,7 @@ builder.Services.AddSingleton<EmbeddingClient>(sp =>
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<IApiClient, ApiClient>();
 
-builder.Services.AddHttpClient(ExternalApi.Postcode, client =>
+builder.Services.AddHttpClient(ApiClientNames.Postcode, client =>
 {
     client.BaseAddress = new Uri("https://api.postcodes.io/");
 });

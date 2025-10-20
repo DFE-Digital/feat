@@ -1,15 +1,12 @@
 @page
 @model feat.web.Pages.ResultsModel
 @{
-  ViewBag.Title = $"{Model?.FindAResponse?.Total ?? 0} result";
-  if (Model?.FindAResponse?.Total.GetValueOrDefault(0) != 1)
-  {
-    ViewBag.Title += "s";
-  }
+  var totalResults = Model.SearchResponse?.TotalCount ?? 0;
+  ViewBag.Title = $"{totalResults} result{(totalResults == 1 ? "" : "s")}";
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@Url.Page(Model?.Search.GetBackPage("Results"))">Back</govuk-back-link>
+    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage("Results"))">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">
@@ -177,7 +174,7 @@
           Apply filters
         </button>
         <!-- BEGIN FACETS
-        @Json.Serialize(Model?.FindAResponse?.Facets)
+        @Json.Serialize(Model.SearchResponse?.Facets)
         END FACETS -->
       </div>
     </div>
@@ -193,7 +190,7 @@
     </div>
 
     <div id="search-results">
-      @foreach (var result in Model?.FindAResponse?.Courses)
+      @foreach (var result in Model.SearchResponse?.Courses)
       {
         await Html.RenderPartialAsync("Partials/Course", result);
       }
