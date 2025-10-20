@@ -81,12 +81,12 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
         Search.Interests.Clear();
         
         List<string> interests = new List<string>();
-        if (!string.IsNullOrEmpty(UserInterest1))
-            interests.Add(UserInterest1);
-        if (!string.IsNullOrEmpty(UserInterest2))
-            interests.Add(UserInterest2);
+        if (!string.IsNullOrWhiteSpace(UserInterest1))
+            interests.Add(UserInterest1.Trim());
+        if (!string.IsNullOrWhiteSpace(UserInterest2))
+            interests.Add(UserInterest2.Trim());
         if (!string.IsNullOrWhiteSpace(UserInterest3))
-            interests.Add(UserInterest3);
+            interests.Add(UserInterest3.Trim());
         Search.Interests = interests;
 
         Search.Updated = true;

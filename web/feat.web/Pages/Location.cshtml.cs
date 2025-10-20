@@ -59,7 +59,7 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
         Search.Updated = true;
         
         if (!string.IsNullOrEmpty(Location)) 
-            Search.Location = Location;
+            Search.Location = Location.Trim();
         if (Distance != null) 
             Search.Distance = Distance.Value;
 

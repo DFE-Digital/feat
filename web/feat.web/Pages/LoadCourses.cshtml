@@ -3,8 +3,12 @@
 @model feat.web.Pages.LoadCoursesModel
 @{
   ViewBag.Title = "Explore your options after school or college - GOV.UK"; 
-  var totalResults = Model.SearchResponse?.TotalCount ?? 0;
-  ViewBag.FlowTitle = $"Showing {totalResults} result{(totalResults == 1 ? "" : "s")}";
+  var totalResults = Model.SearchResponse?.TotalCount ?? 0;  
+  var plural = (totalResults == 1 ? "" : "s");
+  string searchResultText = $"Showing {totalResults} course{plural}";
+  searchResultText += string.IsNullOrEmpty(Model.Search.Location)?" near your area": " near " + Model.Search.Location;
+  searchResultText += Model.Search.Interests.Count>0 ? $" for {Model.Search.Interests[0]}" : string.Empty;
+  
 }
 
 @section BeforeContent {
@@ -13,9 +17,9 @@
 
 <div class="govuk-grid-column-full">
   <h1 class="govuk-heading-l">Your search results</h1>
-  <p class="govuk-body-l">@ViewBag.FlowTitle</p>
+  <p class="govuk-body-l">@(searchResultText)</p>
 
-  <p><a href="clear-session-and-go">Search again</a></p><!-- TODO: Link to clear session and go to start of flow -->
+  <p><a href="/Index">Search again</a></p>
   <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
 </div>
 

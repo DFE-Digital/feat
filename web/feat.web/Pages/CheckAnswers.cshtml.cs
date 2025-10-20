@@ -17,7 +17,7 @@ public class CheckAnswersModel (ILogger<CheckAnswersModel> logger): PageModel
         if (!Search.Updated)
             return RedirectToPage("Index");
 
-        Search.SetPage(PageName.CheckAnswers);// CheckAnswers"
+        Search.SetPage(PageName.CheckAnswers);
         HttpContext.Session.Set("Search", Search);
         
         return Page();
@@ -34,7 +34,7 @@ public class CheckAnswersModel (ILogger<CheckAnswersModel> logger): PageModel
             Search.Updated = true;
             HttpContext.Session.Set("Search", Search);
         
-            return RedirectToPage(PageName.LoadCourses);//"LoadCourses");
+            return RedirectToPage(PageName.LoadCourses);
 
         }
         catch (Exception e)

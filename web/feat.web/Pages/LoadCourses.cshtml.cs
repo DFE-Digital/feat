@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace feat.web.Pages;
 
-public class LoadCoursesModel(ISearchService searchService) : PageModel
+public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesModel> logger) : PageModel
 {
     public required Search Search { get; set; }
     
@@ -14,18 +14,25 @@ public class LoadCoursesModel(ISearchService searchService) : PageModel
     
     public async Task<IActionResult> OnGetAsync([FromQuery] bool debug = false)
     {
-        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-        if (!Search.Updated)
+        logger.LogInformation("OnGetAsync called");
+        try
         {
-            return RedirectToPage("Index");
+            Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+            if (!Search.Updated)
+            {
+                return RedirectToPage(PageName.Index);
+            }
+            
+            Search.Debug = debug;
+            Search.SetPage(PageName.LoadCourses);
+            HttpContext.Session.Set("Search", Search);
+
+            SearchResponse = await searchService.Search(Search, HttpContext.Session.Id);
         }
-
-        Search.Debug = debug;
-        Search.SetPage("Results");
-        HttpContext.Session.Set("Search", Search);
-
-        SearchResponse = await searchService.Search(Search, HttpContext.Session.Id);
-        
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+        }
         return Page();
     }
 }
