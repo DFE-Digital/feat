@@ -46,12 +46,12 @@ public class SituationModel (ILogger<SituationModel> logger) : PageModel
         if (SearchType.HasValue) Search.SearchType = SearchType.Value;
 
         HttpContext.Session.Set("Search", Search);
-
+/*
         if (AgeGroup is Enums.AgeGroup.UnderEighteen or Enums.AgeGroup.EighteenToTwentyFour 
             && SearchType == Enums.SearchType.HE)
         {
             return RedirectToPage("Interests");
-        }
+        }*/
 
         if (AgeGroup == Enums.AgeGroup.UnderEighteen 
             && SearchType is Enums.SearchType.FE or Enums.SearchType.Return)
