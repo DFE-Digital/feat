@@ -15,7 +15,7 @@ export default defineConfig({
         trace: 'on-first-retry',
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
-        baseURL: process.env.FEAT_BASE_URL || 'http://localhost:3000',
+        //baseURL: process.env.FEAT_BASE_URL || 'http://localhost:3000',
         ignoreHTTPSErrors: true,
         headless: true,
     },
@@ -34,13 +34,14 @@ export default defineConfig({
         // API Project
         {
             name: 'API',
-            testDir: './src/api',   // API test files live here
+            testDir: './src/api/tests',   // API test files live here
             use: {
                 // No browser needed
-                baseURL: process.env.FEAT_API_BASE_URL || 'http://localhost:5000',
+                baseURL: process.env.FEAT_API_BASE_URL || 'https://s213d01-app-api.azurewebsites.net',
                 extraHTTPHeaders: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${process.env.FEAT_API_TOKEN || ''}`,
+                    Accept: '*/*',
+                    //Authorization: `Bearer ${process.env.FEAT_API_TOKEN || ''}`,
                 },
             },
         },
