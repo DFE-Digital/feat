@@ -24,6 +24,7 @@
     <ItemGroup>
       <PackageReference Include="Azure.AI.OpenAI" Version="2.5.0-beta.1" />
       <PackageReference Include="Azure.Core" Version="1.49.0" />
+      <PackageReference Include="CsvHelper" Version="33.1.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
         <PrivateAssets>all</PrivateAssets>
@@ -40,6 +41,7 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.10" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
       <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.10" />
+      <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="9.104.0.1" />
     </ItemGroup>
 
     <ItemGroup>

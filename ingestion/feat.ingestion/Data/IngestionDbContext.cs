@@ -1,7 +1,6 @@
 using feat.common.Models;
+using FAC = feat.common.Models.Staging.FAC;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer;
-using Microsoft.Extensions.Configuration;
 
 
 namespace feat.ingestion.Data;
@@ -13,6 +12,8 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
         options.UseSqlServer(b => b.MigrationsAssembly("feat.ingestion"));
     }
 
+    #region Our models
+    
     public DbSet<Employer> Employers { get; set; }
     
     public DbSet<EmployerLocation> EmployerLocations { get; set; }
@@ -38,4 +39,14 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
     public DbSet<UniversityCourse> UniversityCourses { get; set; }
 
     public DbSet<Vacancy> Vacancies { get; set; }
+    
+    #endregion
+    
+    #region Staging Models
+    
+    public DbSet<FAC.AllCoursesCourse> FAC_AllCourses { get; set; }
+    public DbSet<FAC.Course> FAC_Courses { get; set; }
+    public DbSet<FAC.TLevel> FAC_TLevels { get; set; }
+    
+    #endregion
 }
