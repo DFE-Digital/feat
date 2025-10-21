@@ -17,3 +17,7 @@ build/
 
 # Other testing outputs
 coverage/
+
+# Playwright test reports
+playwright-report/
+test-results/
