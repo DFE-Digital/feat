@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using feat.ingestion;
 using feat.ingestion.Configuration;
 using feat.ingestion.Data;
+using feat.ingestion.Handlers;
+using feat.ingestion.Handlers.FAC;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
 
@@ -120,5 +122,19 @@ if (ingestionOptions.Environment.Equals("Development", StringComparison.Invarian
     }
 }
 
+foreach (var argument in args)
+{
+    switch (argument)
+    {
+        case "FAC":
+        {
+            var facHandler = new FACIngestionHandler(ingestionOptions);
+            Console.WriteLine($"Valid: {facHandler.Validate()}");
+            Console.WriteLine($"Ingest: {facHandler.Ingest()}");
+            break;
+        }
+    }
+    
+}
 
 Console.WriteLine("FEAT ingestion service end.");

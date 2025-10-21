@@ -4,7 +4,7 @@ resource "azurerm_storage_account" "feat_storage_account" {
   location                     = azurerm_resource_group.feat-rg.location
   account_tier                 = "Standard"
   account_replication_type     = "LRS"
-  public_network_access_enabled = false
+  public_network_access_enabled = true
   
   network_rules {
     default_action = "Deny"
@@ -15,4 +15,10 @@ resource "azurerm_storage_account" "feat_storage_account" {
     Environment = var.env
     Product     = var.product
   }
+}
+
+resource "azurerm_storage_container" "feat_storage_container" {
+  name = "${var.prefix}-storage-container"
+  storage_account_id = azurerm_storage_account.feat_storage_account.id
+  container_access_type = "private"
 }

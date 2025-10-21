@@ -1,9 +1,9 @@
 using Azure.Search.Documents;
 using feat.common.Models.AiSearch;
 
-namespace feat.ingestion.Data;
+namespace feat.ingestion.Handlers;
 
-public interface IIndexHandler
+public interface ISearchIndexHandler
 {
     bool CreateIndex();
 

@@ -1,4 +1,4 @@
-namespace feat.ingestion.Data;
+namespace feat.ingestion.Handlers;
 
 public interface IMigrationsHandler
 {

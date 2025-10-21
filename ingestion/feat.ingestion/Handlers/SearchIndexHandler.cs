@@ -1,17 +1,16 @@
 using Azure.Search.Documents;
-using feat.common;
 using feat.common.Configuration;
 using feat.common.Models.AiSearch;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
 
-namespace feat.ingestion.Data;
+namespace feat.ingestion.Handlers;
 
-public class IndexHandler(
+public class SearchIndexHandler(
     IOptionsMonitor<AzureOptions> options,
     SearchClient aiSearchClient,
     EmbeddingClient embeddingClient)
-    : IIndexHandler
+    : ISearchIndexHandler
 {
     private readonly AzureOptions _azureOptions = options.CurrentValue;
     private readonly SearchClient _aiSearchClient = aiSearchClient;

@@ -1,6 +1,7 @@
+using feat.ingestion.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace feat.ingestion.Data;
+namespace feat.ingestion.Handlers;
 
 public class MigrationsHandler(IngestionDbContext dbContext) : IMigrationsHandler
 {
