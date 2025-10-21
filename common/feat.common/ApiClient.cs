@@ -11,41 +11,48 @@ public class ApiClient : IApiClient
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<T> GetAsync<T>(string clientName, string url)
+    public async Task<T> GetAsync<T>(
+        string clientName,
+        string url,
+        CancellationToken cancellationToken = default)
     {
         var client = _httpClientFactory.CreateClient(clientName);
 
-        var response = await client.GetAsync(url);
+        var response = await client.GetAsync(url, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
-            var content = await response.Content.ReadAsStringAsync();
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
             throw new HttpRequestException(
                 $"GET {url} failed with {(int)response.StatusCode} ({response.ReasonPhrase}). Content: {content}"
             );
         }
 
-        var result = await response.Content.ReadFromJsonAsync<T>()
+        var result = await response.Content.ReadFromJsonAsync<T>(cancellationToken: cancellationToken)
                      ?? throw new InvalidOperationException($"Failed to deserialize response from {url}");
 
         return result;
     }
 
-    public async Task<T> PostAsync<T>(string clientName, string url, object body)
+    public async Task<T> PostAsync<T>(
+        string clientName,
+        string url,
+        object body,
+        CancellationToken cancellationToken = default)
     {
         var client = _httpClientFactory.CreateClient(clientName);
 
-        var response = await client.PostAsJsonAsync(url, body);
+        var response = await client.PostAsJsonAsync(url, body, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
-            var content = await response.Content.ReadAsStringAsync();
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
             throw new HttpRequestException(
                 $"POST {url} failed with {(int)response.StatusCode} ({response.ReasonPhrase}). Content: {content}"
             );
         }
 
-        var result = await response.Content.ReadFromJsonAsync<T>()
+        var result = await response.Content.ReadFromJsonAsync<T>(cancellationToken: cancellationToken)
                      ?? throw new InvalidOperationException($"Failed to deserialize response from {url}");
 
         return result;

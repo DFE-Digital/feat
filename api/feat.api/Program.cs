@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using feat.api.Data;
 using System.Text.Json;
@@ -75,7 +74,7 @@ builder.Services.AddSingleton<EmbeddingClient>(sp =>
 });
 
 builder.Services.AddScoped<ISearchService, SearchService>();
-builder.Services.AddScoped<IApiClient, ApiClient>();
+builder.Services.AddSingleton<IApiClient, ApiClient>();
 
 builder.Services.AddHttpClient(ApiClientNames.Postcode, client =>
 {

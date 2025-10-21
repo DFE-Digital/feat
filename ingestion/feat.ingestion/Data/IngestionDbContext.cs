@@ -1,8 +1,5 @@
 using feat.common.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer;
-using Microsoft.Extensions.Configuration;
-
 
 namespace feat.ingestion.Data;
 
@@ -34,6 +31,7 @@ public class IngestionDbContext : DbContext
 
     public DbSet<Vacancy> Vacancies { get; set; }
     
+    public DbSet<StagingApprenticeshipCourse> StagingApprenticeshipCourses { get; set; }
     
     public IngestionDbContext(DbContextOptions<IngestionDbContext> options)
         : base(options)

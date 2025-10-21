@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>15ce679b-624b-4e9e-b578-fdf8a24c5fc4</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -31,6 +32,7 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.9" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
       <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.9" />
+      <PackageReference Include="Polly" Version="8.6.4" />
     </ItemGroup>
 
     <ItemGroup>
@@ -39,6 +41,9 @@
 
     <ItemGroup>
       <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="appsettings.Development.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

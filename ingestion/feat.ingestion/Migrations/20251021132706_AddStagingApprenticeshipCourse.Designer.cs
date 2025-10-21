@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251021132706_AddStagingApprenticeshipCourse")]
+    partial class AddStagingApprenticeshipCourse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -444,7 +447,7 @@ namespace feat.ingestion.Migrations
 
                     b.Property<string>("Description")
                         .HasMaxLength(350)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(350)");
 
                     b.Property<double?>("Distance")
                         .HasColumnType("float");
@@ -533,7 +536,7 @@ namespace feat.ingestion.Migrations
 
                     b.Property<string>("WorkingWeekDescription")
                         .HasMaxLength(250)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(250)");
 
                     b.HasKey("Id");
 
