@@ -382,6 +382,30 @@ namespace feat.ingestion.Migrations
                     b.ToTable("Sector");
                 });
 
+            modelBuilder.Entity("feat.common.Models.Staging.FAC.AimData", b =>
+                {
+                    b.Property<string>("LearnAimRef")
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.Property<string>("AwardOrgCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("LearnAimRefTitle")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("NotionalNVQLevel2")
+                        .HasColumnType("int");
+
+                    b.HasKey("LearnAimRef");
+
+                    b.ToTable("FAC_AimData");
+                });
+
             modelBuilder.Entity("feat.common.Models.Staging.FAC.AllCoursesCourse", b =>
                 {
                     b.Property<Guid>("COURSE_ID")
