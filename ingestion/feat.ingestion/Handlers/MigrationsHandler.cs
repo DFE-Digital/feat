@@ -28,7 +28,6 @@ public class MigrationsHandler(IngestionDbContext dbContext) : IMigrationsHandle
             Console.WriteLine($"FEAT ingestion development migration Exception: {e}");
             throw;
         }
-        return false;
     }
 
     public bool HasPendingMigrations()
@@ -43,8 +42,6 @@ public class MigrationsHandler(IngestionDbContext dbContext) : IMigrationsHandle
             Console.WriteLine($"FEAT ingestion development migration Exception: {e}");
             throw;
         }
-
-        return false;
     }
 
     public bool HasPendingModelChanges()
@@ -59,6 +56,5 @@ public class MigrationsHandler(IngestionDbContext dbContext) : IMigrationsHandle
             Console.WriteLine($"FEAT ingestion development migration Exception: {e}");
             throw;
         }
-
-        return false;    }
+    }
 }

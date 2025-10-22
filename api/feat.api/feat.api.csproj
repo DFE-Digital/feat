@@ -40,8 +40,4 @@
       <ProjectReference Include="..\..\common\feat.common\feat.common.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Configuration\" />
-    </ItemGroup>
-
 </Project>

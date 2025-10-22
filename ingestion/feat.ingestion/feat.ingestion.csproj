@@ -51,7 +51,6 @@
 
     <ItemGroup>
       <Folder Include="Handlers\DiscoverUni\" />
-      <Folder Include="Handlers\FAA\" />
     </ItemGroup>
 
 </Project>

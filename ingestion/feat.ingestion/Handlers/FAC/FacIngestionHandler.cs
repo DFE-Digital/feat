@@ -1,19 +1,16 @@
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using feat.ingestion.Configuration;
 using feat.ingestion.Enums;
-using Microsoft.Extensions.Options;
 
 namespace feat.ingestion.Handlers.FAC;
 
-public class FACIngestionHandler(IngestionOptions options) : IngestionHandler(options)
+public class FacIngestionHandler(IngestionOptions options) : IngestionHandler(options)
 {
     public override IngestionType IngestionType => IngestionType.Csv | IngestionType.Manual;
     public override string Name => "Find A Course";
     public override string Description => "File based ingestion from Find A Course, Publish To Course Directory, and Learning AIM Datasets Manually Uploaded into Blob Storage";
     
     private const string ContainerName = "fac";
-    
     
     public override async Task<bool> ValidateAsync(CancellationToken cancellationToken)
     {
@@ -92,7 +89,6 @@ public class FACIngestionHandler(IngestionOptions options) : IngestionHandler(op
         
         // Otherwise, we're returning true
         return true;
-
     }
 
     public override async Task<bool> IngestAsync(CancellationToken cancellationToken)
@@ -108,8 +104,6 @@ public class FACIngestionHandler(IngestionOptions options) : IngestionHandler(op
             Console.WriteLine("Unable to validate course data, stopping");
             return false;
         }
-
-        
         
         return true;
     }
