@@ -62,7 +62,7 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
             Search.Interests.RemoveAt(index);
             HttpContext.Session.Set("Search", Search);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Do nothing
         }

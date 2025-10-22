@@ -56,7 +56,7 @@ public class SubjectsModel(ILogger<SubjectsModel> logger) : PageModel
             Search.Subjects.RemoveAt(index);
             HttpContext.Session.Set("Search", Search);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Do nothing
         }

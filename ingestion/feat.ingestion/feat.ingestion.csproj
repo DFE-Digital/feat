@@ -6,31 +6,43 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>d2a0ca02-4cf9-4ade-b1f9-fc01333ed39c</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+        <Content Include="..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="appsettings.Development.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
+      <PackageReference Include="Azure.AI.OpenAI" Version="2.5.0-beta.1" />
+      <PackageReference Include="Azure.Core" Version="1.49.0" />
+      <PackageReference Include="Azure.Storage.Blobs" Version="12.26.0" />
+      <PackageReference Include="CsvHelper" Version="33.1.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.9" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="9.0.9" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="9.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.9" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.9" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.9" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.10" />
+      <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="9.104.0.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -38,9 +50,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+      <Folder Include="Handlers\DiscoverUni\" />
+      <Folder Include="Handlers\FAA\" />
     </ItemGroup>
 
 </Project>

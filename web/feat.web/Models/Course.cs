@@ -14,7 +14,7 @@ public class Course
     
     public string? WhoThisCourseIsFor { get; set; }
 
-    public string ProviderName { get; set; }
+    public required string ProviderName { get; set; }
 
     public string? Location { get; set; }
 
@@ -85,11 +85,11 @@ public class Course
 
     public string? EmployerName { get; set; }
     
-    public string Id { get; set; }
+    public required string Id { get; set; }
     
     public object? DebugInfo { get; set; }
 
-    public string ToJSON()
+    public string ToJson()
     {
         var json = JsonSerializer.Serialize(this, new JsonSerializerOptions()
         {

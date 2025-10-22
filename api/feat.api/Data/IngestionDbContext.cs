@@ -3,7 +3,7 @@ using feat.common.Models;
 
 namespace feat.api.Data;
 
-public class IngestionDbContext : DbContext
+public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : DbContext(options)
 {
     public DbSet<Employer> Employers { get; set; }
     public DbSet<EmployerLocation> EmployerLocations { get; set; }
@@ -18,12 +18,4 @@ public class IngestionDbContext : DbContext
     public DbSet<Sector> Sectors { get; set; }
     public DbSet<UniversityCourse> UniversitiesCourses { get; set; }
     public DbSet<Vacancy> Vacancies { get; set; }
-
-    public IngestionDbContext(DbContextOptions<IngestionDbContext> options): base(options)
-    {   
-    }
-    
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-    {
-    }
 }
