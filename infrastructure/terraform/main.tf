@@ -4,12 +4,20 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 4.45"
+    },
+    azapi = {
+      source  = "azure/azapi"
+      version = "2.2.0"
     }
   }
 }
 
 provider "azurerm" {
   features {}
+}
+
+provider "azapi" {
+  
 }
 
 # Resource Group
