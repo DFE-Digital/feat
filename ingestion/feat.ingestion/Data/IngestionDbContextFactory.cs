@@ -1,5 +1,4 @@
 using System.Reflection;
-using feat.common.Configuration;
 using feat.ingestion.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -11,7 +10,6 @@ public class IngestionDbContextFactory : IDesignTimeDbContextFactory<IngestionDb
 {
     public IngestionDbContext CreateDbContext(string[] args)
     {
-        
         var currentEnvironment = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
         if (string.IsNullOrEmpty(currentEnvironment))
         {
@@ -28,7 +26,6 @@ public class IngestionDbContextFactory : IDesignTimeDbContextFactory<IngestionDb
 
         var ingestionOptions = new IngestionOptions();
         config.GetSection(IngestionOptions.Name).Bind(ingestionOptions);
-        
 
         string connectionString = ingestionOptions.ConnectionString;
         

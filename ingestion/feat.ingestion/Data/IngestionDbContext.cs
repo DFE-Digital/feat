@@ -1,7 +1,7 @@
 using feat.common.Models;
-using FAC = feat.common.Models.Staging.FAC;
 using Microsoft.EntityFrameworkCore;
-
+using FAC = feat.common.Models.Staging.FAC;
+using FAA = feat.common.Models.Staging.FAA;
 
 namespace feat.ingestion.Data;
 
@@ -47,6 +47,9 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
     public DbSet<FAC.AllCoursesCourse> FAC_AllCourses { get; set; }
     public DbSet<FAC.Course> FAC_Courses { get; set; }
     public DbSet<FAC.TLevel> FAC_TLevels { get; set; }
+    
+    public DbSet<FAA.Apprenticeship> FAA_Apprenticeships { get; set; }
+    public DbSet<FAA.Address> FAA_Addresses { get; set; }
     
     #endregion
 }

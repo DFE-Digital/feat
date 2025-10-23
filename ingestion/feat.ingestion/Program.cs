@@ -5,26 +5,22 @@ using Azure;
 using Azure.AI.OpenAI;
 using Azure.Core.Serialization;
 using Azure.Search.Documents;
+using feat.common;
 using feat.common.Configuration;
-using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using feat.ingestion;
 using feat.ingestion.Configuration;
 using feat.ingestion.Data;
 using feat.ingestion.Handlers;
+using feat.ingestion.Handlers.FAA;
 using feat.ingestion.Handlers.FAC;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
 
-
 Console.WriteLine("FEAT ingestion service started.");
 
-var currentEnvironment = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-if (string.IsNullOrEmpty(currentEnvironment))
-{
-    currentEnvironment = "Development";
-}
+var currentEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
 var builder = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false)
@@ -39,26 +35,29 @@ config.GetSection(IngestionOptions.Name).Bind(ingestionOptions);
 
 if (string.IsNullOrEmpty(ingestionOptions.Environment))
 {
-    Console.WriteLine("FEAT Environment name missing.");
+    Console.WriteLine("Environment missing in configuration.");
     return;
 }
+
 if (string.IsNullOrEmpty(ingestionOptions.ConnectionString))
 {
-    Console.WriteLine("FEAT connection string missing.");
+    Console.WriteLine("ConnectionString missing in configuration.");
     return;
 }
 
-string connectionString = ingestionOptions.ConnectionString;
-
-
-// Set up DI
 var services = new ServiceCollection();
+
 services.AddDbContext<IngestionDbContext>(options =>
-    options.UseSqlServer(connectionString, optionsBuilder => optionsBuilder
-        .UseNetTopologySuite()
-        .MigrationsAssembly("feat.common")
-    ));
+{
+    options.UseSqlServer(ingestionOptions.ConnectionString, o => o.UseNetTopologySuite());
+});
+
 services.AddTransient<IMigrationsHandler, MigrationsHandler>();
+services.AddTransient<FacIngestionHandler>();
+services.AddTransient<FaaIngestionHandler>();
+services.AddSingleton<IApiClient, ApiClient>();
+services.AddSingleton<IIngestionHandlerFactory, IngestionHandlerFactory>();
+services.AddSingleton(ingestionOptions);
 
 services.AddSingleton<SearchClient>(sp =>
 {
@@ -95,9 +94,16 @@ services.AddSingleton<EmbeddingClient>(sp =>
     return openAiClient.GetEmbeddingClient("text-embedding-3-large");
 });
 
+services.AddHttpClient(ApiClientNames.FindAnApprenticeship, client =>
+{
+    client.BaseAddress = new Uri("https://api.apprenticeships.education.gov.uk/");
+    
+    client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", ingestionOptions.ApprenticeshipApiKey);
+    client.DefaultRequestHeaders.Add("X-Version", "2");
+    client.DefaultRequestHeaders.Add("AdditionalDataSources", "Nhs");
+});
 
-
-ServiceProvider serviceProvider = services.BuildServiceProvider();
+var serviceProvider = services.BuildServiceProvider();
 
 if (ingestionOptions.Environment.Equals("Development", StringComparison.InvariantCultureIgnoreCase))
 {
@@ -105,7 +111,7 @@ if (ingestionOptions.Environment.Equals("Development", StringComparison.Invarian
     {
         var migrationsHandler = serviceProvider.GetService<IMigrationsHandler>();
         
-        if (migrationsHandler?.HasPendingModelChanges() ??  false)
+        if (migrationsHandler?.HasPendingModelChanges() ?? false)
         {
             Console.WriteLine(
                 "There are model changes that have not been applied as migrations, these need to be created first");
@@ -113,8 +119,6 @@ if (ingestionOptions.Environment.Equals("Development", StringComparison.Invarian
         }
         
         migrationsHandler?.RunPendingMigrations();
-        
-        
     }
     catch (Exception e)
     {
@@ -122,19 +126,19 @@ if (ingestionOptions.Environment.Equals("Development", StringComparison.Invarian
     }
 }
 
+var factory = serviceProvider.GetRequiredService<IIngestionHandlerFactory>();
+
 foreach (var argument in args)
 {
-    switch (argument)
+    var handler = factory.Create(argument);
+    if (handler == null)
     {
-        case "FAC":
-        {
-            var facHandler = new FACIngestionHandler(ingestionOptions);
-            Console.WriteLine($"Valid: {facHandler.Validate()}");
-            Console.WriteLine($"Ingest: {facHandler.Ingest()}");
-            break;
-        }
+        Console.WriteLine($"Unknown ingestion source: {argument}");
+        continue;
     }
-    
+
+    Console.WriteLine($"Valid: {handler.Validate()}");
+    Console.WriteLine($"Ingest: {handler.Ingest()}");
 }
 
 Console.WriteLine("FEAT ingestion service end.");

@@ -26,7 +26,6 @@
 
     <ItemGroup>
       <Folder Include="Models\Staging\DiscoverUni\" />
-      <Folder Include="Models\Staging\FAA\" />
     </ItemGroup>
 
 </Project>

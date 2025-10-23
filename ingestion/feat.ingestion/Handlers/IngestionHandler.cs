@@ -1,37 +1,25 @@
-using feat.common.Configuration;
 using feat.ingestion.Configuration;
 using feat.ingestion.Enums;
-using Microsoft.Extensions.Options;
 
 namespace feat.ingestion.Handlers;
 
-public class IngestionHandler(IngestionOptions options) : IIngestionHandler
+public abstract class IngestionHandler(IngestionOptions options) : IIngestionHandler
 {
     public virtual IngestionType IngestionType => IngestionType.Manual;
     public virtual string Name => "Default Ingestion Handler";
     public virtual string Description => "This should not be used and should be inherited as the base class";
-
-    public virtual bool Ingest()
+    
+    public bool Ingest()
     {
-        var task = IngestAsync(CancellationToken.None);
-        task.Wait();
-        return task.Result;
+        return IngestAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
-
-    public virtual bool Validate()
+    
+    public bool Validate()
     {
-        var task = ValidateAsync(CancellationToken.None);
-        task.Wait();
-        return task.Result;
+        return ValidateAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
-
-    public virtual Task<bool> IngestAsync(CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public virtual Task<bool> ValidateAsync(CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+    
+    public abstract Task<bool> IngestAsync(CancellationToken cancellationToken);
+    
+    public abstract Task<bool> ValidateAsync(CancellationToken cancellationToken);
 }
