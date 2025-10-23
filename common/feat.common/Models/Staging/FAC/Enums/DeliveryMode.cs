@@ -15,4 +15,6 @@ public enum DeliveryMode
 
     [Description("Blended learning")]
     BlendedLearning = 4,
+    
+    Unknown = -1
 }

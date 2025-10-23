@@ -7,23 +7,15 @@ using Database = feat.common.Models.Staging.FAA;
 
 namespace feat.ingestion.Handlers.FAA;
 
-public class FaaIngestionHandler : IngestionHandler
+public class FaaIngestionHandler(
+    IngestionOptions options,
+    IApiClient apiClient,
+    IngestionDbContext dbContext)
+    : IngestionHandler(options)
 {
-    private readonly IngestionOptions _options;
-    private readonly IApiClient _apiClient;
-    private readonly IngestionDbContext _dbContext;
-    
-    public FaaIngestionHandler(
-        IngestionOptions options,
-        IApiClient apiClient,
-        IngestionDbContext dbContext) : base(options)
-    {
-        _options = options;
-        _apiClient = apiClient;
-        _dbContext = dbContext;
-    }
+    private readonly IngestionOptions _options = options;
 
-    public override IngestionType IngestionType => IngestionType.Api;
+    public override IngestionType IngestionType => IngestionType.Api | IngestionType.Automatic;
     public override string Name => "Find An Apprenticeship";
     public override string Description => "Ingestion from Find An Apprenticeship API";
     
@@ -40,7 +32,7 @@ public class FaaIngestionHandler : IngestionHandler
 
         try
         {
-            response = await _apiClient.GetAsync<ApiResponse>(
+            response = await apiClient.GetAsync<ApiResponse>(
                 ApiClientNames.FindAnApprenticeship, url, cancellationToken: cancellationToken);
         }
         catch (Exception ex)
@@ -73,7 +65,7 @@ public class FaaIngestionHandler : IngestionHandler
                 
                 var url = $"vacancies/vacancy?PageNumber={pageNumber}&PageSize={pageSize}";
 
-                var response = await _apiClient.GetAsync<ApiResponse>(
+                var response = await apiClient.GetAsync<ApiResponse>(
                     ApiClientNames.FindAnApprenticeship, url, cancellationToken: cancellationToken);
                 
                 var courses = response?.Vacancies ?? [];
@@ -150,8 +142,8 @@ public class FaaIngestionHandler : IngestionHandler
                 }).ToList() ?? []
             }).ToList();
 
-            await _dbContext.FAA_Apprenticeships.AddRangeAsync(stagingRows, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.FAA_Apprenticeships.AddRangeAsync(stagingRows, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             Console.WriteLine($"Successfully ingested {stagingRows.Count} courses into staging.");
             return true;

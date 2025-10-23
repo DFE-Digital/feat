@@ -12,16 +12,16 @@ public class Course
     [Key] public Guid CourseId { get; set; }
     public CourseStatus CourseStatus { get; set; }
     public DateTime CreatedOn { get; set; }
-    public DateTime UpdatedOn { get; set; }
+    public DateTime? UpdatedOn { get; set; }
     [StringLength(8)] public string LearnAimRef { get; set; }
     public int ProviderUkprn { get; set; }
-    [StringLength(2000)] public string CourseDescription { get; set; }
-    [StringLength(500)] public string? EntryRequirements { get; set; }
-    [StringLength(500)] public string? WhatYoullLearn { get; set; }
-    [StringLength(500)] public string? HowYoullLearn { get; set; }
-    [StringLength(500)] public string? WhatYoullNeed { get; set; }
-    [StringLength(500)] public string? HowYoullBeAssessed { get; set; }
-    [StringLength(500)] public string? WhereNext { get; set; }
+    [StringLength(4000)] public string? CourseDescription { get; set; }
+    [StringLength(4000)] public string? EntryRequirements { get; set; }
+    [StringLength(4000)] public string? WhatYoullLearn { get; set; }
+    [StringLength(4000)] public string? HowYoullLearn { get; set; }
+    [StringLength(4000)] public string? WhatYoullNeed { get; set; }
+    [StringLength(4000)] public string? HowYoullBeAssessed { get; set; }
+    [StringLength(4000)] public string? WhereNext { get; set; }
     public CourseType? CourseType { get; set; }
     public EducationLevel? EducationLevel  { get; set; }
     [StringLength(500)] public string? AwardingBody { get; set; }
@@ -37,7 +37,7 @@ public sealed class CourseMap : ClassMap<Course>
         Map(m => m.CourseId);
         Map(m => m.CourseStatus);
         Map(m => m.CreatedOn);
-        Map(m => m.UpdatedOn);
+        Map(m => m.UpdatedOn).Default(new DateTime?(), useOnConversionFailure: true);
         Map(m => m.LearnAimRef);
         Map(m => m.ProviderUkprn);
         
@@ -52,25 +52,25 @@ public sealed class CourseMap : ClassMap<Course>
             args.Row.GetField<bool?>("DataIsHtmlEncoded"),
             args.Row.GetField<string?>("EntryRequirements")));
         
-        Map(m => m.EntryRequirements).Convert(args => HtmlDecode(
+        Map(m => m.WhatYoullLearn).Convert(args => HtmlDecode(
             args.Row.GetField<bool?>("DataIsHtmlEncoded"),
-            args.Row.GetField<string?>("EntryRequirements")));
+            args.Row.GetField<string?>("WhatYoullLearn")));
         
-        Map(m => m.EntryRequirements).Convert(args => HtmlDecode(
+        Map(m => m.HowYoullLearn).Convert(args => HtmlDecode(
             args.Row.GetField<bool?>("DataIsHtmlEncoded"),
-            args.Row.GetField<string?>("EntryRequirements")));
+            args.Row.GetField<string?>("HowYoullLearn")));
         
-        Map(m => m.EntryRequirements).Convert(args => HtmlDecode(
+        Map(m => m.WhatYoullNeed).Convert(args => HtmlDecode(
             args.Row.GetField<bool?>("DataIsHtmlEncoded"),
-            args.Row.GetField<string?>("EntryRequirements")));
+            args.Row.GetField<string?>("WhatYoullNeed")));
         
-        Map(m => m.EntryRequirements).Convert(args => HtmlDecode(
+        Map(m => m.HowYoullBeAssessed).Convert(args => HtmlDecode(
             args.Row.GetField<bool?>("DataIsHtmlEncoded"),
-            args.Row.GetField<string?>("EntryRequirements")));
+            args.Row.GetField<string?>("HowYoullBeAssessed")));
         
-        Map(m => m.EntryRequirements).Convert(args => HtmlDecode(
+        Map(m => m.WhereNext).Convert(args => HtmlDecode(
             args.Row.GetField<bool?>("DataIsHtmlEncoded"),
-            args.Row.GetField<string?>("EntryRequirements")));
+            args.Row.GetField<string?>("WhereNext")));
         
         
         
