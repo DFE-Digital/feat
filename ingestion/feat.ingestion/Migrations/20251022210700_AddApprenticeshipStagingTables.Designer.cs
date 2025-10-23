@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251022210700_AddApprenticeshipStagingTables")]
+    partial class AddApprenticeshipStagingTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,30 +383,6 @@ namespace feat.ingestion.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Sector");
-                });
-
-            modelBuilder.Entity("feat.common.Models.Staging.FAC.AimData", b =>
-                {
-                    b.Property<string>("LearnAimRef")
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
-
-                    b.Property<string>("AwardOrgCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("LearnAimRefTitle")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int?>("NotionalNVQLevel2")
-                        .HasColumnType("int");
-
-                    b.HasKey("LearnAimRef");
-
-                    b.ToTable("FAC_AimData");
                 });
 
             modelBuilder.Entity("feat.common.Models.Staging.FAA.Address", b =>

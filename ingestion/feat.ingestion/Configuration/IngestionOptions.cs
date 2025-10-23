@@ -10,5 +10,5 @@ public class IngestionOptions
     public string ConnectionString { get; set; } = string.Empty;
     
     public string BlobStorageConnectionString { get; set; } = string.Empty;
-    
+    public string ApprenticeshipApiKey { get; set; } = string.Empty;
 }
