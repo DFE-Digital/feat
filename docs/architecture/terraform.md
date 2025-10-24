@@ -3,7 +3,7 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.13.3 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.13.4 |
 | <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | 2.2.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.50 |
 
@@ -11,6 +11,7 @@
 
 | Name | Version |
 |------|---------|
+| <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 2.2.0 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.50 |
 
 ## Modules
@@ -21,6 +22,7 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [azapi_resource.feat_main_subnet](https://registry.terraform.io/providers/azure/azapi/2.2.0/docs/resources/resource) | resource |
 | [azurerm_app_service_virtual_network_swift_connection.api_app_vn_conn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_service_virtual_network_swift_connection) | resource |
 | [azurerm_app_service_virtual_network_swift_connection.website_app_vn_conn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_service_virtual_network_swift_connection) | resource |
 | [azurerm_container_registry.feat-registry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) | resource |
@@ -39,8 +41,6 @@ No modules.
 | [azurerm_service_plan.feat-web-asp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/service_plan) | resource |
 | [azurerm_storage_account.feat_storage_account](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_container.feat_storage_container](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
-| [azurerm_subnet.feat_main_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
-| [azurerm_subnet_network_security_group_association.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
 | [azurerm_virtual_network.feat_vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 
 ## Inputs
@@ -51,7 +51,7 @@ No modules.
 | <a name="input_env"></a> [env](#input\_env) | Environment (dev, test, prod) | `string` | n/a | yes |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | `"uksouth"` | no |
 | <a name="input_partition_count"></a> [partition\_count](#input\_partition\_count) | Partitions allow for scaling of document count as well as faster indexing by sharding your index over multiple search units. | `number` | `1` | no |
-| <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix for resource names | `string` | `"s213"` | no |
+| <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix for resource names | `string` | `"s265"` | no |
 | <a name="input_product"></a> [product](#input\_product) | Name of the project | `string` | `"Find Education and Training"` | no |
 | <a name="input_replica_count"></a> [replica\_count](#input\_replica\_count) | Replicas distribute search workloads across the service. You need at least two replicas to support high availability of query workloads (not applicable to the free tier). | `number` | `1` | no |
 | <a name="input_sku"></a> [sku](#input\_sku) | The pricing tier of the search service you want to create (for example, basic or standard). | `string` | `"standard"` | no |
