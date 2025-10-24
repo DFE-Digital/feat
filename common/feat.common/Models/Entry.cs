@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using feat.common.Models.Enums;
 
 namespace feat.common.Models;
 
@@ -38,6 +39,8 @@ public class Entry
     [Column("URL")]
     [StringLength(2083)] 
     public required string Url { get; set; } = string.Empty;
+    
+    public SourceSystem? SourceSystem { get; set; }
 
     public DateTime? SourceUpdated { get; set; }
 

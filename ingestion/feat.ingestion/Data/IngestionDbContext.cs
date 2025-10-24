@@ -1,13 +1,19 @@
 using feat.common.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer;
-using Microsoft.Extensions.Configuration;
-
+using FAC = feat.common.Models.Staging.FAC;
+using FAA = feat.common.Models.Staging.FAA;
 
 namespace feat.ingestion.Data;
 
-public class IngestionDbContext : DbContext
+public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : DbContext(options)
 {
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    {
+        options.UseSqlServer(b => b.MigrationsAssembly("feat.ingestion"));
+    }
+
+    #region Our models
+    
     public DbSet<Employer> Employers { get; set; }
     
     public DbSet<EmployerLocation> EmployerLocations { get; set; }
@@ -34,11 +40,16 @@ public class IngestionDbContext : DbContext
 
     public DbSet<Vacancy> Vacancies { get; set; }
     
+    #endregion
     
-    public IngestionDbContext(DbContextOptions<IngestionDbContext> options)
-        : base(options)
-    {
-        
-    }
+    #region Staging Models
     
+    public DbSet<FAC.AllCoursesCourse> FAC_AllCourses { get; set; }
+    public DbSet<FAC.Course> FAC_Courses { get; set; }
+    public DbSet<FAC.TLevel> FAC_TLevels { get; set; }
+    
+    public DbSet<FAA.Apprenticeship> FAA_Apprenticeships { get; set; }
+    public DbSet<FAA.Address> FAA_Addresses { get; set; }
+    
+    #endregion
 }

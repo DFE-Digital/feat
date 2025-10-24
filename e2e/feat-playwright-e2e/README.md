@@ -123,7 +123,14 @@ Main settings in `playwright.config.ts` include:
 - `projects`: Browser, device, and API configurations
 - `use`: Default settings (trace, screenshot, video, baseURL, headers)
 
----
+## Keeping API Test Data Updated
+When backend data models or API response structures change, make sure to:
+- Update the API test data in `src/api/fixtures/testDataFactory.ts`
+- Review and update any JSON schemas in `src/api/schemas/`
+- Adjust tests in `src/api/tests/` to reflect new or removed fields
+
+Keeping the test data aligned with the live API ensures reliable test results and prevents false failures.
+
 
 ## Contribution Guidelines
 1. Fork the repository

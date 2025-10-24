@@ -62,7 +62,7 @@ workspace "FEATv1" "Find Education and Training - Hosting internal AI Search" {
                     
                     internet = deploymentNode "Public Internet" {
                         tags "Microsoft Azure - Entra Internet Access"
-                        gateway = infrastructureNode "Azure Front Door" {
+                        gateway = infrastructureNode "Shared DfE WAF" {
                             technology "Azure Front Door and Firewalls"
                             description "Automatically distributes and secures incoming application traffic"
                             tags "Microsoft Azure - Firewalls"
@@ -95,29 +95,25 @@ workspace "FEATv1" "Find Education and Training - Hosting internal AI Search" {
                         }
                         
                         
-                        cache = infrastructureNode "Azure Cache" {
-                            description "Redis-backed cache for short term storage of data"
-                            tags "Microsoft Azure - Cache"
+                        cache = infrastructureNode "Distributed Cache" {
+                            description "Azure Cache - Redis"
+                            tags "Microsoft Azure - Cache Redis"
                         }
                         
-                        /* 
+                         
                         staging = infrastructureNode "Azure Blob Storage" {
-                            description "Azure Blob Storage"
+                            description "Staging location for CSV file imports and data storage"
                             tags "Microsoft Azure - Storage Accounts"
                         }
-                        */
+                        
                         
                         db = infrastructureNode "Relational DB" {
                             description "Data store for information to be surfaced to users that isn't required to be searchable"
                             tags "Microsoft Azure - SQL Server"
+                            cache -> this "Backing store"
                         }
                         
-                        /*
-                        datafactory = infrastructureNode "Azure Data Factory" {
-                            description "FAA Data Factory"
-                            tags "Microsoft Azure - Data Factories"
-                        }
-                        */
+                        
                         webContainer = deploymentNode "Auto-Scaling Web Container" {
                             tags "Microsoft Azure - Container Apps Environments"
                             
@@ -151,9 +147,8 @@ workspace "FEATv1" "Find Education and Training - Hosting internal AI Search" {
                                     this -> cache "Saves semantic results and geolocation lookups"
                                     cache -> this "Fetches semantic results and geolocation lookups"
                                     this -> db "Saves additional information for display"
-                                    /*
                                     staging -> this "Loads data from"
-                                    */
+                                    
                                 }
                             }
                             

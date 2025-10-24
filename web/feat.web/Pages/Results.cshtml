@@ -190,7 +190,7 @@
     </div>
 
     <div id="search-results">
-      @foreach (var result in Model.SearchResponse?.Courses)
+      @foreach (var result in Model.SearchResponse?.Courses!)
       {
         await Html.RenderPartialAsync("Partials/Course", result);
       }

@@ -2,11 +2,11 @@ using System.Text.RegularExpressions;
 using Azure;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Models;
-using feat.api.Configuration;
 using feat.api.Enums;
 using feat.api.Models;
 using feat.api.Models.External;
 using feat.common;
+using feat.common.Configuration;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
 

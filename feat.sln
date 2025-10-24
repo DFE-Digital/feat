@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "terraform", "terraform", "{
 		infrastructure\terraform\network.tf = infrastructure\terraform\network.tf
 		infrastructure\terraform\ms-az-search-service.tf = infrastructure\terraform\ms-az-search-service.tf
 		infrastructure\terraform\ms-sql-srv-db.tf = infrastructure\terraform\ms-sql-srv-db.tf
+		infrastructure\terraform\filestore.tf = infrastructure\terraform\filestore.tf
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "e2e", "e2e", "{8BF3D5E1-6737-4758-8CDA-23F8DECBF71A}"

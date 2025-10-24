@@ -56,7 +56,7 @@ public class CareersModel(ILogger<CareersModel> logger) : PageModel
             Search.Careers.RemoveAt(index);
             HttpContext.Session.Set("Search", Search);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Do nothing
         }
