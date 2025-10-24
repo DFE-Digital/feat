@@ -22,25 +22,19 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         if (!Search.Updated)
-            return RedirectToPage("Index");
+            return RedirectToPage(PageName.Index); // ??
         
         if (Search.Distance.HasValue)
             Distance = Search.Distance;
         if (!string.IsNullOrEmpty(Search.Location))
             Location = Search.Location;
-        
-        Search.SetPage("Location");
+
+        Search.SetPage(PageName.Location); 
         HttpContext.Session.Set("Search", Search);
         
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
         //TODO If you've come here from LoadCourses page Need to 'new Search'
         //
 
->>>>>>> Stashed changes
         return Page();
     }
 
@@ -48,7 +42,7 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
-        // If its anything other than HE, we need to validate distance and location
+        // If it's anything other than HE, we need to validate distance and location
         if (Search.SearchType != SearchType.HE)
         {
             if (string.IsNullOrEmpty(Location))
@@ -61,28 +55,19 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
             if (string.IsNullOrEmpty(Location))
                 ModelState.AddModelError("Location", "Please enter a location or click \"Skip this step\"");
         }
-
-        
         
         if (!ModelState.IsValid)
             return Page();
         
         Search.Updated = true;
         
-        if (!string.IsNullOrEmpty(Location)) Search.Location = Location;
-        if (Distance != null) Search.Distance = Distance.Value;
-
+        if (!string.IsNullOrEmpty(Location)) 
+            Search.Location = Location.Trim();
+        if (Distance != null) 
+            Search.Distance = Distance.Value;
 
         HttpContext.Session.Set("Search", Search);
 
-        if (Search.AgeGroup is AgeGroup.UnderEighteen && Search.SearchType is SearchType.FE or SearchType.Return)
-        {
-            return RedirectToPage("How");
-        }
-        
-        if (Search.Interests.Any() || Search.Subjects.Any() || Search.Careers.Any())
-            return RedirectToPage("Summary");
-
-        return RedirectToPage("Interests");
+        return RedirectToPage(PageName.Interests); 
     }
 }
