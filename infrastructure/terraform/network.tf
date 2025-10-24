@@ -11,15 +11,28 @@ resource "azurerm_network_security_group" "feat-nsg" {
   resource_group_name = azurerm_resource_group.feat-rg.name
 
   security_rule {
-    name                       = "defaultSecurityrule"
-    priority                   = 100
+    name                       = "Allow-HTTP(S)-From-VNet"
+    priority                   = 200
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "*" # All source ports
-    destination_port_range     = "*" # "5432" 
     source_address_prefix      = "*"
-    destination_address_prefix = "*"
+    destination_address_prefix = "VirtualNetwork"
+    destination_port_ranges    = ["80", "443"]
+    source_port_range          = "*"
+  }
+
+  #potentially, for internal communication within the VNet:
+  security_rule {
+    name                       = "Allow-Internal-VNet"
+    priority                   = 210
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_address_prefix      = "VirtualNetwork"
+    destination_address_prefix = "VirtualNetwork"
+    source_port_range          = "*"
+    destination_port_range     = "*"
   }
 }
 

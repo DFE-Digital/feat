@@ -3,8 +3,8 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.45"
-    },
+      version = "~> 4.50"
+    }
     azapi = {
       source  = "azure/azapi"
       version = "2.2.0"
@@ -17,7 +17,7 @@ provider "azurerm" {
 }
 
 provider "azapi" {
-  
+
 }
 
 # Resource Group
@@ -46,7 +46,7 @@ resource "azurerm_service_plan" "feat-ing-asp" {
   location            = azurerm_resource_group.feat-rg.location
   resource_group_name = azurerm_resource_group.feat-rg.name
   os_type             = "Linux"
-  sku_name            = "B1"
+  sku_name            = "B3"
 }
 
 # Azure Container Registry

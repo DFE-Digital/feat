@@ -13,9 +13,9 @@ resource "azurerm_mssql_server" "feat_mssql_server" {
 }
 
 resource "azurerm_mssql_database" "feat_mssql_db" {
-  name       = "${var.prefix}-coursedb"
-  server_id  = azurerm_mssql_server.feat_mssql_server.id
-  sku_name   = "S0"
+  name      = "${var.prefix}-coursedb"
+  server_id = azurerm_mssql_server.feat_mssql_server.id
+  sku_name  = "S0"
 
   auto_pause_delay_in_minutes = 120
   max_size_gb                 = 2
