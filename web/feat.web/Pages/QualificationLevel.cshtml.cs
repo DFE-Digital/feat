@@ -4,6 +4,7 @@ using feat.web.Extensions;
 using feat.web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Collections.Generic;
 
 namespace feat.web.Pages;
 
@@ -11,7 +12,7 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
 {
     [BindProperty]
     [Required(ErrorMessage = "Please select the level of qualification you are looking for")]
-    public QualificationLevel? QualificationLevel { get; set; }
+    public List<QualificationLevel> SelectedQualificationOptions { get; set; } = new();
     
     public required Search Search { get; set; }
     
@@ -19,10 +20,10 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         
-        if (Search.QualificationLevel.HasValue)
-            QualificationLevel = Search.QualificationLevel;
-
-        Search.SetPage("QualificationLevel");
+        if (Search.QualificationLevels.Count != 0)
+            SelectedQualificationOptions = Search.QualificationLevels;
+        
+        Search.SetPage(PageName.QualificationLevel); 
         HttpContext.Session.Set("Search", Search);
         
         return Page();
@@ -30,16 +31,46 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
 
     public IActionResult OnPost()
     {
-        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-        if (!ModelState.IsValid)
-            return Page();
+        logger.LogInformation("Qualification OnPost {SelectedQualificationOptions}", SelectedQualificationOptions);
 
-        Search.Updated = true;
-        if (QualificationLevel.HasValue) Search.QualificationLevel = QualificationLevel.Value;
-
-        HttpContext.Session.Set("Search", Search);
-
-        return RedirectToPage("Summary");
-
+        try
+        {
+            Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+            
+            if (SelectedQualificationOptions?.Count == 0)
+            {
+                ModelState.AddModelError("SelectedQualificationOptions", "Please select a level");
+            }
+            if (!ModelState.IsValid) 
+                return Page();
+            
+            Search.QualificationLevels?.Clear();
+            if (SelectedQualificationOptions != null)
+            {
+                foreach (var qualificationOption in SelectedQualificationOptions)
+                {
+                    if (!Search.QualificationLevels.Contains(qualificationOption))
+                    {
+                        Search.QualificationLevels.Add(qualificationOption);
+                    }
+                }
+                Search.Updated = true;
+            }
+            
+            HttpContext.Session.Set("Search", Search);
+        
+            if (SelectedQualificationOptions.Contains(Enums.QualificationLevel.None)  
+                || SelectedQualificationOptions.Contains(Enums.QualificationLevel.OneAndTwo))
+            {
+                return RedirectToPage(PageName.Age);
+            }
+            return RedirectToPage(PageName.CheckAnswers);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+        }
+        return Page();
     }
+    
 }

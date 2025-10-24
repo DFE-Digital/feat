@@ -123,8 +123,8 @@
                     </dd>
                 </div>
             }
-            
-            @if (Model.Search.QualificationLevel.HasValue)
+            <!--
+            if (Model.Search.QualificationLevel.HasValue)
             {
                 <div class="govuk-summary-list__row">
 
@@ -132,13 +132,14 @@
                         Qualification Level
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @Model.Search.QualificationLevel.Value.GetDisplayName()
+                        *-Model.Search.QualificationLevel.Value.GetDisplayName()
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link" asp-page="QualificationLevel">Change<span class="govuk-visually-hidden"> qualification level</span></a>
                     </dd>
                 </div>
             }
+            -->
         </dl>
 
         <p class="govuk-body">Find out <a href="ai" class="govuk-link">how we use AI</a> to bring you relevant results.</p>

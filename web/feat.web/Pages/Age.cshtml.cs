@@ -7,59 +7,66 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace feat.web.Pages;
 
-public class SituationModel (ILogger<SituationModel> logger) : PageModel
+public class AgeModel (ILogger<AgeModel> logger) : PageModel
 {
-    
     [BindProperty]
     [Required(ErrorMessage = "Please select your age group or select \"Skip this step\"")]
     public AgeGroup? AgeGroup { get; set; }
     
-    [BindProperty]
-    [Required(ErrorMessage = "Please select what you want to do or select \"Skip this step \"")]
-    public SearchType? SearchType { get; set; }
-    
     public required Search Search { get; set; }
     
-    public void OnGet()
+    public IActionResult OnGet()
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+        
         if (Search.AgeGroup.HasValue)
             AgeGroup = Search.AgeGroup;
-        if (Search.SearchType.HasValue)
-            SearchType = Search.SearchType;
-        
-        Search.SetPage("Situation");
+
+        Search.SetPage(PageName.Age);//"Age");
         HttpContext.Session.Set("Search", Search);
         
+        return Page();
     }
 
     public IActionResult OnPost()
     {
+        logger.LogInformation("Age OnPost {AgeGroup}", AgeGroup);
+        try
+        {
+
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            Console.WriteLine(e);
+            throw;
+        }
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         if (!ModelState.IsValid)
             return Page();
         
-        Search.SetPage("Situation");
+        //Search.SetPage("Age"); --?? 
         Search.Updated = true;
         
-        if (AgeGroup.HasValue) Search.AgeGroup = AgeGroup.Value;
-        if (SearchType.HasValue) Search.SearchType = SearchType.Value;
-
+        if (AgeGroup.HasValue) 
+            Search.AgeGroup = AgeGroup.Value;
+        
         HttpContext.Session.Set("Search", Search);
-/*
+
+        /*
         if (AgeGroup is Enums.AgeGroup.UnderEighteen or Enums.AgeGroup.EighteenToTwentyFour 
             && SearchType == Enums.SearchType.HE)
         {
             return RedirectToPage("Interests");
-        }*/
+        }
 
         if (AgeGroup == Enums.AgeGroup.UnderEighteen 
             && SearchType is Enums.SearchType.FE or Enums.SearchType.Return)
         {
             return RedirectToPage("Location");
-        }
+        } check-answers
+        */
 
-        return RedirectToPage("How");
-        
+        return RedirectToPage(PageName.CheckAnswers);// need to go to CheckAnswer => Summary.
     }
 }
