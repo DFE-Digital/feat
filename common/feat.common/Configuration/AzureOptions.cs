@@ -15,6 +15,8 @@ public class AzureOptions
     public string AiSearchIndex { get; set; } = string.Empty;
 
     public string AiSearchKey { get; set; } = string.Empty;
+    
+    public string AiSearchAdminKey { get; set; } = string.Empty;
     public string AiSearchIndexScoringProfile { get; set; } = string.Empty;
     
     public string AiSearchIndexScoringParameters { get; set; } = string.Empty;
