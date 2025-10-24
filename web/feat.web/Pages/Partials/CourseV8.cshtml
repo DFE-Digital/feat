@@ -1,0 +1,149 @@
+@using System.Globalization
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@model feat.web.Models.Course
+@{
+  /*
+   * var ti = CultureInfo.CurrentCulture.TextInfo;
+   */
+
+  string TruncateString(ReadOnlySpan<char> fullString, out string remainder, int cutoff = 300)
+  {
+    remainder = string.Empty;
+    if (fullString.IsEmpty || fullString.Length <= cutoff)
+      return fullString.ToString();
+    
+    int cutPosition = fullString[cutoff..].IndexOf('.');
+
+    if (cutPosition == -1)
+      return fullString.ToString();
+    
+    cutPosition += cutoff;
+    remainder = fullString[(cutPosition + 1)..].ToString();
+    return fullString[..cutPosition].ToString();
+  }
+  
+}
+
+<!-- Course Card - Liams html -->
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">@Model.CourseName</h2>
+    <ul class="govuk-summary-card__actions">
+      <li class="govuk-summary-card__action">
+        @{
+          var courseType = Model.CourseType;
+          if (courseType == "Degree")
+          {
+            
+          }else if (courseType == "Apprentiship")
+          {
+          }
+          else 
+          {
+            
+          }
+        }
+        <!--<a class="govuk-link" asp-page-handler="GoToDetailsScreen" >View more details<span class="govuk-visually-hidden">about (Model.CourseName)</span></a>-->
+        <a class="govuk-link" asp-page="./CourseDetails/University" asp-route-courseId="@(Model.CourseName)">
+          View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="govuk-summary-card__content">
+    <dl class="govuk-summary-list">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Provider</dt>
+        <dd class="govuk-summary-list__value">@Model.ProviderName</dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Location</dt>
+        <dd class="govuk-summary-list__value">
+          @{
+            bool hasTown = !string.IsNullOrEmpty(Model.Town);
+            bool hasDistance = Model.Distance.HasValue;
+
+            if (hasTown && hasDistance)
+            {
+              <p>@(Model.Town), @(Model.Distance.Value.ToString(Model.Distance.Value % 1 == 0 ? "N0" : "N1", CultureInfo.InvariantCulture)) miles</p>
+            }
+            else if (!hasTown && hasDistance)
+            {
+              <p>@(Model.Distance.Value.ToString(Model.Distance.Value % 1 == 0 ? "N0" : "N1", CultureInfo.InvariantCulture)) miles</p>
+            }
+            else if (hasTown && !hasDistance)
+            {
+              <p>@(Model.Town)</p>
+            }
+            else
+            {
+              <p>Unavailable</p>
+            }
+          }
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Course type</dt>
+        <dd class="govuk-summary-list__value">
+          @{
+            if (string.IsNullOrEmpty(Model.CourseType))
+            {
+              <p>Course type not provided</p>
+            }
+            else
+            {
+              <p>@Model.CourseType</p>
+            }
+          }
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Requirements</dt>
+        <dd class="govuk-summary-list__value"><!--Completion of a Level 2 qualification in a related subject-->
+          @{
+            if (string.IsNullOrEmpty(Model.EntryRequirements))
+            {
+              <text>Unknown</text>
+            }
+            else
+            {
+              <p>@Model.EntryRequirements</p>
+            }
+          }
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Overview</dt>
+        <dd class="govuk-summary-list__value">
+          @if (string.IsNullOrEmpty(Model.WhoThisCourseIsFor))
+          {
+            <p>Course overview not found</p>
+          }
+          else
+          {
+            var shortendText = TruncateString(Model.WhoThisCourseIsFor, out string tailEndText);
+            if (string.IsNullOrEmpty(tailEndText))
+            {
+              <p>@Model.WhoThisCourseIsFor</p>
+            }
+            else
+            {
+              <p>@shortendText</p>
+              
+              <details class="govuk-details govuk-!-margin-top-2" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                  <span class="govuk-details__summary-text">Read more of the course overview</span>
+                </summary>
+                <div class="govuk-details__text">@tailEndText</div>
+              </details>
+            }
+          }
+        </dd>
+      </div>
+    </dl>
+  </div>
+</div>
+  <!-- End Course Card-->
+  
