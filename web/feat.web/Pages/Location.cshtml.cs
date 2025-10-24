@@ -32,6 +32,12 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
         Search.SetPage("Location");
         HttpContext.Session.Set("Search", Search);
         
+<<<<<<< Updated upstream
+=======
+        //TODO If you've come here from LoadCourses page Need to 'new Search'
+        //
+
+>>>>>>> Stashed changes
         return Page();
     }
 
