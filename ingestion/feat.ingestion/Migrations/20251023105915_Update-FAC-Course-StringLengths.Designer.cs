@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251023105915_Update-FAC-Course-StringLengths")]
+    partial class UpdateFACCourseStringLengths
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -406,185 +409,6 @@ namespace feat.ingestion.Migrations
                     b.ToTable("FAC_AimData");
                 });
 
-            modelBuilder.Entity("feat.common.Models.Staging.FAA.Address", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AddressLine1")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("AddressLine2")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("AddressLine3")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("AddressLine4")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("ApprenticeshipId")
-                        .HasColumnType("int");
-
-                    b.Property<double?>("Latitude")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("Longitude")
-                        .HasColumnType("float");
-
-                    b.Property<string>("Postcode")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApprenticeshipId");
-
-                    b.ToTable("FAA_Addresses");
-                });
-
-            modelBuilder.Entity("feat.common.Models.Staging.FAA.Apprenticeship", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApplicationUrl")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<string>("ApprenticeshipLevel")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("ClosingDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CourseLarsCode")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CourseLevel")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CourseRoute")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("CourseTitle")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("CourseType")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<double?>("Distance")
-                        .HasColumnType("float");
-
-                    b.Property<string>("EmployerContactEmail")
-                        .HasMaxLength(254)
-                        .HasColumnType("nvarchar(254)");
-
-                    b.Property<string>("EmployerContactName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("EmployerContactPhone")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("EmployerName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("EmployerWebsiteUrl")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<string>("ExpectedDuration")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<double>("HoursPerWeek")
-                        .HasColumnType("float");
-
-                    b.Property<bool>("IsDisabilityConfident")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsNationalVacancy")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("IsNationalVacancyDetails")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<long>("NumberOfPositions")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("PostedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ProviderName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("Ukprn")
-                        .HasColumnType("int");
-
-                    b.Property<string>("VacancyReference")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("VacancyUrl")
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<string>("WageAdditionalInformation")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<double?>("WageAmount")
-                        .HasColumnType("float");
-
-                    b.Property<string>("WageType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("WageUnit")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("WorkingWeekDescription")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FAA_Apprenticeships");
-                });
-
             modelBuilder.Entity("feat.common.Models.Staging.FAC.AllCoursesCourse", b =>
                 {
                     b.Property<Guid>("COURSE_ID")
@@ -604,10 +428,11 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("COST_DESCRIPTION")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("COURSE_NAME")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -624,22 +449,22 @@ namespace feat.ingestion.Migrations
                     b.Property<int?>("DELIVER_MODE")
                         .HasColumnType("int");
 
-                    b.Property<long?>("DURATION")
-                        .HasColumnType("bigint");
+                    b.Property<TimeSpan?>("DURATION")
+                        .HasColumnType("time");
 
                     b.Property<int?>("EDUCATION_LEVEL")
                         .HasColumnType("int");
 
                     b.Property<string>("ENTRY_REQUIREMENTS")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool?>("FLEXIBLE_STARTDATE")
                         .HasColumnType("bit");
 
                     b.Property<string>("HOW_YOU_WILL_BE_ASSESSED")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("LEARN_AIM_REF")
                         .HasMaxLength(8)
@@ -688,6 +513,7 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("PROVIDER_NAME")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -711,8 +537,9 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("WHO_THIS_COURSE_IS_FOR")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.HasKey("COURSE_ID", "COURSE_RUN_ID");
 
@@ -730,8 +557,9 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("CourseDescription")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<int>("CourseStatus")
                         .HasColumnType("int");
@@ -746,16 +574,16 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("EntryRequirements")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("HowYoullBeAssessed")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("HowYoullLearn")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("LearnAimRef")
                         .IsRequired()
@@ -769,16 +597,16 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("WhatYoullLearn")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("WhatYoullNeed")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("WhereNext")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.HasKey("CourseId");
 
@@ -794,20 +622,20 @@ namespace feat.ingestion.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DeletedOn")
+                    b.Property<DateTime>("DeletedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("EntryRequirements")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("HowYoullBeAssessed")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("HowYoullLearn")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
@@ -818,7 +646,7 @@ namespace feat.ingestion.Migrations
                     b.Property<int>("TLevelStatus")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedOn")
+                    b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Website")
@@ -826,17 +654,17 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("WhatYouCanDoNext")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("WhatYoullLearn")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("WhoFor")
                         .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.HasKey("TLevelId");
 
@@ -1019,17 +847,6 @@ namespace feat.ingestion.Migrations
                     b.Navigation("Provider");
                 });
 
-            modelBuilder.Entity("feat.common.Models.Staging.FAA.Address", b =>
-                {
-                    b.HasOne("feat.common.Models.Staging.FAA.Apprenticeship", "Apprenticeship")
-                        .WithMany("Addresses")
-                        .HasForeignKey("ApprenticeshipId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Apprenticeship");
-                });
-
             modelBuilder.Entity("feat.common.Models.UniversityCourse", b =>
                 {
                     b.HasOne("feat.common.Models.Entry", "Entry")
@@ -1101,11 +918,6 @@ namespace feat.ingestion.Migrations
             modelBuilder.Entity("feat.common.Models.Sector", b =>
                 {
                     b.Navigation("EntrySectors");
-                });
-
-            modelBuilder.Entity("feat.common.Models.Staging.FAA.Apprenticeship", b =>
-                {
-                    b.Navigation("Addresses");
                 });
 #pragma warning restore 612, 618
         }

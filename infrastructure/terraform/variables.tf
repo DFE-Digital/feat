@@ -10,9 +10,9 @@ variable "product" {
 }
 
 variable "prefix" {
-    description = "Prefix for resource names"
-    type        = string
-    default     = "s213"
+  description = "Prefix for resource names"
+  type        = string
+  default     = "s265"
 }
 
 variable "location" {

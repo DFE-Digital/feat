@@ -1,9 +1,13 @@
 terraform {
-  required_version = ">= 1.13.3"
+  required_version = ">= 1.13.4"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.45"
+      version = "~> 4.50"
+    }
+    azapi = {
+      source  = "azure/azapi"
+      version = "2.2.0"
     }
   }
 }
@@ -12,9 +16,13 @@ provider "azurerm" {
   features {}
 }
 
+provider "azapi" {
+
+}
+
 # Resource Group
 resource "azurerm_resource_group" "feat-rg" {
-  name     = "${var.prefix}-rg"
+  name     = "${var.prefix}rg-uks-feat"
   location = var.location
 
   tags = {
@@ -38,7 +46,7 @@ resource "azurerm_service_plan" "feat-ing-asp" {
   location            = azurerm_resource_group.feat-rg.location
   resource_group_name = azurerm_resource_group.feat-rg.name
   os_type             = "Linux"
-  sku_name            = "B1"
+  sku_name            = "B3"
 }
 
 # Azure Container Registry

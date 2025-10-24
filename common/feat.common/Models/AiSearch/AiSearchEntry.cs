@@ -29,7 +29,7 @@ public class AiSearchEntry
     [VectorSearchField(IsHidden = true, VectorSearchDimensions = 256, VectorSearchProfileName = "compressed")]
     public ReadOnlyMemory<float> DescriptionVector { get; set; }
     
-    [SearchableField(IsFacetable = true, AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
+    [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
     public required string[] Sectors { get; set; }
     
     [VectorSearchField(IsHidden = true, VectorSearchDimensions = 256, VectorSearchProfileName = "compressed")]

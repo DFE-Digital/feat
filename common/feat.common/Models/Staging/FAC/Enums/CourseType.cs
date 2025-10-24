@@ -20,5 +20,7 @@ public enum CourseType
     Multiply = 5,
     
     [Description("Skills Bootcamp")]
-    SkillsBootcamp = 6
+    SkillsBootcamp = 6,
+    
+    Unknown = -1
 }
