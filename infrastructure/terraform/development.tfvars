@@ -1,6 +1,6 @@
 env                = "Dev"
 product            = "Find Education and Training"
-prefix             = "s213d01"
+prefix             = "s265d01"
 location           = "uksouth"
 api_image_name     = "feat-api:latest"
 website_image_name = "feat-web:latest"

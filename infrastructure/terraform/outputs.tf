@@ -18,7 +18,7 @@ output "azurerm_network_security_group" {
 }
 
 output "azurerm_subnet" {
-  value       = azurerm_subnet.feat_main_subnet.name
+  value       = azapi_resource.feat_main_subnet.name
   description = "Subnet name"
 }
 
