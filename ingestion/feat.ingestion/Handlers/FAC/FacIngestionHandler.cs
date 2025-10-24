@@ -1,18 +1,28 @@
 using System.Globalization;
+using Azure.Search.Documents;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using CsvHelper;
+using EnumsNET;
+using feat.common.Models;
+using feat.common.Models.AiSearch;
+using feat.common.Models.Enums;
 using feat.common.Models.Staging.FAC;
+using feat.common.Models.Staging.FAC.Enums;
 using feat.ingestion.Configuration;
 using feat.ingestion.Data;
 using feat.ingestion.Enums;
 using Microsoft.Extensions.Options;
+using Microsoft.Spatial;
+using OpenAI.Embeddings;
 
 namespace feat.ingestion.Handlers.FAC;
 
 public class FacIngestionHandler(
     IngestionOptions options, 
-    IngestionDbContext dbContext) 
+    IngestionDbContext dbContext,
+    ISearchIndexHandler searchIndexHandler,
+    EmbeddingClient embeddingClient) 
     : IngestionHandler(options)
 {
     public override IngestionType IngestionType => IngestionType.Csv | IngestionType.Manual;
@@ -110,10 +120,10 @@ public class FacIngestionHandler(
 
     public override async Task<bool> IngestAsync(CancellationToken cancellationToken)
     {
-        ProcessMode Aim = ProcessMode.Process;
-        ProcessMode Courses = ProcessMode.Process;
-        ProcessMode TLevels = ProcessMode.Process;
-        ProcessMode AllCourses = ProcessMode.Process;
+        ProcessMode Aim = ProcessMode.Skip;
+        ProcessMode Courses = ProcessMode.Skip;
+        ProcessMode TLevels = ProcessMode.Skip;
+        ProcessMode AllCourses = ProcessMode.Skip;
         int batchSize = 5000;
 
         var blobServiceClient = new BlobServiceClient(options.BlobStorageConnectionString);
@@ -247,6 +257,41 @@ public class FacIngestionHandler(
             Console.WriteLine("Done");
 
         }
+        
+        // Get our latest T Level Definitions file
+        var tLevelDefinitionData = files.Where(blob =>
+                blob.Name.Contains("TLevelDefinitions_", StringComparison.InvariantCultureIgnoreCase))
+            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+        if (tLevelDefinitionData != null && TLevels != ProcessMode.Skip)
+        {
+            Console.WriteLine("Starting import of T-Level Definition Data");
+
+            var blobClient = containerClient.GetBlobClient(tLevelDefinitionData.Name);
+            Console.WriteLine("Fetching file");
+            using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
+            Console.WriteLine("Setting up CSV reader");
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            csv.Context.RegisterClassMap<TLevelDefinitionMap>();
+            Console.WriteLine("Reading data...");
+            var records = csv.GetRecords<TLevelDefinition>().ToList();
+
+            if (
+                TLevels == ProcessMode.Force
+                || dbContext.FAC_TLevels.Count() != records.Count
+            )
+            {
+                Console.WriteLine($"Preparing {records.Count} records to DB...");
+                await dbContext.BulkSynchronizeAsync(records, options =>
+                {
+                    options.BatchSize = batchSize;
+                    options.BatchDelayInterval = 1000;
+                    options.UseTableLock = true;
+                }, cancellationToken);
+            }
+
+            Console.WriteLine("Done");
+
+        }
 
         // Get our latest all courses file
         var allCoursesData = files.Where(blob =>
@@ -269,9 +314,9 @@ public class FacIngestionHandler(
 
             if (
                 AllCourses == ProcessMode.Force
-                || dbContext.FAC_TLevels.Count() != records.Count
-                || dbContext.FAC_TLevels.Max(x => x.UpdatedOn) < lastUpdated
-                || dbContext.FAC_TLevels.Max(x => x.CreatedOn) < lastCreated
+                || dbContext.FAC_AllCourses.Count() != records.Count
+                || dbContext.FAC_AllCourses.Max(x => x.UPDATED_DATE) < lastUpdated
+                || dbContext.FAC_AllCourses.Max(x => x.CREATED_DATE) < lastCreated
             )
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
@@ -287,8 +332,120 @@ public class FacIngestionHandler(
 
         }
 
+        List<Entry> entries;
+
+        
+        
+        var tlevelquery =
+            from c in dbContext.FAC_AllCourses
+            join t in dbContext.FAC_TLevels on
+                c.COURSE_ID equals t.TLevelId
+            join td in dbContext.FAC_TLevelDefinitions on
+                t.TLevelDefinitionId equals td.TLevelDefinitionId
+            
+            select new AiSearchEntry()
+            {
+                Id = c.COURSE_ID.ToString(),
+                InstanceId = c.COURSE_RUN_ID.ToString(),
+                Title = c.COURSE_NAME,
+                // TitleVector = GetVector(c.COURSE_NAME),
+                LearningAimTitle = td.Name,
+                // LearningAimTitleVector = GetVector(td.Name),
+                Description = c.WHO_THIS_COURSE_IS_FOR,
+                // DescriptionVector = GetVector(c.WHO_THIS_COURSE_IS_FOR),
+                Sector = c.SECTOR,
+                // SectorVector = GetVector(c.SECTOR),
+                EntryType = nameof(EntryType.Course),
+                QualificationLevel = MapQualificationLevel(td.QualificationLevel),
+                LearningMethod = MapLearningMethod(c.DELIVER_MODE),
+                CourseHours = MapCourseHours(c.STUDY_MODE),
+                StudyTime = MapStudyTime(c.ATTENDANCE_PATTERN),
+                Source = nameof(SourceSystem.FAC),
+                Location = c.LOCATION != null ? GeographyPoint.Create( c.LOCATION.Y, c.LOCATION.X) : null
+            };
+
+        var result = tlevelquery.Take(50).ToList();
+
+        foreach (var aiSearchEntry in result)
+        {
+            aiSearchEntry.TitleVector = GetVector(aiSearchEntry.Title);
+            aiSearchEntry.DescriptionVector = GetVector(aiSearchEntry.Description);
+            aiSearchEntry.LearningAimTitleVector = GetVector(aiSearchEntry.LearningAimTitle);
+            aiSearchEntry.SectorVector = GetVector(aiSearchEntry.Sector);
+        }
+        
+        
+        Console.WriteLine(searchIndexHandler.Ingest(result));
+            
+        
+
         Console.WriteLine("FAC Ingestion Done");
 
         return true;
+    }
+
+    private static string MapStudyTime(AttendancePattern? attendancePattern)
+    {
+        return attendancePattern switch
+        {
+            AttendancePattern.Daytime => nameof(StudyTime.Daytime),
+            AttendancePattern.Weekend => nameof(StudyTime.Weekend),
+            AttendancePattern.Evening => nameof(StudyTime.Evening),
+            _ => string.Empty
+        };
+    }
+
+    private static string MapCourseHours(StudyMode? studyMode)
+    {
+        return studyMode switch
+        {
+            StudyMode.Flexible => nameof(CourseHours.Flexible),
+            StudyMode.FullTime => nameof(CourseHours.FullTime),
+            StudyMode.PartTime => nameof(CourseHours.PartTime),
+            _ => string.Empty
+        };
+    }
+
+    private static string MapLearningMethod(DeliveryMode? deliveryMode)
+    {
+        return deliveryMode switch
+        {
+            DeliveryMode.BlendedLearning => nameof(LearningMethod.Hybrid),
+            DeliveryMode.ClassroomBased => nameof(LearningMethod.ClassroomBased),
+            DeliveryMode.Online => nameof(LearningMethod.Online),
+            DeliveryMode.WorkBased => nameof(LearningMethod.Workbased),
+            _ => string.Empty
+        };
+    }
+
+    private static string MapQualificationLevel(EducationLevel? qualificationLevel)
+    {
+        return qualificationLevel switch
+        {
+            EducationLevel.Level1 => nameof(QualificationLevel.Level1),
+            EducationLevel.Level2 => nameof(QualificationLevel.Level2),
+            EducationLevel.Level3 => nameof(QualificationLevel.Level3),
+            EducationLevel.Level4 => nameof(QualificationLevel.Level4),
+            EducationLevel.Level5 => nameof(QualificationLevel.Level5),
+            EducationLevel.Level6 => nameof(QualificationLevel.Level6),
+            EducationLevel.Level7 => nameof(QualificationLevel.Level7),
+            EducationLevel.Level8 => nameof(QualificationLevel.Level8),
+            EducationLevel.Level0 => nameof(QualificationLevel.Entry),
+            _ => string.Empty
+        };
+    }
+
+    private IReadOnlyList<float> GetVector(string? text)
+    {
+        if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(text))
+        {
+            return new List<float>();
+        }
+            
+        var result = embeddingClient.GenerateEmbedding(text, new EmbeddingGenerationOptions()
+        {
+            Dimensions = 256
+        });
+        return result.Value.ToFloats().ToArray();
     }
 }

@@ -34,7 +34,7 @@ public class Entry
 
     public required bool FlexibleStart { get; set; }
 
-    public AttendancePattern? AttendancePattern { get; set; }   // Enum: FullTime, PartTime, Flexible, Other
+    public CourseHours? AttendancePattern { get; set; }   // Enum: FullTime, PartTime, Flexible, Other
 
     [Column("URL")]
     [StringLength(2083)] 
@@ -49,7 +49,7 @@ public class Entry
 
     public EntryType? Type { get; set; }    // Enum: Apprenticeship, Traineeship, T Level
 
-    public EntryLevel? Level { get; set; }  // Enum: Intermediate, Advanced, Higher, Degree, Professional
+    public StudyTime? Level { get; set; }  // Enum: Intermediate, Advanced, Higher, Degree, Professional
 
     [InverseProperty("Entry")]
     public ICollection<EntryCost> EntryCosts { get; set; } = new List<EntryCost>();
