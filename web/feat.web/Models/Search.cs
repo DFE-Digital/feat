@@ -154,5 +154,9 @@ public static class PageName
     
     public static string LoadCourses = "LoadCourses"; // List of Courses page in Liams v8 
     
+    public static string DetailsCourse = "DetailsCourse";
+    public static string DeatilsApprenticeship = "DeatilsApprenticeship";
+    public static string DeatilsUniversityDegree = "DeatilsUniversityDegree";
+    
     
 }

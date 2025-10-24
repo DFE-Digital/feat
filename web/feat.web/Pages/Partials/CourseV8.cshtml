@@ -25,29 +25,36 @@
   
 }
 
-<!-- Course Card - Liams html -->
+<!-- Course Card -->
 <div class="govuk-summary-card">
   <div class="govuk-summary-card__title-wrapper">
     <h2 class="govuk-summary-card__title">@Model.CourseName</h2>
     <ul class="govuk-summary-card__actions">
       <li class="govuk-summary-card__action">
         @{
-          var courseType = Model.CourseType;
+          var courseType = "Degree"; //Model.CourseType;
+          
           if (courseType == "Degree")
           {
-            
-          }else if (courseType == "Apprentiship")
+            <a class="govuk-link" asp-page="./CourseDetails/UniversityDegree" asp-route-courseId="@(Model.CourseName)">
+              View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
+            </a>
+          }
+          else if (courseType == "Apprenticeship")
           {
+            <a class="govuk-link" asp-page="./CourseDetails/Apprenticeship" asp-route-courseId="@(Model.CourseName)">
+              View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
+            </a>
           }
           else 
           {
-            
+            <a class="govuk-link" asp-page="./CourseDetails/Apprenticeship" asp-route-courseId="@(Model.CourseName)">
+              View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
+            </a>
           }
         }
         <!--<a class="govuk-link" asp-page-handler="GoToDetailsScreen" >View more details<span class="govuk-visually-hidden">about (Model.CourseName)</span></a>-->
-        <a class="govuk-link" asp-page="./CourseDetails/University" asp-route-courseId="@(Model.CourseName)">
-          View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
-        </a>
+        
       </li>
     </ul>
   </div>
@@ -145,5 +152,5 @@
     </dl>
   </div>
 </div>
-  <!-- End Course Card-->
+<!-- End Course Card-->
   

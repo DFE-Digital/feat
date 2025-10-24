@@ -15,29 +15,19 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     [BindProperty]
     public List<AttendancePattern> SelectedCourseHours { get; set; } = new();
     
-    public List<QualificationLevel> SelectedCourseTypes { get; set; } = new();
+    public List<CourseType> SelectedCourseTypes { get; set; } = new();
     public List<QualificationLevel> SelectedQualificationLevels { get; set; } = new();
-    public List<QualificationLevel> SelectedLearningMethods { get; set; } = new();
-    public List<QualificationLevel> SelectedCourseStudyTimes { get; set; } = new();
-    
     
     [BindProperty]
     public Distance? SelectedTravelDistance { get; set; } = new();
     
     
-    
-    //--
     public required Search Search { get; set; }
     
     public SearchResponse? SearchResponse { get; set; }
     
-    public int PageNumber
-    {
-        get
-        {
-            return SearchResponse == null ? 1 : SearchResponse.Page;
-        }
-    }
+    [BindProperty]
+    public Pagination Pagination { get; set; } = new();
     
     public async Task<IActionResult> OnGetAsync([FromQuery] bool debug = false)
     {
@@ -54,33 +44,21 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             Search.SetPage(PageName.LoadCourses);
             HttpContext.Session.Set("Search", Search);
             
-            //TODO- Hack a fixed search; REMOVE 
-            Search = new Search()
-            {
-                Debug = debug, 
-                Interests = new List<string>() { "biotech"}, 
-                Location = "London",
-                AgeGroup = AgeGroup.Eighteen,
-                Distance = Distance.ThirtyPlus,
-                QualificationLevels = new List<QualificationLevel>(){ QualificationLevel.None, QualificationLevel.OneAndTwo},
-                IncludeOnlineCourses = true, 
-                Updated = true,
-                //History = just for navigation,
-            }; 
-
             SearchResponse = await searchService.Search(Search, HttpContext.Session.Id);
             
             // Set up data 
-            
             List<Facet> allFacets = SearchResponse?.Facets.ToList() ?? new List<Facet>();
             
             // set distance - as it was chosen by the user previously
             SelectedTravelDistance = Search.Distance;
             
-            // Pagination
-            var pageNumber = SearchResponse?.Page;
-            var pageSize = SearchResponse?.PageSize;
-            var totalPageCount = SearchResponse?.TotalCount;
+            
+            Pagination pagination = new Pagination()
+            {
+                PageNumber = SearchResponse.Page,
+                PageSize = SearchResponse.PageSize,
+                TotalPageCount = SearchResponse.TotalCount.HasValue ? SearchResponse.TotalCount.Value : 0,
+            };
         }
         catch (Exception e)
         {
@@ -89,44 +67,52 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
         return Page();
     }
 
-    public IActionResult OnPostClearFilter(string filterNumber = "")
+    public async Task<IActionResult> OnPostSort(string sortBy)
     {
-        logger.LogDebug("OnPostClearFilter called; {filterNumber}", filterNumber);
-        if (!string.IsNullOrEmpty(filterNumber))
+        logger.LogInformation("OnPostSort called ");
+        
+        if (!string.IsNullOrEmpty(sortBy))
         {
-            //SelectedCourseHours.Clear();
-
-            // attendancePattern[@i]
-            ModelState.Clear();
+            if (sortBy == "relevance" || sortBy == "distance")
+            {
+                logger.LogInformation("OnPostSort called {sortBy}", sortBy);
+            }
             
-            return Page();
+            SearchResponse = await searchService.GetSortedCourses(sortBy);    
         }
+        return Page();
+    }
 
-        //await Task.Delay(1);
-
-        return Page(); //RedirectToPage(PageName.Index);
+    public IActionResult OnPostClearFilter()
+    {
+        logger.LogDebug("OnPostClearFilter called");
+        // Clear the bound properties
+        ModelState.Clear();
+        return Page();
     }
 
     public async Task<IActionResult> OnPost()
     {
-        //return RedirectToPage(PageName.Interests);
         await Task.Delay(1);
         return Page();
     }
 
     public IActionResult OnPostGoToDetailsScreen([FromQuery] string courseId)
     {
-        logger.LogDebug("OnPostGoToDetailsScreen called; {courseId}", courseId);
         logger.LogInformation("OnPostGoToDetailsScreen called");
         
         if(string.IsNullOrEmpty(courseId))
             return Page();
         
+        logger.LogDebug("OnPostGoToDetailsScreen called; {courseId}", courseId);
+        
         return RedirectToPage(PageName.Interests);
     }
 }
 
-internal class Pagination
+public class Pagination
 {
-    
+    public int PageNumber { get; set; } = 1;
+    public int PageSize  { get; set; } = 10;
+    public long TotalPageCount  { get; set; } = 15;
 }
