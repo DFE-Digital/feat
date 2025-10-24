@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251024124026_Update-FAC-add-TLevelDefinitions")]
+    partial class UpdateFACaddTLevelDefinitions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -841,25 +844,6 @@ namespace feat.ingestion.Migrations
                     b.HasKey("TLevelId");
 
                     b.ToTable("FAC_TLevels");
-                });
-
-            modelBuilder.Entity("feat.common.Models.Staging.FAC.TLevelDefinition", b =>
-                {
-                    b.Property<Guid>("TLevelDefinitionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("QualificationLevel")
-                        .HasColumnType("int");
-
-                    b.HasKey("TLevelDefinitionId");
-
-                    b.ToTable("FAC_TLevelDefinitions");
                 });
 
             modelBuilder.Entity("feat.common.Models.UniversityCourse", b =>

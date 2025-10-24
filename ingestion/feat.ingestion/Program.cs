@@ -5,6 +5,7 @@ using Azure;
 using Azure.AI.OpenAI;
 using Azure.Core.Serialization;
 using Azure.Search.Documents;
+using Azure.Search.Documents.Indexes;
 using feat.common;
 using feat.common.Configuration;
 using feat.ingestion.Configuration;
@@ -53,11 +54,13 @@ services.AddDbContext<IngestionDbContext>(options =>
 });
 
 services.AddTransient<IMigrationsHandler, MigrationsHandler>();
+services.AddTransient<ISearchIndexHandler, SearchIndexHandler>();
 services.AddTransient<FacIngestionHandler>();
 services.AddTransient<FaaIngestionHandler>();
 services.AddSingleton<IApiClient, ApiClient>();
 services.AddSingleton<IIngestionHandlerFactory, IngestionHandlerFactory>();
 services.AddSingleton(ingestionOptions);
+services.Configure<AzureOptions>(config.GetSection(AzureOptions.Name));
 
 services.AddSingleton<SearchClient>(sp =>
 {
@@ -81,6 +84,30 @@ services.AddSingleton<SearchClient>(sp =>
         new Uri(options.AiSearchUrl),
         options.AiSearchIndex,
         new AzureKeyCredential(options.AiSearchKey),
+        clientOptions);
+});
+
+services.AddSingleton<SearchIndexClient>(sp =>
+{
+    var options = sp.GetRequiredService<IOptions<AzureOptions>>().Value;
+    
+    var serializerOptions = new JsonSerializerOptions
+    {
+        Converters =
+        {
+            new JsonStringEnumConverter(),
+            new MicrosoftSpatialGeoJsonConverter()
+        },
+    };
+    
+    var clientOptions = new SearchClientOptions
+    {
+        Serializer = new JsonObjectSerializer(serializerOptions)
+    };
+    
+    return new SearchIndexClient(
+        new Uri(options.AiSearchUrl),
+        new AzureKeyCredential(options.AiSearchAdminKey),
         clientOptions);
 });
 
@@ -119,6 +146,9 @@ if (ingestionOptions.Environment.Equals("Development", StringComparison.Invarian
         }
         
         migrationsHandler?.RunPendingMigrations();
+        
+        var searchIndexHandler = serviceProvider.GetService<ISearchIndexHandler>();
+        searchIndexHandler?.CreateIndex();
     }
     catch (Exception e)
     {

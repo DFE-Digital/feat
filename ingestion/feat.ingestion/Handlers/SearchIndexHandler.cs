@@ -1,4 +1,7 @@
 using Azure.Search.Documents;
+using Azure.Search.Documents.Indexes;
+using Azure.Search.Documents.Indexes.Models;
+using Azure.Search.Documents.Models;
 using feat.common.Configuration;
 using feat.common.Models.AiSearch;
 using Microsoft.Extensions.Options;
@@ -8,22 +11,71 @@ namespace feat.ingestion.Handlers;
 
 public class SearchIndexHandler(
     IOptionsMonitor<AzureOptions> options,
-    SearchClient aiSearchClient,
-    EmbeddingClient embeddingClient)
+    SearchIndexClient aiSearchClient)
     : ISearchIndexHandler
 {
     private readonly AzureOptions _azureOptions = options.CurrentValue;
-    private readonly SearchClient _aiSearchClient = aiSearchClient;
-    private readonly EmbeddingClient _embeddingClient = embeddingClient;
 
     public bool CreateIndex()
     {
+        Console.WriteLine("Creating index...");
         
-        throw new NotImplementedException();
+        var fieldBuilder = new FieldBuilder();
+        string vectorSearchProfileName = "my-vector-profile";
+        string vectorSearchHnswConfig = "hnsw-m10-const1000-search1000";
+
+        var index = new SearchIndex(_azureOptions.AiSearchIndex)
+        {
+            Fields = fieldBuilder.Build(typeof(AiSearchEntry)),
+            SemanticSearch = new SemanticSearch()
+            {
+                Configurations = { new SemanticConfiguration("semantic-title-description", 
+                    new SemanticPrioritizedFields()
+                    {
+                        TitleField = new SemanticField(nameof(AiSearchEntry.Title)),
+                        ContentFields =
+                        {
+                            new SemanticField(nameof(AiSearchEntry.Description)),
+                            new SemanticField(nameof(AiSearchEntry.LearningAimTitle))
+                        },
+                        KeywordsFields =
+                        {
+                            new SemanticField(nameof(AiSearchEntry.Sector))
+                        }
+                    }
+                    ) 
+                }
+            },
+            VectorSearch = new VectorSearch()
+            {
+                Profiles = { new VectorSearchProfile(vectorSearchProfileName, vectorSearchHnswConfig) },
+                Algorithms =
+                {
+                    new HnswAlgorithmConfiguration(vectorSearchHnswConfig)
+                    {
+                        Parameters = new HnswParameters()
+                        {
+                            EfConstruction = 1000,
+                            EfSearch = 1000,
+                            M = 10,
+                            Metric = VectorSearchAlgorithmMetric.Cosine
+                        }
+                    }
+                }
+            }
+        };
+        
+        var result = aiSearchClient.CreateOrUpdateIndex(index);
+
+        Console.WriteLine("Done.");
+        
+        return true;
     }
 
-    public bool Ingest(SearchIndexingBufferedSender<AiSearchEntry> entries)
+    public bool Ingest(List<AiSearchEntry> entries)
     {
-        throw new NotImplementedException();
+        var searchClient = aiSearchClient.GetSearchClient(_azureOptions.AiSearchIndex);
+        var result = searchClient.MergeOrUploadDocuments(entries);
+        return result.Value.Results.All(x => x.Succeeded);
     }
 }

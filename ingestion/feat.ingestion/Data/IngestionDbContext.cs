@@ -47,6 +47,7 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
     public DbSet<FAC.AllCoursesCourse> FAC_AllCourses { get; set; }
     public DbSet<FAC.Course> FAC_Courses { get; set; }
     public DbSet<FAC.TLevel> FAC_TLevels { get; set; }
+    public DbSet<FAC.TLevelDefinition> FAC_TLevelDefinitions { get; set; }
     public DbSet<FAC.AimData> FAC_AimData { get; set; }
     
     public DbSet<FAA.Apprenticeship> FAA_Apprenticeships { get; set; }

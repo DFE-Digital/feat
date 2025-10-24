@@ -4,6 +4,5 @@ public enum EntryType
 {
     Course,
     Apprenticeship,
-    WorkExperience,
-    Training
+    UniversityCourse
 }

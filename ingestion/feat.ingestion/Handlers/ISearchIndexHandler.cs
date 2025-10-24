@@ -7,5 +7,5 @@ public interface ISearchIndexHandler
 {
     bool CreateIndex();
 
-    bool Ingest(SearchIndexingBufferedSender<AiSearchEntry> entries);
+    bool Ingest(List<AiSearchEntry> entries);
 }

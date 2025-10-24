@@ -20,7 +20,7 @@ public class EntryInstance
 
     public TimeSpan? Duration { get; set; }
 
-    public StudyMode? StudyMode { get; set; }       // e.g., Full-time, Part-time, DistanceLearning
+    public LearningMethod? StudyMode { get; set; }       // e.g., Full-time, Part-time, DistanceLearning
     
     [StringLength(255)]
     public required string Reference { get; set; } = string.Empty; 
