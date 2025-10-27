@@ -12,13 +12,13 @@
     var totalResults = Model.SearchResponse?.TotalCount ?? 0;  
     var pluralText = (totalResults == 1 ? String.Empty : "s");
     string locationText = string.IsNullOrEmpty(Model.Search.Location)?"near your area": " near " + Model.Search.Location;
-    string interestText = Model.Search.Interests.Count>0 ? $" for {Model.Search.Interests[0]}" : string.Empty;
+    string interestText = Model.Search.Interests.Count > 0 ? $" for {Model.Search.Interests[0]}" : string.Empty;
     
     searchResultText = $"Showing {totalResults} course{pluralText} {locationText} {interestText}";
   }
   catch (Exception e)
   {
-    Console.WriteLine(e);
+   // Console.WriteLine(e);
   }
 }
 
@@ -295,7 +295,7 @@
               <!--<span aria-current="true">Distance</span>
               | <a href="?page=1&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=relevance">Relevance</a>
               -->
-              <a asp-page-handler="Sort" asp-route-sortBy="distance" >Distance</a> | 
+              <a asp-page-handler="Sort" asp-page="" asp-route-sortBy="distance" >Distance</a> | 
               <a asp-page-handler="Sort" asp-route-sortBy="relevance" >Relevance</a>
             </span>
           </p>
@@ -307,7 +307,7 @@
 
           <nav class="govuk-pagination" aria-label="Pagination">
           @{
-            if (Model.Pagination.PageNumber > 1)
+            if (Model.PaginationState.PageNumber > 1)
             {
               <div class="govuk-pagination__prev">
                 <a class="govuk-link govuk-pagination__link"
@@ -328,13 +328,13 @@
                    href="?page=1&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
                    aria-label="Page 1">
                   @{
-                    if (Model.Pagination.PageNumber > 1)
+                    if (Model.PaginationState.PageNumber > 1)
                     {
-                      @(Model.Pagination.PageNumber - 1)
+                      @(Model.PaginationState.PageNumber - 1)
                     }
                     else
                     {
-                      @Model.Pagination.PageNumber; 
+                      @Model.PaginationState.PageNumber; 
                     }
                   }
                 </a>
@@ -344,7 +344,7 @@
                 <a class="govuk-link govuk-pagination__link" 
                    href="?page=2&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
                    aria-label="Page 2" aria-current="page">
-                  @Model.Pagination.PageNumber
+                  @Model.PaginationState.PageNumber
                 </a>
               </li>
 
@@ -352,13 +352,13 @@
                 <a class="govuk-link govuk-pagination__link" 
                    href="?page=3&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
                    aria-label="Page 3">
-                  @(Model.Pagination.PageNumber + 1)
+                  @(Model.PaginationState.PageNumber + 1)
                 </a>
               </li>
             </ul>
 
             @{
-              if (Model.Pagination.TotalPageCount != Model.Pagination.PageNumber )
+              if (Model.PaginationState.TotalPageCount != Model.PaginationState.PageNumber )
               {
                 <div class="govuk-pagination__next">
                   <a class="govuk-link govuk-pagination__link" 

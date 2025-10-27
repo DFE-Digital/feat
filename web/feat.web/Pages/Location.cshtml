@@ -5,8 +5,6 @@
 @{
     ViewBag.Title = "Explore your options after school or college - GOV.UK";
     ViewBag.SectionTitle = "Where do you want to study?";
-    
-    //ViewBag.Description = "We need to know where you live as some courses or training are only available in certain areas.";
 }
 
 
@@ -20,16 +18,14 @@
 
 <form method="post">
     
-    <govuk-input for="Location" input-class="govuk-input--width-20" spellcheck="false">
-        <govuk-input-label class="govuk-label--m">Enter a town, city or postcode@(Model.Search.SearchType == SearchType.HE ? " (optional)" : "")</govuk-input-label>
+    <govuk-input for="Location" input-class="govuk-input--width-20" spellcheck="false" autocomplete="true">
+        <govuk-input-label class="govuk-label--m">Enter a town, city or postcode (optional)</govuk-input-label>
     </govuk-input>
-
-    @if (Model.Search.SearchType != SearchType.HE)
-    {
-        <govuk-radios for="Distance">
+    
+    <govuk-radios for="Distance">
             <govuk-radios-fieldset>
                 <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                    How far would you be happy to travel?
+                    How far would you be happy to travel? (optional)
                 </govuk-radios-fieldset-legend>
                 @foreach (var option in Enum.GetValues<Distance>())
                 {
@@ -37,7 +33,7 @@
                 }
             </govuk-radios-fieldset>
         </govuk-radios>
-    }
+    
     <div class="govuk-button-group">
         <govuk-button type="submit">Continue</govuk-button>
     </div>

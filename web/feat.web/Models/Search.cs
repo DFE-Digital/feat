@@ -6,7 +6,7 @@ namespace feat.web.Models;
 public class Search
 {
     //For navigation.
-    private List<string> History { get; set; } = [];
+    public List<string> History { get; set; } = [];
     
     public bool Updated { get; set; } = true;
     
@@ -152,7 +152,7 @@ public static class PageName
     public static string Age = "Age";
     public static string CheckAnswers = "CheckAnswers"; // was "Summary";
     
-    public static string LoadCourses = "LoadCourses"; // List of Courses page in Liams v8 
+    public static string LoadCourses = "LoadCourses"; // List of Courses page in v8 
     
     public static string DetailsCourse = "DetailsCourse";
     public static string DeatilsApprenticeship = "DeatilsApprenticeship";

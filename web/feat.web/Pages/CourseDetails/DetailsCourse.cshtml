@@ -1,25 +1,25 @@
-@page
+@page "{id}"
+@using feat.web.Models
 @model feat.web.Pages.CourseDetails.DetailsCourseModel
 
 @{
     
 }
-
 @section BeforeContent {
-    <!--<govuk-back-link href="Url.Page(Model.Search.GetBackPage(PageName.LoadCourses))">Back</govuk-back-link> -->
-    <govuk-back-link href="@Url.Page("/loadcourses")">Back</govuk-back-link>
+  <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.LoadCourses))">Back</govuk-back-link>
 }
+<h4>DetailsCourse, Id: @(Model.Id)</h4>
 
 <!-- Course based on Beta v8-->
 <div class="govuk-width-container">
   <main class="govuk-main-wrapper" id="main-content">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        <h2>@Model.CourseId</h2>
+        <h2>@Model.Id</h2>
         <h5>TODO; Currently All static</h5>
       </div>
+      
       <div class="govuk-grid-column-two-thirds">
-
         <div class="govuk-summary-card">
           <div class="govuk-summary-card__title-wrapper">
             <h2 class="govuk-summary-card__title">
@@ -144,30 +144,5 @@
       </div>
 
 
-
-
-
-
-
     </div></main>
 </div>
-
-<!-- Play-->
-<h1>Course Details</h1>
-<h2>@Model.CourseId</h2>
-
-@{
-    int i = 125;
-    <a asp-page-handler="OnPost" asp-route-myId="myId[@i]">@Model.CourseId</a>
-
-    if (!string.IsNullOrEmpty(Model.CourseId))
-    {
-        <h2>Get from server the Course Details
-            <span>@(Model.CourseId)</span>
-            </h2>
-    }
-    else
-    {
-        <h2>Missing CourseIdX</h2>
-    }
-}

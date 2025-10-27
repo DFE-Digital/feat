@@ -1,3 +1,5 @@
+using feat.web.Extensions;
+using feat.web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -5,24 +7,34 @@ namespace feat.web.Pages.CourseDetails;
 
 public class DetailsCourseModel(ILogger<DetailsCourseModel> logger) : PageModel
 {
-    [BindProperty]
-    public string? CourseId { get; set; }
+    [BindProperty] 
+     public string Id { get; set; }
+     
     
-    public void OnGet(string courseId)
+    public required Search Search { get; set; }
+    
+    public void OnGet(string? id)
     {
-        CourseId = courseId;
-        
-        logger.LogInformation("CourseId: {courseId}", courseId);
-        // Get from server the Course Details
+        logger.LogInformation("OnGet called");
+        try
+        {
+            Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+            Search.SetPage(PageName.DetailsCourse);
+            
+            Id = !string.IsNullOrEmpty(id) ? id : "missing id";
+            
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
  
     public IActionResult OnPost()
     {
-        if (string.IsNullOrEmpty(CourseId))
-        {
-            logger.LogDebug("My data is {myData} doesnt exist", CourseId);
-        }
-        else logger.LogInformation("My data is {myData}",CourseId);
+        logger.LogInformation("OnPost called");
 
         return Page();
     }

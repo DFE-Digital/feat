@@ -9,5 +9,8 @@ public interface ISearchService
     
     Task<SearchResponse> GetGlobalFacets();
 
-    Task<SearchResponse> GetSortedCourses(string sortBy); // Temporary awaing implementation
+    Task<SearchResponse> GetSortedCourses(string sortBy); // Temporary awating implementation
+    
+    Task<SearchResponse> GetCourseDetails(string courseId); // Temporary awating implementation
+    
 }

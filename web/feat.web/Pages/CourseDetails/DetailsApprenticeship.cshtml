@@ -1,16 +1,18 @@
-@page
+@page "{id}"
+@using feat.web.Models
+@using feat.web.Pages
 @model feat.web.Pages.CourseDetails.DetailsApprenticeshipModel
 
 @{
     
 }
 @section BeforeContent {
-    <!--<govuk-back-link href="Url.Page(Model.Search.GetBackPage(PageName.LoadCourses))">Back</govuk-back-link> -->
-    <govuk-back-link href="@Url.Page("/loadcourses")">Back</govuk-back-link>
+  <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.LoadCourses))">Back</govuk-back-link>
 }
 
+<h1>DetailsApprenticeship Id: @(Model.Id)</h1>
 
-<!-- Apprentiship based on Beta v8-->
+<!-- Apprentiship based on v8-->
 <div class="govuk-width-container">
   <main class="govuk-main-wrapper" id="main-content">
     <div class="govuk-grid-row">

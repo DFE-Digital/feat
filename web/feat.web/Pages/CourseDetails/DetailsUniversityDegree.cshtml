@@ -1,4 +1,5 @@
-@page
+@page "{id}"
+@using feat.web.Models
 @model feat.web.Pages.CourseDetails.DetailsUniversityDegreeModel
 
 @{
@@ -6,19 +7,17 @@
 }
 
 @section BeforeContent {
-    <!--<govuk-back-link href="Url.Page(Model.Search.GetBackPage(PageName.LoadCourses))">Back</govuk-back-link> -->
-    <govuk-back-link href="@Url.Page("/loadcourses")">Back</govuk-back-link>
+    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.LoadCourses))">Back</govuk-back-link> 
 }
+
+<!--For data type checking-->
+<h4>DetailsUniversityDegree (Hardcoded); Id: @(Model.CourseId)</h4>
+
 
 <!-- University Degree base on Beta v8-->
 <div class="govuk-width-container">
   <main class="govuk-main-wrapper" id="main-content">
     <div class="govuk-grid-row">
-      
-      <div class="govuk-grid-column-full">
-        <h2>@Model.CourseId</h2>
-        <h5>TODO; Currently static</h5>
-      </div>
       
       <div class="govuk-grid-column-two-thirds">
         

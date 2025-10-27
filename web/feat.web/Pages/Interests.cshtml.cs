@@ -47,7 +47,6 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
             UserInterest3 = Search.Interests[2];
         }
 
-        // If selected distance > 30 miles, 
         if (string.IsNullOrEmpty(Search.Location) ||
             Search.Distance == null || Search.Distance == Distance.ThirtyPlus)
         {

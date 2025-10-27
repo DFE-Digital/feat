@@ -27,7 +27,10 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     public SearchResponse? SearchResponse { get; set; }
     
     [BindProperty]
-    public Pagination Pagination { get; set; } = new();
+    public Pagination PaginationState { get; set; } = new();
+    
+    [BindProperty]
+    public string SortBy { get; set; } = "Distance";
     
     public async Task<IActionResult> OnGetAsync([FromQuery] bool debug = false)
     {
@@ -44,6 +47,7 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             Search.SetPage(PageName.LoadCourses);
             HttpContext.Session.Set("Search", Search);
             
+            
             SearchResponse = await searchService.Search(Search, HttpContext.Session.Id);
             
             // Set up data 
@@ -53,12 +57,14 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             SelectedTravelDistance = Search.Distance;
             
             
-            Pagination pagination = new Pagination()
+            PaginationState = new Pagination()
             {
                 PageNumber = SearchResponse.Page,
                 PageSize = SearchResponse.PageSize,
                 TotalPageCount = SearchResponse.TotalCount.HasValue ? SearchResponse.TotalCount.Value : 0,
             };
+
+            SortBy = SearchResponse.SortBy; 
         }
         catch (Exception e)
         {
@@ -86,6 +92,7 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     public IActionResult OnPostClearFilter()
     {
         logger.LogDebug("OnPostClearFilter called");
+        
         // Clear the bound properties
         ModelState.Clear();
         return Page();
@@ -97,17 +104,6 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
         return Page();
     }
 
-    public IActionResult OnPostGoToDetailsScreen([FromQuery] string courseId)
-    {
-        logger.LogInformation("OnPostGoToDetailsScreen called");
-        
-        if(string.IsNullOrEmpty(courseId))
-            return Page();
-        
-        logger.LogDebug("OnPostGoToDetailsScreen called; {courseId}", courseId);
-        
-        return RedirectToPage(PageName.Interests);
-    }
 }
 
 public class Pagination

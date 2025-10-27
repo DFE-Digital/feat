@@ -36,19 +36,26 @@
           
           if (courseType == "Degree")
           {
-            <a class="govuk-link" asp-page="./CourseDetails/UniversityDegree" asp-route-courseId="@(Model.CourseName)">
+            // asp-page-handler="GoToDetailsScreen"
+            <!--
+            <a class="govuk-link" asp-page="./CourseDetails/DetailsUniversityDegree" asp-route-id="@(Model.Id)">
+              View more details<span class="govuk-visually-hidden">about *(Model.CourseName)</span>
+            </a>
+            -->
+            
+            <a class="govuk-link" asp-page="./CourseDetails/DetailsUniversityDegree" asp-route-id="@(Model.Id)">
               View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
             </a>
           }
           else if (courseType == "Apprenticeship")
           {
-            <a class="govuk-link" asp-page="./CourseDetails/Apprenticeship" asp-route-courseId="@(Model.CourseName)">
+            <a class="govuk-link" asp-page="./CourseDetails/DetailsApprenticeship" asp-route-id="@(Model.Id)">
               View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
             </a>
           }
           else 
           {
-            <a class="govuk-link" asp-page="./CourseDetails/Apprenticeship" asp-route-courseId="@(Model.CourseName)">
+            <a class="govuk-link" asp-page="./CourseDetails/DetailsCourse" asp-route-id="@(Model.Id)">
               View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
             </a>
           }

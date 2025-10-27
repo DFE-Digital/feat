@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using feat.web.Enums;
 using feat.web.Extensions;
 using feat.web.Models;
@@ -33,7 +34,6 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
         HttpContext.Session.Set("Search", Search);
         
         //TODO If you've come here from LoadCourses page Need to 'new Search'
-        //
 
         return Page();
     }
@@ -43,17 +43,23 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
         // If it's anything other than HE, we need to validate distance and location
-        if (Search.SearchType != SearchType.HE)
+
+        if (!string.IsNullOrEmpty(Location.Trim()))
         {
-            if (string.IsNullOrEmpty(Location))
-                ModelState.AddModelError("Location", "Please enter a location");
-            if (!Distance.HasValue)
-                ModelState.AddModelError("Distance", "Please select how far you would be happy to travel");
-        }
-        else
-        {
-            if (string.IsNullOrEmpty(Location))
-                ModelState.AddModelError("Location", "Please enter a location or click \"Skip this step\"");
+            // Has to be a full-name or a full-postcode.
+            // Use an external service to validate - legitimate postcode or real-location, city, town, village
+            
+            //^([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}|GIR ?0A{2})$
+            if (Regex.Match(Location, @"^([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}|GIR ?0A{2})$").Success == false)
+            {
+                // Does not match Postcode.
+                //ModelState.AddModelError("Location", "Please enter a valid postcode");
+            }
+            else
+            {
+                // Is what's entered a real location name, if not.
+                // ModelState.AddModelError("Location", "Please enter a valid location");
+            }
         }
         
         if (!ModelState.IsValid)

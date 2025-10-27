@@ -39,4 +39,11 @@ public class SearchService : ISearchService
         await Task.Delay(1);
         return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
     }
+    
+    public async Task<SearchResponse> GetCourseDetails(string courseId)
+    {
+        var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search/courseId").ToString();
+        await Task.Delay(1);
+        return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
+    }
 }
