@@ -32,22 +32,15 @@
     <ul class="govuk-summary-card__actions">
       <li class="govuk-summary-card__action">
         @{
-          var courseType = "Degree"; //Model.CourseType;
-          
-          if (courseType == "Degree")
+          var courseType = Model.CourseType ?? "Degree";
+
+          if (courseType.Equals("Degree", StringComparison.InvariantCultureIgnoreCase))
           {
-            // asp-page-handler="GoToDetailsScreen"
-            <!--
-            <a class="govuk-link" asp-page="./CourseDetails/DetailsUniversityDegree" asp-route-id="@(Model.Id)">
-              View more details<span class="govuk-visually-hidden">about *(Model.CourseName)</span>
-            </a>
-            -->
-            
             <a class="govuk-link" asp-page="./CourseDetails/DetailsUniversityDegree" asp-route-id="@(Model.Id)">
               View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
             </a>
           }
-          else if (courseType == "Apprenticeship")
+          else if (courseType.Equals("Apprenticeship", StringComparison.InvariantCultureIgnoreCase))
           {
             <a class="govuk-link" asp-page="./CourseDetails/DetailsApprenticeship" asp-route-id="@(Model.Id)">
               View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
@@ -60,8 +53,6 @@
             </a>
           }
         }
-        <!--<a class="govuk-link" asp-page-handler="GoToDetailsScreen" >View more details<span class="govuk-visually-hidden">about (Model.CourseName)</span></a>-->
-        
       </li>
     </ul>
   </div>
