@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Web;
 using CsvHelper.Configuration;
+using feat.common.Models.Enums;
 using feat.common.Models.Staging.FAC.Enums;
 
 namespace feat.common.Models.Staging.FAC;
