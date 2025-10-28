@@ -4,8 +4,6 @@ namespace feat.web.Enums;
 
 public enum Distance
 {
-    [Display(Name = $"Up to 1 mile")]
-    One = 1,
     [Display(Name = $"Up to 2 miles")]
     Two = 2,
     [Display(Name = $"Up to 5 miles")]
@@ -14,10 +12,8 @@ public enum Distance
     Ten = 10,
     [Display(Name = $"Up to 15 miles")]
     Fifteen = 15,
-    [Display(Name = $"Up to 25 miles")]
-    TwentyFive = 25,
     [Display(Name = $"Up to 30 miles")]
     Thirty = 30,
-    [Display(Name = $"Up to 50 miles")]
-    Fifty = 50,
+    [Display(Name = $"Over 30 miles")]
+    ThirtyPlus = 300,
 }

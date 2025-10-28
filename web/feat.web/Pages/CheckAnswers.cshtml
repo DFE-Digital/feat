@@ -1,0 +1,113 @@
+@page
+@using System.Text
+@using feat.web.Models
+@model feat.web.Pages.CheckAnswersModel
+@{
+    ViewBag.Title = "Explore your options after school or college - GOV.UK"; 
+    ViewBag.FlowTitle = "Check your answers";
+}
+@section BeforeContent {
+    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.CheckAnswers))">Back</govuk-back-link>
+}
+
+
+<h1 class="govuk-heading-l">@ViewBag.FlowTitle</h1>
+
+<p class="govuk-body">Check your answers, and change them if you'd like to, before viewing your search results.</p>
+
+<dl class="govuk-summary-list">
+    
+    @if (!string.IsNullOrEmpty(Model.Search.Location))
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Location
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @Model.Search.Location
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" asp-page="@(PageName.Location)">Change<span class="govuk-visually-hidden"> location</span></a>
+            </dd>
+        </div>
+    }
+    @if (Model.Search.Distance.HasValue)
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Travel distance
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @Model.Search.Distance.Value.GetDisplayName()
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" asp-page="@(PageName.Location)">Change<span class="govuk-visually-hidden"> travel distance</span></a>
+            </dd>
+        </div>
+    }
+
+    @if (Model.Search.Interests.Any())
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Interests
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @string.Join(", ", Model.Search.Interests)
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" asp-page="@PageName.Interests">Change<span class="govuk-visually-hidden"> interests</span></a>
+            </dd>
+        </div>
+    }
+
+    @if (Model.Search.QualificationLevels != null && Model.Search.QualificationLevels.Any()) 
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Qualification Level
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @{
+                    bool first = true;
+                    StringBuilder sbQualificationsLevelText = new();
+                    foreach (var qualificationsLevel in Model.Search.QualificationLevels)
+                    {
+                        if (first)
+                            first = false;
+                        else
+                            sbQualificationsLevelText.Append(", ");
+                        
+                        sbQualificationsLevelText.Append(qualificationsLevel.GetDisplayName());
+                    }
+                    
+                    @sbQualificationsLevelText.ToString();
+                }
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" asp-page="@PageName.QualificationLevel">Change<span class="govuk-visually-hidden"> qualification level</span></a>
+            </dd>
+        </div>
+    }
+    
+    @if (Model.Search.AgeGroup.HasValue)
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Age 
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @Model.Search.AgeGroup.Value.GetDisplayName()
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" asp-page="@PageName.Age">Change<span class="govuk-visually-hidden"> travel distance</span></a>
+            </dd>
+        </div>
+    }
+
+</dl>
+
+<p class="govuk-body">Find out <a asp-page="AI" target="_blank" class="govuk-link">how we use AI</a> to bring you relevant results.</p>
+
+<govuk-button-link asp-page="@PageName.LoadCourses">Search</govuk-button-link>
+    

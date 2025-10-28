@@ -11,5 +11,8 @@ public class SearchResponse
     public List<Course> Courses { get; set; } = [];
     
     public IList<Facet> Facets { get; set; } = new List<Facet>();
+
     
+    public string SortBy = "Distance";
+
 }

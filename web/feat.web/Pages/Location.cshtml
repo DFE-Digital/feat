@@ -1,29 +1,31 @@
 ﻿@page
 @using feat.web.Enums
+@using feat.web.Models
 @model LocationModel
 @{
-    ViewBag.Title = "Where do you want to study?";
+    ViewBag.Title = "Explore your options after school or college - GOV.UK";
+    ViewBag.SectionTitle = "Where do you want to study?";
 }
 
 
 @section BeforeContent {
-    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage("Location"))">Back</govuk-back-link>
+    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.Location))">Back</govuk-back-link>
 }
 
-<h1 class="govuk-heading-l">@ViewBag.Title</h1>
-<p class="govuk-body">We need to know where you live as some courses or training are only available in certain areas.</p>
-<p class="govuk-body">If you enter a location that is different to where you live, you should check whether you need to live in the area (often referred to as being 'a resident') to do the course.</p>
+<h1 class="govuk-heading-l">@ViewBag.SectionTitle</h1>
+<p>You can search anywhere in England.</p>
+<p>However, some courses are only available to people living in the local area. This is more common for short courses or those aiming to help you find employment. And can apply even if it is online training. Check with the provider if you are unsure. </p>
 
 <form method="post">
-    <govuk-input for="Location" input-class="govuk-input--width-20" spellcheck="false">
-        <govuk-input-label class="govuk-label--m">Enter a town, city or postcode@(Model.Search.SearchType == SearchType.HE ? " (optional)" : "")</govuk-input-label>
+    
+    <govuk-input for="Location" input-class="govuk-input--width-20" spellcheck="false" autocomplete="true">
+        <govuk-input-label class="govuk-label--m">Enter a town, city or postcode (optional)</govuk-input-label>
     </govuk-input>
-    @if (Model.Search.SearchType != SearchType.HE)
-    {
-        <govuk-radios for="Distance">
+    
+    <govuk-radios for="Distance">
             <govuk-radios-fieldset>
                 <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                    How far would you be happy to travel?
+                    How far would you be happy to travel? (optional)
                 </govuk-radios-fieldset-legend>
                 @foreach (var option in Enum.GetValues<Distance>())
                 {
@@ -31,12 +33,8 @@
                 }
             </govuk-radios-fieldset>
         </govuk-radios>
-    }
+    
     <div class="govuk-button-group">
         <govuk-button type="submit">Continue</govuk-button>
-        @if (Model.Search.SearchType == SearchType.HE)
-        {
-            <a asp href="@Url.PageLink("Summary")" class="govuk-link">Skip this step</a>       
-        }
     </div>
 </form>

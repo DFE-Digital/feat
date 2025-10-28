@@ -1,0 +1,155 @@
+@page "{id}"
+@using feat.web.Models
+@model feat.web.Pages.CourseDetails.DetailsUniversityDegreeModel
+
+@{
+    
+}
+
+@section BeforeContent {
+    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.LoadCourses))">Back</govuk-back-link> 
+}
+
+<!--For data type checking-->
+<h4>DetailsUniversityDegree (Hardcoded); Id: @(Model.CourseId)</h4>
+
+
+<!-- University Degree base on Beta v8-->
+<div class="govuk-width-container">
+  <main class="govuk-main-wrapper" id="main-content">
+    <div class="govuk-grid-row">
+      
+      <div class="govuk-grid-column-two-thirds">
+        
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">
+              About the course
+            </h2>
+          </div>
+
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Qualification type</dt>
+                <dd class="govuk-summary-list__value">Degree</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Level</dt>
+                <dd class="govuk-summary-list__value">7</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Entry requirements</dt>
+                <dd class="govuk-summary-list__value">Two A Levels and one relevant vocational qualification</dd>
+              </div>
+              
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Tuition fee</dt>
+                <dd class="govuk-summary-list__value">£0.00</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Awarding organisation</dt>
+                <dd class="govuk-summary-list__value">University of Leeds</dd>
+              </div>
+              
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Course description</dt>
+                <dd class="govuk-summary-list__value">Gain practical skills and knowledge to advance in your chosen field.</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Location</h2>
+          </div>
+
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">University</dt>
+                <dd class="govuk-summary-list__value">University of Leeds</dd>
+                <dd class="govuk-summary-list__actions">
+                  <a class="govuk-link" href="#">View website<span class="govuk-visually-hidden"> name (Location)</span></a>
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+                <dt class="govuk-summary-list__key">Campus name</dt>
+                <dd class="govuk-summary-list__value">Woodhouse Lane Campus</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Campus address</dt>
+                <dd class="govuk-summary-list__value">Woodhouse Ln, Leeds LS2 9JT</dd>
+                <dd class="govuk-summary-list__actions">
+                  <a class="govuk-link" href="#">View on a map<span class="govuk-visually-hidden"> name (Location)</span></a>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Course details</h2>
+          </div>
+
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Delivery method</dt>
+                <dd class="govuk-summary-list__value">Classroom based</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Start date</dt>
+                <dd class="govuk-summary-list__value">6 March 2026</dd>
+              </div>
+              
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Duration</dt>
+                <dd class="govuk-summary-list__value">3 years</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Hours</dt>
+                <dd class="govuk-summary-list__value">Part time</dd>
+              </div>
+
+            </dl>
+          </div>
+        </div>
+
+        <button type="submit" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
+          Go to course
+        </button>
+        
+        <p>The information we show you about a course comes from the provider. If you want to know more about a course visit their website. You can also email or call them if you have any questions or want to discuss your options.</p>
+      </div>
+
+      <!-- On the Right side - 1/3 width -->
+      <div class="govuk-grid-column-one-third">
+        <div class="x-govuk-related-navigation">
+          <nav class="x-govuk-related-navigation__nav-section" aria-labelledby="related-navigation-related-content">
+            
+            <h2 class="x-govuk-related-navigation__main-heading" id="related-navigation-related-content">Related links</h2>
+            <ul class="x-govuk-related-navigation__link-list">
+              <li class="x-govuk-related-navigation__link">
+                <a class="govuk-link x-govuk-related-navigation__section-link" href="/browse/education/school-life">Explore jobs and careers you could do after this course</a>
+              </li>
+              <li class="x-govuk-related-navigation__link">
+                <a class="govuk-link x-govuk-related-navigation__section-link" asp-page="./AboutDegrees" >More information about Degrees</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      </div>
+    </main>
+</div>
+
