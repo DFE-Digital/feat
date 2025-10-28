@@ -147,23 +147,3 @@ public class Search
         return new Search();
     }
 }
-
-public static class PageName
-{
-    public static string Index = "Index";
-    public static string Location = "Location";
-    public static string Interests = "Interests";
-    public static string QualificationLevel = "QualificationLevel";
-    public static string Age = "Age";
-    public static string CheckAnswers = "CheckAnswers"; // was "Summary";
-    
-    public static string LoadCourses = "LoadCourses"; // List of Courses page in v8 
-    
-    public static string DetailsCourse = "DetailsCourse";
-    public static string DeatilsApprenticeship = "DeatilsApprenticeship";
-    public static string DeatilsUniversityDegree = "DeatilsUniversityDegree";
-    
-    public static string NoResultsSearch = "NoResultsSearch";
-    
-    
-}

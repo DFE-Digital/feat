@@ -3,10 +3,7 @@
 @using System.Text.Json.Serialization
 @model feat.web.Models.Course
 @{
-  /*
-   * var ti = CultureInfo.CurrentCulture.TextInfo;
-   */
-
+  
   string TruncateString(ReadOnlySpan<char> fullString, out string remainder, int cutoff = 300)
   {
     remainder = string.Empty;
