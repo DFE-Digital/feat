@@ -23,7 +23,9 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         if (!Search.Updated)
-            return RedirectToPage(PageName.Index); // ??
+            return RedirectToPage(PageName.Index); 
+        
+        // If you've come here from LoadCourses page then need to 'new Search'
         
         if (Search.Distance.HasValue)
             Distance = Search.Distance;
@@ -33,8 +35,6 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
         Search.SetPage(PageName.Location); 
         HttpContext.Session.Set("Search", Search);
         
-        //TODO If you've come here from LoadCourses page Need to 'new Search'
-
         return Page();
     }
 
@@ -42,25 +42,8 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
-        // If it's anything other than HE, we need to validate distance and location
+        //TODO validate location is real or post-code is real
 
-        if (!string.IsNullOrEmpty(Location.Trim()))
-        {
-            // Has to be a full-name or a full-postcode.
-            // Use an external service to validate - legitimate postcode or real-location, city, town, village
-            
-            //^([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}|GIR ?0A{2})$
-            if (Regex.Match(Location, @"^([A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}|GIR ?0A{2})$").Success == false)
-            {
-                // Does not match Postcode.
-                //ModelState.AddModelError("Location", "Please enter a valid postcode");
-            }
-            else
-            {
-                // Is what's entered a real location name, if not.
-                // ModelState.AddModelError("Location", "Please enter a valid location");
-            }
-        }
         
         if (!ModelState.IsValid)
             return Page();

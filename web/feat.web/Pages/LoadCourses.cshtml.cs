@@ -49,6 +49,11 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             
             
             SearchResponse = await searchService.Search(Search, HttpContext.Session.Id);
+
+            if (SearchResponse == null || !SearchResponse.Courses.Any())
+            {
+                return RedirectToPage(PageName.NoResultsSearch);
+            }
             
             // Set up data 
             List<Facet> allFacets = SearchResponse?.Facets.ToList() ?? new List<Facet>();
@@ -84,16 +89,16 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
                 logger.LogInformation("OnPostSort called {sortBy}", sortBy);
             }
             
-            SearchResponse = await searchService.GetSortedCourses(sortBy);    
+            SearchResponse = await searchService.GetFilteredSortedCourses(sortBy);    
         }
         return Page();
     }
 
-    public IActionResult OnPostClearFilter()
+    public IActionResult OnPostClearFilters()
     {
         logger.LogDebug("OnPostClearFilter called");
         
-        // Clear the bound properties
+        //TODO Clear the filter properties
         ModelState.Clear();
         return Page();
     }

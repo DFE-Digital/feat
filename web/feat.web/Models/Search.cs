@@ -141,6 +141,11 @@ public class Search
         }
         return string.Empty;
     }
+
+    public Search ClearSearch()
+    {
+        return new Search();
+    }
 }
 
 public static class PageName
@@ -157,6 +162,8 @@ public static class PageName
     public static string DetailsCourse = "DetailsCourse";
     public static string DeatilsApprenticeship = "DeatilsApprenticeship";
     public static string DeatilsUniversityDegree = "DeatilsUniversityDegree";
+    
+    public static string NoResultsSearch = "NoResultsSearch";
     
     
 }

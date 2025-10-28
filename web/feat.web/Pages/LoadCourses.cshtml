@@ -18,7 +18,6 @@
   }
   catch (Exception e)
   {
-   // Console.WriteLine(e);
   }
 }
 
@@ -40,16 +39,17 @@
 
         <!--Filters-->
         <div class="govuk-grid-column-one-third">
-          <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-3 govuk-!-display-none-print" id="toggle-filters" type="button">
+          <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-3 govuk-!-display-none-print" 
+                  id="toggle-filters" type="button">
             Show filters
           </button>
 
           <div id="filter-panel" class="filter-container" > <!--hidden=""-->
             @{
-              //TODO: Use facets from search response to build filter selections 
-              List<Facet> allFacets = Model.SearchResponse?.Facets.ToList() ?? new List<Facet>();
+              //TODO: Use facets from initial search response to build filter selections 
+              //List<Facet> allFacets = Model.SearchResponse?.Facets.ToList() ?? new List<Facet>();
             }
-            <form method="get"><!-- action="load-courses"> -->
+            <form method="get">
               <div class="filter-container">
                 <div class="filter-search-terms">
                   <div class="filter-heading">
@@ -231,7 +231,7 @@
                                   <govuk-checkboxes-item id="attendancePattern[@i]"
                                                          value="@(attendancePattern.ToString("G"))"
                                                          checked="@(isTrue)">
-                                    @attendancePattern.ToString() <!-- <>-attendancePattern.GetDisplayName();-->
+                                    @attendancePattern.ToString() 
                                   </govuk-checkboxes-item>
                                   i++;
                                 }
@@ -274,8 +274,7 @@
                   <br>
                   <button class="govuk-button" type="submit">Apply filters</button>
                   <p class="govuk-body">
-                    <a href="/08/load-courses" class="govuk-link" id="clear-all-link">Clear all filters</a>
-                    <!--<a asp-page-handler="ClearFilter" asp-route-filterNumberOrId="">Clear filter</a>-->
+                    <a class="govuk-link" asp-page-handler="ClearFilters" >Clear filter</a>
                   </p>
 
                 </div>
@@ -283,7 +282,20 @@
             </form>
           </div>
         </div>
-
+        
+        @if (Model.SearchResponse == null || Model.SearchResponse.Courses == null || 
+             !Model.SearchResponse.Courses.Any())
+        {
+          <h2 class="govuk-heading-m" role="status" aria-live="polite">It looks like we can’t find anything based on your answers.</h2>
+          <p>Here are some things you can try:</p>
+          <ul class="govuk-list govuk-list--bullet">
+            <li>removing a filter</li>
+            <li><a asp-page="@PageName.Interests">making your search broader</a></li>
+            <li>increasing the distance or looking in a <a asp-page="@PageName.Location">different location</a></li>
+          </ul>
+        }
+        else
+        {
         <!-- Results & Pagination -->
         <div class="govuk-grid-column-two-thirds">
           <h2 class="govuk-heading-m">Available courses</h2>
@@ -295,34 +307,34 @@
               <!--<span aria-current="true">Distance</span>
               | <a href="?page=1&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=relevance">Relevance</a>
               -->
-              <a asp-page-handler="Sort" asp-page="" asp-route-sortBy="distance" >Distance</a> | 
+              <a asp-page-handler="Sort" asp-page="/" asp-route-sortBy="distance" >Distance</a> | 
               <a asp-page-handler="Sort" asp-route-sortBy="relevance" >Relevance</a>
             </span>
           </p>
           
-          @foreach (Course course in Model.SearchResponse?.Courses)
+          @foreach (Course course in Model.SearchResponse.Courses)
           {
             await Html.RenderPartialAsync("Partials/CourseV8", course);
           }
-
-          <nav class="govuk-pagination" aria-label="Pagination">
-          @{
-            if (Model.PaginationState.PageNumber > 1)
-            {
-              <div class="govuk-pagination__prev">
-                <a class="govuk-link govuk-pagination__link"
-                   href="?page=1&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
-                   rel="prev">
-                  <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-                    <path d="m6.5938-0.0088125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
-                  </svg>
-                  <span class="govuk-pagination__link-title">Previous<span class="govuk-visually-hidden"> page</span></span>
-                </a>
-              </div>
-            }
-          }
           
-          <ul class="govuk-pagination__list">
+          <nav class="govuk-pagination" aria-label="Pagination">
+            @{
+              if (Model.PaginationState.PageNumber > 1)
+              {
+                <div class="govuk-pagination__prev">
+                  <a class="govuk-link govuk-pagination__link"
+                     href="?page=1&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
+                     rel="prev">
+                    <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                      <path d="m6.5938-0.0088125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                    </svg>
+                    <span class="govuk-pagination__link-title">Previous<span class="govuk-visually-hidden"> page</span></span>
+                  </a>
+                </div>
+              }
+            }
+          
+            <ul class="govuk-pagination__list">
               <li class="govuk-pagination__item ">
                 <a class="govuk-link govuk-pagination__link" 
                    href="?page=1&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
@@ -372,10 +384,10 @@
                 </div>
               }
             }
-            
           </nav>
 
         </div>
+        }
       </div>
 
     </main>

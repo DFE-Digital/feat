@@ -33,7 +33,7 @@ public class SearchService : ISearchService
         return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
     }
     
-    public async Task<SearchResponse> GetSortedCourses(string sortBy)
+    public async Task<SearchResponse> GetFilteredSortedCourses(string sortBy)
     {
         var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search/sort").ToString();
         await Task.Delay(1);
