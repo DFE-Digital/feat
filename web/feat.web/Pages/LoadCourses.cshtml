@@ -2,6 +2,7 @@
 @using feat.common.Models.Enums
 @using feat.web.Models
 @using feat.web.Enums
+@using feat.web.Utils
 @model feat.web.Pages.LoadCoursesModel
 @{
   ViewBag.Title = "Explore your options after school or college - GOV.UK";
@@ -33,7 +34,7 @@
         <div class="govuk-grid-column-full">
           <h1 class="govuk-heading-l">Your search results</h1>
           <p class="govuk-body-l">@(searchResultText)</p>
-          <p><a href="/Index">Search again</a></p>
+          <p><a asp-page="@PageName.Location">Search again</a></p>
           <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
         </div>
 

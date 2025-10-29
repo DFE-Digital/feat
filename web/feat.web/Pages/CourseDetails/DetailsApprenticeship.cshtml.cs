@@ -2,6 +2,7 @@ using feat.web.Extensions;
 using feat.web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using feat.web.Utils;
 
 namespace feat.web.Pages.CourseDetails;
 
@@ -20,7 +21,7 @@ public class DetailsApprenticeshipModel(ILogger<DetailsApprenticeshipModel> logg
         try
         {
             Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-            Search.SetPage(PageName.DeatilsApprenticeship);
+            Search.SetPage(PageName.DetailsApprenticeship);
             
             Id = !string.IsNullOrEmpty(id) ? id : "missing id";
         }
