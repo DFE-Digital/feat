@@ -13,6 +13,7 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
 {
 
     [BindProperty]
+    [MaxLength(100, ErrorMessage = SharedStrings.LessThan100Char)]
     public string? Location { get; set; }
     
     [BindProperty]
@@ -26,8 +27,13 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
         if (!Search.Updated)
             return RedirectToPage(PageName.Index); 
         
-        // If you've come here from LoadCourses page then need to 'new Search'
-        
+        // If you've come here from LoadCourses page then start to 'new Search'
+        if (Search.History.Contains(PageName.LoadCourses))
+        {
+            Search = new Search();
+            Search.SetPage(PageName.Index); 
+        }
+
         if (Search.Distance.HasValue)
             Distance = Search.Distance;
         if (!string.IsNullOrEmpty(Search.Location))
@@ -43,8 +49,13 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
-        //TODO validate location is real or post-code is real
-
+        // TODO validate entered location is real or entered post-code is real.
+        
+        var distanceValue = Distance.HasValue? Distance.Value : new Distance();
+        if (!string.IsNullOrEmpty(Location) && distanceValue == 0)
+        {
+            ModelState.AddModelError("Distance", SharedStrings.SelectHowFarTravel);
+        }
         
         if (!ModelState.IsValid)
             return Page();
