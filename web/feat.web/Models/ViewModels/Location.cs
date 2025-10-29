@@ -15,6 +15,8 @@ public class Location
     public string? County { private get; init; }
     
     public string? Postcode { private get; init; }
+    
+    public GeoLocation? GeoLocation { get; init; }
 
     public string Display => FormatAddress;
 

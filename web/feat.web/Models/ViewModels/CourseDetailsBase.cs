@@ -5,6 +5,8 @@ namespace feat.web.Models.ViewModels;
 
 public abstract class CourseDetailsBase
 {
+    public string Title { get; init; }
+    
     public CourseType Type { private get; init; }
     
     public string TypeDisplay => Type.GetDescription() ?? NotAvailableString;
@@ -26,6 +28,8 @@ public abstract class CourseDetailsBase
     public CourseHours? Hours { private get; init; }
 
     public string HoursDisplay => Hours?.GetDescription() ?? NotAvailableString;
+    
+    public string? CourseUrl { get; init; }
 
     protected static string NotAvailableString => "Not available";
     
