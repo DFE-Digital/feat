@@ -4,6 +4,7 @@ using feat.web.Models;
 using feat.web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using feat.web.Utils;
 
 namespace feat.web.Pages.CourseDetails;
 
@@ -22,7 +23,7 @@ public class DetailsUniversityDegreeModel(ILogger<DetailsUniversityDegreeModel> 
         try
         {
             Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-            Search.SetPage(PageName.DeatilsUniversityDegree);
+            Search.SetPage(PageName.DetailsUniversityDegree);
             HttpContext.Session.Set("Search", Search);
             
             CourseId = !string.IsNullOrEmpty(id) ? id : "missing id";

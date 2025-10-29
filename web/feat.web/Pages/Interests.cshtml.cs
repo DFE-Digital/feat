@@ -4,18 +4,22 @@ using feat.web.Extensions;
 using feat.web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using feat.web.Utils;
 
 namespace feat.web.Pages;
 
 public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
 {
     [BindProperty]
+    [MaxLength(100, ErrorMessage = SharedStrings.LessThan100Char)]
     public string? UserInterest1 { get; set; } = string.Empty;
     
     [BindProperty]
+    [MaxLength(100, ErrorMessage = SharedStrings.LessThan100Char)]
     public string? UserInterest2 { get; set; }
     
     [BindProperty]
+    [MaxLength(100, ErrorMessage = SharedStrings.LessThan100Char)]
     public string? UserInterest3 { get; set; }
     
     [BindProperty] 
