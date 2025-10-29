@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace feat.common.Models.Staging.FAC.Enums;
+namespace feat.common.Models.Enums;
 
 public enum DeliveryMode
 {

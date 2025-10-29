@@ -224,7 +224,7 @@
                               </govuk-checkboxes-fieldset-legend>
                               @{
                                 int i = 0;
-                                foreach (var attendancePattern in Enum.GetValues<AttendancePattern>())
+                                foreach (var attendancePattern in Enum.GetValues<CourseHours>())
                                 {
                                   var isTrue = Model.SelectedCourseHours.Contains(attendancePattern);
 

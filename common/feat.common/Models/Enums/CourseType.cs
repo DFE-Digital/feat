@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace feat.common.Models.Staging.FAC.Enums;
+namespace feat.common.Models.Enums;
 
 public enum CourseType
 {
@@ -21,6 +21,18 @@ public enum CourseType
     
     [Description("Skills Bootcamp")]
     SkillsBootcamp = 6,
+    
+    [Description("A Level")]
+    ALevels = 7,
+    
+    [Description("Apprenticeship")]
+    Apprenticeship = 8,
+    
+    [Description("Degree")]
+    Degree = 9,
+    
+    [Description("Diploma")]
+    Diploma = 10,
     
     Unknown = -1
 }

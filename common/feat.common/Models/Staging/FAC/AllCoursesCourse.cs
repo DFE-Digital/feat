@@ -4,6 +4,7 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
+using feat.common.Models.Enums;
 using feat.common.Models.Staging.FAC.Enums;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;

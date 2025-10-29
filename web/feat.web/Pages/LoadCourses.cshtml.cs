@@ -1,11 +1,9 @@
-using feat.common.Models;
 using feat.web.Enums;
 using feat.web.Extensions;
 using feat.web.Models;
 using feat.web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using NetTopologySuite.Operation.Valid;
 using feat.common.Models.Enums;
 
 namespace feat.web.Pages;
@@ -13,10 +11,10 @@ namespace feat.web.Pages;
 public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesModel> logger) : PageModel
 {
     [BindProperty]
-    public List<AttendancePattern> SelectedCourseHours { get; set; } = new();
+    public List<CourseHours> SelectedCourseHours { get; set; } = new();
     
-    public List<CourseType> SelectedCourseTypes { get; set; } = new();
-    public List<QualificationLevel> SelectedQualificationLevels { get; set; } = new();
+    public List<Enums.CourseType> SelectedCourseTypes { get; set; } = new();
+    public List<Enums.QualificationLevel> SelectedQualificationLevels { get; set; } = new();
     
     [BindProperty]
     public Distance? SelectedTravelDistance { get; set; } = new();
