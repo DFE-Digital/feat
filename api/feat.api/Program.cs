@@ -26,13 +26,13 @@ builder.Services.Configure<AzureOptions>(
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.WriteIndented = true;
-    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    //options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     options.JsonSerializerOptions.Converters.Add(new MicrosoftSpatialGeoJsonConverter());
 });
 
-var connectionString = builder.Configuration.GetConnectionString("IngestionConnection");
+var connectionString = builder.Configuration.GetConnectionString("Courses");
 builder.Services.AddDbContext<IngestionDbContext>(options =>
     options.UseSqlServer(connectionString, x => x.UseNetTopologySuite()));
 
@@ -75,6 +75,7 @@ builder.Services.AddSingleton<EmbeddingClient>(sp =>
 });
 
 builder.Services.AddScoped<ISearchService, SearchService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddSingleton<IApiClient, ApiClient>();
 
 builder.Services.AddHttpClient(ApiClientNames.Postcode, client =>

@@ -12,5 +12,7 @@ public class CourseDetailsCourse : CourseDetailsBase
     
     public List<Location>? ProviderAddresses { get; init; }
     
+    public string? ProviderUrl { get; init; }
+    
     public List<StartDate>? StartDates { get; init; }
 }

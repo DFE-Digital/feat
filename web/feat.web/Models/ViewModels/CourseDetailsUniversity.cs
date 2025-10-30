@@ -12,6 +12,8 @@ public class CourseDetailsUniversity : CourseDetailsBase
     
     public string? University { get; init; }
     
+    public string? UniversityUrl { get; set; }
+    
     public string? CampusName { get; init; }
     
     public Location? CampusAddress { get; init; }

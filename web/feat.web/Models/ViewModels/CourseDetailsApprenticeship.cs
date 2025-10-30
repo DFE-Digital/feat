@@ -14,6 +14,8 @@ public class CourseDetailsApprenticeship : CourseDetailsBase
     
     public Location? EmployerAddress { get; init; }
     
+    public string? EmployerUrl { get; init; }
+    
     public string? EmployerDescription { get; init; }
     
     public string? TrainingProvider { get; init; }
