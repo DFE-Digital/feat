@@ -2,7 +2,7 @@
 @using System.Text.Json
 @using System.Text.Json.Serialization
 @using feat.common.Models.Enums
-@model feat.web.Models.ViewModels.SearchResult
+@model feat.web.Models.Course
 
 @{
   
@@ -42,7 +42,7 @@
             courseDetails = "DetailsApprenticeship";
           }
           
-          <a class="govuk-link" asp-page="./CourseDetails/@courseDetails" asp-route-id="@(Model.Id)">
+          <a class="govuk-link" asp-page="./CourseDetails/@courseDetails" asp-route-id="@(Model.CourseId)">
             View more details<span class="govuk-visually-hidden">about @(Model.CourseTypeDisplay)</span>
           </a>
         }

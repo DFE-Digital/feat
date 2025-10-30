@@ -29,7 +29,7 @@ public class SudoSearchService : ISearchService
         {
             var item0 = new SearchResult
             {
-                Id = ($"A{i}"), DistanceSudo = i / 2,
+                CourseId = ($"A{i}"), DistanceSudo = i / 2,
                 CourseTitle = "Media A Level",
                 ProviderName = "Leeds College",
                 Location = "Leeds",
@@ -43,7 +43,7 @@ public class SudoSearchService : ISearchService
 
             var item1 = new SearchResult
             {
-                Id = ($"B{i}"), DistanceSudo = (i + 2) / 2, 
+                CourseId = ($"B{i}"), DistanceSudo = (i + 2) / 2, 
                 CourseTitle = "Media A Level",
                 ProviderName = "Bradford College",
                 Location = "Leeds",
@@ -130,7 +130,6 @@ public class SudoSearchService : ISearchService
         {
             SearchResults = pagedItems,
             Facets = new List<Facet>(),
-            
             Page = pageNumber,
             PageSize = pageSize,
             TotalCount = SearchResultsInner.Count,

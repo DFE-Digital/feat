@@ -284,7 +284,7 @@
           </div>
         </div>
         
-        @if (Model.SearchResponse == null || !Model.SearchResponse.SearchResults.Any())
+        @if (Model.Courses == null || !Model.Courses.Any()) 
         {
           <h2 class="govuk-heading-m" role="status" aria-live="polite">It looks like we can’t find anything based on your answers.</h2>
           <p>Here are some things you can try:</p>
@@ -309,7 +309,7 @@
               </span>
             </p>
 
-            @foreach (var searchResult in Model.SearchResponse.SearchResults)
+            @foreach (var searchResult in Model.Courses) 
             {
               await Html.RenderPartialAsync("Partials/CourseV8", searchResult);
             }

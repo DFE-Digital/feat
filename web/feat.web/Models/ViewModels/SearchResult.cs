@@ -5,9 +5,8 @@ namespace feat.web.Models.ViewModels;
 
 public class SearchResult
 {
-    public required string Id { get; set; }
+    public required string CourseId { get; set; }
     public decimal DistanceSudo { get; set; } = 1;
-    
     
     public required string CourseTitle { get; init; }
     

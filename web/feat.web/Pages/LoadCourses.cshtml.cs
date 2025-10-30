@@ -24,6 +24,8 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     public required Search Search { get; set; }
     
     public SearchResponse? SearchResponse { get; set; }
+
+    public List<Course> Courses { get; set; } = [];
     
     
     [BindProperty]
@@ -45,15 +47,17 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             HttpContext.Session.Set("Search", Search);
             
             // Temporary for dev.
-            int pageSize = 5;
-            SearchResponse = await searchService.GetFilteredSortedPagedCourses(Search, HttpContext.Session.Id, "Description", pageNumber, 3);
-
+            var pageSize = 3;
+            SearchResponse = await searchService.GetFilteredSortedPagedCourses(Search, HttpContext.Session.Id, "Description", pageNumber, pageSize);
+            
             if (SearchResponse == null || !SearchResponse.SearchResults.Any())
             {
                 return RedirectToPage(PageName.NoResultsSearch);
             }
             
-            // Set up data : 
+            // Set up data :
+            Courses = SearchResponse.SearchResults.ToCourses();
+            
             // Filter & Facets
             
             // set distance - as it was chosen by the user previously
