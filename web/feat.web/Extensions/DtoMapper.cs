@@ -1,7 +1,7 @@
 using feat.web.Models;
 using feat.web.Models.ViewModels;
 
-namespace feat.web.Utils;
+namespace feat.web.Extensions;
 
 public static class DtoMapper
 {
