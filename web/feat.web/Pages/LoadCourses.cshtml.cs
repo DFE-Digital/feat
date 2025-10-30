@@ -25,13 +25,11 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     
     public SearchResponse? SearchResponse { get; set; }
     
-    [BindProperty]
-    public Pagination PaginationState { get; set; } = new();
     
     [BindProperty]
     public string SortBy { get; set; } = "Distance";
     
-    public async Task<IActionResult> OnGetAsync([FromQuery] bool debug = false)
+    public async Task<IActionResult> OnGetAsync(int pageNumber = 1, [FromQuery] bool debug = false) 
     {
         logger.LogInformation("OnGetAsync called");
         try
@@ -41,33 +39,29 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             {
                 return RedirectToPage(PageName.Index);
             }
-            
+
             Search.Debug = debug;
             Search.SetPage(PageName.LoadCourses);
             HttpContext.Session.Set("Search", Search);
             
-            
-            SearchResponse = await searchService.Search(Search, HttpContext.Session.Id);
+            // Temporary for dev.
+            int pageSize = 5;
+            SearchResponse = await searchService.GetFilteredSortedPagedCourses(Search, HttpContext.Session.Id, "Description", pageNumber, 3);
 
-            if (SearchResponse == null || !SearchResponse.Courses.Any())
+            if (SearchResponse == null || !SearchResponse.SearchResults.Any())
             {
                 return RedirectToPage(PageName.NoResultsSearch);
             }
             
-            // Set up data 
-            List<Facet> allFacets = SearchResponse?.Facets.ToList() ?? new List<Facet>();
+            // Set up data : 
+            // Filter & Facets
             
             // set distance - as it was chosen by the user previously
             SelectedTravelDistance = Search.Distance;
             
-            
-            PaginationState = new Pagination()
-            {
-                PageNumber = SearchResponse.Page,
-                PageSize = SearchResponse.PageSize,
-                TotalPageCount = SearchResponse.TotalCount.HasValue ? SearchResponse.TotalCount.Value : 0,
-            };
-
+            CurrentPage = SearchResponse.Page;
+            PageSize = SearchResponse.PageSize;
+            TotalPages = (int)Math.Ceiling((double)SearchResponse.TotalCount / (double)pageSize);
             SortBy = SearchResponse.SortBy; 
         }
         catch (Exception e)
@@ -87,8 +81,6 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             {
                 logger.LogInformation("OnPostSort called {sortBy}", sortBy);
             }
-            
-            SearchResponse = await searchService.GetFilteredSortedCourses(sortBy);    
         }
         return Page();
     }
@@ -108,11 +100,59 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
         return Page();
     }
 
+    // Pagination logic
+    public int CurrentPage { get; set; } = 1;
+    public int TotalPages { get; set; }
+    public int PageSize { get; set; } = 10;
+    
+    // Pagination helpers
+    public bool HasPreviousPage => CurrentPage > 1;
+    public bool HasNextPage => CurrentPage < TotalPages;
+    public int PreviousPage => CurrentPage - 1;
+    public int NextPage => CurrentPage + 1;
+
+    internal List<int> GetPageNumbers()
+    {
+        List<int> pages = new List<int>();
+
+        if (TotalPages <= 3)
+        {
+            for (int i = 0; i < TotalPages; i++)
+            {
+                pages.Add(i);
+            }
+        }
+        else
+        {
+            if (CurrentPage == 1)
+            {
+                pages.Add(1);
+                pages.Add(2);
+                pages.Add(3);
+            }
+            else if (CurrentPage == TotalPages)
+            {
+                // At the End - last 3pages
+                pages.Add(TotalPages - 2);
+                pages.Add(TotalPages - 1);
+                pages.Add(TotalPages);
+            }
+            else
+            {
+                // In the middle
+                pages.Add(CurrentPage - 1);
+                pages.Add(CurrentPage);
+                pages.Add(CurrentPage + 1);
+            }
+        }
+        return pages;
+    }
+
 }
 
 public class Pagination
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize  { get; set; } = 10;
-    public long TotalPageCount  { get; set; } = 15;
+    public int TotalPageCount  { get; set; } = 15;
 }

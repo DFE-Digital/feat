@@ -284,8 +284,7 @@
           </div>
         </div>
         
-        @if (Model.SearchResponse == null || Model.SearchResponse.Courses == null || 
-             !Model.SearchResponse.Courses.Any())
+        @if (Model.SearchResponse == null || !Model.SearchResponse.SearchResults.Any())
         {
           <h2 class="govuk-heading-m" role="status" aria-live="polite">It looks like we can’t find anything based on your answers.</h2>
           <p>Here are some things you can try:</p>
@@ -297,97 +296,84 @@
         }
         else
         {
-        <!-- Results & Pagination -->
-        <div class="govuk-grid-column-two-thirds">
-          <h2 class="govuk-heading-m">Available courses</h2>
-          
-          <p class="govuk-body govuk-!-margin-bottom-6">
-            <span class="govuk-!-font-weight-bold">Sort courses by:</span>
-            <span class="govuk-!-margin-left-2">
+          <!-- Results & Pagination -->
+          <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-m">Available courses</h2>
 
-              <!--<span aria-current="true">Distance</span>
-              | <a href="?page=1&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=relevance">Relevance</a>
-              -->
-              <a asp-page-handler="Sort" asp-page="/" asp-route-sortBy="distance" >Distance</a> | 
-              <a asp-page-handler="Sort" asp-route-sortBy="relevance" >Relevance</a>
-            </span>
-          </p>
-          
-          @foreach (Course course in Model.SearchResponse.Courses)
-          {
-            await Html.RenderPartialAsync("Partials/CourseV8", course);
-          }
-          
-          <nav class="govuk-pagination" aria-label="Pagination">
-            @{
-              if (Model.PaginationState.PageNumber > 1)
-              {
-                <div class="govuk-pagination__prev">
-                  <a class="govuk-link govuk-pagination__link"
-                     href="?page=1&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
-                     rel="prev">
-                    <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-                      <path d="m6.5938-0.0088125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
-                    </svg>
-                    <span class="govuk-pagination__link-title">Previous<span class="govuk-visually-hidden"> page</span></span>
-                  </a>
-                </div>
-              }
+            <!-- Sort Region-->
+            <p class="govuk-body govuk-!-margin-bottom-6">
+              <span class="govuk-!-font-weight-bold">Sort courses by:</span>
+              <span class="govuk-!-margin-left-2">
+                <a asp-page-handler="Sort" asp-page="/" asp-route-sortBy="distance">Distance</a> |
+                <a asp-page-handler="Sort" asp-route-sortBy="relevance">Relevance</a>
+              </span>
+            </p>
+
+            @foreach (var searchResult in Model.SearchResponse.SearchResults)
+            {
+              await Html.RenderPartialAsync("Partials/CourseV8", searchResult);
             }
-          
-            <ul class="govuk-pagination__list">
-              <li class="govuk-pagination__item ">
-                <a class="govuk-link govuk-pagination__link" 
-                   href="?page=1&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
-                   aria-label="Page 1">
-                  @{
-                    if (Model.PaginationState.PageNumber > 1)
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+              <nav class="govuk-pagination" aria-label="Pagination">
+                @if (Model.HasPreviousPage)
+                {
+                  <div class="govuk-pagination__prev">
+                    <a class="govuk-link govuk-pagination__link"
+                       asp-page="LoadCourses" asp-route-pageNumber="@(Model.PreviousPage)"
+                       aria-label="Previous">
+                      <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" 
+                           height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                        <path d="m6.5938-0.0088125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                      </svg>
+                      <span class="govuk-pagination__link-title">Previous<span class="govuk-visually-hidden"> page</span></span>
+                    </a>
+                  </div>
+                }
+                <ul class="govuk-pagination__list">
+                  @foreach (var pageNumber in Model.GetPageNumbers())
+                  {
+                    @if (pageNumber == Model.CurrentPage)
                     {
-                      @(Model.PaginationState.PageNumber - 1)
+                      <li class="govuk-pagination__item govuk-pagination__item--current">
+                        <a class="govuk-link govuk-pagination__link"
+                           aria-label=@($"Page {pageNumber}") aria-current="page">
+                          @pageNumber
+                        </a><span></span>
+                      </li>
                     }
                     else
                     {
-                      @Model.PaginationState.PageNumber; 
+                      <li class="govuk-pagination__item ">
+                        <a class="govuk-link govuk-pagination__link"
+                           asp-page="" asp-route-pageNumber="@pageNumber"
+                           aria-label=@($"Page {pageNumber}")>
+                          @pageNumber
+                        </a>
+                      </li>
                     }
                   }
-                </a>
-              </li>
+                </ul>
 
-              <li class="govuk-pagination__item govuk-pagination__item--current">
-                <a class="govuk-link govuk-pagination__link" 
-                   href="?page=2&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
-                   aria-label="Page 2" aria-current="page">
-                  @Model.PaginationState.PageNumber
-                </a>
-              </li>
-
-              <li class="govuk-pagination__item ">
-                <a class="govuk-link govuk-pagination__link" 
-                   href="?page=3&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
-                   aria-label="Page 3">
-                  @(Model.PaginationState.PageNumber + 1)
-                </a>
-              </li>
-            </ul>
-
-            @{
-              if (Model.PaginationState.TotalPageCount != Model.PaginationState.PageNumber )
-              {
-                <div class="govuk-pagination__next">
-                  <a class="govuk-link govuk-pagination__link" 
-                     href="?page=3&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
-                     rel="next">
-                    <span class="govuk-pagination__link-title">Next<span class="govuk-visually-hidden"> page</span></span>
-                    <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-                      <path d="m8.108-0.0088125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
-                    </svg>
-                  </a>
-                </div>
-              }
+                @if (Model.HasNextPage)
+                {
+                  <div class="govuk-pagination__next">
+                    <a class="govuk-link govuk-pagination__link"
+                       asp-page="LoadCourses" asp-route-pageNumber="@Model.NextPage"
+                       rel="next">
+                      <span class="govuk-pagination__link-title">Next<span class="govuk-visually-hidden"> page</span></span>
+                      <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" 
+                           height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                        <path d="m8.108-0.0088125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                      </svg>
+                    </a>
+                  </div>
+                }
+              </nav>
             }
-          </nav>
-
-        </div>
+          </div>
         }
       </div>
 

@@ -32,7 +32,12 @@ public class SearchService : ISearchService
         var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search/global-facets").ToString();
         return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
     }
-    
+
+    public Task<SearchResponse> GetFilteredSortedPagedCourses(Search search, string sessionId, string sortFilter, int pageNumber, int pageSize)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<SearchResponse> GetFilteredSortedCourses(string sortBy)
     {
         var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search/sort").ToString();
@@ -46,4 +51,6 @@ public class SearchService : ISearchService
         await Task.Delay(1);
         return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
     }
+    
+    
 }

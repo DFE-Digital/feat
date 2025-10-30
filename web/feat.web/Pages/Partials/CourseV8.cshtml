@@ -1,7 +1,9 @@
 @using System.Globalization
 @using System.Text.Json
 @using System.Text.Json.Serialization
-@model feat.web.Models.Course
+@using feat.common.Models.Enums
+@model feat.web.Models.ViewModels.SearchResult
+
 @{
   
   string TruncateString(ReadOnlySpan<char> fullString, out string remainder, int cutoff = 300)
@@ -25,30 +27,24 @@
 <!-- Course Card -->
 <div class="govuk-summary-card">
   <div class="govuk-summary-card__title-wrapper">
-    <h2 class="govuk-summary-card__title">@Model.CourseName</h2>
+    <h2 class="govuk-summary-card__title">@Model.CourseTitle</h2>
     <ul class="govuk-summary-card__actions">
       <li class="govuk-summary-card__action">
         @{
-          var courseType = Model.CourseType ?? "Degree";
-
-          if (courseType.Equals("Degree", StringComparison.InvariantCultureIgnoreCase))
+          string courseDetails = "DetailsCourse";
+          
+          if (Model.CourseType == CourseType.Degree)
           {
-            <a class="govuk-link" asp-page="./CourseDetails/DetailsUniversityDegree" asp-route-id="@(Model.Id)">
-              View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
-            </a>
+            courseDetails = "DetailsUniversityDegree";
           }
-          else if (courseType.Equals("Apprenticeship", StringComparison.InvariantCultureIgnoreCase))
+          else if (Model.CourseType == CourseType.Apprenticeship)
           {
-            <a class="govuk-link" asp-page="./CourseDetails/DetailsApprenticeship" asp-route-id="@(Model.Id)">
-              View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
-            </a>
+            courseDetails = "DetailsApprenticeship";
           }
-          else 
-          {
-            <a class="govuk-link" asp-page="./CourseDetails/DetailsCourse" asp-route-id="@(Model.Id)">
-              View more details<span class="govuk-visually-hidden">about @(Model.CourseName)</span>
-            </a>
-          }
+          
+          <a class="govuk-link" asp-page="./CourseDetails/@courseDetails" asp-route-id="@(Model.Id)">
+            View more details<span class="govuk-visually-hidden">about @(Model.CourseTypeDisplay)</span>
+          </a>
         }
       </li>
     </ul>
@@ -64,24 +60,30 @@
         <dt class="govuk-summary-list__key">Location</dt>
         <dd class="govuk-summary-list__value">
           @{
-            bool hasTown = !string.IsNullOrEmpty(Model.Town);
-            bool hasDistance = Model.Distance.HasValue;
+            bool hasTown = !string.IsNullOrEmpty(Model.Location);
+            bool hasDistance = !string.IsNullOrEmpty(Model.Distance);
 
-            if (hasTown && hasDistance)
+            @if (hasTown && hasDistance)
             {
-              <p>@(Model.Town), @(Model.Distance.Value.ToString(Model.Distance.Value % 1 == 0 ? "N0" : "N1", CultureInfo.InvariantCulture)) miles</p>
-            }
-            else if (!hasTown && hasDistance)
-            {
-              <p>@(Model.Distance.Value.ToString(Model.Distance.Value % 1 == 0 ? "N0" : "N1", CultureInfo.InvariantCulture)) miles</p>
-            }
-            else if (hasTown && !hasDistance)
-            {
-              <p>@(Model.Town)</p>
+              <p>@($"{Model.Location}, {Model.Distance}")</p>
             }
             else
             {
-              <p>Unavailable</p>
+              if (!hasTown && hasDistance)
+              {
+                <p>@Model.Distance</p>
+              }
+              else
+              {
+                if (hasTown && !hasDistance)
+                {
+                  <p>@(Model.Location)</p>
+                }
+                else
+                {
+                  <p>Unavailable</p>
+                }
+              }
             }
           }
         </dd>
@@ -90,28 +92,28 @@
         <dt class="govuk-summary-list__key">Course type</dt>
         <dd class="govuk-summary-list__value">
           @{
-            if (string.IsNullOrEmpty(Model.CourseType))
+            if (string.IsNullOrEmpty(Model.CourseTypeDisplay))
             {
               <p>Course type not provided</p>
             }
             else
             {
-              <p>@Model.CourseType</p>
+              <p>@Model.CourseTypeDisplay</p>
             }
           }
         </dd>
       </div>
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Requirements</dt>
-        <dd class="govuk-summary-list__value"><!--Completion of a Level 2 qualification in a related subject-->
+        <dd class="govuk-summary-list__value">
           @{
-            if (string.IsNullOrEmpty(Model.EntryRequirements))
+            if (string.IsNullOrEmpty(Model.Requirements))
             {
               <text>Unknown</text>
             }
             else
             {
-              <p>@Model.EntryRequirements</p>
+              <p>@Model.Requirements</p>
             }
           }
         </dd>
@@ -119,16 +121,16 @@
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Overview</dt>
         <dd class="govuk-summary-list__value">
-          @if (string.IsNullOrEmpty(Model.WhoThisCourseIsFor))
+          @if (string.IsNullOrEmpty(Model.Overview))
           {
             <p>Course overview not found</p>
           }
           else
           {
-            var shortendText = TruncateString(Model.WhoThisCourseIsFor, out string tailEndText);
+            var shortendText = TruncateString(Model.Overview, out string tailEndText);
             if (string.IsNullOrEmpty(tailEndText))
             {
-              <p>@Model.WhoThisCourseIsFor</p>
+              <p>@Model.Overview</p>
             }
             else
             {
