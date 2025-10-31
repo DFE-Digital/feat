@@ -50,7 +50,8 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
             {
                 foreach (var qualificationOption in SelectedQualificationOptions)
                 {
-                    if (!Search.QualificationLevels.Contains(qualificationOption))
+                    if (Search.QualificationLevels != null && 
+                        !Search.QualificationLevels.Contains(qualificationOption))
                     {
                         Search.QualificationLevels.Add(qualificationOption);
                     }
@@ -60,8 +61,9 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
             
             HttpContext.Session.Set("Search", Search);
         
-            if (SelectedQualificationOptions.Contains(Enums.QualificationLevel.None)  
-                || SelectedQualificationOptions.Contains(Enums.QualificationLevel.OneAndTwo))
+            if (SelectedQualificationOptions != null && 
+                (SelectedQualificationOptions.Contains(Enums.QualificationLevel.None) || 
+                 SelectedQualificationOptions.Contains(Enums.QualificationLevel.OneAndTwo)))
             {
                 return RedirectToPage(PageName.Age);
             }

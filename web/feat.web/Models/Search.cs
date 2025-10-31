@@ -37,7 +37,18 @@ public class Search
     
     public CourseLevel? CourseLevel { get; set; }
     
-    // private field to prevent re-entrancy
+    // Store Pagination 
+    public int CurrentPage { get; set; } = 1;
+    public int TotalPages { get; set; }
+    public int PageSize { get; set; } = 10;
+    
+    //Sorting Distance | Relevance
+    public OrderBy OrderBy { get; set; }  = OrderBy.Relevance;
+    
+    // Course id for Details 
+    public string? CourseId { get; set; }
+    
+    // private field to prevent re-entery
     private bool _pageIsChanging = false;
     private bool _pageBackIsChanging = false;
     
@@ -74,10 +85,12 @@ public class Search
             IncludeOnlineCourses = IncludeOnlineCourses,
             Location = Location,
             Radius = Distance.HasValue ? (int)Distance.Value : 1000,
-            OrderBy = OrderBy.Relevance,
-            Page = 1,
-            PageSize = 20,
-            Debug = Debug
+            OrderBy = OrderBy,
+            PageNumber = CurrentPage,
+            PageSize = PageSize, 
+            Debug = Debug, 
+            CourseId = CourseId
+            
         };
     }
 

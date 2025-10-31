@@ -6,6 +6,6 @@ public class TrainingOptionsModel(ILogger<TrainingOptionsModel> logger) : PageMo
 {
     public void OnGet()
     {
-        
+        logger.LogInformation("OnGet");
     }
 }

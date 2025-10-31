@@ -23,15 +23,24 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     
     public required Search Search { get; set; }
     
-    public SearchResponse? SearchResponse { get; set; }
     
-    [BindProperty]
-    public Pagination PaginationState { get; set; } = new();
+    public List<Course> Courses { get; set; } = [];
     
-    [BindProperty]
-    public string SortBy { get; set; } = "Distance";
+    public int TotalCourseCount { get; private set; }
+
+
+    // Pagination logic
+    public int CurrentPage { get; set; } = 1;
+    public int TotalPages { get; set; }
+    public int PageSize { get; set; } = 3;
     
-    public async Task<IActionResult> OnGetAsync([FromQuery] bool debug = false)
+    // Pagination helpers
+    public bool HasPreviousPage => CurrentPage > 1;
+    public bool HasNextPage => CurrentPage < TotalPages;
+    public int PreviousPage => CurrentPage - 1;
+    public int NextPage => CurrentPage + 1;
+    
+    public async Task<IActionResult> OnGetAsync(string orderBy, int pageNumber = 1, [FromQuery] bool debug = false) 
     {
         logger.LogInformation("OnGetAsync called");
         try
@@ -42,53 +51,47 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
                 return RedirectToPage(PageName.Index);
             }
             
+            // pagination
+            if(pageNumber > 0)
+                Search.CurrentPage = pageNumber;
+            Search.TotalPages = TotalPages;
+            Search.PageSize = PageSize;
+            
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                Search.OrderBy = orderBy.Equals("distance", StringComparison.InvariantCultureIgnoreCase) ? OrderBy.Distance : OrderBy.Relevance;
+            }
+            
             Search.Debug = debug;
             Search.SetPage(PageName.LoadCourses);
             HttpContext.Session.Set("Search", Search);
             
+            var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
             
-            SearchResponse = await searchService.Search(Search, HttpContext.Session.Id);
-
-            if (SearchResponse == null || !SearchResponse.Courses.Any())
+            if (searchResponse.SearchResults.Count == 0)
             {
                 return RedirectToPage(PageName.NoResultsSearch);
             }
+
+            // Set up data :
+            TotalCourseCount = (int)searchResponse.TotalCount;
+            Courses = searchResponse.SearchResults.ToCourses();
             
-            // Set up data 
-            List<Facet> allFacets = SearchResponse?.Facets.ToList() ?? new List<Facet>();
+            // Filter & Facets
             
             // set distance - as it was chosen by the user previously
             SelectedTravelDistance = Search.Distance;
             
+            CurrentPage = searchResponse.Page;
+            PageSize = searchResponse.PageSize;
+            TotalPages = (int)Math.Ceiling(searchResponse.TotalCount / (double)searchResponse.PageSize);
             
-            PaginationState = new Pagination()
-            {
-                PageNumber = SearchResponse.Page,
-                PageSize = SearchResponse.PageSize,
-                TotalPageCount = SearchResponse.TotalCount.HasValue ? SearchResponse.TotalCount.Value : 0,
-            };
-
-            SortBy = SearchResponse.SortBy; 
+            // Save back into Session
+            
         }
         catch (Exception e)
         {
             logger.LogError(e.Message);
-        }
-        return Page();
-    }
-
-    public async Task<IActionResult> OnPostSort(string sortBy)
-    {
-        logger.LogInformation("OnPostSort called ");
-        
-        if (!string.IsNullOrEmpty(sortBy))
-        {
-            if (sortBy == "relevance" || sortBy == "distance")
-            {
-                logger.LogInformation("OnPostSort called {sortBy}", sortBy);
-            }
-            
-            SearchResponse = await searchService.GetFilteredSortedCourses(sortBy);    
         }
         return Page();
     }
@@ -108,11 +111,41 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
         return Page();
     }
 
-}
+    internal List<int> GetPageNumbers()
+    {
+        List<int> pages = new List<int>();
 
-public class Pagination
-{
-    public int PageNumber { get; set; } = 1;
-    public int PageSize  { get; set; } = 10;
-    public long TotalPageCount  { get; set; } = 15;
+        if (TotalPages <= 3)
+        {
+            for (int i = 0; i < TotalPages; i++)
+            {
+                pages.Add(i);
+            }
+        }
+        else
+        {
+            if (CurrentPage == 1)
+            {
+                pages.Add(1);
+                pages.Add(2);
+                pages.Add(3);
+            }
+            else if (CurrentPage == TotalPages)
+            {
+                // At the End - last 3pages
+                pages.Add(TotalPages - 2);
+                pages.Add(TotalPages - 1);
+                pages.Add(TotalPages);
+            }
+            else
+            {
+                // In the middle
+                pages.Add(CurrentPage - 1);
+                pages.Add(CurrentPage);
+                pages.Add(CurrentPage + 1);
+            }
+        }
+        return pages;
+    }
+
 }

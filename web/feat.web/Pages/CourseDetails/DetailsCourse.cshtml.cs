@@ -9,7 +9,7 @@ namespace feat.web.Pages.CourseDetails;
 public class DetailsCourseModel(ILogger<DetailsCourseModel> logger) : PageModel
 {
     [BindProperty] 
-     public string Id { get; set; }
+     public required string Id { get; set; }
      
     
     public required Search Search { get; set; }

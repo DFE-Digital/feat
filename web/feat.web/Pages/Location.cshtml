@@ -5,7 +5,6 @@
 @model LocationModel
 @{
     ViewBag.Title = "Explore your options after school or college - GOV.UK";
-    ViewBag.SectionTitle = "Where do you want to study?";
 }
 
 
@@ -13,9 +12,9 @@
     <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.Location))">Back</govuk-back-link>
 }
 
-<h1 class="govuk-heading-l">@ViewBag.SectionTitle</h1>
+<h1 class="govuk-heading-l">Where do you want to study?</h1>
 <p>You can search anywhere in England.</p>
-<p>However, some courses are only available to people living in the local area. This is more common for short courses or those aiming to help you find employment. And can apply even if it is online training. Check with the provider if you are unsure. </p>
+<p>Some courses are only available to people living in the local area. This can apply even if it is online training. It is more common for short courses or those aiming to help you find employment. Check with the provider if you are unsure.</p>
 
 <form method="post">
     

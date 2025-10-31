@@ -29,6 +29,8 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
 
     public IActionResult OnGet()
     {
+        logger.LogInformation("OnGet");
+        
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
         if (!Search.Updated)
