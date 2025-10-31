@@ -36,4 +36,16 @@ public static class DtoMapper
 
         return new List<Course>();
     }
+    
+    /*-*/
+    public static CourseDetailsUniversity ToCourseDetailsUniversity(this SearchResponse searchResponse)
+    {
+        var sss = searchResponse.CourseDetails;
+        
+        return new CourseDetailsUniversity()
+        {
+            //TuitionFee = 
+        };
+    }
+    /*-*/
 }

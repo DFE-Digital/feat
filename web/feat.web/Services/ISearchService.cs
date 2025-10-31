@@ -9,9 +9,6 @@ public interface ISearchService
     
     Task<SearchResponse> GetGlobalFacets();
 
-    // Temporary awating appropriate implementation
-    Task<SearchResponse> GetFilteredSortedPagedCourses(Search search, string sessionId, string sortFilter, int pageNumber, int pageSize); 
-    
-    Task<SearchResponse> GetCourseDetails(string courseId); 
-    
+    Task<SearchResponse> GetCourseDetails(Search search, string sessionId);
+
 }

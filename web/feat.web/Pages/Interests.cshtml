@@ -6,17 +6,15 @@
 @model InterestsModel
 @{
     ViewBag.Title = "Explore your options after school or college - GOV.UK";
-    ViewBag.SectionTitle = "What courses, subjects, jobs, or careers are you interested in?";
 }
 
 @section BeforeContent {
     <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.Interests))">Back</govuk-back-link>
 }
 
-<h1 class="govuk-heading-l">@ViewBag.SectionTitle</h1>
-<p class="govuk-body">
-    You can be as specific as you like. For example:
-</p>
+<h1 class="govuk-heading-l">What courses, subjects, jobs, or careers are you interested in?</h1>
+<p class="govuk-body">Be as specific or broad as you like. You can try searching for academic subjects, practical skills, or just start from an idea of what you'd like to do.</p>
+<p>For example:</p>
 <ul class="govuk-list govuk-list--bullet">
     <li>maths</li>
     <li>bricklaying</li>

@@ -5,16 +5,13 @@
 @model feat.web.Pages.CheckAnswersModel
 @{
     ViewBag.Title = "Explore your options after school or college - GOV.UK"; 
-    ViewBag.FlowTitle = "Check your answers";
 }
+
 @section BeforeContent {
     <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.CheckAnswers))">Back</govuk-back-link>
 }
 
-
-<h1 class="govuk-heading-l">@ViewBag.FlowTitle</h1>
-
-<p class="govuk-body">Check your answers, and change them if you'd like to, before viewing your search results.</p>
+<h1 class="govuk-heading-l">Check your answers</h1>
 
 <dl class="govuk-summary-list">
     

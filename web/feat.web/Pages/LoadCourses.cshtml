@@ -10,7 +10,7 @@
   string searchResultText = "Showing courses";
   try
   {
-    var totalResults = Model.SearchResponse?.TotalCount ?? 0;  
+    var totalResults = Model.TotalCourseCount;
     var pluralText = (totalResults == 1 ? String.Empty : "s");
     string locationText = string.IsNullOrEmpty(Model.Search.Location)?"near your area": " near " + Model.Search.Location;
     string interestText = Model.Search.Interests.Count > 0 ? $" for {Model.Search.Interests[0]}" : string.Empty;
@@ -19,6 +19,7 @@
   }
   catch (Exception e)
   {
+    // ignored
   }
 }
 
@@ -284,7 +285,7 @@
           </div>
         </div>
         
-        @if (Model.Courses == null || !Model.Courses.Any()) 
+        @if (!Model.Courses.Any()) 
         {
           <h2 class="govuk-heading-m" role="status" aria-live="polite">It looks like we can’t find anything based on your answers.</h2>
           <p>Here are some things you can try:</p>
@@ -304,8 +305,18 @@
             <p class="govuk-body govuk-!-margin-bottom-6">
               <span class="govuk-!-font-weight-bold">Sort courses by:</span>
               <span class="govuk-!-margin-left-2">
-                <a asp-page-handler="Sort" asp-page="/" asp-route-sortBy="distance">Distance</a> |
-                <a asp-page-handler="Sort" asp-route-sortBy="relevance">Relevance</a>
+                @{
+                  if (Model.Search.OrderBy == OrderBy.Distance) 
+                  {
+                    <span aria-current="true">Distance | </span>
+                    <a asp-page="@PageName.LoadCourses" asp-route-orderBy="relevance">Relevance</a>
+                  }
+                  else
+                  {
+                    <a asp-page="@PageName.LoadCourses" asp-route-orderBy="distance" >Distance</a>
+                    <span aria-current="true">| Relevance</span>
+                  } 
+                }
               </span>
             </p>
 

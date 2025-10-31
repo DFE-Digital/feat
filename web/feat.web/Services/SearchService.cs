@@ -33,11 +33,6 @@ public class SearchService : ISearchService
         return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
     }
 
-    public Task<SearchResponse> GetFilteredSortedPagedCourses(Search search, string sessionId, string sortFilter, int pageNumber, int pageSize)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<SearchResponse> GetFilteredSortedCourses(string sortBy)
     {
         var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search/sort").ToString();
@@ -45,7 +40,7 @@ public class SearchService : ISearchService
         return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
     }
     
-    public async Task<SearchResponse> GetCourseDetails(string courseId)
+    public async Task<SearchResponse> GetCourseDetails(Search search, string sessionId)
     {
         var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search/courseId").ToString();
         await Task.Delay(1);

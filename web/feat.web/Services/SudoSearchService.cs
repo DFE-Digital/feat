@@ -1,9 +1,11 @@
 using feat.common;
 using feat.common.Models.Enums;
 using feat.web.Configuration;
+using feat.web.Enums;
 using feat.web.Models;
 using feat.web.Models.ViewModels;
 using Microsoft.Extensions.Options;
+using CourseType = feat.common.Models.Enums.CourseType;
 
 namespace feat.web.Services;
 
@@ -12,7 +14,10 @@ public class SudoSearchService : ISearchService
     private readonly IApiClient _apiClient;
     private readonly IOptions<SearchOptions> _options;
     
-    private List<SearchResult> SearchResultsInner = new();
+    private List<SearchResult> _searchResultsInner = new();
+    private OrderBy _orderBy = OrderBy.Relevance;
+    private int _pageSize = 2;   // No. of courses on a pages
+    private int _pageNumber = 1; 
 
     public SudoSearchService(
         IApiClient apiClient,
@@ -22,14 +27,15 @@ public class SudoSearchService : ISearchService
         _options = options;
     }
 
-    private IEnumerable<SearchResult> GenerateSearchResults(int iRecords = 50, string sortBy = "")
+    private IEnumerable<SearchResult> GenerateSearchResults(int iRecords, OrderBy orderBy)
     {
         List<SearchResult> searchResults = new();
         for (int i = 0; i < iRecords; i++)
         {
             var item0 = new SearchResult
             {
-                CourseId = ($"A{i}"), DistanceSudo = i / 2,
+                CourseId = ($"a{i}"), 
+                DistanceSudo = i / 2,
                 CourseTitle = "Media A Level",
                 ProviderName = "Leeds College",
                 Location = "Leeds",
@@ -43,7 +49,8 @@ public class SudoSearchService : ISearchService
 
             var item1 = new SearchResult
             {
-                CourseId = ($"B{i}"), DistanceSudo = (i + 2) / 2, 
+                CourseId = ($"b{i}"), 
+                DistanceSudo = (i + 2) / 2, 
                 CourseTitle = "Media A Level",
                 ProviderName = "Bradford College",
                 Location = "Leeds",
@@ -57,33 +64,28 @@ public class SudoSearchService : ISearchService
             searchResults.Add(item1);
         }
 
-        if (sortBy.Equals("distance", StringComparison.InvariantCultureIgnoreCase))
+        if (orderBy == OrderBy.Distance)
         {
-            searchResults = searchResults.OrderBy(x => x.Distance).ToList();
+            searchResults = searchResults.OrderBy(x => x.DistanceSudo).ToList();
         }
-        else if(sortBy.Equals("relevance", StringComparison.InvariantCultureIgnoreCase))
+        else if(orderBy == OrderBy.Relevance)
         {
             searchResults = searchResults.OrderBy(x => x.CourseTitle).ToList();
         }
 
-        SearchResultsInner = searchResults;
+        _searchResultsInner = searchResults;
         return searchResults;
     }
-    private List<SearchResult> GetPagedSearchResults(int pageNumber, int pageSize=7)
+    private List<SearchResult> GetPagedSearchResults(int pageNumber, int pageSize)
     {
-        if (!SearchResultsInner.Any())
-        {
-            GenerateSearchResults();
-        }
-        
-        var totalSearchResults = SearchResultsInner.Count;
+        var totalSearchResults = _searchResultsInner.Count;
         var totalPages = (int)Math.Ceiling(totalSearchResults / (double)pageSize);
         
         int currentPage = pageNumber;
         if (currentPage < 1) currentPage = 1;
         if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
 
-        var searchResults = SearchResultsInner
+        var searchResults = _searchResultsInner
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
             .ToList();
@@ -92,55 +94,134 @@ public class SudoSearchService : ISearchService
     }
 
     
-    public async Task<SearchResponse> Search(Search search, string sessionId)
-    {
-        await Task.Delay(1);
-        GenerateSearchResults();
-        
-        return new SearchResponse()
-        {
-            SearchResults = SearchResultsInner,
-            // selected facets / facets used in the search.
-            Facets = new List<Facet>(),
-
-            Page = 1,
-            PageSize = 10,
-            TotalCount = 100,
-            SortBy = "Description"
-        };
-    }
-
     public async Task<SearchResponse> GetGlobalFacets()
     {
         var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search/global-facets").ToString();
         return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
     }
 
-    public async Task<SearchResponse> GetFilteredSortedPagedCourses(Search search, string sessionId, string sortFilter, int pageNumber, int pageSize)
+    public async Task<SearchResponse> Search(Search search, string sessionId) 
     {
         await Task.Delay(1);
-        if (!SearchResultsInner.Any())
+        var request = search.ToSearchRequest();
+        request.SessionId = sessionId;
+        
+        _pageSize = request.PageSize;
+        _pageNumber = request.PageNumber;
+        _orderBy = request.OrderBy; 
+        
+        if (!_searchResultsInner.Any())
         {
-            GenerateSearchResults();
+            GenerateSearchResults(50, _orderBy);
         }
         
-        var pagedItems = GetPagedSearchResults(pageNumber, pageSize);
+        var pagedItems = GetPagedSearchResults(_pageNumber, _pageSize);
 
         return new SearchResponse()
         {
             SearchResults = pagedItems,
             Facets = new List<Facet>(),
-            Page = pageNumber,
-            PageSize = pageSize,
-            TotalCount = SearchResultsInner.Count,
-            SortBy = sortFilter
+            
+            Page = _pageNumber,
+            PageSize = _pageSize,
+            TotalCount = _searchResultsInner.Count, 
+            OrderBy = _orderBy
         };
     }
-    
-    public async Task<SearchResponse> GetCourseDetails(string courseId)
+
+    public async Task<SearchResponse> GetCourseDetails(Search search, string sessionId)
     {
-        var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search/courseId").ToString();
         await Task.Delay(1);
-        return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
+        var searchRequest = search.ToSearchRequest();
+        searchRequest.SessionId = sessionId;
+
+        if (!_searchResultsInner.Any())
+        {
+            GenerateSearchResults(50, _orderBy);
+        }
+        // Find the Id in teh data-store, and use that id to build of a specific return type.
+        var courseLite = _searchResultsInner.Where(x => x.CourseId == search.CourseId).FirstOrDefault();
+
+        if (courseLite == null)
+        {
+            return new SearchResponse();
+        }
+
+        if (courseLite.CourseType == CourseType.Degree)
+        {
+            var degree = GetDegreeDetails(courseLite);
+            return new SearchResponse() { CourseDetails = degree };
+        }
+        else if (courseLite.CourseType == CourseType.Apprenticeship)
+        {
+            var aprenticeship = GetApprenticeshipDetails(courseLite);
+            return new SearchResponse() { CourseDetails = aprenticeship };
+        }
+        else if (courseLite.CourseType == CourseType.Multiply)
+        {
+            // TODO Multiple locations (?)
+        }
+        
+        var course = GetCourseDetails(courseLite);
+        return new SearchResponse() { CourseDetails = course };
+    }
+
+    private CourseDetailsUniversity GetDegreeDetails(SearchResult courseLite)
+    {
+        return new CourseDetailsUniversity
+        {
+            Type = CourseType.Degree,
+            Level = 6,
+            EntryRequirements = courseLite.Requirements + " Entry requirements",
+            TuitionFee = 1000,
+            AwardingOrganisation = "University",
+            Description = "A Degree course "+courseLite.Overview,
+            University = courseLite.ProviderName + " -University",
+            CampusName = "Campus",
+            CampusAddress = new Location { Address1 = "10 Street", Town = "Town", Postcode = "W12 6LA" },
+            DeliveryMode = DeliveryMode.ClassroomBased,
+            StartDate = new StartDate(new DateTime(2025, 10, 1)),
+            Duration = TimeSpan.FromDays(28),
+            Hours = CourseHours.PartTime,
+        };
+    }
+
+    private CourseDetailsApprenticeship GetApprenticeshipDetails(SearchResult courseLite)
+    {
+        return new CourseDetailsApprenticeship
+        {
+            Type = CourseType.Apprenticeship,
+            Level = 3,
+            EntryRequirements = "Entry requirements " + courseLite.Requirements,
+            Wage = 1000,
+            PositionAvailable = "Dogsbody",
+            Description = "Description " + courseLite.Overview,
+            EmployerName = "Company",
+            EmployerAddress = new Location { Address1 = "10 Street", Town = "Town", Postcode = "W12 6LA" },
+            EmployerDescription = "A nice company",
+            TrainingProvider = "College",
+            DeliveryMode = DeliveryMode.WorkBased,
+            StartDate = new StartDate(new DateTime(2025, 10, 1)),
+            Duration = TimeSpan.FromDays(28),
+            Hours = CourseHours.FullTime,
+        };
+    }
+
+    private CourseDetailsCourse GetCourseDetails(SearchResult courseLite)
+    {
+        return new CourseDetailsCourse
+        {
+            Type = CourseType.ALevels,
+            Level = 3,
+            EntryRequirements = "Entry requirements  " + courseLite.Requirements,
+            Cost = 1000,
+            Description = "Description " + courseLite.Overview,
+            ProviderName = "College",
+            ProviderAddresses = [new Location { Address1 = "10 Street", Town = "Town", Postcode = "W12 6LA" }],
+            DeliveryMode = DeliveryMode.ClassroomBased,
+            StartDates = [new StartDate(new DateTime(2025, 10, 1))],
+            Duration = TimeSpan.FromDays(28),
+            Hours = CourseHours.FullTime,
+        };
     }
 }
