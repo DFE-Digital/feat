@@ -25,7 +25,7 @@ jobs:
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
       RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
-      WEBSITE_NAME: s213d01-app-web
+      WEBSITE_NAME: s265d01-app-web
     environment: ${{ github.event.inputs.environment }}
 
     steps:

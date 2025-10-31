@@ -27,7 +27,7 @@ jobs:
       OPENAI_KEY: ${{ secrets.AZURE_OPENAI_APIKEY }}
       AISEARCH_KEY: ${{ secrets.AZURE_AISEARCH_APIKEY }}
       RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
-      API_NAME: s213d01-app-api
+      API_NAME: s265d01-app-api
     environment: ${{ github.event.inputs.environment }}
 
     steps:
