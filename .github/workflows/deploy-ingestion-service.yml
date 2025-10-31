@@ -11,9 +11,6 @@ on:
           - Development
           - Test
 
-  schedule:
-    - cron: '0 4 * * *'  # Daily at 04:00
-
 jobs:
   build-and-deploy:
     name: "Build & Deploy"
