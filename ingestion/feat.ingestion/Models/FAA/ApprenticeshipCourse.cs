@@ -16,7 +16,7 @@ public class ApprenticeshipCourse
     
     public Wage Wage { get; set; }
     
-    public double HoursPerWeek { get; set; }
+    public decimal? HoursPerWeek { get; set; }
     
     public string? ExpectedDuration { get; set; }
     

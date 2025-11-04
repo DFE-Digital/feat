@@ -22,7 +22,7 @@ public class Apprenticeship
     
     public DateTime ClosingDate { get; set; }
     
-    public DateTime StartDate { get; set; }
+    public DateTime? StartDate { get; set; }
     
     [StringLength(50)]
     public string WageType { get; set; }
@@ -38,7 +38,7 @@ public class Apprenticeship
     [StringLength(1000)]
     public string? WorkingWeekDescription { get; set; }
     
-    public double HoursPerWeek { get; set; }
+    public decimal? HoursPerWeek { get; set; }
     
     [StringLength(20)]
     public string? ExpectedDuration { get; set; }

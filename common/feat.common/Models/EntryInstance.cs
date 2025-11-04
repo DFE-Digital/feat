@@ -18,9 +18,10 @@ public class EntryInstance
 
     public DateTime? StartDate { get; set; }
 
+    [Column(TypeName = "bigint")]
     public TimeSpan? Duration { get; set; }
 
-    public LearningMethod? StudyMode { get; set; }       // e.g., Full-time, Part-time, DistanceLearning
+    public LearningMethod? StudyMode { get; set; }
     
     [StringLength(255)]
     public required string Reference { get; set; } = string.Empty; 

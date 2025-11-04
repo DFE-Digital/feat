@@ -11,7 +11,8 @@ namespace feat.ingestion.Handlers;
 
 public class SearchIndexHandler(
     IOptionsMonitor<AzureOptions> options,
-    SearchIndexClient aiSearchClient)
+    SearchIndexClient aiSearchClient,
+    EmbeddingClient embeddingClient)
     : ISearchIndexHandler
 {
     private readonly AzureOptions _azureOptions = options.CurrentValue;
@@ -77,5 +78,20 @@ public class SearchIndexHandler(
         var searchClient = aiSearchClient.GetSearchClient(_azureOptions.AiSearchIndex);
         var result = searchClient.MergeOrUploadDocuments(entries);
         return result.Value.Results.All(x => x.Succeeded);
+    }
+    
+    public IReadOnlyList<float> GetVector(string? text)
+    {
+        if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(text))
+        {
+            return new List<float>();
+        }
+            
+        var result = embeddingClient.GenerateEmbedding(text, new EmbeddingGenerationOptions()
+        {
+            Dimensions = 256
+        });
+        
+        return result.Value.ToFloats().ToArray();
     }
 }

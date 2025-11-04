@@ -194,7 +194,7 @@ namespace feat.ingestion.Migrations
                     Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EntryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Duration = table.Column<TimeSpan>(type: "time", nullable: true),
+                    Duration = table.Column<TimeSpan>(type: "bigint", nullable: true),
                     StudyMode = table.Column<int>(type: "int", nullable: true),
                     Reference = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
                 },

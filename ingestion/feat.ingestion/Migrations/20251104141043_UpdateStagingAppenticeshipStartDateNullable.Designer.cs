@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251104141043_UpdateStagingAppenticeshipStartDateNullable")]
+    partial class UpdateStagingAppenticeshipStartDateNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,7 +49,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Employer", (string)null);
+                    b.ToTable("Employer");
                 });
 
             modelBuilder.Entity("feat.common.Models.EmployerLocation", b =>
@@ -67,7 +70,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("EmployerLocation", (string)null);
+                    b.ToTable("EmployerLocation");
                 });
 
             modelBuilder.Entity("feat.common.Models.Entry", b =>
@@ -134,7 +137,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasIndex("ProviderId");
 
-                    b.ToTable("Entry", (string)null);
+                    b.ToTable("Entry");
                 });
 
             modelBuilder.Entity("feat.common.Models.EntryCost", b =>
@@ -156,7 +159,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasIndex("EntryId");
 
-                    b.ToTable("EntryCost", (string)null);
+                    b.ToTable("EntryCost");
                 });
 
             modelBuilder.Entity("feat.common.Models.EntryInstance", b =>
@@ -192,7 +195,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasIndex("EntryId");
 
-                    b.ToTable("EntryInstance", (string)null);
+                    b.ToTable("EntryInstance");
                 });
 
             modelBuilder.Entity("feat.common.Models.EntryLocation", b =>
@@ -213,7 +216,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("EntryLocation", (string)null);
+                    b.ToTable("EntryLocation");
                 });
 
             modelBuilder.Entity("feat.common.Models.EntrySector", b =>
@@ -234,7 +237,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasIndex("SectorId");
 
-                    b.ToTable("EntrySector", (string)null);
+                    b.ToTable("EntrySector");
                 });
 
             modelBuilder.Entity("feat.common.Models.Location", b =>
@@ -298,7 +301,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Location", (string)null);
+                    b.ToTable("Location");
                 });
 
             modelBuilder.Entity("feat.common.Models.Provider", b =>
@@ -340,7 +343,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Provider", (string)null);
+                    b.ToTable("Provider");
                 });
 
             modelBuilder.Entity("feat.common.Models.ProviderLocation", b =>
@@ -361,7 +364,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasIndex("ProviderId");
 
-                    b.ToTable("ProviderLocation", (string)null);
+                    b.ToTable("ProviderLocation");
                 });
 
             modelBuilder.Entity("feat.common.Models.Sector", b =>
@@ -383,7 +386,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sector", (string)null);
+                    b.ToTable("Sector");
                 });
 
             modelBuilder.Entity("feat.common.Models.Staging.FAA.Address", b =>
@@ -427,7 +430,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasIndex("ApprenticeshipId");
 
-                    b.ToTable("FAA_Addresses", (string)null);
+                    b.ToTable("FAA_Addresses");
                 });
 
             modelBuilder.Entity("feat.common.Models.Staging.FAA.Apprenticeship", b =>
@@ -498,8 +501,8 @@ namespace feat.ingestion.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<decimal?>("HoursPerWeek")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("HoursPerWeek")
+                        .HasColumnType("float");
 
                     b.Property<bool>("IsDisabilityConfident")
                         .HasColumnType("bit");
@@ -562,7 +565,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FAA_Apprenticeships", (string)null);
+                    b.ToTable("FAA_Apprenticeships");
                 });
 
             modelBuilder.Entity("feat.common.Models.Staging.FAC.AimData", b =>
@@ -586,7 +589,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasKey("LearnAimRef");
 
-                    b.ToTable("FAC_AimData", (string)null);
+                    b.ToTable("FAC_AimData");
                 });
 
             modelBuilder.Entity("feat.common.Models.Staging.FAC.AllCoursesCourse", b =>
@@ -720,7 +723,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasKey("COURSE_ID", "COURSE_RUN_ID");
 
-                    b.ToTable("FAC_AllCourses", (string)null);
+                    b.ToTable("FAC_AllCourses");
                 });
 
             modelBuilder.Entity("feat.common.Models.Staging.FAC.Course", b =>
@@ -786,7 +789,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasKey("CourseId");
 
-                    b.ToTable("FAC_Courses", (string)null);
+                    b.ToTable("FAC_Courses");
                 });
 
             modelBuilder.Entity("feat.common.Models.Staging.FAC.TLevel", b =>
@@ -844,7 +847,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasKey("TLevelId");
 
-                    b.ToTable("FAC_TLevels", (string)null);
+                    b.ToTable("FAC_TLevels");
                 });
 
             modelBuilder.Entity("feat.common.Models.Staging.FAC.TLevelDefinition", b =>
@@ -863,7 +866,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasKey("TLevelDefinitionId");
 
-                    b.ToTable("FAC_TLevelDefinitions", (string)null);
+                    b.ToTable("FAC_TLevelDefinitions");
                 });
 
             modelBuilder.Entity("feat.common.Models.UniversityCourse", b =>
@@ -894,7 +897,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasIndex("EntryId");
 
-                    b.ToTable("UniversityCourse", (string)null);
+                    b.ToTable("UniversityCourse");
                 });
 
             modelBuilder.Entity("feat.common.Models.Vacancy", b =>
@@ -930,7 +933,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasIndex("EntryId");
 
-                    b.ToTable("Vacancy", (string)null);
+                    b.ToTable("Vacancy");
                 });
 
             modelBuilder.Entity("feat.common.Models.EmployerLocation", b =>

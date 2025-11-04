@@ -21,7 +21,7 @@ public class Vacancy
 
     public WageUnit? WageUnit { get; set; }
 
-    public int? HoursPerWeek { get; set; }
+    public decimal? HoursPerWeek { get; set; }
     
     public DateTime? ClosingDate { get; set; }
 

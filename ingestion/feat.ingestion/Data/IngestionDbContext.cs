@@ -1,5 +1,6 @@
 using feat.common.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using FAC = feat.common.Models.Staging.FAC;
 using FAA = feat.common.Models.Staging.FAA;
 
@@ -10,6 +11,21 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         options.UseSqlServer(b => b.MigrationsAssembly("feat.ingestion"));
+    }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        
+        var timeSpanToTicksConverter = new ValueConverter<TimeSpan?, long?>(
+            v => v.HasValue ? v.Value.Ticks : null,
+            v => v.HasValue ? TimeSpan.FromTicks(v.Value) : null
+        );
+
+        modelBuilder.Entity<EntryInstance>()
+            .Property(e => e.Duration)
+            .HasConversion(timeSpanToTicksConverter)
+            .HasColumnType("bigint");
     }
 
     #region Our models

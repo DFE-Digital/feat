@@ -15,6 +15,9 @@ public class Employer
 
     [StringLength(255)]
     public required string Name { get; set; } = string.Empty;
+    
+    [StringLength(2083)] 
+    public string? Url { get; set; }
 
     [InverseProperty("Employer")] 
     public ICollection<EmployerLocation> EmployerLocations { get; set; } = new List<EmployerLocation>();

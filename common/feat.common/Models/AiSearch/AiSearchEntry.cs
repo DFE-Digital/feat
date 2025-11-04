@@ -2,8 +2,6 @@ using System.Text.Json.Serialization;
 using Azure.Core.Serialization;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
-using feat.common.Models.Enums;
-using feat.common.Models.Staging.FAC.Enums;
 using Microsoft.Spatial;
 
 namespace feat.common.Models.AiSearch;
