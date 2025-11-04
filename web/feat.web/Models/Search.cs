@@ -140,7 +140,6 @@ public class Search
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
         }
         finally
         {
