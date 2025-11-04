@@ -14,7 +14,6 @@ public class IndexModel(ILogger<IndexModel> logger) : PageModel
         
         var search = new Search();
         search.SetPage(PageName.Index);
-        
         HttpContext.Session.Set("Search", search);
         
         return Page();

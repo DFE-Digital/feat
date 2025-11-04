@@ -1,5 +1,6 @@
 using System.Text;
 using feat.web.Enums;
+using feat.web.Extensions;
 
 namespace feat.web.Models;
 
@@ -7,55 +8,49 @@ public class Search
 {
     //For navigation.
     public List<string> History { get; set; } = [];
-    
     public bool Updated { get; set; } = true;
     
-    
-    public AgeGroup? AgeGroup { get; set; }
-    
-    public List<QualificationLevel> QualificationLevels { get; set; } = new();
-
+    public string? Location { get; set; } 
     public Distance? Distance { get; set; }
+    public List<string> Interests { get; set; } = []; 
+    public List<QualificationLevel> QualificationLevels { get; set; } = new(); 
+    public AgeGroup? AgeGroup { get; set; }
+    public List<string>? SelectedFilterFacetItems { get; set; } = []; // All filter selected facets. 
     
-    public SearchMethod? SearchMethod { get; set; }
-    
-    public SearchType? SearchType { get; set; }
-
     public bool IncludeOnlineCourses { get; set; } = true;
-    
     public bool Debug { get; set; } = false;
-
-    public string? Location { get; set; }
-
-    public List<string> Interests { get; set; } = [];
-
-    public List<string> Subjects { get; set; } = [];
-    
-    public List<string> Careers { get; set; } = [];
-    
-    public CourseType? CourseType { get; set; }
-    
-    public CourseLevel? CourseLevel { get; set; }
     
     // Store Pagination 
     public int CurrentPage { get; set; } = 1;
     public int TotalPages { get; set; }
     public int PageSize { get; set; } = 10;
     
-    //Sorting Distance | Relevance
+    //Sorting: Distance | Relevance
     public OrderBy OrderBy { get; set; }  = OrderBy.Relevance;
     
-    // Course id for Details 
+    // Course id for Details request
     public string? CourseId { get; set; }
     
-    // private field to prevent re-entery
+
     private bool _pageIsChanging = false;
     private bool _pageBackIsChanging = false;
     
     public string? Query {
         get
-        {
-            var mergedList = Interests.Union(Subjects).Union(Careers).ToList();
+        {   
+            // List<QualificationLevel> -> 
+            //QualificationLevel.
+            
+            // AgeGroup? -> 
+            // AgeGroup. 
+            // TODO 
+            var selectedAgeGroup = AgeGroup.ToString();
+            var selectedQualificationLevels = QualificationLevels.Select(x=> x.GetDisplayName());
+
+            var mergedList = Interests;
+            if (selectedAgeGroup != null) 
+                mergedList.Add(selectedAgeGroup);
+            mergedList.AddRange(selectedQualificationLevels);
             
             if (mergedList.Count == 0)
             {
@@ -76,7 +71,7 @@ public class Search
             return sb.ToString().Trim();
         }
     }
-
+    
     public SearchRequest ToSearchRequest()
     {
         return new SearchRequest
@@ -89,7 +84,7 @@ public class Search
             PageNumber = CurrentPage,
             PageSize = PageSize, 
             Debug = Debug, 
-            CourseId = CourseId
+            CourseId = CourseId, // Course detail request; possibly a different Api
             
         };
     }
@@ -102,7 +97,6 @@ public class Search
                 return;
             _pageIsChanging = true;
 
-            page = page.Trim().ToLower();
             if (!History.Contains(page))
             {
                 History.Add(page);
@@ -131,8 +125,7 @@ public class Search
             if (_pageBackIsChanging)
                 return string.Empty;
             _pageBackIsChanging = true;
-
-            page = page.Trim().ToLower();
+            
             if (!History.Contains(page))
             {
                 return History.LastOrDefault() ?? "Index";
@@ -147,6 +140,7 @@ public class Search
         catch (Exception e)
         {
             Console.WriteLine(e);
+            throw;
         }
         finally
         {

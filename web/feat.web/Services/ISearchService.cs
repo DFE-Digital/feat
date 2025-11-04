@@ -7,8 +7,6 @@ public interface ISearchService
 {
     Task<SearchResponse> Search(Search search, string sessionId);
     
-    Task<SearchResponse> GetGlobalFacets();
-
     Task<SearchResponse> GetCourseDetails(Search search, string sessionId);
 
 }

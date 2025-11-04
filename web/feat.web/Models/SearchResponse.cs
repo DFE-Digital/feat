@@ -13,7 +13,7 @@ public class SearchResponse
 
     public List<SearchResult> SearchResults { get; init; } = [];
     
-    public IList<Facet> Facets { get; set; } = new List<Facet>();
+    public List<Facet> Facets { get; set; } = new List<Facet>();
 
     public OrderBy OrderBy { get; set; }
 

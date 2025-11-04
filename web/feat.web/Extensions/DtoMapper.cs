@@ -5,6 +5,21 @@ namespace feat.web.Extensions;
 
 public static class DtoMapper
 {
+    // Map facets to a ClientFacet 
+    public static ClientFacet ToClientFacet(this Facet facet)
+    {
+        return new ClientFacet() 
+        {
+            Name = facet.Name,
+            Values = new Dictionary<string, long>(facet.Values) 
+        };
+    }
+    
+    public static List<ClientFacet> ToClientFacets(this List<Facet> facets)
+    {
+        return facets?.Count > 0 ? facets.Select(f => f.ToClientFacet()).ToList() : [];
+    }
+
     public static Course ToCourse(this SearchResult searchResult)
     {
         return new Course()
@@ -23,29 +38,24 @@ public static class DtoMapper
 
     public static List<Course> ToCourses(this List<SearchResult> searchResults)
     {
-        if (searchResults?.Count > 0)
-        {
-            IList<Course> courses = new List<Course>();
-            foreach (var searchResult in searchResults)
-            {
-                courses.Add(searchResult.ToCourse());
-            }
-
-            return courses.ToList();
-        }
-
-        return new List<Course>();
+        return searchResults?.Count > 0 ? searchResults.Select(sr => sr.ToCourse()).ToList() : [];
     }
     
-    /*-*/
-    public static CourseDetailsUniversity ToCourseDetailsUniversity(this SearchResponse searchResponse)
+    // --------------------------------------------------------
+    // Map server entity with a matching client entity
+    // Server                               --> Client
+    // ---------------------------------------------------------
+    // CourseDetailsUniversity              --> UniversityCourse
+    // CourseDetailsApprenticeship          --> ApprenticeshipCourse
+    // CourseDetailsMultiLocationStartDate  --> MultiLocationStartDateCourse
+    // CourseDetailsCourse                  --> GenericCourseDetails
+    
+    public static UniversityCourse ToUniversityCourse(this CourseDetailsUniversity courseDetailsUniversity)
     {
-        var sss = searchResponse.CourseDetails;
-        
-        return new CourseDetailsUniversity()
+        return new UniversityCourse()
         {
-            //TuitionFee = 
+            University = courseDetailsUniversity.University
         };
     }
-    /*-*/
+    
 }

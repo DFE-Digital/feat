@@ -4,6 +4,7 @@ using feat.web.Configuration;
 using feat.web.Enums;
 using feat.web.Models;
 using feat.web.Models.ViewModels;
+using feat.web.Utils;
 using Microsoft.Extensions.Options;
 using CourseType = feat.common.Models.Enums.CourseType;
 
@@ -76,6 +77,7 @@ public class SudoSearchService : ISearchService
         _searchResultsInner = searchResults;
         return searchResults;
     }
+    
     private List<SearchResult> GetPagedSearchResults(int pageNumber, int pageSize)
     {
         var totalSearchResults = _searchResultsInner.Count;
@@ -93,16 +95,170 @@ public class SudoSearchService : ISearchService
         return searchResults;
     }
 
-    
-    public async Task<SearchResponse> GetGlobalFacets()
+    public async Task<List<Facet>> GetGlobalFacets()
     {
-        var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search/global-facets").ToString();
-        return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
+        await Task.Delay(1);
+        List<Facet> facets = new List<Facet>();
+
+        Facet courseType = new Facet
+        {
+            Name = "Course_Type",
+            Values = new()
+            {
+                { "A level", 0 },
+                { "Apprenticeship", 0 },
+                { "BTEC", 0 },
+                { "Diploma", 0 },
+                { "Degree", 0 },
+                { "T Levels", 0 }
+            }
+        };
+        facets.Add(courseType);
+        
+        Facet qualificationLevel = new Facet
+        {
+            Name = "Qualification_Level",
+            Values = new()
+            {
+                { "Entry level (like entry level functional skills)", 0 },
+                { "Level 1 (like first certificate)", 0 },
+                { "Level 2 (like GCSEs)", 0 },
+                { "Level 3 (like A levels)", 0 },
+                { "Level 4 (like high national certificate)", 0 },
+                { "Level 5 (like diplomas)", 0 },
+                { "Level 6 (like degree)", 0 },
+                { "Level 7 (like masters degree)", 0 }
+            }
+        };
+        facets.Add(qualificationLevel);
+        
+        facets.Add(new Facet
+        {
+            Name = "Learning_Method",
+            Values = new()
+            {
+                { "Online ", 0 },
+                { "Classroom based", 0 },
+                { "Work based", 0 },
+                { "Hybrid", 0 }
+            }
+        });
+
+        facets.Add(new Facet
+        {
+            Name = "Course_Hours",
+            Values = new()
+            {
+                { "Full time", 0 },
+                { "Part time", 0 },
+                { "Flexible", 0 }
+            }
+        });
+
+        facets.Add(new Facet
+        {
+            Name = "Course_Study_Time", 
+            Values = new()
+            {
+                { "Daytime", 0 },
+                { "Evening", 0 },
+                { "Weekend", 0 }
+            }
+        });
+
+        return facets;
+    }
+
+    private static List<Facet> GetCurrentFacets()
+    {
+        //await Task.Delay(1);
+        List<Facet> facets = new List<Facet>();
+
+        Facet courseType = new Facet
+        {
+            Name = "Course_Type",
+            Values = new()
+            {
+                { "A level", 0 },
+                { "Apprenticeship", 0 },
+                //{ "BTEC", 0 },
+                //{ "Diploma", 0 },
+                { "Degree", 0 },
+                { "T Levels", 0 }
+            }
+        };
+        facets.Add(courseType);
+        
+        Facet qualificationLevel = new Facet
+        {
+            Name = "Qualification_Level",
+            Values = new()
+            {
+                { "Entry level (like entry level functional skills)", 0 },
+                //{ "Level 1 (like first certificate)", 0 },
+                //{ "Level 2 (like GCSEs)", 0 },
+                { "Level 3 (like A levels)", 0 },
+                { "Level 4 (like high national certificate)", 0 },
+                //{ "Level 5 (like diplomas)", 0 },
+                //{ "Level 6 (like degree)", 0 },
+                { "Level 7 (like masters degree)", 0 }
+            }
+        };
+        facets.Add(qualificationLevel);
+        
+        facets.Add(new Facet
+        {
+            Name = "Learning_Method",
+            Values = new()
+            {
+                { "Online ", 0 },
+                { "Classroom based", 0 },
+                //{ "Work based", 0 },
+                //{ "Hybrid", 0 }
+            }
+        });
+
+        facets.Add(new Facet
+        {
+            Name = "Course_Hours",
+            Values = new()
+            {
+                { "Full time", 0 },
+                //{ "Part time", 0 },
+                //{ "Flexible", 0 }
+            }
+        });
+
+        facets.Add(new Facet
+        {
+            Name = "Course_Study_Time", 
+            Values = new()
+            {
+                { "Daytime", 0 },
+                //{ "Evening", 0 },
+                //{ "Weekend", 0 }
+            }
+        });
+        return facets;
     }
 
     public async Task<SearchResponse> Search(Search search, string sessionId) 
     {
-        await Task.Delay(1);
+        if (!search.History.Contains(PageName.CheckAnswers))
+        {
+            return new SearchResponse()
+            {
+                SearchResults = new List<SearchResult>(),
+                Facets = await GetGlobalFacets(),
+            
+                Page = _pageNumber,
+                PageSize = 0,
+                TotalCount = 0, 
+                OrderBy = _orderBy
+            };
+        }
+
+        await Task.Delay(10);
         var request = search.ToSearchRequest();
         request.SessionId = sessionId;
         
@@ -120,7 +276,7 @@ public class SudoSearchService : ISearchService
         return new SearchResponse()
         {
             SearchResults = pagedItems,
-            Facets = new List<Facet>(),
+            Facets = GetCurrentFacets(), // need all facets that are covered by the 'full-count' Search query. 
             
             Page = _pageNumber,
             PageSize = _pageSize,
@@ -129,6 +285,8 @@ public class SudoSearchService : ISearchService
         };
     }
 
+    
+    // Course Details
     public async Task<SearchResponse> GetCourseDetails(Search search, string sessionId)
     {
         await Task.Delay(1);
@@ -149,12 +307,12 @@ public class SudoSearchService : ISearchService
 
         if (courseLite.CourseType == CourseType.Degree)
         {
-            var degree = GetDegreeDetails(courseLite);
+            var degree = GetDegreeDetailsData(courseLite);
             return new SearchResponse() { CourseDetails = degree };
         }
         else if (courseLite.CourseType == CourseType.Apprenticeship)
         {
-            var aprenticeship = GetApprenticeshipDetails(courseLite);
+            var aprenticeship = GetApprenticeshipDetailsData(courseLite);
             return new SearchResponse() { CourseDetails = aprenticeship };
         }
         else if (courseLite.CourseType == CourseType.Multiply)
@@ -162,11 +320,11 @@ public class SudoSearchService : ISearchService
             // TODO Multiple locations (?)
         }
         
-        var course = GetCourseDetails(courseLite);
+        var course = GetCourseDetailsData(courseLite);
         return new SearchResponse() { CourseDetails = course };
     }
 
-    private CourseDetailsUniversity GetDegreeDetails(SearchResult courseLite)
+    private CourseDetailsUniversity GetDegreeDetailsData(SearchResult courseLite)
     {
         return new CourseDetailsUniversity
         {
@@ -186,7 +344,7 @@ public class SudoSearchService : ISearchService
         };
     }
 
-    private CourseDetailsApprenticeship GetApprenticeshipDetails(SearchResult courseLite)
+    private CourseDetailsApprenticeship GetApprenticeshipDetailsData(SearchResult courseLite)
     {
         return new CourseDetailsApprenticeship
         {
@@ -207,7 +365,7 @@ public class SudoSearchService : ISearchService
         };
     }
 
-    private CourseDetailsCourse GetCourseDetails(SearchResult courseLite)
+    private CourseDetailsCourse GetCourseDetailsData(SearchResult courseLite)
     {
         return new CourseDetailsCourse
         {

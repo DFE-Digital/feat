@@ -26,19 +26,6 @@ public class SearchService : ISearchService
         var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search").ToString();
         return await _apiClient.PostAsync<SearchResponse>(ApiClientNames.Feat, endpoint, request);
     }
-
-    public async Task<SearchResponse> GetGlobalFacets()
-    {
-        var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search/global-facets").ToString();
-        return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
-    }
-
-    public async Task<SearchResponse> GetFilteredSortedCourses(string sortBy)
-    {
-        var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search/sort").ToString();
-        await Task.Delay(1);
-        return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
-    }
     
     public async Task<SearchResponse> GetCourseDetails(Search search, string sessionId)
     {
@@ -46,6 +33,4 @@ public class SearchService : ISearchService
         await Task.Delay(1);
         return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
     }
-    
-    
 }

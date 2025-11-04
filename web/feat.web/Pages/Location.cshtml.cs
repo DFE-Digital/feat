@@ -3,13 +3,14 @@ using System.Text.RegularExpressions;
 using feat.web.Enums;
 using feat.web.Extensions;
 using feat.web.Models;
+using feat.web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using feat.web.Utils;
 
 namespace feat.web.Pages;
 
-public class LocationModel(ILogger<LocationModel> logger) : PageModel
+public class LocationModel(ISearchService searchService, ILogger<LocationModel> logger) : PageModel
 {
 
     [BindProperty]
@@ -21,7 +22,7 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
     
     public required Search Search { get; set; }
     
-    public IActionResult OnGet()
+    public async Task<IActionResult> OnGetAsync()
     {
         logger.LogInformation("OnGet");
         
@@ -35,12 +36,20 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
             Search = new Search();
             Search.SetPage(PageName.Index); 
         }
-
-        if (Search.Distance.HasValue)
-            Distance = Search.Distance;
+        
+        // Set up full list of facets;
+        var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
+        if (searchResponse.Facets.Any())
+        {
+            HttpContext.Session.Set(SharedStrings.AllClientFacets, searchResponse.Facets.ToClientFacets());    
+        }
+        
         if (!string.IsNullOrEmpty(Search.Location))
             Location = Search.Location;
-
+        if (Search.Distance.HasValue)
+            Distance = Search.Distance;
+        
+        Search.Updated = true;
         Search.SetPage(PageName.Location); 
         HttpContext.Session.Set("Search", Search);
         
