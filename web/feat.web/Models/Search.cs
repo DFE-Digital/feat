@@ -41,12 +41,19 @@ public class Search
             // TODO List<QualificationLevel> and AgeGroup? -> Build up querry or send parameter?
               
             var selectedAgeGroup = AgeGroup.ToString();
-            var selectedQualificationLevels = QualificationLevels.Select(x=> x.GetDisplayName());
+            var selectedQualificationLevels = QualificationLevels.Select(x=> x.GetDisplayName()).ToList();
 
-            var mergedList = Interests;
+            var mergedList = new List<string>();
+            Interests.ForEach((interest) =>
+            {
+                if (!string.IsNullOrEmpty(interest))
+                    mergedList.Add(interest);
+            });
             if (selectedAgeGroup != null) 
                 mergedList.Add(selectedAgeGroup);
-            mergedList.AddRange(selectedQualificationLevels);
+
+            if (selectedQualificationLevels.Count != 0)
+                mergedList.AddRange(selectedQualificationLevels);
             
             if (mergedList.Count == 0)
             {
