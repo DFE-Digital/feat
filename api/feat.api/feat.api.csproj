@@ -26,7 +26,7 @@
         <PackageReference Include="GeographicLib.NET" Version="2.3.2" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
         <PackageReference Include="Microsoft.Azure.Core.Spatial" Version="1.2.0-beta.1" />
-        <PackageReference Include="Scalar.AspNetCore" Version="2.9.0" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.10.0" />
 
     </ItemGroup>
 
