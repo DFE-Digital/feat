@@ -4,26 +4,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using feat.web.Utils;
 
-namespace feat.web.Pages.CourseDetails;
+namespace feat.web.Pages;
 
-public class DetailsApprenticeshipModel(ILogger<DetailsApprenticeshipModel> logger) : PageModel
+public class DetailsCourseModel(ILogger<DetailsCourseModel> logger) : PageModel
 {
     [BindProperty] 
-    public required string Id { get; set; }
-    
+     public required string Id { get; set; }
+     
     
     public required Search Search { get; set; }
     
     public void OnGet(string? id)
     {
         logger.LogInformation("OnGet called");
-
         try
         {
             Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-            Search.SetPage(PageName.DetailsApprenticeship);
+            Search.SetPage(PageName.DetailsCourse);
             
             Id = !string.IsNullOrEmpty(id) ? id : "missing id";
+            
+            
         }
         catch (Exception e)
         {
@@ -31,5 +32,11 @@ public class DetailsApprenticeshipModel(ILogger<DetailsApprenticeshipModel> logg
             throw;
         }
     }
-    
+ 
+    public IActionResult OnPost()
+    {
+        logger.LogInformation("OnPost called");
+
+        return Page();
+    }
 }

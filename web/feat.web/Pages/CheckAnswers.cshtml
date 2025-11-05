@@ -29,6 +29,7 @@
             </dd>
         </div>
     }
+    
     @if (Model.Search.Distance.HasValue)
     {
         <div class="govuk-summary-list__row">
@@ -105,7 +106,7 @@
 
 </dl>
 
-<p class="govuk-body">Find out <a asp-page="AI" target="_blank" class="govuk-link">how we use AI</a> to bring you relevant results.</p>
+<p class="govuk-body">Find out <a asp-page="AI" class="govuk-link">how we use AI</a> to bring you relevant results.</p>
 
 <govuk-button-link asp-page="@PageName.LoadCourses">Search</govuk-button-link>
     

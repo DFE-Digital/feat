@@ -42,7 +42,7 @@
             courseDetails = "DetailsApprenticeship";
           }
           
-          <a class="govuk-link" asp-page="./CourseDetails/@courseDetails" asp-route-id="@(Model.CourseId)">
+          <a class="govuk-link" asp-page="@courseDetails" asp-route-id="@(Model.CourseId)">
             View more details<span class="govuk-visually-hidden">about @(Model.CourseTypeDisplay)</span>
           </a>
         }

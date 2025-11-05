@@ -1,14 +1,11 @@
 @page "{id}"
 @using feat.web.Models
 @using feat.web.Utils
-@model feat.web.Pages.CourseDetails.DetailsUniversityDegreeModel
+@model feat.web.Pages.DetailsUniversityDegreeModel
 
 @section BeforeContent {
     <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.DetailsUniversityDegree))">Back</govuk-back-link> 
 }
-
-<!--For data type checking-->
-<h4>DetailsUniversityDegree (Hardcoded); Id: @(Model.CourseId)</h4>
 
 @if (Model.UniversityCourseDetails != null)
 {

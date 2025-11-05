@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using feat.web.Utils;
 
-namespace feat.web.Pages.CourseDetails;
+namespace feat.web.Pages;
 
 public class DetailsUniversityDegreeModel(ILogger<DetailsUniversityDegreeModel> logger, ISearchService searchService) : PageModel
 {   

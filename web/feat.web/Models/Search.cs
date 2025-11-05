@@ -15,7 +15,7 @@ public class Search
     public List<string> Interests { get; set; } = []; 
     public List<QualificationLevel> QualificationLevels { get; set; } = new(); 
     public AgeGroup? AgeGroup { get; set; }
-    public List<string>? SelectedFilterFacetItems { get; set; } = []; // All filter selected facets. 
+    public List<string>? SelectedFilterFacetItems { get; set; } = [];  
     
     public bool IncludeOnlineCourses { get; set; } = true;
     public bool Debug { get; set; } = false;
@@ -38,12 +38,8 @@ public class Search
     public string? Query {
         get
         {   
-            // List<QualificationLevel> -> 
-            //QualificationLevel.
-            
-            // AgeGroup? -> 
-            // AgeGroup. 
-            // TODO 
+            // TODO List<QualificationLevel> and AgeGroup? -> Build up querry or send parameter?
+              
             var selectedAgeGroup = AgeGroup.ToString();
             var selectedQualificationLevels = QualificationLevels.Select(x=> x.GetDisplayName());
 
@@ -84,7 +80,7 @@ public class Search
             PageNumber = CurrentPage,
             PageSize = PageSize, 
             Debug = Debug, 
-            CourseId = CourseId, // Course detail request; possibly a different Api
+            CourseId = CourseId, //TODO Course detail request; possibly a different Api
             
         };
     }
@@ -132,10 +128,7 @@ public class Search
             }
 
             var index = History.LastIndexOf(page);
-            if (index == 0)
-                return "Index";
-
-            return History[index - 1];
+            return index == 0 ? "Index" : History[index - 1];
         }
         catch (Exception e)
         {
