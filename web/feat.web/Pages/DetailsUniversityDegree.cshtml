@@ -9,10 +9,13 @@
 
 @if (Model.UniversityCourseDetails != null)
 {
+  <h2>@(Model.UniversityCourseDetails.Title + " "+ Model.UniversityCourseDetails.TypeDisplay)</h2>
+  
   <!-- University Degree base on Beta v8-->
   <div class="govuk-width-container">
     <main class="govuk-main-wrapper" id="main-content">
       <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full"></div>
 
         <div class="govuk-grid-column-two-thirds">
 
@@ -27,7 +30,7 @@
               <dl class="govuk-summary-list">
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Qualification type</dt>
-                  <dd class="govuk-summary-list__value">Degree</dd>
+                  <dd class="govuk-summary-list__value">@Model.UniversityCourseDetails.TypeDisplay</dd>
                 </div>
 
                 <div class="govuk-summary-list__row">
@@ -106,7 +109,7 @@
 
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start date</dt>
-                  <dd class="govuk-summary-list__value">@Model.UniversityCourseDetails.StartDate</dd>
+                  <dd class="govuk-summary-list__value">@Model.UniversityCourseDetails.StartDate?.Display</dd>
                 </div>
 
                 <div class="govuk-summary-list__row">

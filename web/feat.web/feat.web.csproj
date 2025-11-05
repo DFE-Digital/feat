@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="GovUk.Frontend.AspNetCore" Version="3.3.0" />
+      <PackageReference Include="GovUk.Frontend.AspNetCore" Version="3.4.1" />
     </ItemGroup>
 
 </Project>

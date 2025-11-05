@@ -19,7 +19,7 @@ public class DetailsUniversityDegreeModel(ILogger<DetailsUniversityDegreeModel> 
     
     public required Search Search { get; set; }
     
-    public IActionResult OnGet(string id)
+    public async Task<IActionResult> OnGetAsync(string id)
     {
         logger.LogInformation("OnGet called");
 
@@ -37,7 +37,7 @@ public class DetailsUniversityDegreeModel(ILogger<DetailsUniversityDegreeModel> 
             logger.LogInformation("CourseId: {Id}", id);
             
             // Get from server the Course Details - Api call
-            var response = searchService.GetCourseDetails(Search, "").Result;
+            var response = await searchService.GetCourseDetails(Search, "");
             UniversityCourseDetails = (CourseDetailsUniversity)(response.CourseDetails!);
             
             // Courses = searchResponse.SearchResults.ToCourses();

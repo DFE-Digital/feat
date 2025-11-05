@@ -169,9 +169,9 @@ public class SudoSearchService : ISearchService
         return facets;
     }
 
-    private static List<Facet> GetCurrentFacets()
+    private async Task<List<Facet>> GetCurrentFacets(List<string>? selectedValues)
     {
-        //await Task.Delay(1);
+        await Task.Delay(1);
         List<Facet> facets = new List<Facet>();
 
         Facet courseType = new Facet
@@ -239,6 +239,7 @@ public class SudoSearchService : ISearchService
                 //{ "Weekend", 0 }
             }
         });
+        
         return facets;
     }
 
@@ -258,6 +259,8 @@ public class SudoSearchService : ISearchService
             };
         }
 
+        var lstSelectedValues = search.SelectedFilterFacetItems;
+
         await Task.Delay(10);
         var request = search.ToSearchRequest();
         request.SessionId = sessionId;
@@ -276,7 +279,7 @@ public class SudoSearchService : ISearchService
         return new SearchResponse()
         {
             SearchResults = pagedItems,
-            Facets = GetCurrentFacets(), // need all facets that are covered by the 'full-count' Search query. 
+            Facets = await GetCurrentFacets(lstSelectedValues), // need all facets that are covered by the 'full-count' Search query. 
             
             Page = _pageNumber,
             PageSize = _pageSize,
@@ -367,6 +370,45 @@ public class SudoSearchService : ISearchService
 
     private CourseDetailsCourse GetCourseDetailsData(SearchResult courseLite)
     {
+        var iii = new Random().Next(1, 3);
+        if (iii == 1)
+        {
+            return new CourseDetailsCourse
+            {
+                Type = CourseType.ALevels,
+                Level = 3,
+                EntryRequirements = "Entry requirements  " + courseLite.Requirements,
+                Cost = 1000,
+                Description = "Description " + courseLite.Overview,
+                ProviderName = "College",
+                ProviderAddresses = [new Location { Address1 = "29 Acacia Road", Town = "Town", Postcode = "LE2 6LA" }],
+                DeliveryMode = DeliveryMode.ClassroomBased,
+                StartDates = [new StartDate(new DateTime(2025, 10, 1)),
+                    new StartDate(new DateTime(2026, 09, 1)),
+                    new StartDate(new DateTime(2026, 04, 1))],
+                Duration = TimeSpan.FromDays(28),
+                Hours = CourseHours.FullTime,
+            };
+        }
+        else if (iii == 2)
+        {
+            return new CourseDetailsCourse
+            {
+                Type = CourseType.ALevels,
+                Level = 3,
+                EntryRequirements = "Entry requirements  " + courseLite.Requirements,
+                Cost = 1000,
+                Description = "Description " + courseLite.Overview,
+                ProviderName = "College",
+                ProviderAddresses = [new Location { Address1 = "10 Street", Town = "Town", Postcode = "W12 6LA" }, 
+                    new Location { Address1 = "29 Acacia Road", Town = "Town", Postcode = "LE2 6LA" }],
+                DeliveryMode = DeliveryMode.ClassroomBased,
+                StartDates = [new StartDate(new DateTime(2025, 10, 1)),
+                    new StartDate(new DateTime(2026, 09, 1))],
+                Duration = TimeSpan.FromDays(28),
+                Hours = CourseHours.FullTime,
+            };
+        }
         return new CourseDetailsCourse
         {
             Type = CourseType.ALevels,
@@ -375,9 +417,13 @@ public class SudoSearchService : ISearchService
             Cost = 1000,
             Description = "Description " + courseLite.Overview,
             ProviderName = "College",
-            ProviderAddresses = [new Location { Address1 = "10 Street", Town = "Town", Postcode = "W12 6LA" }],
+            ProviderAddresses = [new Location { Address1 = "10 Street", Town = "Town", Postcode = "W12 6LA" }, 
+                new Location { Address1 = "29 Acacia Road", Town = "Town", Postcode = "LE2 6LA" },
+                new Location { Address1 = "137 Nottingham Road", Town = "Nottingham", Postcode = "NG2 6LA" }],
             DeliveryMode = DeliveryMode.ClassroomBased,
-            StartDates = [new StartDate(new DateTime(2025, 10, 1))],
+            StartDates = [new StartDate(new DateTime(2025, 10, 1)),
+                new StartDate(new DateTime(2026, 09, 1)),
+                new StartDate(new DateTime(2026, 04, 1))],
             Duration = TimeSpan.FromDays(28),
             Hours = CourseHours.FullTime,
         };
