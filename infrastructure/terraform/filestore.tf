@@ -16,9 +16,3 @@ resource "azurerm_storage_account" "feat_storage_account" {
     Product     = var.product
   }
 }
-
-resource "azurerm_storage_container" "feat_storage_container" {
-  name                  = "${var.prefix}-storage-container"
-  storage_account_id    = azurerm_storage_account.feat_storage_account.id
-  container_access_type = "private"
-}
