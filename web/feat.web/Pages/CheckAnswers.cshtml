@@ -52,7 +52,10 @@
                 Interests
             </dt>
             <dd class="govuk-summary-list__value">
-                @string.Join(", ", Model.Search.Interests)
+                @{
+                    var interests = Model.Search.Interests.Where(x => !string.IsNullOrEmpty(x)).Select(x => x).ToList();
+                }
+                @string.Join(", ", interests)
             </dd>
             <dd class="govuk-summary-list__actions">
                 <a class="govuk-link" asp-page="@PageName.Interests">Change<span class="govuk-visually-hidden"> interests</span></a>
