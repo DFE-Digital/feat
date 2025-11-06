@@ -19,6 +19,4 @@ public class CourseDetailsUniversity : CourseDetailsBase
     public Location? CampusAddress { get; init; }
     
     public StartDate? StartDate { get; init; }
-    
-    
 }
