@@ -23,8 +23,7 @@ namespace feat.ingestion.Handlers.FAC;
 public class FacIngestionHandler(
     IngestionOptions options, 
     IngestionDbContext dbContext,
-    ISearchIndexHandler searchIndexHandler,
-    EmbeddingClient embeddingClient) 
+    ISearchIndexHandler searchIndexHandler) 
     : IngestionHandler(options)
 {
     public override IngestionType IngestionType => IngestionType.Csv | IngestionType.Manual;
@@ -574,10 +573,10 @@ public class FacIngestionHandler(
         
         foreach (var aiSearchEntry in result)
         {
-            aiSearchEntry.TitleVector = GetVector(aiSearchEntry.Title);
-            aiSearchEntry.DescriptionVector = GetVector(aiSearchEntry.Description);
-            aiSearchEntry.LearningAimTitleVector = GetVector(aiSearchEntry.LearningAimTitle);
-            aiSearchEntry.SectorVector = GetVector(aiSearchEntry.Sector);
+            aiSearchEntry.TitleVector = searchIndexHandler.GetVector(aiSearchEntry.Title);
+            aiSearchEntry.DescriptionVector = searchIndexHandler.GetVector(aiSearchEntry.Description);
+            aiSearchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(aiSearchEntry.LearningAimTitle);
+            aiSearchEntry.SectorVector = searchIndexHandler.GetVector(aiSearchEntry.Sector);
         }
         
         
@@ -639,19 +638,5 @@ public class FacIngestionHandler(
             EducationLevel.Level0 => nameof(QualificationLevel.Entry),
             _ => string.Empty
         };
-    }
-
-    private IReadOnlyList<float> GetVector(string? text)
-    {
-        if (string.IsNullOrEmpty(text) || string.IsNullOrWhiteSpace(text))
-        {
-            return new List<float>();
-        }
-            
-        var result = embeddingClient.GenerateEmbedding(text, new EmbeddingGenerationOptions()
-        {
-            Dimensions = 256
-        });
-        return result.Value.ToFloats().ToArray();
     }
 }

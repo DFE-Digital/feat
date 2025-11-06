@@ -18,6 +18,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using ZiggyCreatures.Caching.Fusion;
+using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 Console.WriteLine("FEAT ingestion service started.");
 
@@ -33,6 +37,9 @@ var config = builder.Build();
 
 var ingestionOptions = new IngestionOptions();
 config.GetSection(IngestionOptions.Name).Bind(ingestionOptions);
+
+var cachingOptions = new CacheOptions();
+config.GetSection(CacheOptions.Name).Get<CacheOptions>();
 
 if (string.IsNullOrEmpty(ingestionOptions.Environment))
 {
@@ -61,6 +68,92 @@ services.AddSingleton<IApiClient, ApiClient>();
 services.AddSingleton<IIngestionHandlerFactory, IngestionHandlerFactory>();
 services.AddSingleton(ingestionOptions);
 services.Configure<AzureOptions>(config.GetSection(AzureOptions.Name));
+
+switch (cachingOptions?.Type)
+{
+    case "Memory":
+        services.AddDistributedMemoryCache();
+        services.AddFusionCacheMemoryBackplane();
+        services.AddFusionCache()
+            .WithRegisteredSerializer()
+            .WithSerializer(
+                new FusionCacheSystemTextJsonSerializer()
+            )
+            .WithDefaultEntryOptions(new FusionCacheEntryOptions()
+            {
+                Duration = cachingOptions?.Duration ?? TimeSpan.FromDays(30),
+                SkipBackplaneNotifications = true
+            });
+        break;
+    case "Redis":
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = cachingOptions.ConnectionString;
+        });
+        services.AddFusionCacheStackExchangeRedisBackplane(options =>
+        {
+            options.Configuration = cachingOptions.ConnectionString;
+        });
+        
+        services.AddFusionCache()
+            .WithOptions(opt =>
+            {
+                opt.CacheKeyPrefix = "";
+                opt.DistributedCacheCircuitBreakerDuration = TimeSpan.FromSeconds(2);
+            })
+            .WithRegisteredSerializer()
+            .WithRegisteredDistributedCache()
+            .WithStackExchangeRedisBackplane()
+            .WithSerializer(
+                new FusionCacheSystemTextJsonSerializer()
+            )
+            .WithDefaultEntryOptions(new FusionCacheEntryOptions()
+            {
+                Duration = cachingOptions?.Duration ?? TimeSpan.FromDays(30),
+                DistributedCacheDuration = cachingOptions?.Duration ?? TimeSpan.FromDays(30),
+                
+                IsFailSafeEnabled = true,
+                FailSafeMaxDuration = TimeSpan.FromHours(2),
+                FailSafeThrottleDuration = TimeSpan.FromSeconds(30),
+
+                EagerRefreshThreshold = 0.9f,
+
+                FactorySoftTimeout = TimeSpan.FromMilliseconds(100),
+                FactoryHardTimeout = TimeSpan.FromMilliseconds(1500),
+
+                DistributedCacheSoftTimeout = TimeSpan.FromSeconds(1),
+                DistributedCacheHardTimeout = TimeSpan.FromSeconds(2),
+                AllowBackgroundDistributedCacheOperations = true,
+
+                // JITTERING
+                JitterMaxDuration = TimeSpan.FromSeconds(2)
+            });
+        break;
+    default:
+        services.AddFusionCache()
+            .WithoutDistributedCache()
+            .WithoutBackplane()
+            .WithSerializer(
+                new FusionCacheSystemTextJsonSerializer()
+            )
+            .WithDefaultEntryOptions(new FusionCacheEntryOptions()
+            {
+                Duration = TimeSpan.Zero
+            });
+        break;
+}
+
+services.AddOpenTelemetry()
+    // SETUP TRACES
+    .WithTracing(tracing => tracing
+            .AddFusionCacheInstrumentation()
+            .AddConsoleExporter() // OR ANY ANOTHER EXPORTER
+    )
+    // SETUP METRICS
+    .WithMetrics(metrics => metrics
+            .AddFusionCacheInstrumentation()
+            .AddConsoleExporter() // OR ANY ANOTHER EXPORTER
+    );
 
 services.AddSingleton<SearchClient>(sp =>
 {
