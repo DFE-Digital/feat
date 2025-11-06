@@ -46,7 +46,8 @@ builder.Services.AddRazorPages().AddJsonOptions(options =>
 builder.Services.AddDirectoryBrowser();
 
 builder.Services.AddScoped<IApiClient, ApiClient>();
-builder.Services.AddScoped<ISearchService, SearchService>();
+//builder.Services.AddScoped<ISearchService, SearchService>();
+builder.Services.AddScoped<ISearchService, MockSearchService>();
 
 builder.Services.AddHttpClient(ApiClientNames.Feat, (sp, client) =>
     {

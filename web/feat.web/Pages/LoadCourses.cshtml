@@ -4,13 +4,18 @@
 @using feat.web.Enums
 @using feat.web.Utils
 @model feat.web.Pages.LoadCoursesModel
+
+@section BeforeContent {
+  <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.LoadCourses))">Back</govuk-back-link>
+}
+
 @{
   ViewBag.Title = "Explore your options after school or college - GOV.UK";
 
   string searchResultText = "Showing courses";
   try
   {
-    var totalResults = Model.SearchResponse?.TotalCount ?? 0;  
+    var totalResults = Model.TotalCourseCount;
     var pluralText = (totalResults == 1 ? String.Empty : "s");
     string locationText = string.IsNullOrEmpty(Model.Search.Location)?"near your area": " near " + Model.Search.Location;
     string interestText = Model.Search.Interests.Count > 0 ? $" for {Model.Search.Interests[0]}" : string.Empty;
@@ -19,11 +24,8 @@
   }
   catch (Exception e)
   {
+    // ignored
   }
-}
-
-@section BeforeContent {
-    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.LoadCourses))">Back</govuk-back-link>
 }
 
 <div>
@@ -31,6 +33,7 @@
     <main class="govuk-main-wrapper" id="main-content">
       <div class="govuk-grid-row">
 
+        <!--Header section -->
         <div class="govuk-grid-column-full">
           <h1 class="govuk-heading-l">Your search results</h1>
           <p class="govuk-body-l">@(searchResultText)</p>
@@ -40,17 +43,14 @@
 
         <!--Filters-->
         <div class="govuk-grid-column-one-third">
-          <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-3 govuk-!-display-none-print" 
-                  id="toggle-filters" type="button">
+          <!--<button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-3 govuk-!-display-none-print" 
+                      id="toggle-filters" type="button">
             Show filters
-          </button>
+          </button>-->
+          
 
-          <div id="filter-panel" class="filter-container" > <!--hidden=""-->
-            @{
-              //TODO: Use facets from initial search response to build filter selections 
-              //List<Facet> allFacets = Model.SearchResponse?.Facets.ToList() ?? new List<Facet>();
-            }
-            <form method="get">
+          <div id="filter-panel" class="filter-container" > 
+            <form method="post" asp-page-handler="UpdateSelection">
               <div class="filter-container">
                 <div class="filter-search-terms">
                   <div class="filter-heading">
@@ -59,223 +59,62 @@
                 </div>
 
                 <div class="filter-list">
+                  @if (Model.AllFacets != null && Model.AllFacets.Count > 0)
+                  {
+                    int iFacetPosition = 0;
 
-                  <!-- 1) Course type checkboxes -->
-                  <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                      Course type *
-                    </legend>
-                    <div class="govuk-checkboxes govuk-checkboxes--small">
-
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="filter-A-Level" name="filter" type="checkbox" value="A Level">
-                        <label class="govuk-label govuk-checkboxes__label" for="filter-A-Level">A Level</label>
-                      </div>
-
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="filter-Apprenticeship" name="filter" type="checkbox" value="Apprenticeship">
-                        <label class="govuk-label govuk-checkboxes__label" for="filter-Apprenticeship">Apprenticeship</label>
-                      </div>
-
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="filter-BTEC" name="filter" type="checkbox" value="BTEC">
-                        <label class="govuk-label govuk-checkboxes__label" for="filter-BTEC">BTEC</label>
-                      </div>
-
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="filter-Diploma" name="filter" type="checkbox" value="Diploma">
-                        <label class="govuk-label govuk-checkboxes__label" for="filter-Diploma">Diploma</label>
-                      </div>
-
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="filter-Degree" name="filter" type="checkbox" value="Degree">
-                        <label class="govuk-label govuk-checkboxes__label" for="filter-Degree">Degree</label>
-                      </div>
-
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="filter-T-Level" name="filter" type="checkbox" value="T Level">
-                        <label class="govuk-label govuk-checkboxes__label" for="filter-T-Level">T Level</label>
-                      </div>
-
-                    </div>
-                  </fieldset>
-
-                  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-
-                  <!-- 2) Travel Distance (Drop down)-->
-                  <div class="govuk-form-group">
-                    <govuk-select for="SelectedTravelDistance">
-                      <govuk-select-label>Travel Distance</govuk-select-label>
-                      @foreach (var option in Enum.GetValues<Distance>())
-                      {
-                        <govuk-select-item selected="@(Model.SelectedTravelDistance == option)">@option.GetDisplayName()</govuk-select-item>
-                      }
-                    </govuk-select>
-                  </div>
-
-                  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-
-                  <!-- 3) Qualification level (checkboxes) level 1, level 2 etc -->
-                  <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                      Qualification level *
-                    </legend>
-                    <div class="govuk-checkboxes govuk-checkboxes--small">
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="qualification-level-entry" name="qualification-level" type="checkbox" value="entry">
-                        <label class="govuk-label govuk-checkboxes__label" for="qualification-level-entry">
-                          Entry level (like entry level functional skills)
-                        </label>
-                      </div>
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="qualification-level-level-1" name="qualification-level" type="checkbox" value="level-1">
-                        <label class="govuk-label govuk-checkboxes__label" for="qualification-level-level-1">
-                          Level 1 (like first certificate)
-                        </label>
-                      </div>
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="qualification-level-level-2" name="qualification-level" type="checkbox" value="level-2">
-                        <label class="govuk-label govuk-checkboxes__label" for="qualification-level-level-2">
-                          Level 2 (like GCSEs)
-                        </label>
-                      </div>
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="qualification-level-level-3" name="qualification-level" type="checkbox" value="level-3">
-                        <label class="govuk-label govuk-checkboxes__label" for="qualification-level-level-3">
-                          Level 3 (like A levels)
-                        </label>
-                      </div>
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="qualification-level-level-4" name="qualification-level" type="checkbox" value="level-4">
-                        <label class="govuk-label govuk-checkboxes__label" for="qualification-level-level-4">
-                          Level 4 (like high national certificate)
-                        </label>
-                      </div>
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="qualification-level-level-5" name="qualification-level" type="checkbox" value="level-5">
-                        <label class="govuk-label govuk-checkboxes__label" for="qualification-level-level-5">
-                          Level 5 (like diplomas)
-                        </label>
-                      </div>
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="qualification-level-level-6" name="qualification-level" type="checkbox" value="level-6">
-                        <label class="govuk-label govuk-checkboxes__label" for="qualification-level-level-6">
-                          Level 6 (like degree)
-                        </label>
-                      </div>
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="qualification-level-level-7" name="qualification-level" type="checkbox" value="level-7">
-                        <label class="govuk-label govuk-checkboxes__label" for="qualification-level-level-7">
-                          Level 7 (like masters degree)
-                        </label>
-                      </div>
-                    </div>
-                  </fieldset>
-
-                  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-
-                  <!-- 4) Learning Method (online, class room, work based, Hybrid)-->
-                  <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                      Learning method *
-                    </legend>
-                    <div class="govuk-checkboxes govuk-checkboxes--small">
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="learning-method-1" name="learning-method" type="checkbox" value="Online">
-                        <label class="govuk-label govuk-checkboxes__label" for="learning-method-1">
-                          Online
-                        </label>
-                      </div>
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="learning-method-2" name="learning-method" type="checkbox" value="Classroom based">
-                        <label class="govuk-label govuk-checkboxes__label" for="learning-method-2">
-                          Classroom based
-                        </label>
-                      </div>
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="learning-method-3" name="learning-method" type="checkbox" value="Work based">
-                        <label class="govuk-label govuk-checkboxes__label" for="learning-method-3">
-                          Work based
-                        </label>
-                      </div>
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="learning-method-4" name="learning-method" type="checkbox" value="Hybrid">
-                        <label class="govuk-label govuk-checkboxes__label" for="learning-method-4">
-                          Hybrid
-                        </label>
-                      </div>
-                    </div>
-                  </fieldset>
-
-                  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-
-                  <!-- 5) Course Hours - AttendancePattern : Full time, Part time, Flexible  -->
-                  @{
-                    bool hasCourseHours = true;
-                    if (hasCourseHours)
+                    foreach (var curFacet in Model.AllFacets)
                     {
-                      var CourseHours_DisplayName = "Course Hours *";
-                      
-                      <fieldset class="govuk-fieldset">
-                        <div class="govuk-checkboxes govuk-checkboxes--small">
-                          <govuk-checkboxes for="SelectedCourseHours" > 
-                            <govuk-checkboxes-fieldset>
-                              <govuk-checkboxes-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--s">
-                                @CourseHours_DisplayName
-                              </govuk-checkboxes-fieldset-legend>
-                              @{
-                                int i = 0;
-                                foreach (var attendancePattern in Enum.GetValues<CourseHours>())
-                                {
-                                  var isTrue = Model.SelectedCourseHours.Contains(attendancePattern);
-
-                                  <govuk-checkboxes-item id="attendancePattern[@i]"
-                                                         value="@(attendancePattern.ToString("G"))"
-                                                         checked="@(isTrue)">
-                                    @attendancePattern.ToString() 
-                                  </govuk-checkboxes-item>
-                                  i++;
-                                }
-                              }
-                            </govuk-checkboxes-fieldset>
-                          </govuk-checkboxes>
+                      iFacetPosition++;
+                      if (iFacetPosition == 2)
+                      {
+                        <!-- 2) Travel Distance (Drop down) ...-->
+                        <div class="govuk-form-group">
+                          <govuk-select for="SelectedTravelDistance">
+                            <govuk-select-label>Travel Distance</govuk-select-label>
+                            @foreach (var option in Enum.GetValues<Distance>())
+                            {
+                              <govuk-select-item selected="@(Model.SelectedTravelDistance == option)">@option.GetDisplayName()</govuk-select-item>
+                            }
+                          </govuk-select>
                         </div>
+                        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+                      }
+                      
+                      <!-- Render selectable checkboxes for supplied facets-->
+                      <fieldset class="govuk-fieldset">
+                        <govuk-checkboxes for="SelectedFilterFacetItems">
+                          <govuk-checkboxes-fieldset>
+                            <govuk-checkboxes-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--s">
+                              @curFacet.Description
+                            </govuk-checkboxes-fieldset-legend>
+                            @{
+                              int i = 0;
+                              foreach (var facetValue in curFacet.Values)
+                              {
+                                var isTrue = facetValue.Value == 1L;
+
+                                <govuk-checkboxes-item id="facetValue.Key+@(i)" class="govuk-checkboxes__item"
+                                                       value="@(facetValue.Key)"
+                                                       checked="@(isTrue)">
+                                  @facetValue.Key
+                                </govuk-checkboxes-item>
+                                i++;
+                              }
+                            }
+                          </govuk-checkboxes-fieldset>
+                        </govuk-checkboxes>
+                        <!--p class="govuk-body">
+                          <a class="govuk-link" asp-page-handler="ClearFilter" >Clear filters</a>
+                        </p-->
                       </fieldset>
+                      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
                     }
                   }
-
-                  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-
-                  <!-- 6) Course study time 'Daytime, Evening, Weekend -->
-                  <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                      Course study time *
-                    </legend>
-                    <div class="govuk-checkboxes govuk-checkboxes--small">
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="course-times-1" name="course-times" type="checkbox" value="Daytime">
-                        <label class="govuk-label govuk-checkboxes__label" for="course-times-1">
-                          Daytime
-                        </label>
-                      </div>
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="course-times-2" name="course-times" type="checkbox" value="Evening">
-                        <label class="govuk-label govuk-checkboxes__label" for="course-times-2">
-                          Evening
-                        </label>
-                      </div>
-                      <div class="govuk-checkboxes__item">
-                        <input class="govuk-checkboxes__input" id="course-times-3" name="course-times" type="checkbox" value="Weekend">
-                        <label class="govuk-label govuk-checkboxes__label" for="course-times-3">
-                          Weekend
-                        </label>
-                      </div>
-                    </div>
-                  </fieldset>
                   <br>
                   <button class="govuk-button" type="submit">Apply filters</button>
                   <p class="govuk-body">
-                    <a class="govuk-link" asp-page-handler="ClearFilters" >Clear filter</a>
+                    <a class="govuk-link" asp-page-handler="ClearFilters" >Clear All filters</a>
                   </p>
 
                 </div>
@@ -284,8 +123,7 @@
           </div>
         </div>
         
-        @if (Model.SearchResponse == null || Model.SearchResponse.Courses == null || 
-             !Model.SearchResponse.Courses.Any())
+        @if (!Model.Courses.Any()) 
         {
           <h2 class="govuk-heading-m" role="status" aria-live="polite">It looks like we can’t find anything based on your answers.</h2>
           <p>Here are some things you can try:</p>
@@ -297,97 +135,94 @@
         }
         else
         {
-        <!-- Results & Pagination -->
-        <div class="govuk-grid-column-two-thirds">
-          <h2 class="govuk-heading-m">Available courses</h2>
-          
-          <p class="govuk-body govuk-!-margin-bottom-6">
-            <span class="govuk-!-font-weight-bold">Sort courses by:</span>
-            <span class="govuk-!-margin-left-2">
+          <!-- Results & Pagination -->
+          <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-m">Available courses</h2>
 
-              <!--<span aria-current="true">Distance</span>
-              | <a href="?page=1&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=relevance">Relevance</a>
-              -->
-              <a asp-page-handler="Sort" asp-page="/" asp-route-sortBy="distance" >Distance</a> | 
-              <a asp-page-handler="Sort" asp-route-sortBy="relevance" >Relevance</a>
-            </span>
-          </p>
-          
-          @foreach (Course course in Model.SearchResponse.Courses)
-          {
-            await Html.RenderPartialAsync("Partials/CourseV8", course);
-          }
-          
-          <nav class="govuk-pagination" aria-label="Pagination">
-            @{
-              if (Model.PaginationState.PageNumber > 1)
-              {
-                <div class="govuk-pagination__prev">
-                  <a class="govuk-link govuk-pagination__link"
-                     href="?page=1&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
-                     rel="prev">
-                    <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-                      <path d="m6.5938-0.0088125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
-                    </svg>
-                    <span class="govuk-pagination__link-title">Previous<span class="govuk-visually-hidden"> page</span></span>
-                  </a>
-                </div>
-              }
+            <!-- Sort Region-->
+            <p class="govuk-body govuk-!-margin-bottom-6">
+              <span class="govuk-!-font-weight-bold">Sort courses by:</span>
+              <span class="govuk-!-margin-left-2">
+                @{
+                  if (Model.Search.OrderBy == OrderBy.Distance) 
+                  {
+                    <span aria-current="true">Distance | </span>
+                    <a asp-page="@PageName.LoadCourses" asp-route-orderBy="relevance">Relevance</a>
+                  }
+                  else
+                  {
+                    <a asp-page="@PageName.LoadCourses" asp-route-orderBy="distance" >Distance</a>
+                    <span aria-current="true">| Relevance</span>
+                  } 
+                }
+              </span>
+            </p>
+
+            @foreach (var searchResult in Model.Courses) 
+            {
+              await Html.RenderPartialAsync("Partials/CourseV8", searchResult);
             }
-          
-            <ul class="govuk-pagination__list">
-              <li class="govuk-pagination__item ">
-                <a class="govuk-link govuk-pagination__link" 
-                   href="?page=1&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
-                   aria-label="Page 1">
-                  @{
-                    if (Model.PaginationState.PageNumber > 1)
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+              <nav class="govuk-pagination" aria-label="Pagination">
+                @if (Model.HasPreviousPage)
+                {
+                  <div class="govuk-pagination__prev">
+                    <a class="govuk-link govuk-pagination__link"
+                       asp-page="LoadCourses" asp-route-pageNumber="@(Model.PreviousPage)"
+                       aria-label="Previous">
+                      <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" 
+                           height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                        <path d="m6.5938-0.0088125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                      </svg>
+                      <span class="govuk-pagination__link-title">Previous<span class="govuk-visually-hidden"> page</span></span>
+                    </a>
+                  </div>
+                }
+                <ul class="govuk-pagination__list">
+                  @foreach (var pageNumber in Model.GetPageNumbers())
+                  {
+                    @if (pageNumber == Model.CurrentPage)
                     {
-                      @(Model.PaginationState.PageNumber - 1)
+                      <li class="govuk-pagination__item govuk-pagination__item--current">
+                        <a class="govuk-link govuk-pagination__link"
+                           aria-label=@($"Page {pageNumber}") aria-current="page">
+                          @pageNumber
+                        </a><span></span>
+                      </li>
                     }
                     else
                     {
-                      @Model.PaginationState.PageNumber; 
+                      <li class="govuk-pagination__item ">
+                        <a class="govuk-link govuk-pagination__link"
+                           asp-page="" asp-route-pageNumber="@pageNumber"
+                           aria-label=@($"Page {pageNumber}")>
+                          @pageNumber
+                        </a>
+                      </li>
                     }
                   }
-                </a>
-              </li>
+                </ul>
 
-              <li class="govuk-pagination__item govuk-pagination__item--current">
-                <a class="govuk-link govuk-pagination__link" 
-                   href="?page=2&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
-                   aria-label="Page 2" aria-current="page">
-                  @Model.PaginationState.PageNumber
-                </a>
-              </li>
-
-              <li class="govuk-pagination__item ">
-                <a class="govuk-link govuk-pagination__link" 
-                   href="?page=3&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
-                   aria-label="Page 3">
-                  @(Model.PaginationState.PageNumber + 1)
-                </a>
-              </li>
-            </ul>
-
-            @{
-              if (Model.PaginationState.TotalPageCount != Model.PaginationState.PageNumber )
-              {
-                <div class="govuk-pagination__next">
-                  <a class="govuk-link govuk-pagination__link" 
-                     href="?page=3&amp;option-select-filter-location=&amp;subject-filter=&amp;travel-location=&amp;sort=" 
-                     rel="next">
-                    <span class="govuk-pagination__link-title">Next<span class="govuk-visually-hidden"> page</span></span>
-                    <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
-                      <path d="m8.108-0.0088125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
-                    </svg>
-                  </a>
-                </div>
-              }
+                @if (Model.HasNextPage)
+                {
+                  <div class="govuk-pagination__next">
+                    <a class="govuk-link govuk-pagination__link"
+                       asp-page="LoadCourses" asp-route-pageNumber="@Model.NextPage"
+                       rel="next">
+                      <span class="govuk-pagination__link-title">Next<span class="govuk-visually-hidden"> page</span></span>
+                      <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" 
+                           height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                        <path d="m8.108-0.0088125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                      </svg>
+                    </a>
+                  </div>
+                }
+              </nav>
             }
-          </nav>
-
-        </div>
+          </div>
         }
       </div>
 

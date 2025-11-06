@@ -1,11 +1,14 @@
 @using System.Globalization
 @using System.Text.Json
 @using System.Text.Json.Serialization
-@model feat.web.Models.Course
+
 @{
+  // @model feat.web.Models.Course
   TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
 }
+ 
 <div class="govuk-summary-card" data-category="A Level">
+<!--
       <div class="govuk-summary-card__title-wrapper">
         <h2 class="govuk-summary-card__title">
           @Model.CourseName <a class="card-link" href="#" style="margin-right: 10px;"></a>
@@ -103,11 +106,12 @@
           </div>
           @if (Model.DebugInfo is not null)
           {
-            <!-- @Json.Serialize(Model) -->
+            @Json.Serialize(Model) 
           }
         </dl>
         
         
         
       </div>
+      -->
     </div>

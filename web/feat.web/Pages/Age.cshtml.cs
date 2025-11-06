@@ -11,7 +11,7 @@ namespace feat.web.Pages;
 public class AgeModel(ILogger<AgeModel> logger) : PageModel
 {
     [BindProperty]
-    [Required(ErrorMessage = "Please select your age group or select \"Skip this step\"")]
+    [Required(ErrorMessage = "Please select your age group")]
     public AgeGroup? AgeGroup { get; set; }
 
     public required Search Search { get; set; }
