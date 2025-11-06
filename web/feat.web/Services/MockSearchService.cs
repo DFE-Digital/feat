@@ -10,7 +10,7 @@ using CourseType = feat.common.Models.Enums.CourseType;
 
 namespace feat.web.Services;
 
-public class SudoSearchService : ISearchService
+public class MockSearchService : ISearchService
 {
     private readonly IApiClient _apiClient;
     private readonly IOptions<SearchOptions> _options;
@@ -20,7 +20,7 @@ public class SudoSearchService : ISearchService
     private int _pageSize = 2;   // No. of courses on a pages
     private int _pageNumber = 1; 
 
-    public SudoSearchService(
+    public MockSearchService(
         IApiClient apiClient,
         IOptions<SearchOptions> options)
     {
