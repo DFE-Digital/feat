@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace feat.common.Models.Staging.FAC.Enums;
+namespace feat.ingestion.Models.FAC.Enums;
 
 public enum EducationLevel
 {

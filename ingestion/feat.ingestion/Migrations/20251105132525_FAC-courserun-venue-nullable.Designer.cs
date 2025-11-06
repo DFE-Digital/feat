@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251105132525_FAC-courserun-venue-nullable")]
+    partial class FACcourserunvenuenullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -971,20 +974,21 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ProviderName")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int?>("ProviderStatus")
+                    b.Property<int>("ProviderStatus")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProviderType")
+                    b.Property<int>("ProviderType")
                         .HasColumnType("int");
 
                     b.Property<string>("TradingName")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int?>("Ukprn")
+                    b.Property<int>("Ukprn")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedOn")
@@ -992,7 +996,7 @@ namespace feat.ingestion.Migrations
 
                     b.HasKey("ProviderId");
 
-                    b.ToTable("FAC_Providers");
+                    b.ToTable("FAC_Provider");
                 });
 
             modelBuilder.Entity("feat.ingestion.Models.FAC.TLevel", b =>
@@ -1090,67 +1094,6 @@ namespace feat.ingestion.Migrations
                     b.HasKey("TLevelLocationId");
 
                     b.ToTable("FAC_TLevelLocations");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.FAC.Venue", b =>
-                {
-                    b.Property<Guid>("VenueId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AddressLine1")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("AddressLine2")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("County")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Postcode")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<Guid?>("ProviderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("ProviderUkprn")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Telephone")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Town")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("VenueName")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("VenueStatus")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Website")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.HasKey("VenueId");
-
-                    b.ToTable("FAC_Venues");
                 });
 
             modelBuilder.Entity("feat.common.Models.EmployerLocation", b =>

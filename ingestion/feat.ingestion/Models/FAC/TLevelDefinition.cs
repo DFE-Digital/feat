@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Web;
 using CsvHelper.Configuration;
-using feat.common.Models.Staging.FAC.Enums;
+using feat.common.Extensions;
+using feat.ingestion.Models.FAC.Enums;
 
-namespace feat.common.Models.Staging.FAC;
+namespace feat.ingestion.Models.FAC;
 
 [Table("FAC_TLevelDefinitions")]
 public class TLevelDefinition
@@ -22,7 +22,7 @@ public sealed class TLevelDefinitionMap : ClassMap<TLevelDefinition>
     {
         // Course Info
         Map(m => m.TLevelDefinitionId);
-        Map(m => m.Name).TypeConverter<CleanString>();
+        Map(m => m.Name).TypeConverter<CleanStringExtension>();
         Map(m => m.QualificationLevel).Default(EducationLevel.Unknown, useOnConversionFailure: true);
     }
 }
