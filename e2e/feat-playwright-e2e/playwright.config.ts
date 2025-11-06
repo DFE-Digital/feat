@@ -21,14 +21,36 @@ export default defineConfig({
     },
     projects: [
         // UI Project
-        { name: 'Chromium', use: { browserName: 'chromium' } },
+        {
+            name: 'Desktop Chromium',
+            testDir: './src/ui/tests',
+            use: {
+                ...devices['Desktop Chrome'],
+                baseURL:
+                    process.env.FEAT_UI_BASE_URL ||
+                    'https://s265d01-app-web.azurewebsites.net/',
+            },
+        },
         {
             name: 'Mobile Chrome',
-            use: { browserName: 'chromium', ...devices['Pixel 8'], isMobile: true },
+            testDir: './src/ui/tests',
+            use: {
+                ...devices['Pixel 8'],
+                isMobile: true,
+                baseURL:
+                    process.env.FEAT_UI_BASE_URL ||
+                    'https://s265d01-app-web.azurewebsites.net/',
+            },
         },
         {
             name: 'Mobile Safari',
-            use: { browserName: 'webkit', ...devices['iPhone 16'] },
+            testDir: './src/ui/tests',
+            use: {
+                ...devices['iPhone 16'],
+                baseURL:
+                    process.env.FEAT_UI_BASE_URL ||
+                    'https://s265d01-app-web.azurewebsites.net/',
+            },
         },
 
         // API Project
