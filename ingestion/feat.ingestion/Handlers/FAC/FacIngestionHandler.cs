@@ -127,7 +127,7 @@ public class FacIngestionHandler(
         var TLevels = ProcessMode.Skip;
         var AllCourses = ProcessMode.Skip;
         var Providers = ProcessMode.Skip;
-        var Venues = ProcessMode.Force;
+        var Venues = ProcessMode.Skip;
         const int batchSize = 5000;
 
         var blobServiceClient = new BlobServiceClient(options.BlobStorageConnectionString);
@@ -568,8 +568,9 @@ public class FacIngestionHandler(
                 Location = c.LOCATION != null ? GeographyPoint.Create( c.LOCATION.Y, c.LOCATION.X) : null
             };
 
-        var result = tlevelquery.Take(50).ToList();
-        result.Clear();
+        var result = tlevelquery.Take(10).ToList();
+        
+        Console.WriteLine("Generating embeddings");
         
         foreach (var aiSearchEntry in result)
         {
@@ -579,6 +580,7 @@ public class FacIngestionHandler(
             aiSearchEntry.SectorVector = searchIndexHandler.GetVector(aiSearchEntry.Sector);
         }
         
+        Console.WriteLine("Done");
         
         // Console.WriteLine(searchIndexHandler.Ingest(result));
             
