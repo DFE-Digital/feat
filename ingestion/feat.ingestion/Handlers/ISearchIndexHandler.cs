@@ -8,4 +8,6 @@ public interface ISearchIndexHandler
     bool CreateIndex();
 
     bool Ingest(List<AiSearchEntry> entries);
+
+    IReadOnlyList<float> GetVector(string? text);
 }

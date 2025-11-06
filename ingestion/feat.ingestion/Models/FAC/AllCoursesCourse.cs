@@ -1,15 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
-using CsvHelper;
 using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
+using feat.common.Extensions;
 using feat.common.Models.Enums;
-using feat.common.Models.Staging.FAC.Enums;
+using feat.ingestion.Models.FAC.Converters;
+using feat.ingestion.Models.FAC.Enums;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using DeliveryMode = feat.common.Models.Enums.DeliveryMode;
 
-namespace feat.common.Models.Staging.FAC;
+namespace feat.ingestion.Models.FAC;
 
 [Table("FAC_AllCourses")]
 [PrimaryKey(nameof(COURSE_ID), nameof(COURSE_RUN_ID))]
@@ -63,8 +64,8 @@ public sealed class AllCoursesCourseMap : ClassMap<AllCoursesCourse>
         // Course Info
         Map(m => m.COURSE_ID);
         Map(m => m.LEARN_AIM_REF);
-        Map(m => m.COURSE_NAME).TypeConverter<CleanString>();
-        Map(m => m.AWARDING_BODY).TypeConverter<CleanString>();
+        Map(m => m.COURSE_NAME).TypeConverter<CleanStringExtension>();
+        Map(m => m.AWARDING_BODY).TypeConverter<CleanStringExtension>();
         Map(m => m.DELIVER_MODE);
         Map(m => m.COURSE_TYPE);
         Map(m => m.STUDY_MODE);
@@ -76,7 +77,7 @@ public sealed class AllCoursesCourseMap : ClassMap<AllCoursesCourse>
             args.Row.GetField<string?>("DURATION_VALUE"),
             args.Row.GetField<string?>("STARTDATE"))
         );
-        Map(m => m.COURSE_URL).TypeConverter<CleanString>();
+        Map(m => m.COURSE_URL).TypeConverter<CleanStringExtension>();
 
         // Dates
         Map(m => m.CREATED_DATE).TypeConverter<DDMMYYYY>();
@@ -85,34 +86,34 @@ public sealed class AllCoursesCourseMap : ClassMap<AllCoursesCourse>
 
         // Cost
         Map(m => m.COST).Default(new decimal?(), useOnConversionFailure:true);
-        Map(m => m.COST_DESCRIPTION).TypeConverter<CleanString>();
+        Map(m => m.COST_DESCRIPTION).TypeConverter<CleanStringExtension>();
 
         // Text Data
-        Map(m => m.WHO_THIS_COURSE_IS_FOR).TypeConverter<CleanString>();
-        Map(m => m.ENTRY_REQUIREMENTS).TypeConverter<CleanString>();
-        Map(m => m.HOW_YOU_WILL_BE_ASSESSED).TypeConverter<CleanString>();
+        Map(m => m.WHO_THIS_COURSE_IS_FOR).TypeConverter<CleanStringExtension>();
+        Map(m => m.ENTRY_REQUIREMENTS).TypeConverter<CleanStringExtension>();
+        Map(m => m.HOW_YOU_WILL_BE_ASSESSED).TypeConverter<CleanStringExtension>();
 
         // Instance Info
         Map(m => m.COURSE_RUN_ID);
 
         // Provider Info
         Map(m => m.PROVIDER_UKPRN);
-        Map(m => m.PROVIDER_NAME).TypeConverter<CleanString>();
+        Map(m => m.PROVIDER_NAME).TypeConverter<CleanStringExtension>();
 
 
         // Location Data
-        Map(m => m.LOCATION_NAME).TypeConverter<CleanString>();
-        Map(m => m.LOCATION_ADDRESS1).TypeConverter<CleanString>();
-        Map(m => m.LOCATION_ADDRESS2).TypeConverter<CleanString>();
-        Map(m => m.LOCATION_TOWN).TypeConverter<CleanString>();
-        Map(m => m.LOCATION_COUNTY).TypeConverter<CleanString>();
-        Map(m => m.LOCATION_POSTCODE).TypeConverter<CleanString>();
+        Map(m => m.LOCATION_NAME).TypeConverter<CleanStringExtension>();
+        Map(m => m.LOCATION_ADDRESS1).TypeConverter<CleanStringExtension>();
+        Map(m => m.LOCATION_ADDRESS2).TypeConverter<CleanStringExtension>();
+        Map(m => m.LOCATION_TOWN).TypeConverter<CleanStringExtension>();
+        Map(m => m.LOCATION_COUNTY).TypeConverter<CleanStringExtension>();
+        Map(m => m.LOCATION_POSTCODE).TypeConverter<CleanStringExtension>();
         Map(m => m.LOCATION).Convert(args => CalculateGeographyPoint(
             args.Row.GetField<string?>("LOCATION_LATITUDE"),
             args.Row.GetField<string?>("LOCATION_LONGITUDE")));
-        Map(m => m.LOCATION_EMAIL).TypeConverter<CleanString>();
-        Map(m => m.LOCATION_TELEPHONE).TypeConverter<CleanString>();
-        Map(m => m.LOCATION_WEBSITE).TypeConverter<CleanString>();
+        Map(m => m.LOCATION_EMAIL).TypeConverter<CleanStringExtension>();
+        Map(m => m.LOCATION_TELEPHONE).TypeConverter<CleanStringExtension>();
+        Map(m => m.LOCATION_WEBSITE).TypeConverter<CleanStringExtension>();
 
         // Other Data
         Map(m => m.NATIONAL).Convert(args => 
@@ -121,7 +122,7 @@ public sealed class AllCoursesCourseMap : ClassMap<AllCoursesCourse>
                 args.Row.GetField<string?>("REGIONS"))
             );
         Map(m => m.REGIONS);
-        Map(m => m.SECTOR).TypeConverter<CleanString>();
+        Map(m => m.SECTOR).TypeConverter<CleanStringExtension>();
     }
 
     private bool? CalculateNational(string? national, string? regions)
@@ -183,61 +184,5 @@ public sealed class AllCoursesCourseMap : ClassMap<AllCoursesCourse>
         };
 
         return (end - start).Duration();
-    }
-}
-
-public class DDMMYYYY : DateTimeConverter
-{
-    public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
-    {
-        if (text is null or "NA" or "" or "NAN")
-            return null;
-
-        if (DateTime.TryParseExact(text, "dd/M/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal,
-                out DateTime result))
-        {
-            return result;
-        }
-
-        return null;
-    }
-}
-
-internal sealed class DeliveryModeEnumConverter() : EnumConverter(typeof(DeliveryMode))
-{
-    public override object ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
-    {
-        if (string.IsNullOrEmpty(text))
-            return null;
-        
-        if(!Enum.TryParse(text?.ToUpper(), out DeliveryMode deliveryMode))
-        {
-            return null;
-        }
-
-        return deliveryMode;
-    }
-}
-
-internal sealed class AttendancePatternEnumConverter() : EnumConverter(typeof(AttendancePattern))
-{
-    public override object ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
-    {
-        if (string.IsNullOrEmpty(text))
-            return AttendancePattern.Undefined;
-        
-        if(!Enum.TryParse(text?.ToUpper(), out AttendancePattern attendancePattern))
-        {
-            return AttendancePattern.Undefined;
-        }
-
-        // If we're set to day or block release, we need to set this to daytime
-        // as per a NCS request
-        if (attendancePattern == AttendancePattern.DayOrBlockRelease)
-        {
-            attendancePattern = AttendancePattern.Daytime;
-        }
-        
-        return attendancePattern;
     }
 }

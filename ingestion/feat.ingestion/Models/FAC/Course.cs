@@ -3,15 +3,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Web;
 using CsvHelper.Configuration;
 using feat.common.Models.Enums;
-using feat.common.Models.Staging.FAC.Enums;
+using feat.ingestion.Models.FAC.Enums;
 
-namespace feat.common.Models.Staging.FAC;
+namespace feat.ingestion.Models.FAC;
 
 [Table("FAC_Courses")]
 public class Course
 {
     [Key] public Guid CourseId { get; set; }
-    public CourseStatus CourseStatus { get; set; }
+    public Status CourseStatus { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }
     [StringLength(8)] public string LearnAimRef { get; set; }
