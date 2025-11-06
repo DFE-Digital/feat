@@ -1,6 +1,6 @@
 using feat.common.Models;
 using Microsoft.EntityFrameworkCore;
-using FAC = feat.common.Models.Staging.FAC;
+using FAC = feat.ingestion.Models.FAC;
 using FAA = feat.common.Models.Staging.FAA;
 
 namespace feat.ingestion.Data;
@@ -44,14 +44,25 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
     
     #region Staging Models
     
+    #region Find a Course / Publish to Course Directory
     public DbSet<FAC.AllCoursesCourse> FAC_AllCourses { get; set; }
     public DbSet<FAC.Course> FAC_Courses { get; set; }
+    public DbSet<FAC.CourseRun> FAC_CourseRuns { get; set; }
     public DbSet<FAC.TLevel> FAC_TLevels { get; set; }
     public DbSet<FAC.TLevelDefinition> FAC_TLevelDefinitions { get; set; }
+    public DbSet<FAC.TLevelLocation> FAC_TLevelLocations { get; set; }
     public DbSet<FAC.AimData> FAC_AimData { get; set; }
+    public DbSet<FAC.ApprovedQualification> FAC_ApprovedQualifications { get; set; }
+    public DbSet<FAC.Provider> FAC_Providers { get; set; }
+    public DbSet<FAC.Venue> FAC_Venues { get; set; }
     
+    #endregion
+    
+    #region Find an Apprenticeship
     public DbSet<FAA.Apprenticeship> FAA_Apprenticeships { get; set; }
     public DbSet<FAA.Address> FAA_Addresses { get; set; }
+    
+    #endregion
     
     #endregion
 }

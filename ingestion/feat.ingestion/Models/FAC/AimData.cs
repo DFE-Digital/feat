@@ -1,12 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Web;
-using CsvHelper;
 using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
-using feat.common.Models.Staging.FAC.Enums;
+using feat.ingestion.Models.FAC.Enums;
 
-namespace feat.common.Models.Staging.FAC;
+namespace feat.ingestion.Models.FAC;
 
 [Table("FAC_AimData")]
 public class AimData
@@ -32,21 +29,5 @@ public sealed class AimDataMap : ClassMap<AimData>
         Map(m => m.NotionalNVQLevelv2).Default(EducationLevel.Unknown, true);
         Map(m => m.LearnAimRefTitle);
         Map(m => m.AwardOrgCode);
-    }
-}
-
-internal sealed class EducationLevelEnumConverter() : EnumConverter(typeof(EducationLevel))
-{
-    public override object ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
-    {
-        if (string.IsNullOrEmpty(text))
-            return EducationLevel.Unknown;
-        
-        if(!Enum.TryParse(text?.ToUpper(), out EducationLevel levelType))
-        {
-            return EducationLevel.Unknown;
-        }
-
-        return levelType;
     }
 }

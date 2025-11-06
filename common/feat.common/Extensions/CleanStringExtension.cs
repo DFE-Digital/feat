@@ -2,9 +2,9 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 
-namespace feat.common.Models.Staging.FAC;
+namespace feat.common.Extensions;
 
-public class CleanString : StringConverter
+public class CleanStringExtension : StringConverter
 {
     public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
     {
