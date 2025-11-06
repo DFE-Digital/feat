@@ -11,27 +11,27 @@ namespace feat.ingestion.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<long>(
+            migrationBuilder.DropColumn("Duration", "EntryInstance");
+            
+            migrationBuilder.AddColumn<long>(
                 name: "Duration",
                 table: "EntryInstance",
                 type: "bigint",
-                nullable: true,
-                oldClrType: typeof(TimeSpan),
-                oldType: "time",
-                oldNullable: true);
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<TimeSpan>(
-                name: "Duration",
+            migrationBuilder.DropColumn(
+                name: "DURATION",
+                table: "EntryInstance");
+            
+            migrationBuilder.AddColumn<TimeSpan>(
+                name: "DURATION",
                 table: "EntryInstance",
                 type: "time",
-                nullable: true,
-                oldClrType: typeof(long),
-                oldType: "bigint",
-                oldNullable: true);
+                nullable: true);
         }
     }
 }
