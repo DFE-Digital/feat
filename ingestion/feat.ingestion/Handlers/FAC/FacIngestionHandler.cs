@@ -121,13 +121,13 @@ public class FacIngestionHandler(
 
     public override async Task<bool> IngestAsync(CancellationToken cancellationToken)
     {
-        var Aim = ProcessMode.Skip;
-        var ApprovedQualifications = ProcessMode.Skip;
-        var Courses = ProcessMode.Skip;
-        var TLevels = ProcessMode.Skip;
-        var AllCourses = ProcessMode.Skip;
-        var Providers = ProcessMode.Skip;
-        var Venues = ProcessMode.Skip;
+        var Aim = ProcessMode.Process;
+        var ApprovedQualifications = ProcessMode.Process;
+        var Courses = ProcessMode.Process;
+        var TLevels = ProcessMode.Process;
+        var AllCourses = ProcessMode.Process;
+        var Providers = ProcessMode.Process;
+        var Venues = ProcessMode.Process;
         const int batchSize = 5000;
 
         var blobServiceClient = new BlobServiceClient(options.BlobStorageConnectionString);
