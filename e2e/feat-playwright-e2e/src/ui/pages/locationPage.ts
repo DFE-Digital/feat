@@ -45,7 +45,6 @@ export class LocationPage {
     fieldError = (text: string): Locator =>
         this.page.locator('.govuk-error-message', { hasText: new RegExp(text, 'i') });
 
-    // Optional: error state on the Location form group, if GOV.UK error class used
     locationFormGroupError = (): Locator =>
         this.page.locator('#Location').locator('xpath=ancestor::*[contains(@class,"govuk-form-group--error")]');
 

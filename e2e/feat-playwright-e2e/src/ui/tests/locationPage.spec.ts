@@ -98,7 +98,7 @@ test.describe('FEAT – 2.0 Location', () => {
         await loc.distanceRadio('Up to 5 miles').check();
         await loc.continueButton().click();
 
-        await expect(page).toHaveURL(/(what-are-you-interested-in|interests)/i);
+        await expect(page).toHaveURL(/\/interests$/i);
     });
 
     test('AC7: returning to page restores location and distance', async ({ page }) => {
@@ -107,7 +107,7 @@ test.describe('FEAT – 2.0 Location', () => {
         await loc.locationInput().fill('Leeds');
         await loc.distanceRadio('Up to 15 miles').check();
         await loc.continueButton().click();
-        await expect(page).toHaveURL(/(what-are-you-interested-in|interests)/i);
+        await expect(page).toHaveURL(/\/interests$/i);
 
         await page.goBack();
         await expect(loc.locationInput()).toHaveValue(/Leeds/i);
@@ -120,7 +120,6 @@ test.describe('FEAT – 2.0 Location', () => {
         await loc.locationInput().fill('Over 30 test');
         await loc.distanceRadio('Over 30 miles').check();
         await loc.continueButton().click();
-        
         await expect(page).toHaveURL(/\/interests$/i);
 
     });
