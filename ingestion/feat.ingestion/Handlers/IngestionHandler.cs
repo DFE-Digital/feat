@@ -21,12 +21,19 @@ public abstract class IngestionHandler(IngestionOptions options) : IIngestionHan
     
     public bool Sync()
     {
-        return Sync(CancellationToken.None).GetAwaiter().GetResult();
+        return SyncAsync(CancellationToken.None).GetAwaiter().GetResult();
+    }
+    
+    public bool Index()
+    {
+        return IndexAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
     
     public abstract Task<bool> IngestAsync(CancellationToken cancellationToken);
     
     public abstract Task<bool> ValidateAsync(CancellationToken cancellationToken);
     
-    public abstract Task<bool> Sync(CancellationToken cancellationToken);
+    public abstract Task<bool> SyncAsync(CancellationToken cancellationToken);
+    
+    public abstract Task<bool> IndexAsync(CancellationToken cancellationToken);
 }

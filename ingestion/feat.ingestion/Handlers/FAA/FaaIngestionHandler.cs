@@ -2,6 +2,7 @@ using System.Data.Entity;
 using System.Globalization;
 using feat.common;
 using feat.common.Models;
+using feat.common.Models.AiSearch;
 using feat.common.Models.Enums;
 using feat.common.Models.Staging.FAA.Enums;
 using feat.ingestion.Configuration;
@@ -18,7 +19,8 @@ namespace feat.ingestion.Handlers.FAA;
 public class FaaIngestionHandler(
     IngestionOptions options,
     IApiClient apiClient,
-    IngestionDbContext dbContext)
+    IngestionDbContext dbContext,
+    ISearchIndexHandler searchIndexHandler)
     : IngestionHandler(options)
 {
     private readonly IngestionOptions _options = options;
@@ -160,7 +162,7 @@ public class FaaIngestionHandler(
         }
     }
     
-    public override async Task<bool> Sync(CancellationToken cancellationToken)
+    public override async Task<bool> SyncAsync(CancellationToken cancellationToken)
     {
         var apprenticeships = EntityFrameworkQueryableExtensions.Include(
                 dbContext.FAA_Apprenticeships.Include(a => a.Addresses),
@@ -380,6 +382,42 @@ public class FaaIngestionHandler(
 
         return true;
     }
+
+    public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
+    {
+        var entries = EntityFrameworkQueryableExtensions.Include(EntityFrameworkQueryableExtensions.Include(
+                dbContext.Entries.Include(e => e.EntryInstances),
+                entry => entry.EntryInstances),
+                entry => entry.Vacancies)
+            .ToList();
+            
+        var searchEntries = entries.Select(e => new AiSearchEntry
+        {
+            Id = e.Id.ToString(),
+            InstanceId = e.EntryInstances.First()
+                .Id.ToString(),
+            Title = e.Title,
+            Description = e.Description,
+            EntryType = nameof(EntryType.Apprenticeship),
+            Source = nameof(SourceSystem.FAA),
+            QualificationLevel = MapQualificationLevel(e.Vacancies.First().Level),
+            // TODO: Below fields
+            // LearningMethod = ,
+            // CourseHours = ,
+            // StudyTime = ,
+            // Location = ,
+        }).ToList();
+        
+        foreach (var searchEntry in searchEntries)
+        {
+            searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
+            searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
+            searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
+            searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
+        }
+        
+        return searchIndexHandler.Ingest(searchEntries);
+    }
     
     private static CourseHours? MapCourseHours(decimal? hoursPerWeek)
     {
@@ -452,5 +490,21 @@ public class FaaIngestionHandler(
         };
 
         return level;
+    }
+    
+    private static string MapQualificationLevel(ApprenticeshipLevel? apprenticeshipLevel)
+    {
+        return apprenticeshipLevel switch
+        {
+            ApprenticeshipLevel.Intermediate => nameof(QualificationLevel.Level2),
+            ApprenticeshipLevel.Advanced => nameof(QualificationLevel.Level3),
+            // TODO: Check: Higher can be level 4 or 5
+            ApprenticeshipLevel.Higher => nameof(QualificationLevel.Level5),
+            // TODO: Check: Degree can be level 6 or 7
+            ApprenticeshipLevel.Degree => nameof(QualificationLevel.Level7),
+            _ => string.Empty
+            
+            // https://developer.apprenticeships.education.gov.uk/Documentation/display-advert-api-v2#/operations/get-vacancy
+        };
     }
 }
