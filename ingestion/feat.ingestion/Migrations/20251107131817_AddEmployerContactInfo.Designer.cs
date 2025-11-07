@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251107131817_AddEmployerContactInfo")]
+    partial class AddEmployerContactInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -927,38 +930,14 @@ namespace feat.ingestion.Migrations
                     b.Property<decimal?>("HoursPerWeek")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("Level")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("NationalVacancy")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("NationalVacancyDetails")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
                     b.Property<short?>("Positions")
                         .HasColumnType("smallint");
-
-                    b.Property<DateTime?>("PostedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Url")
-                        .HasMaxLength(2083)
-                        .HasColumnType("nvarchar(2083)");
 
                     b.Property<decimal?>("Wage")
                         .HasColumnType("money");
 
-                    b.Property<int?>("WageType")
-                        .HasColumnType("int");
-
                     b.Property<int?>("WageUnit")
                         .HasColumnType("int");
-
-                    b.Property<string>("WorkingWeekDescription")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
 
                     b.HasKey("Id");
 

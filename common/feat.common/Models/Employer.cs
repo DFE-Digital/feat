@@ -18,6 +18,15 @@ public class Employer
     
     [StringLength(2083)] 
     public string? Url { get; set; }
+    
+    [StringLength(50)]
+    public string? ContactName { get; set; }
+    
+    [StringLength(320)]
+    public string? ContactEmail { get; set; }
+    
+    [StringLength(20)]
+    public string? ContactPhone { get; set; }
 
     [InverseProperty("Employer")] 
     public ICollection<EmployerLocation> EmployerLocations { get; set; } = new List<EmployerLocation>();

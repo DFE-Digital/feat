@@ -44,6 +44,7 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.10" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
       <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.10" />
+      <PackageReference Include="Z.EntityFramework.Extensions" Version="9.104.0.1" />
       <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="9.104.0.1" />
     </ItemGroup>
 

@@ -382,6 +382,11 @@ public class FacIngestionHandler(
 
         return true;
     }
+    
+    public override Task<bool> Sync(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 
     private static string MapStudyTime(AttendancePattern? attendancePattern)
     {

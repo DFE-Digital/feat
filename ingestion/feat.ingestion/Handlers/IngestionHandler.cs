@@ -19,7 +19,14 @@ public abstract class IngestionHandler(IngestionOptions options) : IIngestionHan
         return ValidateAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
     
+    public bool Sync()
+    {
+        return Sync(CancellationToken.None).GetAwaiter().GetResult();
+    }
+    
     public abstract Task<bool> IngestAsync(CancellationToken cancellationToken);
     
     public abstract Task<bool> ValidateAsync(CancellationToken cancellationToken);
+    
+    public abstract Task<bool> Sync(CancellationToken cancellationToken);
 }

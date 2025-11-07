@@ -1,6 +1,6 @@
 namespace feat.ingestion.Models.FAA;
 
-public class ApprenticeshipCourse
+public class Apprenticeship
 {
     public string? Title { get; set; }
     
