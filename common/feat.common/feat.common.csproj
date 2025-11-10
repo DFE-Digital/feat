@@ -24,8 +24,4 @@
       <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.10" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Models\Staging\DiscoverUni\" />
-    </ItemGroup>
-
 </Project>

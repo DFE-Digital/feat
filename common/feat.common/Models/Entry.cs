@@ -29,6 +29,9 @@ public class Entry
     
     [StringLength(255)]
     public required string Title { get; set; } = string.Empty;
+    
+    [StringLength(255)]
+    public required string AimOrAltTitle { get; set; } = string.Empty;
 
     public string? Description { get; set; }
 
@@ -49,7 +52,9 @@ public class Entry
 
     public EntryType? Type { get; set; }
 
-    public StudyTime? Level { get; set; }
+    public int? Level { get; set; }
+    
+    public StudyTime? StudyTime { get; set; }
 
     [InverseProperty("Entry")]
     public ICollection<EntryCost> EntryCosts { get; set; } = new List<EntryCost>();

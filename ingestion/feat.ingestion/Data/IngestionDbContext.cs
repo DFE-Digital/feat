@@ -1,7 +1,7 @@
 using feat.common.Models;
 using Microsoft.EntityFrameworkCore;
 using FAC = feat.ingestion.Models.FAC;
-using FAA = feat.common.Models.Staging.FAA;
+using FAA = feat.ingestion.Models.FAA;
 
 namespace feat.ingestion.Data;
 

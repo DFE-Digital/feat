@@ -1,4 +1,4 @@
-namespace feat.ingestion.Models.FAA;
+namespace feat.ingestion.Models.FAA.External;
 
 public class ApiResponse
 {

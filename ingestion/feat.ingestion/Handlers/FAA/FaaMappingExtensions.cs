@@ -1,11 +1,11 @@
-using feat.ingestion.Models.FAA;
-using Database = feat.common.Models.Staging.FAA;
+using feat.ingestion.Models.FAA.External;
+using Database = feat.ingestion.Models.FAA;
 
 namespace feat.ingestion.Handlers.FAA;
 
 public static class FaaMappingExtensions
 {
-    public static Database.Apprenticeship FromDto(this Apprenticeship apprenticeship)
+    private static Database.Apprenticeship FromDto(this Apprenticeship apprenticeship)
     {
         var dbApprenticeship = new Database.Apprenticeship
         {
@@ -56,8 +56,8 @@ public static class FaaMappingExtensions
     {
         return apprenticeships.Select(apprenticeship => apprenticeship.FromDto()).ToList();
     }
-    
-    public static Database.Address FromDto(this Address address)
+
+    private static Database.Address FromDto(this Address address)
     {
         return new Database.Address
         {
@@ -70,8 +70,8 @@ public static class FaaMappingExtensions
             Longitude = address.Longitude
         };
     }
-    
-    public static List<Database.Address> FromDtoList(this List<Address> addresses)
+
+    private static List<Database.Address> FromDtoList(this List<Address> addresses)
     {
         return addresses.Select(address => address.FromDto()).ToList();
     }

@@ -3,7 +3,6 @@ using feat.common;
 using feat.common.Models;
 using feat.common.Models.AiSearch;
 using feat.common.Models.Enums;
-using feat.common.Models.Staging.FAA.Enums;
 using feat.ingestion.Configuration;
 using feat.ingestion.Data;
 using feat.ingestion.Enums;
@@ -11,7 +10,7 @@ using feat.ingestion.Models.FAA;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Spatial;
 using NetTopologySuite.Geometries;
-using Database = feat.common.Models.Staging.FAA;
+using External = feat.ingestion.Models.FAA.External;
 using Location = feat.common.Models.Location;
 
 namespace feat.ingestion.Handlers.FAA;
@@ -38,11 +37,11 @@ public class FaaIngestionHandler(
         }
 
         const string url = "vacancies/vacancy?PageNumber=1&PageSize=1";
-        ApiResponse response;
+        External.ApiResponse response;
 
         try
         {
-            response = await apiClient.GetAsync<ApiResponse>(
+            response = await apiClient.GetAsync<External.ApiResponse>(
                 ApiClientNames.FindAnApprenticeship, url, cancellationToken: cancellationToken);
         }
         catch (Exception ex)
@@ -66,8 +65,8 @@ public class FaaIngestionHandler(
 
         try
         {
-            var allApprenticeships = new List<Database.Apprenticeship>();
-            var allAddresses = new List<Database.Address>();
+            var allApprenticeships = new List<Apprenticeship>();
+            var allAddresses = new List<Address>();
             var pageNumber = 1;
 
             while (true)
@@ -76,7 +75,7 @@ public class FaaIngestionHandler(
                 
                 var url = $"vacancies/vacancy?PageNumber={pageNumber}&PageSize={apiPageSize}";
                 
-                var response = await apiClient.GetAsync<ApiResponse>(
+                var response = await apiClient.GetAsync<External.ApiResponse>(
                     ApiClientNames.FindAnApprenticeship, url, cancellationToken: cancellationToken);
 
                 var apprenticeships = response.Vacancies.FromDtoList();
@@ -164,7 +163,7 @@ public class FaaIngestionHandler(
     
     public override async Task<bool> SyncAsync(CancellationToken cancellationToken)
     {
-        var apprenticeships = dbContext.Set<Database.Apprenticeship>()
+        var apprenticeships = dbContext.Set<Apprenticeship>()
             .Include(apprenticeship => apprenticeship.Addresses)
             .ToList();
 
@@ -240,13 +239,15 @@ public class FaaIngestionHandler(
                 ProviderId = providerId,
                 Reference = a.VacancyReference!,
                 Title = a.Title!,
+                AimOrAltTitle = a.CourseTitle!,
                 Description = a.Description,
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
                 Url = a.ApplicationUrl ?? string.Empty,
                 SourceSystem = SourceSystem.FAA,
                 Type = EntryType.Apprenticeship,
-                Level = StudyTime.Daytime // TODO: Check
+                Level = a.CourseLevel,
+                StudyTime = StudyTime.Daytime
             };
         }).ToList();
         
@@ -275,7 +276,7 @@ public class FaaIngestionHandler(
                 Created = DateTime.UtcNow,
                 EntryId = entryId,
                 StartDate = a.StartDate,
-                Duration = ParseMonthStringToTimeSpan(a.ExpectedDuration),
+                Duration = ParseMonthStringToTimeSpan(a.ExpectedDuration, a.StartDate),
                 StudyMode = LearningMethod.Workbased,
                 Reference = a.VacancyReference!
             };
@@ -519,29 +520,28 @@ public class FaaIngestionHandler(
                 {
                     var locationPoint = el.Location.GeoLocation != null
                         ? GeographyPoint.Create(el.Location.GeoLocation.Y, el.Location.GeoLocation.X)
-                        : GeographyPoint.Create(0, 0);
+                        : null;
 
                     var searchEntry = new AiSearchEntry
                     {
-                        // TODO: Check following 2 IDs are correct
                         Id = entry.Id.ToString(),
                         InstanceId = entry.EntryInstances.First().Id.ToString(),
                         Sector = entry.EntrySectors.First().Sector.Name,
                         Title = entry.Title,
+                        LearningAimTitle = entry.AimOrAltTitle,
                         Description = entry.Description,
                         EntryType = nameof(EntryType.Apprenticeship),
                         Source = nameof(SourceSystem.FAA),
-                        QualificationLevel = MapQualificationLevel(vacancy.Level),
+                        QualificationLevel = MapQualificationLevel(entry.Level),
                         LearningMethod = nameof(LearningMethod.Workbased),
                         CourseHours = nameof(entry.AttendancePattern),
                         StudyTime = nameof(entry.Level),
                         Location = locationPoint
                     };
                     
-                    // TODO: Add caching
                     searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
                     searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
-                    searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector("TO_CHANGE"); // TODO: Need AimOrAltTitle
+                    searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
                     searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
 
                     searchEntries.Add(searchEntry);
@@ -566,9 +566,9 @@ public class FaaIngestionHandler(
         };
     }
     
-    private static TimeSpan? ParseMonthStringToTimeSpan(string? input)
+    private static TimeSpan? ParseMonthStringToTimeSpan(string? input, DateTime? startDate)
     {
-        if (string.IsNullOrWhiteSpace(input))
+        if (string.IsNullOrWhiteSpace(input) || startDate == null)
         {
             return null;
         }
@@ -580,7 +580,8 @@ public class FaaIngestionHandler(
         if (monthParts.Length > 0
             && int.TryParse(monthParts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var months))
         {
-            return TimeSpan.FromDays(months * 30.44);
+            var endDate = startDate.Value.AddMonths(months);
+            return (endDate - startDate).Value.Duration();
         }
 
         return null;
@@ -629,19 +630,13 @@ public class FaaIngestionHandler(
         return level;
     }
     
-    private static string MapQualificationLevel(ApprenticeshipLevel? apprenticeshipLevel)
+    private static string MapQualificationLevel(int? qualificationLevel)
     {
-        return apprenticeshipLevel switch
+        if (qualificationLevel == null || !Enum.IsDefined(typeof(QualificationLevel), qualificationLevel.Value))
         {
-            ApprenticeshipLevel.Intermediate => nameof(QualificationLevel.Level2),
-            ApprenticeshipLevel.Advanced => nameof(QualificationLevel.Level3),
-            // TODO: Check: Higher can be level 4 or 5
-            ApprenticeshipLevel.Higher => nameof(QualificationLevel.Level5),
-            // TODO: Check: Degree can be level 6 or 7
-            ApprenticeshipLevel.Degree => nameof(QualificationLevel.Level7),
-            _ => string.Empty
-            
-            // https://developer.apprenticeships.education.gov.uk/Documentation/display-advert-api-v2#/operations/get-vacancy
-        };
+            return "Not Specified";
+        }
+        
+        return ((QualificationLevel)qualificationLevel.Value).ToString();
     }
 }

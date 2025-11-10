@@ -1,4 +1,4 @@
-namespace feat.common.Models.Staging.FAA.Enums;
+namespace feat.common.Models.Enums;
 
 public enum WageType
 {
