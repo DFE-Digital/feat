@@ -204,6 +204,31 @@ public class FaaIngestionHandler(
 
         Console.WriteLine($"Providers synchronized: {providers.Count}");
         
+        // SECTOR
+        
+        var sectors = apprenticeships
+            .GroupBy(a => a.CourseRoute!.Trim(), StringComparer.OrdinalIgnoreCase)
+            .Select(a => new Sector
+            {
+                Created = DateTime.UtcNow,
+                Name = a.Key
+            }).ToList();
+
+        await dbContext.BulkSynchronizeAsync(sectors, options =>
+        {
+            options.IgnoreOnSynchronizeUpdateExpression = s => new
+            {
+                s.Id,
+                s.Created
+            };
+            options.ColumnPrimaryKeyExpression = s => s.Name;
+        }, cancellationToken);
+
+        var sectorLookup = dbContext.Set<Sector>()
+            .ToDictionary(s => s.Name.ToLower().Trim(), s => s.Id);
+
+        Console.WriteLine($"Sectors synchronized: {sectors.Count}");
+        
         // ENTRY
         
         var entries = apprenticeships.Select(a =>
@@ -267,6 +292,26 @@ public class FaaIngestionHandler(
         }, cancellationToken);
         
         Console.WriteLine($"EntryInstances synchronized: {entries.Count}");
+        
+        // ENTRYSECTOR
+
+        var entrySectors = apprenticeships.Select(a => new EntrySector
+        {
+            EntryId = entryLookup[a.VacancyReference!],
+            SectorId = sectorLookup[a.CourseRoute!.ToLower().Trim()]
+        }).ToList();
+
+        await dbContext.BulkSynchronizeAsync(entrySectors, options =>
+        {
+            options.IgnoreOnSynchronizeUpdateExpression = es => es.Id;
+            options.ColumnPrimaryKeyExpression = es => new
+            {
+                es.EntryId,
+                es.SectorId
+            };
+        }, cancellationToken);
+
+        Console.WriteLine($"EntrySectors synchronized: {entrySectors.Count}");
         
         // EMPLOYER
         
@@ -435,7 +480,8 @@ public class FaaIngestionHandler(
             .Include(e => e.Provider)
             .Where(x => x.SourceSystem == SourceSystem.FAA)
             .Include(entry => entry.Vacancies)
-            .Include(entry => entry.EntryInstances)
+            .Include(entry => entry.EntryInstances).Include(entry => entry.EntrySectors)
+            .ThenInclude(entrySector => entrySector.Sector)
             .ToList();
 
         if (entries.Count == 0)
@@ -480,6 +526,7 @@ public class FaaIngestionHandler(
                         // TODO: Check following 2 IDs are correct
                         Id = entry.Id.ToString(),
                         InstanceId = entry.EntryInstances.First().Id.ToString(),
+                        Sector = entry.EntrySectors.First().Sector.Name,
                         Title = entry.Title,
                         Description = entry.Description,
                         EntryType = nameof(EntryType.Apprenticeship),
@@ -494,10 +541,8 @@ public class FaaIngestionHandler(
                     // TODO: Add caching
                     searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
                     searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
-                    // TODO: Replace. Exists in FAA_Apprenticeships.CourseTitle?
-                    searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector("TO_CHANGE");
-                    // TODO: Replace. Exists in FAA_Apprenticeships.CourseRoute?
-                    searchEntry.SectorVector = searchIndexHandler.GetVector("TO_CHANGE");
+                    searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector("TO_CHANGE"); // TODO: Need AimOrAltTitle
+                    searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
 
                     searchEntries.Add(searchEntry);
                 }
