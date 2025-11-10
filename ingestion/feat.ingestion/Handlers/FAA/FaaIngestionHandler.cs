@@ -1,4 +1,3 @@
-using System.Data.Entity;
 using System.Globalization;
 using feat.common;
 using feat.common.Models;
@@ -9,10 +8,10 @@ using feat.ingestion.Configuration;
 using feat.ingestion.Data;
 using feat.ingestion.Enums;
 using feat.ingestion.Models.FAA;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Spatial;
 using NetTopologySuite.Geometries;
 using Database = feat.common.Models.Staging.FAA;
-using EntityFrameworkQueryableExtensions = Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions;
 using Location = feat.common.Models.Location;
 
 namespace feat.ingestion.Handlers.FAA;
@@ -165,9 +164,8 @@ public class FaaIngestionHandler(
     
     public override async Task<bool> SyncAsync(CancellationToken cancellationToken)
     {
-        var apprenticeships = EntityFrameworkQueryableExtensions.Include(
-                dbContext.FAA_Apprenticeships.Include(a => a.Addresses),
-                apprenticeship => apprenticeship.Addresses)
+        var apprenticeships = dbContext.Set<Database.Apprenticeship>()
+            .Include(apprenticeship => apprenticeship.Addresses)
             .ToList();
 
         if (apprenticeships.Count == 0)
@@ -215,8 +213,8 @@ public class FaaIngestionHandler(
             {
                 Created = DateTime.UtcNow,
                 ProviderId = providerId,
-                Reference = a.VacancyReference,
-                Title = a.Title,
+                Reference = a.VacancyReference!,
+                Title = a.Title!,
                 Description = a.Description,
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
@@ -254,7 +252,7 @@ public class FaaIngestionHandler(
                 StartDate = a.StartDate,
                 Duration = ParseMonthStringToTimeSpan(a.ExpectedDuration),
                 StudyMode = LearningMethod.Workbased,
-                Reference = a.VacancyReference
+                Reference = a.VacancyReference!
             };
         }).ToList();
         
@@ -431,13 +429,13 @@ public class FaaIngestionHandler(
     {
         Console.WriteLine("Starting Find An Apprenticeship AI Search indexing...");
         
-        var entries = EntityFrameworkQueryableExtensions.Include(EntityFrameworkQueryableExtensions.Include(dbContext
-                    .Entries
-                    .Include(e => e.EntryInstances)
-                    .Include(e => e.Vacancies)
-                    .Include(e => e.Provider)
-                    .Where(x => x.SourceSystem == SourceSystem.FAA), entry => entry.Vacancies),
-                entry => entry.EntryInstances)
+        var entries = dbContext.Entries
+            .Include(e => e.EntryInstances)
+            .Include(e => e.Vacancies).ThenInclude(vacancy => vacancy.Employer)
+            .Include(e => e.Provider)
+            .Where(x => x.SourceSystem == SourceSystem.FAA)
+            .Include(entry => entry.Vacancies)
+            .Include(entry => entry.EntryInstances)
             .ToList();
 
         if (entries.Count == 0)
@@ -448,9 +446,9 @@ public class FaaIngestionHandler(
 
         Console.WriteLine($"Loaded {entries.Count} entries for indexing.");
         
-        var employerLocations = EntityFrameworkQueryableExtensions.Include(dbContext.Set<EmployerLocation>()
-                .Include(el => el.Location)
-                .Include(el => el.Employer), employerLocation => employerLocation.Location)
+        var employerLocations = dbContext.Set<EmployerLocation>()
+            .Include(el => el.Location)
+            .Include(el => el.Employer).Include(employerLocation => employerLocation.Location)
             .ToList();
 
         Console.WriteLine($"Loaded {employerLocations.Count} employer locations.");
@@ -467,6 +465,7 @@ public class FaaIngestionHandler(
 
                 if (filteredEmployerLocations.Count == 0)
                 {
+                    Console.WriteLine($"No locations found for employer '{vacancy.Employer.Name}' (Vacancy '{entry.Reference}'). Skipping.");
                     continue;
                 }
 
@@ -492,12 +491,13 @@ public class FaaIngestionHandler(
                         Location = locationPoint
                     };
                     
+                    // TODO: Add caching
                     searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
                     searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
                     // TODO: Replace. Exists in FAA_Apprenticeships.CourseTitle?
-                    searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector("Customer service practitioner (level 2)");
+                    searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector("TO_CHANGE");
                     // TODO: Replace. Exists in FAA_Apprenticeships.CourseRoute?
-                    searchEntry.SectorVector = searchIndexHandler.GetVector("Sales, marketing and procurement");
+                    searchEntry.SectorVector = searchIndexHandler.GetVector("TO_CHANGE");
 
                     searchEntries.Add(searchEntry);
                 }
@@ -579,7 +579,7 @@ public class FaaIngestionHandler(
         if (!Enum.TryParse<ApprenticeshipLevel>(apprenticeshipLevel, out var level))
         {
             return null;
-        };
+        }
 
         return level;
     }

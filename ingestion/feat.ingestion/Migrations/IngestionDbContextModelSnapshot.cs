@@ -28,6 +28,18 @@ namespace feat.ingestion.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+                    
+                    b.Property<string>("ContactEmail")
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
+
+                    b.Property<string>("ContactName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ContactPhone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -39,6 +51,10 @@ namespace feat.ingestion.Migrations
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("datetime2");
+                    
+                    b.Property<string>("Url")
+                        .HasMaxLength(2083)
+                        .HasColumnType("nvarchar(2083)");
 
                     b.HasKey("Id");
 
@@ -494,8 +510,8 @@ namespace feat.ingestion.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<double>("HoursPerWeek")
-                        .HasColumnType("float");
+                    b.Property<decimal?>("HoursPerWeek")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsDisabilityConfident")
                         .HasColumnType("bit");
@@ -517,7 +533,7 @@ namespace feat.ingestion.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime>("StartDate")
+                    b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
@@ -607,17 +623,41 @@ namespace feat.ingestion.Migrations
                     b.Property<Guid>("EntryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("HoursPerWeek")
+                    b.Property<decimal?>("HoursPerWeek")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("Level")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("NationalVacancy")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("NationalVacancyDetails")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<short?>("Positions")
                         .HasColumnType("smallint");
 
+                    b.Property<DateTime?>("PostedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(2083)
+                        .HasColumnType("nvarchar(2083)");
+
                     b.Property<decimal?>("Wage")
                         .HasColumnType("money");
 
+                    b.Property<int?>("WageType")
+                        .HasColumnType("int");
+
                     b.Property<int?>("WageUnit")
                         .HasColumnType("int");
+
+                    b.Property<string>("WorkingWeekDescription")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.HasKey("Id");
 
