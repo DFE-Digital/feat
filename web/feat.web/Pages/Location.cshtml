@@ -12,16 +12,20 @@
     <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.Location))">Back</govuk-back-link>
 }
 
+
+
 <h1 class="govuk-heading-l">Where do you want to study?</h1>
 <p>You can search anywhere in England.</p>
 <p>Some courses are only available to people living in the local area. This can apply even if it is online training. It is more common for short courses or those aiming to help you find employment. Check with the provider if you are unsure.</p>
 
 <form method="post">
     <input id="preselectedLocation" type="hidden" value="@Model.Location"/>
+    
     <label for="home-location" class="govuk-label--m">Enter a town, city or postcode (optional)</label>
-    <div class="autocomplete-wrapper govuk-input--width-20" id="autocomplete-wrapper-id" for="Location" >
-        <select name="home-location" id="home-location" asp-for="Location">
-            @foreach (var locationName in SharedStrings.LocationsInEngland)
+    <div class="autocomplete-wrapper govuk-input--width-20"  
+         asp-validation-summary="All" asp-for="@Model.Location"  >
+        <select name="home-location" id="home-location" asp-for="@Model.Location">
+            @foreach (var locationName in Model.Locations)
             {
                 <option value="@locationName">@locationName</option>
             }
@@ -53,13 +57,14 @@
     
     var selectEl = document.querySelector('#home-location')
     accessibleAutocomplete.enhanceSelectElement({
+        selectElement: selectEl,
         name: 'Location',
         autoselect: true,
         confirmOnBlur: true,
         defaultValue: selectedValue,
         allowEmpty: true,
-        minLength: 3,
-        selectElement: selectEl
+        minLength: 3,        
+        id: 'home-location'
     })
 
     var queryStringParameters = window.location.search

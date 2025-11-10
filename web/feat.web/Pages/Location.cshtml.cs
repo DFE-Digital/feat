@@ -23,6 +23,8 @@ public partial class LocationModel(ISearchService searchService, ILogger<Locatio
     
     [GeneratedRegex(SharedStrings.PostcodePattern)]
     private static partial Regex PostcodeRegex();
+
+    public List<string> Locations { get; set; } = [];
     
     public async Task<IActionResult> OnGetAsync()
     {
@@ -38,7 +40,8 @@ public partial class LocationModel(ISearchService searchService, ILogger<Locatio
             Search = new Search();
             Search.SetPage(PageName.Index); 
         }
-        
+
+        Locations = GetLocations();
         // Set up full list of facets;
         var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
         if (searchResponse.Facets.Any())
@@ -69,29 +72,24 @@ public partial class LocationModel(ISearchService searchService, ILogger<Locatio
         {
             ModelState.AddModelError("Distance", SharedStrings.SelectHowFarUCanTravel);
         }
-        
+
         if (!string.IsNullOrEmpty(location))
         {
             var locationIsValid = SharedStrings.LocationsInEngland.Contains(location);
 
             if (!locationIsValid)
             {
-                if (location.Length > 100)
+                // location does not match, check if it's a post-code 
+                Regex postcodeRegex = PostcodeRegex();
+                if (!postcodeRegex.IsMatch(location))
                 {
-                    ModelState.AddModelError("Location", SharedStrings.LessThan100Char);
-                }
-                else
-                {
-                    // location does not match, check for post-code 
-                    Regex postcodeRegex = PostcodeRegex();
-                    if (!postcodeRegex.IsMatch(location))
-                    {
-                        //ModelState.AddModelError("Location", SharedStrings.EnterValidLocation);
-                        ModelState.AddModelError("Distance", SharedStrings.EnterValidLocation);
-                    }
+                    // TODO autocomplete field is not working
+                    ModelState.AddModelError("Location", SharedStrings.EnterValidLocation);
                 }
             }
         }
+        
+        Locations = GetLocations();
         
         if (!ModelState.IsValid)
             return Page();
@@ -108,5 +106,9 @@ public partial class LocationModel(ISearchService searchService, ILogger<Locatio
         return RedirectToPage(PageName.Interests); 
     }
 
-    
+    private static List<string> GetLocations()
+    {
+        return SharedStrings.LocationsInEngland.ToList();
+    }
+
 }
