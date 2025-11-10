@@ -9,6 +9,7 @@ using feat.ingestion.Configuration;
 using feat.ingestion.Data;
 using feat.ingestion.Enums;
 using feat.ingestion.Models.FAA;
+using Microsoft.Spatial;
 using NetTopologySuite.Geometries;
 using Database = feat.common.Models.Staging.FAA;
 using EntityFrameworkQueryableExtensions = Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions;
@@ -179,7 +180,7 @@ public class FaaIngestionHandler(
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
         
-        // PROVIDERS
+        // PROVIDER
         
         var providers = apprenticeships
             .GroupBy(a => a.Ukprn)
@@ -269,10 +270,10 @@ public class FaaIngestionHandler(
         
         Console.WriteLine($"EntryInstances synchronized: {entries.Count}");
         
-        // EMPLOYERS
+        // EMPLOYER
         
         var employers = apprenticeships
-            .GroupBy(a => a.EmployerName!.ToLower().Trim())
+            .GroupBy(a => a.EmployerName!.Trim(), StringComparer.OrdinalIgnoreCase)
             .Select(a => new Employer
         {
             Created = DateTime.UtcNow,
@@ -298,7 +299,7 @@ public class FaaIngestionHandler(
 
         Console.WriteLine($"Employers synchronized: {employers.Count}");
 
-        // VACANCIES
+        // VACANCY
         
         var vacancies = apprenticeships.Select(a =>
         {
@@ -331,8 +332,9 @@ public class FaaIngestionHandler(
 
         Console.WriteLine($"Vacancies synchronized: {vacancies.Count}");
         
-        // LOCATIONS
-        
+        // LOCATION
+        // TODO: Fix lowercase AddressLine1 and Postcode in DB. Create Comparer
+
         var locations = apprenticeships
             .SelectMany(a => a.Addresses)
             .GroupBy(a => new
@@ -345,7 +347,7 @@ public class FaaIngestionHandler(
             {
                 var longitude = a.First().Longitude;
                 var latitude = a.First().Latitude;
-                
+
                 return new Location
                 {
                     Created = DateTime.UtcNow,
@@ -374,8 +376,50 @@ public class FaaIngestionHandler(
                 l.Address4
             };
         }, cancellationToken);
-        
+
         Console.WriteLine($"Locations synchronized: {locations.Count}");
+        
+        // EMPLOYERLOCATION
+        
+        var locationLookup = dbContext.Set<Location>()
+            .ToDictionary(
+                l => (
+                    Postcode: (l.Postcode ?? string.Empty).ToLower().Trim(),
+                    Address1: (l.Address1 ?? string.Empty).ToLower().Trim(),
+                    Address4: (l.Address4 ?? string.Empty).ToLower().Trim()
+                ),
+                l => l.Id
+            );
+        
+        var employerLocationKeys = apprenticeships
+            .SelectMany(ap => ap.Addresses.Select(ad => new
+            {
+                EmployerName = ap.EmployerName?.ToLower().Trim(),
+                Postcode = (ad.Postcode ?? string.Empty).ToLower().Trim(),
+                Address1 = (ad.AddressLine1 ?? string.Empty).ToLower().Trim(),
+                Address4 = (ad.AddressLine4 ?? string.Empty).ToLower().Trim()
+            }))
+            .Distinct()
+            .ToList();
+        
+        var employerLocations = employerLocationKeys
+            .Select(x => new EmployerLocation
+            {
+                EmployerId = employerLookup[x.EmployerName!.ToLower().Trim()],
+                LocationId = locationLookup[(x.Postcode, x.Address1, x.Address4)],
+            }).ToList();
+        
+        await dbContext.BulkSynchronizeAsync(employerLocations, options =>
+        {
+            options.IgnoreOnSynchronizeUpdateExpression = el => el.Id;
+            options.ColumnPrimaryKeyExpression = el => new
+            {
+                el.EmployerId,
+                el.LocationId
+            };
+        }, cancellationToken);
+
+        Console.WriteLine($"EmployerLocations synchronized: {employerLocations.Count}");
         
         await transaction.CommitAsync(cancellationToken);
         Console.WriteLine("Find An Apprenticeship table sync complete.");
@@ -385,38 +429,85 @@ public class FaaIngestionHandler(
 
     public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
-        var entries = EntityFrameworkQueryableExtensions.Include(EntityFrameworkQueryableExtensions.Include(
-                dbContext.Entries.Include(e => e.EntryInstances),
-                entry => entry.EntryInstances),
-                entry => entry.Vacancies)
+        Console.WriteLine("Starting Find An Apprenticeship AI Search indexing...");
+        
+        var entries = dbContext.Entries
+            .Include(e => e.EntryInstances)
+            .Include(e => e.Vacancies)
+            .Include(e => e.Provider)
+            .Where(x => x.SourceSystem == SourceSystem.FAA)
             .ToList();
-            
-        var searchEntries = entries.Select(e => new AiSearchEntry
+
+        if (entries.Count == 0)
         {
-            Id = e.Id.ToString(),
-            InstanceId = e.EntryInstances.First()
-                .Id.ToString(),
-            Title = e.Title,
-            Description = e.Description,
-            EntryType = nameof(EntryType.Apprenticeship),
-            Source = nameof(SourceSystem.FAA),
-            QualificationLevel = MapQualificationLevel(e.Vacancies.First().Level),
-            // TODO: Below fields
-            // LearningMethod = ,
-            // CourseHours = ,
-            // StudyTime = ,
-            // Location = ,
-        }).ToList();
-        
-        foreach (var searchEntry in searchEntries)
-        {
-            searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
-            searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
-            searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
-            searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
+            Console.WriteLine("No entries found to index.");
+            return false;
         }
+
+        Console.WriteLine($"Loaded {entries.Count} entries for indexing.");
         
-        return searchIndexHandler.Ingest(searchEntries);
+        var employerLocations = dbContext.Set<EmployerLocation>()
+            .Include(el => el.Location)
+            .Include(el => el.Employer)
+            .ToList();
+
+        Console.WriteLine($"Loaded {employerLocations.Count} employer locations.");
+        
+        var searchEntries = new List<AiSearchEntry>();
+
+        foreach (var entry in entries)
+        {
+            foreach (var vacancy in entry.Vacancies)
+            {
+                var filteredEmployerLocations = employerLocations
+                    .Where(el => el.EmployerId == vacancy.EmployerId)
+                    .ToList();
+
+                if (filteredEmployerLocations.Count == 0)
+                {
+                    Console.WriteLine($"No locations found for employer '{vacancy.Employer.Name}' (Vacancy '{entry.Reference}'). Skipping.");
+                    continue;
+                }
+
+                foreach (var el in filteredEmployerLocations)
+                {
+                    var locationPoint = el.Location?.GeoLocation != null
+                        ? GeographyPoint.Create(el.Location.GeoLocation.Y, el.Location.GeoLocation.X)
+                        : GeographyPoint.Create(0, 0);
+
+                    var searchEntry = new AiSearchEntry
+                    {
+                        // TODO: Check following 2 IDs are correct
+                        Id = entry.Id.ToString(),
+                        InstanceId = entry.EntryInstances.First().Id.ToString(),
+                        Title = entry.Title,
+                        Description = entry.Description,
+                        EntryType = nameof(EntryType.Apprenticeship),
+                        Source = nameof(SourceSystem.FAA),
+                        QualificationLevel = MapQualificationLevel(vacancy.Level),
+                        LearningMethod = nameof(LearningMethod.Workbased),
+                        CourseHours = nameof(entry.AttendancePattern),
+                        StudyTime = nameof(entry.Level),
+                        Location = locationPoint
+                    };
+                    
+                    searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
+                    searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
+                    // TODO: Exists in FAA_Apprenticeships.CourseTitle?
+                    //searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
+                    // TODO: Exists in FAA_Apprenticeships.CourseRoute?
+                    //searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
+
+                    searchEntries.Add(searchEntry);
+                }
+            }
+        }
+
+        Console.WriteLine($"Created {searchEntries.Count} records for indexing.");
+        var result = searchIndexHandler.Ingest(searchEntries);
+
+        Console.WriteLine($"Find An Apprenticeship AI Search indexing {(result ? "complete" : "failed")}.");
+        return result;
     }
     
     private static CourseHours? MapCourseHours(decimal? hoursPerWeek)
