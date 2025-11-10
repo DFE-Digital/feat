@@ -170,6 +170,7 @@ foreach (var argument in args)
     Console.WriteLine($"Valid: {handler.Validate()}");
     Console.WriteLine($"Ingest: {handler.Ingest()}");
     Console.WriteLine($"Sync: {handler.Sync()}");
+    Console.WriteLine($"Index: {handler.Index()}");
 }
 
 Console.WriteLine("FEAT ingestion service end.");

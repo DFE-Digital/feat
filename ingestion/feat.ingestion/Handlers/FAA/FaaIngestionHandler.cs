@@ -431,11 +431,13 @@ public class FaaIngestionHandler(
     {
         Console.WriteLine("Starting Find An Apprenticeship AI Search indexing...");
         
-        var entries = dbContext.Entries
-            .Include(e => e.EntryInstances)
-            .Include(e => e.Vacancies)
-            .Include(e => e.Provider)
-            .Where(x => x.SourceSystem == SourceSystem.FAA)
+        var entries = EntityFrameworkQueryableExtensions.Include(EntityFrameworkQueryableExtensions.Include(dbContext
+                    .Entries
+                    .Include(e => e.EntryInstances)
+                    .Include(e => e.Vacancies)
+                    .Include(e => e.Provider)
+                    .Where(x => x.SourceSystem == SourceSystem.FAA), entry => entry.Vacancies),
+                entry => entry.EntryInstances)
             .ToList();
 
         if (entries.Count == 0)
@@ -446,9 +448,9 @@ public class FaaIngestionHandler(
 
         Console.WriteLine($"Loaded {entries.Count} entries for indexing.");
         
-        var employerLocations = dbContext.Set<EmployerLocation>()
-            .Include(el => el.Location)
-            .Include(el => el.Employer)
+        var employerLocations = EntityFrameworkQueryableExtensions.Include(dbContext.Set<EmployerLocation>()
+                .Include(el => el.Location)
+                .Include(el => el.Employer), employerLocation => employerLocation.Location)
             .ToList();
 
         Console.WriteLine($"Loaded {employerLocations.Count} employer locations.");
@@ -465,13 +467,12 @@ public class FaaIngestionHandler(
 
                 if (filteredEmployerLocations.Count == 0)
                 {
-                    Console.WriteLine($"No locations found for employer '{vacancy.Employer.Name}' (Vacancy '{entry.Reference}'). Skipping.");
                     continue;
                 }
 
                 foreach (var el in filteredEmployerLocations)
                 {
-                    var locationPoint = el.Location?.GeoLocation != null
+                    var locationPoint = el.Location.GeoLocation != null
                         ? GeographyPoint.Create(el.Location.GeoLocation.Y, el.Location.GeoLocation.X)
                         : GeographyPoint.Create(0, 0);
 
@@ -493,10 +494,10 @@ public class FaaIngestionHandler(
                     
                     searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
                     searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
-                    // TODO: Exists in FAA_Apprenticeships.CourseTitle?
-                    //searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
-                    // TODO: Exists in FAA_Apprenticeships.CourseRoute?
-                    //searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
+                    // TODO: Replace. Exists in FAA_Apprenticeships.CourseTitle?
+                    searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector("Customer service practitioner (level 2)");
+                    // TODO: Replace. Exists in FAA_Apprenticeships.CourseRoute?
+                    searchEntry.SectorVector = searchIndexHandler.GetVector("Sales, marketing and procurement");
 
                     searchEntries.Add(searchEntry);
                 }
