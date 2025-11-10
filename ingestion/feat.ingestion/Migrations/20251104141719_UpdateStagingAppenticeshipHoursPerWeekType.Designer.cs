@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251104141719_UpdateStagingAppenticeshipHoursPerWeekType")]
+    partial class UpdateStagingAppenticeshipHoursPerWeekType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,18 +31,6 @@ namespace feat.ingestion.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ContactEmail")
-                        .HasMaxLength(320)
-                        .HasColumnType("nvarchar(320)");
-
-                    b.Property<string>("ContactName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ContactPhone")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -88,11 +79,6 @@ namespace feat.ingestion.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AimOrAltTitle")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<int?>("AttendancePattern")
                         .HasColumnType("int");
 
@@ -129,9 +115,6 @@ namespace feat.ingestion.Migrations
 
                     b.Property<DateTime?>("SourceUpdated")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("StudyTime")
-                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -585,98 +568,7 @@ namespace feat.ingestion.Migrations
                     b.ToTable("FAA_Apprenticeships");
                 });
 
-            modelBuilder.Entity("feat.common.Models.UniversityCourse", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("EntryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool?>("Foundation")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("Honours")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("Nhs")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("Sandwich")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("YearAbroad")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EntryId");
-
-                    b.ToTable("UniversityCourse");
-                });
-
-            modelBuilder.Entity("feat.common.Models.Vacancy", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ClosingDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("EmployerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("EntryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal?>("HoursPerWeek")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("Level")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("NationalVacancy")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("NationalVacancyDetails")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<short?>("Positions")
-                        .HasColumnType("smallint");
-
-                    b.Property<DateTime?>("PostedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Url")
-                        .HasMaxLength(2083)
-                        .HasColumnType("nvarchar(2083)");
-
-                    b.Property<decimal?>("Wage")
-                        .HasColumnType("money");
-
-                    b.Property<int?>("WageType")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("WageUnit")
-                        .HasColumnType("int");
-
-                    b.Property<string>("WorkingWeekDescription")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployerId");
-
-                    b.HasIndex("EntryId");
-
-                    b.ToTable("Vacancy");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.FAC.AimData", b =>
+            modelBuilder.Entity("feat.common.Models.Staging.FAC.AimData", b =>
                 {
                     b.Property<string>("LearnAimRef")
                         .HasMaxLength(8)
@@ -700,7 +592,7 @@ namespace feat.ingestion.Migrations
                     b.ToTable("FAC_AimData");
                 });
 
-            modelBuilder.Entity("feat.ingestion.Models.FAC.AllCoursesCourse", b =>
+            modelBuilder.Entity("feat.common.Models.Staging.FAC.AllCoursesCourse", b =>
                 {
                     b.Property<Guid>("COURSE_ID")
                         .HasColumnType("uniqueidentifier");
@@ -834,56 +726,7 @@ namespace feat.ingestion.Migrations
                     b.ToTable("FAC_AllCourses");
                 });
 
-            modelBuilder.Entity("feat.ingestion.Models.FAC.ApprovedQualification", b =>
-                {
-                    b.Property<string>("QualificationNumber")
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
-
-                    b.Property<bool>("AdvancedLearnerLoans_FundingAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Age1416_FundingAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Age1619_FundingAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("DigitalEntitlement_FundingAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("FreeCoursesForJobs_FundingAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LegalEntitlementEnglishandMaths_FundingAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LegalEntitlementL2L3_FundingAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("Level")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("LifelongLearningEntitlement_FundingAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LocalFlexibilities_FundingAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("QualificationType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SectorSubjectArea")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.HasKey("QualificationNumber");
-
-                    b.ToTable("FAC_ApprovedQualifications");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.FAC.Course", b =>
+            modelBuilder.Entity("feat.common.Models.Staging.FAC.Course", b =>
                 {
                     b.Property<Guid>("CourseId")
                         .ValueGeneratedOnAdd()
@@ -949,101 +792,7 @@ namespace feat.ingestion.Migrations
                     b.ToTable("FAC_Courses");
                 });
 
-            modelBuilder.Entity("feat.ingestion.Models.FAC.CourseRun", b =>
-                {
-                    b.Property<Guid>("CourseRunId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("AttendancePattern")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("Cost")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("CostDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("CourseRunStatus")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CourseWebsite")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DeliveryMode")
-                        .HasColumnType("int");
-
-                    b.Property<long?>("Duration")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool>("FlexibleStartDate")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("National")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("StudyMode")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("VenueId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CourseRunId");
-
-                    b.ToTable("FAC_CourseRuns");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.FAC.Provider", b =>
-                {
-                    b.Property<Guid>("ProviderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Alias")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("CourseDirectoryName")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("ProviderName")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("ProviderStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProviderType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TradingName")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("Ukprn")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ProviderId");
-
-                    b.ToTable("FAC_Providers");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.FAC.TLevel", b =>
+            modelBuilder.Entity("feat.common.Models.Staging.FAC.TLevel", b =>
                 {
                     b.Property<Guid>("TLevelId")
                         .ValueGeneratedOnAdd()
@@ -1101,7 +850,7 @@ namespace feat.ingestion.Migrations
                     b.ToTable("FAC_TLevels");
                 });
 
-            modelBuilder.Entity("feat.ingestion.Models.FAC.TLevelDefinition", b =>
+            modelBuilder.Entity("feat.common.Models.Staging.FAC.TLevelDefinition", b =>
                 {
                     b.Property<Guid>("TLevelDefinitionId")
                         .ValueGeneratedOnAdd()
@@ -1120,85 +869,71 @@ namespace feat.ingestion.Migrations
                     b.ToTable("FAC_TLevelDefinitions");
                 });
 
-            modelBuilder.Entity("feat.ingestion.Models.FAC.TLevelLocation", b =>
+            modelBuilder.Entity("feat.common.Models.UniversityCourse", b =>
                 {
-                    b.Property<Guid>("TLevelLocationId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("TLevelId")
+                    b.Property<Guid>("EntryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("TLevelLocationStatus")
-                        .HasColumnType("int");
+                    b.Property<bool?>("Foundation")
+                        .HasColumnType("bit");
 
-                    b.Property<Guid>("VenueId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<bool?>("Honours")
+                        .HasColumnType("bit");
 
-                    b.HasKey("TLevelLocationId");
+                    b.Property<bool?>("Nhs")
+                        .HasColumnType("bit");
 
-                    b.ToTable("FAC_TLevelLocations");
+                    b.Property<bool?>("Sandwich")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("YearAbroad")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntryId");
+
+                    b.ToTable("UniversityCourse");
                 });
 
-            modelBuilder.Entity("feat.ingestion.Models.FAC.Venue", b =>
+            modelBuilder.Entity("feat.common.Models.Vacancy", b =>
                 {
-                    b.Property<Guid>("VenueId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AddressLine1")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("AddressLine2")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("County")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<DateTime?>("CreatedOn")
+                    b.Property<DateTime?>("ClosingDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Email")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Postcode")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<Guid?>("ProviderId")
+                    b.Property<Guid>("EmployerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("ProviderUkprn")
+                    b.Property<Guid>("EntryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("HoursPerWeek")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<short?>("Positions")
+                        .HasColumnType("smallint");
+
+                    b.Property<decimal?>("Wage")
+                        .HasColumnType("money");
+
+                    b.Property<int?>("WageUnit")
                         .HasColumnType("int");
 
-                    b.Property<string>("Telephone")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.HasKey("Id");
 
-                    b.Property<string>("Town")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                    b.HasIndex("EmployerId");
 
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime2");
+                    b.HasIndex("EntryId");
 
-                    b.Property<string>("VenueName")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("VenueStatus")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Website")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.HasKey("VenueId");
-
-                    b.ToTable("FAC_Venues");
+                    b.ToTable("Vacancy");
                 });
 
             modelBuilder.Entity("feat.common.Models.EmployerLocation", b =>

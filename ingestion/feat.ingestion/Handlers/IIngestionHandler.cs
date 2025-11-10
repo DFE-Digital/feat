@@ -14,7 +14,15 @@ public interface IIngestionHandler
 
     public bool Validate();
     
+    public bool Sync();
+
+    public bool Index();
+    
     public Task<bool> IngestAsync(CancellationToken cancellationToken);
 
     public Task<bool> ValidateAsync(CancellationToken cancellationToken);
+    
+    public Task<bool> SyncAsync(CancellationToken cancellationToken);
+    
+    public Task<bool> IndexAsync(CancellationToken cancellationToken);
 }

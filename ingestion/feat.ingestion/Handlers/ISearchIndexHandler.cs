@@ -1,4 +1,3 @@
-using Azure.Search.Documents;
 using feat.common.Models.AiSearch;
 
 namespace feat.ingestion.Handlers;

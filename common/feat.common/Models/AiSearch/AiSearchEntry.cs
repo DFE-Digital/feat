@@ -58,5 +58,5 @@ public class AiSearchEntry
     
     [JsonConverter(typeof(MicrosoftSpatialGeoJsonConverter))]
     [SimpleField(IsFilterable = true, IsSortable = true)]
-    public required GeographyPoint Location { get; set; }
+    public required GeographyPoint? Location { get; set; }
 }

@@ -1,8 +1,8 @@
-namespace feat.ingestion.Models.FAA;
+namespace feat.ingestion.Models.FAA.External;
 
 public class ApiResponse
 {
-    public List<ApprenticeshipCourse> Vacancies { get; set; } = [];
+    public List<Apprenticeship> Vacancies { get; set; } = [];
     
     public int Total { get; set; }
     

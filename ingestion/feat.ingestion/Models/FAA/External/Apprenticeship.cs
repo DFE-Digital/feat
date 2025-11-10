@@ -1,6 +1,6 @@
-namespace feat.ingestion.Models.FAA;
+namespace feat.ingestion.Models.FAA.External;
 
-public class ApprenticeshipCourse
+public class Apprenticeship
 {
     public string? Title { get; set; }
     
@@ -16,7 +16,7 @@ public class ApprenticeshipCourse
     
     public Wage Wage { get; set; }
     
-    public double HoursPerWeek { get; set; }
+    public decimal? HoursPerWeek { get; set; }
     
     public string? ExpectedDuration { get; set; }
     
