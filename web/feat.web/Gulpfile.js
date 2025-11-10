@@ -4,7 +4,6 @@ const sass = require("gulp-sass")(require('sass'));
 const sourcemaps = require('gulp-sourcemaps');
 
 const { task, series, dest, src, parallel } = require("gulp");
-    
 
 
 let paths = {
@@ -42,6 +41,16 @@ task('moj-css', function() {
         .pipe(dest(paths.dist + 'css'));
 });
 
+task('autocomplete-js', function() {
+    return src('node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.js', { sourcemaps: true })
+        .pipe(dest(paths.dist + 'js'));
+});
+
+task('autocomplete-css', function() {
+    return src('node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.css', { sourcemaps: true })
+        .pipe(dest(paths.dist + 'css'));
+});
+
 task("sass", function () {
     return src(paths.src + '/scss/*.scss')
         .pipe(sourcemaps.init())
@@ -65,6 +74,8 @@ task("dev", series(
     "moj-js",
     "moj-assets",
     "moj-css",
+    "autocomplete-js",
+    "autocomplete-css",
     "images",
     "sass"     
 ));

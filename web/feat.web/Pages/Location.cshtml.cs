@@ -10,10 +10,9 @@ using feat.web.Utils;
 
 namespace feat.web.Pages;
 
-public class LocationModel(ISearchService searchService, ILogger<LocationModel> logger) : PageModel
+public partial class LocationModel(ISearchService searchService, ILogger<LocationModel> logger) : PageModel
 {
-
-    [BindProperty]
+    [BindProperty] 
     [MaxLength(100, ErrorMessage = SharedStrings.LessThan100Char)]
     public string? Location { get; set; }
     
@@ -21,6 +20,9 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
     public Distance? Distance { get; set; }
     
     public required Search Search { get; set; }
+    
+    [GeneratedRegex(SharedStrings.PostcodePattern)]
+    private static partial Regex PostcodeRegex();
     
     public async Task<IActionResult> OnGetAsync()
     {
@@ -43,9 +45,10 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
         {
             HttpContext.Session.Set(SharedStrings.AllClientFacets, searchResponse.Facets.ToClientFacets());    
         }
-        
+
         if (!string.IsNullOrEmpty(Search.Location))
             Location = Search.Location;
+
         if (Search.Distance.HasValue)
             Distance = Search.Distance;
         
@@ -60,19 +63,41 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
-        // TODO validate entered location is real or entered post-code is real.
-        
+        var location = Location?.Trim();
         var distanceValue = Distance.HasValue? Distance.Value : new Distance();
-        if (!string.IsNullOrEmpty(Location) && distanceValue == 0)
+        if (!string.IsNullOrEmpty(location) && distanceValue == 0)
         {
-            ModelState.AddModelError("Distance", SharedStrings.SelectHowFarTravel);
+            ModelState.AddModelError("Distance", SharedStrings.SelectHowFarUCanTravel);
+        }
+        
+        if (!string.IsNullOrEmpty(location))
+        {
+            var locationIsValid = SharedStrings.LocationsInEngland.Contains(location);
+
+            if (!locationIsValid)
+            {
+                if (location.Length > 100)
+                {
+                    ModelState.AddModelError("Location", SharedStrings.LessThan100Char);
+                }
+                else
+                {
+                    // location does not match, check for post-code 
+                    Regex postcodeRegex = PostcodeRegex();
+                    if (!postcodeRegex.IsMatch(location))
+                    {
+                        //ModelState.AddModelError("Location", SharedStrings.EnterValidLocation);
+                        ModelState.AddModelError("Distance", SharedStrings.EnterValidLocation);
+                    }
+                }
+            }
         }
         
         if (!ModelState.IsValid)
             return Page();
         
         Search.Updated = true;
-        
+
         if (!string.IsNullOrEmpty(Location)) 
             Search.Location = Location.Trim();
         if (Distance != null) 
@@ -82,4 +107,6 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
 
         return RedirectToPage(PageName.Interests); 
     }
+
+    
 }

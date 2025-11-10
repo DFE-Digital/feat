@@ -17,24 +17,57 @@
 <p>Some courses are only available to people living in the local area. This can apply even if it is online training. It is more common for short courses or those aiming to help you find employment. Check with the provider if you are unsure.</p>
 
 <form method="post">
-    
-    <govuk-input for="Location" input-class="govuk-input--width-20" spellcheck="false" autocomplete="true">
-        <govuk-input-label class="govuk-label--m">Enter a town, city or postcode (optional)</govuk-input-label>
-    </govuk-input>
+    <input id="preselectedLocation" type="hidden" value="@Model.Location"/>
+    <label for="home-location" class="govuk-label--m">Enter a town, city or postcode (optional)</label>
+    <div class="autocomplete-wrapper govuk-input--width-20" id="autocomplete-wrapper-id" for="Location" >
+        <select name="home-location" id="home-location" asp-for="Location">
+            @foreach (var locationName in SharedStrings.LocationsInEngland)
+            {
+                <option value="@locationName">@locationName</option>
+            }
+        </select>
+    </div>
+    <br/>
     
     <govuk-radios for="Distance">
-            <govuk-radios-fieldset>
-                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                    How far would you be happy to travel? (optional)
-                </govuk-radios-fieldset-legend>
-                @foreach (var option in Enum.GetValues<Distance>())
-                {
-                    <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
-                }
-            </govuk-radios-fieldset>
-        </govuk-radios>
+        <govuk-radios-fieldset>
+            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                How far would you be happy to travel? (optional)
+            </govuk-radios-fieldset-legend>
+            @foreach (var option in Enum.GetValues<Distance>())
+            {
+                <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
+            }
+        </govuk-radios-fieldset>
+    </govuk-radios>
     
     <div class="govuk-button-group">
         <govuk-button type="submit">Continue</govuk-button>
     </div>
 </form>
+
+<script type="text/javascript" src="~/js/accessible-autocomplete.min.js"></script>
+<script type="text/javascript">
+    var previousSelectionEl = document.getElementById("preselectedLocation");
+    var selectedValue = previousSelectionEl.value === '' ? '' : previousSelectionEl.value;    
+    
+    var selectEl = document.querySelector('#home-location')
+    accessibleAutocomplete.enhanceSelectElement({
+        name: 'Location',
+        autoselect: true,
+        confirmOnBlur: true,
+        defaultValue: selectedValue,
+        allowEmpty: true,
+        minLength: 3,
+        selectElement: selectEl
+    })
+
+    var queryStringParameters = window.location.search
+    var previouslySubmitted = queryStringParameters.length > 0
+      if (previouslySubmitted) {
+          var submittedEl = document.querySelector('.submitted')
+          submittedEl.classList.remove('submitted--hidden')
+          var params = new URLSearchParams(document.location.search.split('?')[1])
+          document.querySelector('.submitted__last-location').innerHTML = params.get('home-location')
+      }
+</script>

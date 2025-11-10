@@ -22,13 +22,14 @@
   "homepage": "https://github.com/DFE-Digital/feat-web#readme",
   "dependencies": {
     "@ministryofjustice/frontend": "^6.0.0",
+    "accessible-autocomplete": "^3.0.1",
     "dfe-frontend": "^2.0.1",
     "govuk-frontend": "^5.12.0"
   },
   "devDependencies": {
     "gulp": "^5.0.1",
     "gulp-sass": "^6.0.1",
-    "sass": "^1.93.2",
-    "gulp-sourcemaps": "^3.0.0"
+    "gulp-sourcemaps": "^3.0.0",
+    "sass": "^1.93.2"
   }
 }

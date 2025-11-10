@@ -90,6 +90,7 @@ app.UseRouting();
 app.UseAuthorization();
 app.UseSession();
 
+app.UseGovUkFrontend();
 app.UseStaticFiles();
 app.MapStaticAssets();
 
