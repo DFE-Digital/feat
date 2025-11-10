@@ -17,25 +17,25 @@ public class AiSearchEntry
     [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
     public required string Title { get; set; }
     
-    [VectorSearchField(IsHidden = true, VectorSearchDimensions = 256, VectorSearchProfileName = "my-vector-profile")]
+    [VectorSearchField(IsHidden = true, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
     public IReadOnlyList<float> TitleVector { get; set; }
     
     [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
     public string? LearningAimTitle { get; set; }
     
-    [VectorSearchField(IsHidden = true, VectorSearchDimensions = 256, VectorSearchProfileName = "my-vector-profile")]
+    [VectorSearchField(IsHidden = true, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
     public IReadOnlyList<float> LearningAimTitleVector { get; set; }
     
     [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
     public string? Description { get; set; }
     
-    [VectorSearchField(IsHidden = true, VectorSearchDimensions = 256, VectorSearchProfileName = "my-vector-profile")]
+    [VectorSearchField(IsHidden = true, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
     public IReadOnlyList<float> DescriptionVector { get; set; }
     
     [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
     public string? Sector { get; set; }
     
-    [VectorSearchField(IsHidden = true, VectorSearchDimensions = 256, VectorSearchProfileName = "my-vector-profile")]
+    [VectorSearchField(IsHidden = true, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
     public IReadOnlyList<float> SectorVector { get; set; }
     
     [SimpleField(IsFacetable = true)]

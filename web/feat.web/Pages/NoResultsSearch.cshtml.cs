@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using feat.web.Extensions;
 using feat.web.Models;
+using feat.web.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -17,7 +18,8 @@ public class NoResultsSearchModel(ILogger<NoResultsSearchModel> logger) : PageMo
         try
         {
             Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-            
+            Search.SetPage(PageName.NoResultsSearch);
+            HttpContext.Session.Set("Search", Search);
         }
         catch (Exception e)
         {

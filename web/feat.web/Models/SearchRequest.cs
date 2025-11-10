@@ -18,9 +18,11 @@ public class SearchRequest
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public OrderBy OrderBy { get; set; } = OrderBy.Relevance;
 
-    public int Page { get; set; } = 1;
+    public int PageNumber { get; set; } = 1;
 
     public int PageSize { get; set; } = 10;
-
+    
+    public string? CourseId { get; set; }
+   
     public bool Debug { get; set; } = false;
 }

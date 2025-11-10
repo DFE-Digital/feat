@@ -2,8 +2,7 @@
 @model feat.web.Pages.IndexModel
 @using feat.web.Utils
 @{
-    ViewBag.Title = "Explore your options after school or college - GOV.UK"; 
-    ViewBag.SectionTitle = "Find education and training opportunities";
+    ViewBag.Title = "Explore your options after school or college - GOV.UK";
 }
 
 
@@ -11,10 +10,10 @@
 <div class="govuk-width-container">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h2 class="govuk-heading-l">@ViewBag.SectionTitle</h2>
+            <h2 class="govuk-heading-l">Find education and training opportunities</h2>
             <p>Whether you're already in education or training, or coming back after a break, we can help you work out what to do next.</p>
             
-            <govuk-button-link asp-page="location" is-start-button="false">Start now</govuk-button-link>
+            <govuk-button-link asp-page="@PageName.Location" is-start-button="false">Start now</govuk-button-link>
         </div>
     </div>
 </div>

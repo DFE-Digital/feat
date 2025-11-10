@@ -7,14 +7,16 @@ using EnumsNET;
 using feat.common.Models;
 using feat.common.Models.AiSearch;
 using feat.common.Models.Enums;
-using feat.common.Models.Staging.FAC;
-using feat.common.Models.Staging.FAC.Enums;
 using feat.ingestion.Configuration;
 using feat.ingestion.Data;
 using feat.ingestion.Enums;
+using feat.ingestion.Models.FAC;
+using feat.ingestion.Models.FAC.Enums;
 using Microsoft.Extensions.Options;
 using Microsoft.Spatial;
 using OpenAI.Embeddings;
+using DeliveryMode = feat.common.Models.Enums.DeliveryMode;
+using Provider = feat.ingestion.Models.FAC.Provider;
 
 namespace feat.ingestion.Handlers.FAC;
 
@@ -119,11 +121,14 @@ public class FacIngestionHandler(
 
     public override async Task<bool> IngestAsync(CancellationToken cancellationToken)
     {
-        ProcessMode Aim = ProcessMode.Skip;
-        ProcessMode Courses = ProcessMode.Skip;
-        ProcessMode TLevels = ProcessMode.Skip;
-        ProcessMode AllCourses = ProcessMode.Skip;
-        int batchSize = 5000;
+        var Aim = ProcessMode.Process;
+        var ApprovedQualifications = ProcessMode.Process;
+        var Courses = ProcessMode.Process;
+        var TLevels = ProcessMode.Process;
+        var AllCourses = ProcessMode.Process;
+        var Providers = ProcessMode.Process;
+        var Venues = ProcessMode.Process;
+        const int batchSize = 5000;
 
         var blobServiceClient = new BlobServiceClient(options.BlobStorageConnectionString);
         var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
@@ -143,7 +148,7 @@ public class FacIngestionHandler(
 
         // Get our latest AIM Data file
         var aimData = files.Where(blob =>
-                blob.Name.Contains("LearningDelivery", StringComparison.InvariantCultureIgnoreCase))
+                blob.Name.StartsWith("LearningDelivery_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
         if (aimData != null && Aim != ProcessMode.Skip)
         {
@@ -174,9 +179,42 @@ public class FacIngestionHandler(
             Console.WriteLine("Done");
         }
 
+        // Get our latest Approved Qualification data
+        var approvedQualificationData = files.Where(blob =>
+                blob.Name.StartsWith("ApprovedQualifications_", StringComparison.InvariantCultureIgnoreCase))
+            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+        if (approvedQualificationData != null && ApprovedQualifications != ProcessMode.Skip)
+        {
+            Console.WriteLine("Starting import of Approved Qualification Data");
+            var blobClient = containerClient.GetBlobClient(approvedQualificationData.Name);
+            Console.WriteLine("Fetching file");
+            using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
+            Console.WriteLine("Setting up CSV reader");
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            csv.Context.RegisterClassMap<ApprovedQualificationMap>();
+            Console.WriteLine("Reading data...");
+            var records = csv.GetRecords<ApprovedQualification>().ToList();
+
+            if (
+                ApprovedQualifications == ProcessMode.Force
+                || dbContext.FAC_ApprovedQualifications.Count() != records.Count
+            )
+            {
+                Console.WriteLine($"Preparing {records.Count} records to DB...");
+                await dbContext.BulkSynchronizeAsync(records, options =>
+                {
+                    options.BatchSize = batchSize;
+                    options.BatchDelayInterval = 1000;
+                    options.UseTableLock = true;
+                }, cancellationToken);
+            }
+
+            Console.WriteLine("Done");
+        }
+        
         // Get our latest courses file
         var courseData = files.Where(blob =>
-                blob.Name.Contains("Courses_", StringComparison.InvariantCultureIgnoreCase))
+                blob.Name.StartsWith("Courses_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
         if (courseData != null && Courses != ProcessMode.Skip)
         {
@@ -215,10 +253,52 @@ public class FacIngestionHandler(
 
             Console.WriteLine("Done");
         }
+        
+        // Get our latest course runs file
+        var courseRunData = files.Where(blob =>
+                blob.Name.StartsWith("CourseRuns_", StringComparison.InvariantCultureIgnoreCase))
+            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+        if (courseRunData != null && Courses != ProcessMode.Skip)
+        {
+            Console.WriteLine("Starting import of Course Run Data");
+            var blobClient = containerClient.GetBlobClient(courseRunData.Name);
+            Console.WriteLine("Fetching file");
+            using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
+            Console.WriteLine("Setting up CSV reader");
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            csv.Context.RegisterClassMap<CourseRunMap>();
+            Console.WriteLine("Reading data...");
+            var records = csv.GetRecords<CourseRun>().ToList();
+
+            // Determine if there are any changes
+            if (records.Count != 0)
+            {
+                var lastUpdated = records.Max(x => x.UpdatedOn);
+                var lastCreated = records.Max(x => x.CreatedOn);
+
+                if (
+                    Courses == ProcessMode.Force
+                    || dbContext.FAC_CourseRuns.Count() != records.Count
+                    || dbContext.FAC_CourseRuns.Max(x => x.UpdatedOn) < lastUpdated
+                    || dbContext.FAC_CourseRuns.Max(x => x.CreatedOn) < lastCreated
+                )
+                {
+                    Console.WriteLine($"Preparing {records.Count} records to DB...");
+                    await dbContext.BulkSynchronizeAsync(records, options =>
+                    {
+                        options.BatchSize = batchSize;
+                        options.BatchDelayInterval = 1000;
+                        options.UseTableLock = true;
+                    }, cancellationToken);
+                }
+            }
+
+            Console.WriteLine("Done");
+        }
 
         // Get our latest T Levels file
         var tLevelData = files.Where(blob =>
-                blob.Name.Contains("TLevels_", StringComparison.InvariantCultureIgnoreCase))
+                blob.Name.StartsWith("TLevels_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
         if (tLevelData != null && TLevels != ProcessMode.Skip)
         {
@@ -259,7 +339,7 @@ public class FacIngestionHandler(
         
         // Get our latest T Level Definitions file
         var tLevelDefinitionData = files.Where(blob =>
-                blob.Name.Contains("TLevelDefinitions_", StringComparison.InvariantCultureIgnoreCase))
+                blob.Name.StartsWith("TLevelDefinitions_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
         if (tLevelDefinitionData != null && TLevels != ProcessMode.Skip)
         {
@@ -291,10 +371,82 @@ public class FacIngestionHandler(
             Console.WriteLine("Done");
 
         }
+        
+        // Get our latest T Level Locations file
+        var tLevelLocationData = files.Where(blob =>
+                blob.Name.StartsWith("TLevelLocations_", StringComparison.InvariantCultureIgnoreCase))
+            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+        if (tLevelLocationData != null && TLevels != ProcessMode.Skip)
+        {
+            Console.WriteLine("Starting import of T-Level Location Data");
+
+            var blobClient = containerClient.GetBlobClient(tLevelLocationData.Name);
+            Console.WriteLine("Fetching file");
+            using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
+            Console.WriteLine("Setting up CSV reader");
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            csv.Context.RegisterClassMap<TLevelLocationMap>();
+            Console.WriteLine("Reading data...");
+            var records = csv.GetRecords<TLevelLocation>().ToList();
+
+            if (
+                TLevels == ProcessMode.Force
+                || dbContext.FAC_TLevelLocations.Count() != records.Count
+            )
+            {
+                Console.WriteLine($"Preparing {records.Count} records to DB...");
+                await dbContext.BulkSynchronizeAsync(records, options =>
+                {
+                    options.BatchSize = batchSize;
+                    options.BatchDelayInterval = 1000;
+                    options.UseTableLock = true;
+                }, cancellationToken);
+            }
+
+            Console.WriteLine("Done");
+
+        }
+        
+        // Get our latest Providers file
+        var providerData = files.Where(blob =>
+                blob.Name.StartsWith("Providers_", StringComparison.InvariantCultureIgnoreCase))
+            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+        if (providerData != null && Providers != ProcessMode.Skip)
+        {
+            Console.WriteLine("Starting import of Provider Data");
+
+            var blobClient = containerClient.GetBlobClient(providerData.Name);
+            Console.WriteLine("Fetching file");
+            using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
+            Console.WriteLine("Setting up CSV reader");
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            csv.Context.RegisterClassMap<ProviderMap>();
+            Console.WriteLine("Reading data...");
+            var records = csv.GetRecords<Provider>().ToList();
+            var lastUpdated = records.Max(x => x.UpdatedOn);
+
+            if (
+                Providers == ProcessMode.Force
+                || dbContext.FAC_Providers.Count() != records.Count
+                || dbContext.FAC_Providers.Max(x => x.UpdatedOn) < lastUpdated
+            )
+            {
+                Console.WriteLine($"Preparing {records.Count} records to DB...");
+                await dbContext.BulkSynchronizeAsync(records, options =>
+                {
+                    options.BatchSize = batchSize;
+                    options.BatchDelayInterval = 1000;
+                    options.UseTableLock = true;
+                }, cancellationToken);
+            }
+
+            Console.WriteLine("Done");
+
+        }
 
         // Get our latest all courses file
         var allCoursesData = files.Where(blob =>
-                blob.Name.Contains("AllCourses", StringComparison.InvariantCultureIgnoreCase))
+                blob.Name.StartsWith("AllCourses_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
         if (allCoursesData != null && AllCourses != ProcessMode.Skip)
         {
@@ -330,9 +482,66 @@ public class FacIngestionHandler(
             Console.WriteLine("Done");
 
         }
+        
+        // Get our latest venue file
+        var venueData = files.Where(blob =>
+                blob.Name.StartsWith("Venues_", StringComparison.InvariantCultureIgnoreCase))
+            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+        if (venueData != null && Venues != ProcessMode.Skip)
+        {
+            Console.WriteLine("Starting import of Venue Data");
+
+            var blobClient = containerClient.GetBlobClient(venueData.Name);
+            Console.WriteLine("Fetching file");
+            using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
+            Console.WriteLine("Setting up CSV reader");
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            csv.Context.RegisterClassMap<VenueMap>();
+            Console.WriteLine("Reading data...");
+            var records = csv.GetRecords<Venue>().ToList();
+            var lastUpdated = records.Max(x => x.CreatedOn);
+            var lastCreated = records.Max(x => x.UpdatedOn);
+
+            if (
+                Venues == ProcessMode.Force
+                || dbContext.FAC_Venues.Count() != records.Count
+                || dbContext.FAC_Venues.Max(x => x.UpdatedOn) < lastUpdated
+                || dbContext.FAC_Venues.Max(x => x.CreatedOn) < lastCreated
+            )
+            {
+                Console.WriteLine($"Preparing {records.Count} records to DB...");
+                await dbContext.BulkSynchronizeAsync(records, options =>
+                {
+                    options.BatchSize = batchSize;
+                    options.BatchDelayInterval = 1000;
+                    options.UseTableLock = true;
+                }, cancellationToken);
+            }
+
+            Console.WriteLine("Done");
+
+        }
 
         List<Entry> entries;
 
+        var venueQuery =
+            from a in dbContext.FAC_AllCourses
+            join cr in dbContext.FAC_CourseRuns on
+                a.COURSE_RUN_ID equals cr.CourseRunId
+            join v in dbContext.FAC_Venues on
+                cr.VenueId equals v.VenueId
+
+            select new
+            {
+                v.VenueId,
+                cr.CourseRunId,
+                a.LOCATION_POSTCODE,
+                v.Postcode,
+                Location = a.LOCATION != null ? GeographyPoint.Create(a.LOCATION.Y, a.LOCATION.X) : null
+            };
+
+        var venueResult = venueQuery.Take(50).ToList();
+        
         
         
         var tlevelquery =
@@ -347,13 +556,9 @@ public class FacIngestionHandler(
                 Id = c.COURSE_ID.ToString(),
                 InstanceId = c.COURSE_RUN_ID.ToString(),
                 Title = c.COURSE_NAME,
-                // TitleVector = GetVector(c.COURSE_NAME),
                 LearningAimTitle = td.Name,
-                // LearningAimTitleVector = GetVector(td.Name),
                 Description = c.WHO_THIS_COURSE_IS_FOR,
-                // DescriptionVector = GetVector(c.WHO_THIS_COURSE_IS_FOR),
                 Sector = c.SECTOR,
-                // SectorVector = GetVector(c.SECTOR),
                 EntryType = nameof(EntryType.Course),
                 QualificationLevel = MapQualificationLevel(td.QualificationLevel),
                 LearningMethod = MapLearningMethod(c.DELIVER_MODE),
@@ -363,8 +568,10 @@ public class FacIngestionHandler(
                 Location = c.LOCATION != null ? GeographyPoint.Create( c.LOCATION.Y, c.LOCATION.X) : null
             };
 
-        var result = tlevelquery.Take(50).ToList();
-
+        var result = tlevelquery.Take(10).ToList();
+        
+        Console.WriteLine("Generating embeddings");
+        
         foreach (var aiSearchEntry in result)
         {
             aiSearchEntry.TitleVector = searchIndexHandler.GetVector(aiSearchEntry.Title);
@@ -373,8 +580,9 @@ public class FacIngestionHandler(
             aiSearchEntry.SectorVector = searchIndexHandler.GetVector(aiSearchEntry.Sector);
         }
         
+        Console.WriteLine("Done");
         
-        Console.WriteLine(searchIndexHandler.Ingest(result));
+        // Console.WriteLine(searchIndexHandler.Ingest(result));
             
         
 

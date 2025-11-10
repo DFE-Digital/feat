@@ -14,10 +14,17 @@ using feat.ingestion.Handlers;
 using feat.ingestion.Handlers.FAA;
 using feat.ingestion.Handlers.FAC;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using ZiggyCreatures.Caching.Fusion;
+using ZiggyCreatures.Caching.Fusion.Backplane.StackExchangeRedis;
+using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 Console.WriteLine("FEAT ingestion service started.");
 
@@ -33,6 +40,9 @@ var config = builder.Build();
 
 var ingestionOptions = new IngestionOptions();
 config.GetSection(IngestionOptions.Name).Bind(ingestionOptions);
+
+var cacheOptions = new CacheOptions();
+config.GetSection(CacheOptions.Name).Bind(cacheOptions);
 
 if (string.IsNullOrEmpty(ingestionOptions.Environment))
 {
@@ -61,6 +71,69 @@ services.AddSingleton<IApiClient, ApiClient>();
 services.AddSingleton<IIngestionHandlerFactory, IngestionHandlerFactory>();
 services.AddSingleton(ingestionOptions);
 services.Configure<AzureOptions>(config.GetSection(AzureOptions.Name));
+services.Configure<CacheOptions>(config.GetSection(CacheOptions.Name));
+
+
+switch (cacheOptions?.Type)
+{
+    case "Memory":
+        services.AddDistributedMemoryCache();
+        services.AddFusionCacheMemoryBackplane();
+        services.AddFusionCache()
+            .WithRegisteredDistributedCache()
+            .WithRegisteredBackplane()
+            .WithSerializer(
+                new FusionCacheSystemTextJsonSerializer()
+            )
+            .WithDefaultEntryOptions(new FusionCacheEntryOptions()
+            {
+                Duration = cacheOptions?.Duration ?? TimeSpan.FromDays(30),
+                SkipBackplaneNotifications = true
+            });
+        break;
+    case "Redis":
+        services.AddFusionCache()
+            .WithDistributedCache(_ =>
+            {
+                var connectionString = cacheOptions.ConnectionString;
+                var options = new RedisCacheOptions { Configuration = connectionString };
+                return new RedisCache(options);
+            })
+            .WithStackExchangeRedisBackplane(x => x.Configuration = cacheOptions.ConnectionString )
+            .WithSerializer(
+                new FusionCacheSystemTextJsonSerializer()
+            )
+            .WithDefaultEntryOptions(new FusionCacheEntryOptions()
+            {
+                Duration = cacheOptions?.Duration ?? TimeSpan.FromDays(30),
+                DistributedCacheDuration = cacheOptions?.Duration ?? TimeSpan.FromDays(30)
+            });
+        break;
+    default:
+        services.AddFusionCache()
+            .WithoutDistributedCache()
+            .WithoutBackplane()
+            .WithSerializer(
+                new FusionCacheSystemTextJsonSerializer()
+            )
+            .WithDefaultEntryOptions(new FusionCacheEntryOptions()
+            {
+                Duration = TimeSpan.Zero
+            });
+        break;
+}
+
+services.AddOpenTelemetry()
+    // SETUP TRACES
+    .WithTracing(tracing => tracing
+            .AddFusionCacheInstrumentation()
+            .AddConsoleExporter() // OR ANY ANOTHER EXPORTER
+    )
+    // SETUP METRICS
+    .WithMetrics(metrics => metrics
+            .AddFusionCacheInstrumentation()
+            .AddConsoleExporter() // OR ANY ANOTHER EXPORTER
+    );
 
 services.AddSingleton<SearchClient>(sp =>
 {
@@ -157,6 +230,17 @@ if (ingestionOptions.Environment.Equals("Development", StringComparison.Invarian
 }
 
 var factory = serviceProvider.GetRequiredService<IIngestionHandlerFactory>();
+
+var cache = serviceProvider.GetRequiredService<IFusionCache>();
+
+Console.WriteLine($"Starting cache test at {DateTime.Now}");
+var test = cache.GetOrSet<string>("test", entry =>
+{
+    Thread.Sleep(10000);
+    return "This is a test";
+});
+Console.WriteLine($"Cache value is [{test}]");
+Console.WriteLine($"Ending cache test at {DateTime.Now}");
 
 foreach (var argument in args)
 {

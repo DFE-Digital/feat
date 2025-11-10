@@ -4,19 +4,18 @@
 @using feat.web.Models
 @model AgeModel
 @{
-    ViewBag.Title = "Explore your options after school or college - GOV.UK"; 
-    ViewBag.SectionTitle = "Your age";
+    ViewBag.Title = "Explore your options after school or college - GOV.UK";
 }
 
 @section BeforeContent {
     <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.Age))">Back</govuk-back-link>
 }
 
-<h1 class="govuk-heading-l">@ViewBag.SectionTitle</h1>
+<h1 class="govuk-heading-l">Your age</h1>
 <p class="govuk-body">This is optional but telling us means you will see more relevant results.</p>
 <p class="govuk-body">Not all education and training courses are available to everyone.</p>
 <p class="govuk-body">This is often linked to age. As well as what qualifications you already have or your employment status.</p>
-<p><a href="/TrainingOptionsPages/TrainingOptions" target="_blank" class="govuk-link">Discover the different training options</a></p>
+<p><a href="/TrainingOptionsPages/TrainingOptions" class="govuk-link">Discover the different training options</a></p>
 
 <form method="post">
     <govuk-radios for="AgeGroup">

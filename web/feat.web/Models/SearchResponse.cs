@@ -1,18 +1,21 @@
+using feat.web.Enums;
+using feat.web.Models.ViewModels;
+
 namespace feat.web.Models;
 
 public class SearchResponse
 {
-    public int Page { get; set; }
+    public int Page { get; init; }
     
-    public int PageSize { get; set; }
-    
-    public long? TotalCount { get; set; }
+    public int PageSize { get; init; }
 
-    public List<Course> Courses { get; set; } = [];
-    
-    public IList<Facet> Facets { get; set; } = new List<Facet>();
+    public long TotalCount { get; init; } = 0;
 
+    public List<SearchResult> SearchResults { get; init; } = [];
     
-    public string SortBy = "Distance";
+    public List<Facet> Facets { get; set; } = new List<Facet>();
 
+    public OrderBy OrderBy { get; set; }
+
+    public object? CourseDetails { get; init; }
 }

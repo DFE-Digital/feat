@@ -9,6 +9,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{BE87DC58-9B7F-4581-8ADB-44EB89DC6FDE}"
 	ProjectSection(SolutionItems) = preProject
 		infrastructure\docker\docker-compose.yml = infrastructure\docker\docker-compose.yml
+		infrastructure\docker\docker-compose-redis.yml = infrastructure\docker\docker-compose-redis.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "terraform", "terraform", "{8DC45152-DAB5-4175-B769-4810089C40F7}"

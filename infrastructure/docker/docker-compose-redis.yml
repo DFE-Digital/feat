@@ -1,0 +1,20 @@
+services:
+  redis-stack-server:
+    container_name: redis-stack-server
+    ports:
+      - 6379:6379
+    image: redis/redis-stack-server:latest
+    restart: always
+  redisinsight:
+    container_name: redisinsight
+    ports:
+      - 5540:5540
+    image: redis/redisinsight:latest
+    volumes:
+      - redisinsight:/data
+    depends_on:
+      - redis-stack-server
+    restart: always
+networks: {}
+volumes:
+  redisinsight: null
