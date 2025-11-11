@@ -52,7 +52,7 @@ public class Entry
 
     public EntryType? Type { get; set; }
 
-    public int? Level { get; set; }
+    public QualificationLevel? Level { get; set; }
     
     public StudyTime? StudyTime { get; set; }
 

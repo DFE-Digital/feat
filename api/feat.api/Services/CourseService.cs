@@ -31,14 +31,14 @@ public class CourseService(IngestionDbContext dbContext) : ICourseService
         {
             Id = entry.Id,
             Title = entry.Title,
-            Type = (int?)entry.Type,
+            Type = entry.Type,
             Level = entry.Level,
             EntryRequirements = entry.EntryRequirements,
             Description = entry.Description,
-            DeliveryMode = (int?)entry.EntryInstances.First().StudyMode,
+            DeliveryMode = entry.EntryInstances.First().StudyMode,
             Duration = entry.EntryInstances.First().Duration,
-            HoursType = (int?)entry.AttendancePattern,
-            StartDates = entry.EntryInstances.Select(e => e.StartDate),
+            HoursType = entry.AttendancePattern,
+            StartDates = entry.EntryInstances.Select(e => e.StartDate)
         };
 
         switch (entry.Type)
@@ -72,19 +72,19 @@ public class CourseService(IngestionDbContext dbContext) : ICourseService
                 break;
             case EntryType.Course:
                 // TODO: Set these for courses
-                courseDetails.Costs = null;
+                courseDetails.Costs = [];
                 courseDetails.CourseUrl = null;
                 courseDetails.ProviderUrl = null;
                 courseDetails.ProviderName = null;
-                courseDetails.ProviderAddresses = null;
+                courseDetails.ProviderAddresses = [];
                 break;
             case EntryType.UniversityCourse:
                 // TODO: Set these for university courses
-                courseDetails.Costs = null;
+                courseDetails.Costs = [];
                 courseDetails.CourseUrl = null;
                 courseDetails.ProviderUrl = null;
                 courseDetails.ProviderName = null;
-                courseDetails.ProviderAddresses = null;
+                courseDetails.ProviderAddresses = [];
                 courseDetails.TuitionFee = null;
                 courseDetails.University = null;
                 courseDetails.CampusName = null;

@@ -1,3 +1,5 @@
+using feat.common.Models.Enums;
+
 namespace feat.api.Models;
 
 public class CourseDetailsResponse
@@ -6,35 +8,35 @@ public class CourseDetailsResponse
     
     public string? Title { get; set; }
     
-    public int? Type { get; set; }
+    public EntryType? Type { get; set; }
     
-    public int? Level { get; set; }
+    public QualificationLevel? Level { get; set; }
     
     public string? EntryRequirements { get; set; }
     
     public string? Description { get; set; }
     
-    public int? DeliveryMode { get; set; }
+    public LearningMethod? DeliveryMode { get; set; }
     
     public TimeSpan? Duration { get; set; }
     
-    public int? HoursType { get; set; }
+    public CourseHours? HoursType { get; set; }
     
     public string? EmployerName { get; set; }
     
-    public List<Location>? EmployerAddresses { get; set; }
+    public IEnumerable<Location> EmployerAddresses { get; set; } = [];
     
     public string? EmployerDescription { get; set; }
     
     public string? ProviderName { get; set; }
-    
-    public List<Location>? ProviderAddresses { get; set; }
+
+    public IEnumerable<Location> ProviderAddresses { get; set; } = [];
     
     public string? ProviderUrl { get; set; }
+
+    public IEnumerable<DateTime?> StartDates { get; set; } = [];
     
-    public IEnumerable<DateTime?>? StartDates { get; set; }
-    
-    public IEnumerable<double?>? Costs { get; set; }
+    public IEnumerable<double?> Costs { get; set; } = [];
     
     public decimal? Wage { get; set; }
     
