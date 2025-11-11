@@ -525,7 +525,7 @@ public class FaaIngestionHandler(
                     var searchEntry = new AiSearchEntry
                     {
                         Id = entry.Id.ToString(),
-                        InstanceId = entry.EntryInstances.First().Id.ToString(),
+                        InstanceId = $"{entry.EntryInstances.First().Id}-{el.LocationId}",
                         Sector = entry.EntrySectors.First().Sector.Name,
                         Title = entry.Title,
                         LearningAimTitle = entry.AimOrAltTitle,

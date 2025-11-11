@@ -18,13 +18,17 @@ public class CourseDetailsResponse
     
     public TimeSpan? Duration { get; set; }
     
-    public int? Hours { get; set; }
+    public int? HoursType { get; set; }
+    
+    public string? EmployerName { get; set; }
+    
+    public List<Location>? EmployerAddresses { get; set; }
+    
+    public string? EmployerDescription { get; set; }
     
     public string? ProviderName { get; set; }
     
     public List<Location>? ProviderAddresses { get; set; }
-    
-    public string? ProviderDescription { get; set; }
     
     public string? ProviderUrl { get; set; }
     
@@ -37,10 +41,6 @@ public class CourseDetailsResponse
     public decimal? TuitionFee { get; set; }
     
     public string? PositionAvailable { get; set; }
-    
-    public string? EmployerName { get; set; }
-    
-    public string? EmployerDescription { get; set; }
     
     public string? TrainingProvider { get; set; }
     
