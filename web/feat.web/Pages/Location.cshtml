@@ -12,7 +12,9 @@
     <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.Location))">Back</govuk-back-link>
 }
 
-
+<!--TODO unable to hook into 'govuk-error-summary' - asp-validation-summary="All" 
+    display all errors lcally for dev purposes only -->
+<div class="govuk-error-summary" asp-validation-summary="All"></div>
 
 <h1 class="govuk-heading-l">Where do you want to study?</h1>
 <p>You can search anywhere in England.</p>
@@ -22,9 +24,9 @@
     <input id="preselectedLocation" type="hidden" value="@Model.Location"/>
     
     <label for="home-location" class="govuk-label--m">Enter a town, city or postcode (optional)</label>
-    <div class="autocomplete-wrapper govuk-input--width-20"  
-         asp-validation-summary="All" asp-for="@Model.Location"  >
-        <select name="home-location" id="home-location" asp-for="@Model.Location">
+    <div class="autocomplete-wrapper govuk-input--width-20" 
+         for="Location"> 
+        <select name="home-location" id="home-location" >
             @foreach (var locationName in Model.Locations)
             {
                 <option value="@locationName">@locationName</option>
