@@ -246,7 +246,7 @@ public class FaaIngestionHandler(
                 Url = a.ApplicationUrl ?? string.Empty,
                 SourceSystem = SourceSystem.FAA,
                 Type = EntryType.Apprenticeship,
-                Level = a.CourseLevel,
+                Level = MapCourseLevel(a.CourseLevel),
                 StudyTime = StudyTime.Daytime
             };
         }).ToList();
@@ -525,17 +525,17 @@ public class FaaIngestionHandler(
                     var searchEntry = new AiSearchEntry
                     {
                         Id = entry.Id.ToString(),
-                        InstanceId = entry.EntryInstances.First().Id.ToString(),
+                        InstanceId = $"{entry.EntryInstances.First().Id}_{el.LocationId}",
                         Sector = entry.EntrySectors.First().Sector.Name,
                         Title = entry.Title,
                         LearningAimTitle = entry.AimOrAltTitle,
                         Description = entry.Description,
                         EntryType = nameof(EntryType.Apprenticeship),
                         Source = nameof(SourceSystem.FAA),
-                        QualificationLevel = MapQualificationLevel(entry.Level),
+                        QualificationLevel = entry.Level?.ToString() ?? "Not Specified",
                         LearningMethod = nameof(LearningMethod.Workbased),
-                        CourseHours = nameof(entry.AttendancePattern),
-                        StudyTime = nameof(entry.Level),
+                        CourseHours = entry.AttendancePattern?.ToString() ?? "Not Specified",
+                        StudyTime = entry.StudyTime?.ToString() ?? "Not Specified",
                         Location = locationPoint
                     };
                     
@@ -630,13 +630,13 @@ public class FaaIngestionHandler(
         return level;
     }
     
-    private static string MapQualificationLevel(int? qualificationLevel)
+    private static QualificationLevel? MapCourseLevel(int courseLevel)
     {
-        if (qualificationLevel == null || !Enum.IsDefined(typeof(QualificationLevel), qualificationLevel.Value))
+        if (Enum.IsDefined(typeof(QualificationLevel), courseLevel))
         {
-            return "Not Specified";
+            return (QualificationLevel)courseLevel;
         }
-        
-        return ((QualificationLevel)qualificationLevel.Value).ToString();
+
+        return null;
     }
 }
