@@ -71,6 +71,7 @@ public class CourseService(IngestionDbContext dbContext) : ICourseService
                 courseDetails.PositionAvailable = entry.Title; // We don't have any other info, besides using entry.AimOrAltTitle
                 break;
             case EntryType.Course:
+                // TODO: Set these for courses
                 courseDetails.Costs = null;
                 courseDetails.CourseUrl = null;
                 courseDetails.ProviderUrl = null;
@@ -78,6 +79,7 @@ public class CourseService(IngestionDbContext dbContext) : ICourseService
                 courseDetails.ProviderAddresses = null;
                 break;
             case EntryType.UniversityCourse:
+                // TODO: Set these for university courses
                 courseDetails.Costs = null;
                 courseDetails.CourseUrl = null;
                 courseDetails.ProviderUrl = null;
