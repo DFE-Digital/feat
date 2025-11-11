@@ -51,3 +51,17 @@ output "search_service_name" {
   value       = azurerm_search_service.feat_search_service.name
   description = "The name of the Azure Search Service"
 }
+
+output "cache_hostname" {
+  value       = azurerm_managed_redis.feat_redis_enterprise.hostname
+  description = "The DNS hostname for the cache"
+}
+output "cache_port" {
+  value       = azurerm_managed_redis.feat_redis_enterprise.default_database[0].port
+  description = "The port the managed redis cache is running on"
+}
+output "cache_primary_access_key" {
+  value       = azurerm_managed_redis.feat_redis_enterprise.default_database[0].primary_access_key
+  description = "The Managed Redis primary access key."
+  sensitive   = true
+}

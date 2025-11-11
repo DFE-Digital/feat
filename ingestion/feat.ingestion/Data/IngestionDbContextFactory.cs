@@ -26,9 +26,8 @@ public class IngestionDbContextFactory : IDesignTimeDbContextFactory<IngestionDb
 
         var ingestionOptions = new IngestionOptions();
         config.GetSection(IngestionOptions.Name).Bind(ingestionOptions);
-
-        string connectionString = ingestionOptions.ConnectionString;
-        
+        ;
+        var connectionString = config.GetConnectionString("Ingestion");
         var optionsBuilder = new DbContextOptionsBuilder<IngestionDbContext>();
         optionsBuilder.UseSqlServer(connectionString, b => b
             .UseNetTopologySuite()
