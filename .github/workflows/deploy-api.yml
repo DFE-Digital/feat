@@ -27,7 +27,6 @@ jobs:
       OPENAI_KEY: ${{ secrets.AZURE_OPENAI_APIKEY }}
       AISEARCH_KEY: ${{ secrets.AZURE_AISEARCH_APIKEY }}
       RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
-      COURSEDB_CONNECTION_STRING: ${{ secrets.COURSEDB_CONNECTION_STRING }}
       API_NAME: ${{ vars.ENV_PREFIX }}-app-api
     environment: ${{ github.event.inputs.environment }}
 
@@ -66,7 +65,6 @@ jobs:
             --name "$API_NAME" \
             --resource-group "$RESOURCE_GROUP" \
             --settings \
-              ConnectionStrings__Courses="$COURSEDB_CONNECTION_STRING" \
               Azure__OpenAiKey="$OPENAI_KEY" \
               Azure__AiSearchKey="$AISEARCH_KEY" \
               ASPNETCORE_ENVIRONMENT="${{ github.event.inputs.environment }}"
