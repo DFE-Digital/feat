@@ -21,3 +21,9 @@ coverage/
 # Playwright test reports
 playwright-report/
 test-results/
+
+# Playwright UI cache
+.playwright/
+playwright/.cache/
+playwright/.last-run.json
+playwright/index.json
