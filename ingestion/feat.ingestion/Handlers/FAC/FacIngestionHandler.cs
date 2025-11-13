@@ -23,7 +23,8 @@ namespace feat.ingestion.Handlers.FAC;
 public class FacIngestionHandler(
     IngestionOptions options, 
     IngestionDbContext dbContext,
-    ISearchIndexHandler searchIndexHandler) 
+    ISearchIndexHandler searchIndexHandler,
+    BlobServiceClient blobServiceClient) 
     : IngestionHandler(options)
 {
     public override IngestionType IngestionType => IngestionType.Csv | IngestionType.Manual;
@@ -35,13 +36,6 @@ public class FacIngestionHandler(
     
     public override async Task<bool> ValidateAsync(CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(options.BlobStorageConnectionString))
-        {
-            Console.WriteLine("Blob storage connection string not set");
-            return false;
-        }
-
-        var blobServiceClient = new BlobServiceClient(options.BlobStorageConnectionString);
         var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
         var exists = await containerClient.ExistsAsync(cancellationToken);
         if (!exists)
@@ -130,7 +124,6 @@ public class FacIngestionHandler(
         var Venues = ProcessMode.Process;
         const int batchSize = 5000;
 
-        var blobServiceClient = new BlobServiceClient(options.BlobStorageConnectionString);
         var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
         await containerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
         var valid = await ValidateAsync(cancellationToken);
