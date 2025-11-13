@@ -1,3 +1,8 @@
+# Workaround for a bug where azurerm_container_app_environment doesn't register the Microsoft.App provider
+resource "azurerm_resource_provider_registration" "app" {
+  name = "Microsoft.App"
+}
+
 # Azure Container App Environment
 resource "azurerm_container_app_environment" "feat-ingestion-environment" {
   name                  = "${var.prefix}-cg-ingestion"
@@ -23,4 +28,8 @@ resource "azurerm_container_app_environment" "feat-ingestion-environment" {
     Environment = var.env
     Product     = var.product
   }
+
+  depends_on = [
+    azurerm_resource_provider_registration.app
+  ]
 }
