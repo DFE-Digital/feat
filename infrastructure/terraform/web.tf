@@ -6,7 +6,10 @@ resource "azurerm_service_plan" "feat-web-asp" {
   os_type             = "Linux"
   sku_name            = "B1"
 
-  depends_on = [azurerm_mssql_database.feat_mssql_db, azurerm_managed_redis.feat_redis_enterprise]
+  depends_on = [
+    azurerm_mssql_database.feat_mssql_db, 
+    azurerm_managed_redis.feat_redis_enterprise,
+    azurerm_container_registry.feat-registry]
 }
 
 # Linux Web App - API
@@ -36,7 +39,7 @@ resource "azurerm_linux_web_app" "feat-api" {
   }
 
   connection_string {
-    name  = "SQL"
+    name  = "Courses"
     type  = "SQLServer"
     value = "Server=tcp:${azurerm_mssql_server.feat_mssql_server.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.feat_mssql_db.name};Persist Security Info=False;User ID=feat-admin;Password=${var.sql_admin_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   }
@@ -44,7 +47,7 @@ resource "azurerm_linux_web_app" "feat-api" {
   connection_string {
     name  = "Redis"
     type  = "RedisCache"
-    value = "${var.prefix}-redis.uksouth.redis.azure.net:10000"
+    value = "${azurerm_managed_redis.feat_redis_enterprise.hostname}:${azurerm_managed_redis.feat_redis_enterprise.default_database.port}"
   }
 
   https_only = true
