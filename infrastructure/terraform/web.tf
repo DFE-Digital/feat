@@ -7,9 +7,10 @@ resource "azurerm_service_plan" "feat-web-asp" {
   sku_name            = "B1"
 
   depends_on = [
-    azurerm_mssql_database.feat_mssql_db, 
+    azurerm_mssql_database.feat_mssql_db,
     azurerm_managed_redis.feat_redis_enterprise,
-    azurerm_container_registry.feat-registry]
+    azurerm_container_registry.feat-registry
+  ]
 }
 
 # Linux Web App - API
