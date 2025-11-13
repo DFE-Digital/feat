@@ -44,7 +44,7 @@ resource "azurerm_linux_web_app" "feat-api" {
   connection_string {
     name  = "Redis"
     type  = "RedisCache"
-    value = "s265d01-redis.uksouth.redis.azure.net:10000"
+    value = "${var.prefix}-redis.uksouth.redis.azure.net:10000"
   }
 
   https_only = true
