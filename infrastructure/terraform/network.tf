@@ -78,41 +78,28 @@ resource "azapi_resource" "feat_main_subnet" {
 
 }
 
-resource "azapi_resource" "feat_ingestion_subnet" {
-  type      = "Microsoft.Network/virtualNetworks/subnets@2024-05-01"
+resource "azurerm_subnet" "feat_ingestion_subnet" {
   name      = "${var.prefix}-ingestion-subnet"
-  parent_id = azurerm_virtual_network.feat_vnet.id
-
-  body = {
-    properties = {
-      addressPrefixes = ["10.0.2.0/23"]
-      delegations = [
-        {
-          name = "ing-delegation"
-          properties = {
-            serviceName = "Microsoft.App/environments"
-          }
-
-        }
+  resource_group_name = azurerm_resource_group.feat-rg.name
+  virtual_network_name = azurerm_virtual_network.feat_vnet.name
+  address_prefixes = ["10.0.2.0/23"]
+  
+  delegation {
+    name = "Microsoft.App.environments"
+    service_delegation {
+      name = "Microsoft.App/environments"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action"
       ]
-
-      # the association with the network security group
-      networkSecurityGroup = {
-        id = azurerm_network_security_group.feat-nsg.id
-      }
     }
   }
-
-  depends_on = [azurerm_network_security_group.feat-nsg]
-
-
 }
 
 resource "azurerm_private_dns_zone" "default" {
   name                = "${var.prefix}-pdz.database.windows.net"
   resource_group_name = azurerm_resource_group.feat-rg.name
 
-  depends_on = [azapi_resource.feat_main_subnet, azapi_resource.feat_ingestion_subnet]
+  depends_on = [azapi_resource.feat_main_subnet, azurerm_subnet.feat_ingestion_subnet]
 
 
 }
@@ -123,7 +110,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "default" {
   virtual_network_id    = azurerm_virtual_network.feat_vnet.id
   resource_group_name   = azurerm_resource_group.feat-rg.name
 
-  depends_on = [azapi_resource.feat_main_subnet, azapi_resource.feat_ingestion_subnet]
+  depends_on = [azapi_resource.feat_main_subnet, azurerm_subnet.feat_ingestion_subnet]
 
 
 }
@@ -137,7 +124,7 @@ resource "azurerm_mssql_virtual_network_rule" "mssql_vnet_rule" {
 resource "azurerm_mssql_virtual_network_rule" "mssql_ing_vnet_rule" {
   name      = "${var.prefix}-mssql-ing-vnet-rule"
   server_id = azurerm_mssql_server.feat_mssql_server.id
-  subnet_id = azapi_resource.feat_ingestion_subnet.id
+  subnet_id = azurerm_subnet.feat_ingestion_subnet.id
 }
 
 # API VNet Integration
