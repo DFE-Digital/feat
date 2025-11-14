@@ -6,10 +6,5 @@ resource "azurerm_search_service" "feat_search_service" {
   replica_count       = var.replica_count
   partition_count     = var.partition_count
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+
 }

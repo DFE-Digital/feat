@@ -4,12 +4,7 @@ resource "azurerm_virtual_network" "feat_vnet" {
   resource_group_name = azurerm_resource_group.feat-rg.name
   address_space       = ["10.0.0.0/16"]
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+
 }
 
 resource "azurerm_network_security_group" "feat-nsg" {
@@ -42,12 +37,7 @@ resource "azurerm_network_security_group" "feat-nsg" {
     destination_port_range     = "*"
   }
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+
 }
 
 resource "azapi_resource" "feat_main_subnet" {
@@ -85,12 +75,7 @@ resource "azapi_resource" "feat_main_subnet" {
 
   depends_on = [azurerm_network_security_group.feat-nsg]
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+
 }
 
 resource "azapi_resource" "feat_ingestion_subnet" {
@@ -128,12 +113,7 @@ resource "azapi_resource" "feat_ingestion_subnet" {
 
   depends_on = [azurerm_network_security_group.feat-nsg]
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+
 }
 
 resource "azurerm_private_dns_zone" "default" {
@@ -142,12 +122,7 @@ resource "azurerm_private_dns_zone" "default" {
 
   depends_on = [azapi_resource.feat_main_subnet, azapi_resource.feat_ingestion_subnet]
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "default" {
@@ -158,12 +133,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "default" {
 
   depends_on = [azapi_resource.feat_main_subnet, azapi_resource.feat_ingestion_subnet]
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+
 }
 
 #  VNet SQL Firewall Rule
@@ -172,24 +142,14 @@ resource "azurerm_mssql_virtual_network_rule" "mssql_vnet_rule" {
   server_id = azurerm_mssql_server.feat_mssql_server.id
   subnet_id = azapi_resource.feat_main_subnet.id
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+
 }
 resource "azurerm_mssql_virtual_network_rule" "mssql_ing_vnet_rule" {
   name      = "${var.prefix}-mssql-ing-vnet-rule"
   server_id = azurerm_mssql_server.feat_mssql_server.id
   subnet_id = azapi_resource.feat_ingestion_subnet.id
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+
 }
 
 # API VNet Integration
@@ -199,12 +159,7 @@ resource "azurerm_app_service_virtual_network_swift_connection" "api_app_vn_conn
 
   depends_on = [azurerm_linux_web_app.feat-api, azapi_resource.feat_main_subnet]
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+
 }
 
 # Website VNet Integration
@@ -214,10 +169,5 @@ resource "azurerm_app_service_virtual_network_swift_connection" "website_app_vn_
 
   depends_on = [azurerm_linux_web_app.feat-website, azapi_resource.feat_main_subnet]
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to the 'tags' attribute
-      tags,
-    ]
-  }
+
 }
