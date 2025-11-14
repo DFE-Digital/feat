@@ -10,6 +10,8 @@ terraform {
       version = "2.7.0"
     }
   }
+
+  backend "azurerm" {}
 }
 
 provider "azurerm" {
@@ -28,5 +30,12 @@ resource "azurerm_resource_group" "feat-rg" {
   tags = {
     Environment = var.env
     Product     = var.product
+  }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
   }
 }

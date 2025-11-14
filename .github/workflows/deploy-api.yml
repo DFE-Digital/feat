@@ -12,6 +12,13 @@ on:
           - Test
 
 jobs:
+  prepare-infrastructure:
+    name: "Prepare Infrastructure"
+    uses: ./.github/workflows/azure-infrastructure.yml
+    with:
+      environment: ${{ github.event.inputs.environment || 'Development' }}
+    secrets: inherit
+    
   build-and-deploy:
     name: "Build & Deploy"
     runs-on: ubuntu-latest

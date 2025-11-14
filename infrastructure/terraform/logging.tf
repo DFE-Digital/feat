@@ -4,4 +4,16 @@ resource "azurerm_log_analytics_workspace" "feat_logging" {
   location            = azurerm_resource_group.feat-rg.location
   sku                 = "PerGB2018"
   retention_in_days   = 30
+
+  tags = {
+    Environment = var.env
+    Product     = var.product
+  }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }

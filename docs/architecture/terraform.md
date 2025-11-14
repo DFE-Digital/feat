@@ -22,6 +22,7 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [azapi_resource.feat_ingestion_subnet](https://registry.terraform.io/providers/azure/azapi/2.7.0/docs/resources/resource) | resource |
 | [azapi_resource.feat_main_subnet](https://registry.terraform.io/providers/azure/azapi/2.7.0/docs/resources/resource) | resource |
 | [azurerm_app_service_virtual_network_swift_connection.api_app_vn_conn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_service_virtual_network_swift_connection) | resource |
 | [azurerm_app_service_virtual_network_swift_connection.website_app_vn_conn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/app_service_virtual_network_swift_connection) | resource |

@@ -3,6 +3,18 @@ resource "azurerm_virtual_network" "feat_vnet" {
   location            = azurerm_resource_group.feat-rg.location
   resource_group_name = azurerm_resource_group.feat-rg.name
   address_space       = ["10.0.0.0/16"]
+
+  tags = {
+    Environment = var.env
+    Product     = var.product
+  }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }
 
 resource "azurerm_network_security_group" "feat-nsg" {
@@ -34,22 +46,36 @@ resource "azurerm_network_security_group" "feat-nsg" {
     source_port_range          = "*"
     destination_port_range     = "*"
   }
+
+  tags = {
+    Environment = var.env
+    Product     = var.product
+  }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }
 
 resource "azapi_resource" "feat_main_subnet" {
   type      = "Microsoft.Network/virtualNetworks/subnets@2024-05-01"
-  name      = "${var.prefix}-subnet"
+  name      = "${var.prefix}-main-subnet"
   parent_id = azurerm_virtual_network.feat_vnet.id
 
   body = {
     properties = {
       addressPrefixes = ["10.0.1.0/24"]
-      delegations = [{
-        name = "asp-delegation"
-        properties = {
-          serviceName = "Microsoft.Web/serverFarms"
+      delegations = [
+        {
+          name = "asp-delegation"
+          properties = {
+            serviceName = "Microsoft.Web/serverFarms"
+          }
         }
-      }]
+      ]
       serviceEndpoints = [
         {
           service   = "Microsoft.Sql"
@@ -67,14 +93,64 @@ resource "azapi_resource" "feat_main_subnet" {
     }
   }
 
-  depends_on = [azurerm_network_security_group.feat-nsg]
+  depends_on = [azurerm_virtual_network.feat_vnet, azurerm_network_security_group.feat-nsg]
 }
+
+resource "azapi_resource" "feat_ingestion_subnet" {
+  type      = "Microsoft.Network/virtualNetworks/subnets@2024-05-01"
+  name      = "${var.prefix}-ingestion-subnet"
+  parent_id = azurerm_virtual_network.feat_vnet.id
+
+  body = {
+    properties = {
+      addressPrefixes = ["10.0.2.0/23"]
+      delegations = [
+        {
+          name = "asp-ingestion-delegation"
+          properties = {
+            serviceName = "Microsoft.App/environments"
+          }
+        }
+      ]
+      serviceEndpoints = [
+        {
+          service   = "Microsoft.Sql"
+          locations = [azurerm_resource_group.feat-rg.location]
+        },
+        {
+          service   = "Microsoft.Storage"
+          locations = [azurerm_resource_group.feat-rg.location]
+        }
+      ]
+
+      # the association with the network security group
+      networkSecurityGroup = {
+        id = azurerm_network_security_group.feat-nsg.id
+      }
+    }
+  }
+
+  depends_on = [azurerm_virtual_network.feat_vnet, azurerm_network_security_group.feat-nsg]
+}
+
 
 resource "azurerm_private_dns_zone" "default" {
   name                = "${var.prefix}-pdz.database.windows.net"
   resource_group_name = azurerm_resource_group.feat-rg.name
 
   depends_on = [azapi_resource.feat_main_subnet]
+
+  tags = {
+    Environment = var.env
+    Product     = var.product
+  }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "default" {
@@ -84,6 +160,18 @@ resource "azurerm_private_dns_zone_virtual_network_link" "default" {
   resource_group_name   = azurerm_resource_group.feat-rg.name
 
   depends_on = [azapi_resource.feat_main_subnet]
+
+  tags = {
+    Environment = var.env
+    Product     = var.product
+  }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }
 
 #  VNet SQL Firewall Rule
@@ -99,6 +187,8 @@ resource "azurerm_app_service_virtual_network_swift_connection" "api_app_vn_conn
   subnet_id      = azapi_resource.feat_main_subnet.id
 
   depends_on = [azurerm_linux_web_app.feat-api, azapi_resource.feat_main_subnet]
+
+
 }
 
 # Website VNet Integration
@@ -107,4 +197,6 @@ resource "azurerm_app_service_virtual_network_swift_connection" "website_app_vn_
   subnet_id      = azapi_resource.feat_main_subnet.id
 
   depends_on = [azurerm_linux_web_app.feat-website, azapi_resource.feat_main_subnet]
+
+
 }

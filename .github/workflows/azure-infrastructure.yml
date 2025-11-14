@@ -22,6 +22,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       TF_VAR_sql_admin_username: ${{ secrets.SQL_ADMIN_USERNAME }}
       TF_VAR_sql_admin_password: ${{ secrets.SQL_ADMIN_PASSWORD }}
+      ENVIRONMENT: ${{ github.event.inputs.environment }}
     environment: ${{ github.event.inputs.environment }}
     defaults:
       run:
@@ -45,10 +46,10 @@ jobs:
               "subscriptionId": "${{ env.ARM_SUBSCRIPTION_ID }}"
             }
             
-      - name: Lowercase the repo name and username
+      - name: "Lowercase the repo name and username"
         run: echo "ENVIRONMENT_LOWER=${ENVIRONMENT,,}" >>${GITHUB_ENV}
             
-      - name: Check if remote state exists
+      - name: "Check if remote state exists"
         id: tfstate
         run: |
           set -e
@@ -65,7 +66,7 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Terraform Init (migrate or reconfigure)
+      - name: "Terraform Init (migrate or reconfigure)"
         run: |
           COMMON='-backend-config="resource_group_name=${{ vars.ENV_PREFIX }}rg-uks-terraform-state" -backend-config="storage_account_name=${{ vars.ENV_PREFIX }}tfstatesa" -backend-config="container_name=tfstate" -backend-config="key=${{ env.ENVIRONMENT_LOWER }}.tfstate"'
           if [ "${{ steps.tfstate.outputs.exists }}" = "true" ]; then
@@ -77,9 +78,7 @@ jobs:
           fi
 
       - name: "Terraform Plan"
-        run: |
-          env_name_lc=$(echo "${{ github.event.inputs.environment }}" | tr '[:upper:]' '[:lower:]')
-          terraform plan -var-file="${{ env.ENVIRONMENT_LOWER }}.tfvars" -out=tfplan
+        run: terraform plan -var-file=${{ env.ENVIRONMENT_LOWER }}.tfvars -out=tfplan
 
       - name: "Terraform Apply"
         run: terraform apply -auto-approve tfplan
