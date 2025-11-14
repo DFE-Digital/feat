@@ -94,6 +94,10 @@ resource "azurerm_subnet" "feat_ingestion_subnet" {
     }
   }
 }
+resource "azurerm_subnet_network_security_group_association" "feat_ingestion_nsg" {
+  subnet_id                 = azurerm_subnet.feat_ingestion_subnet.id
+  network_security_group_id = azurerm_network_security_group.feat-nsg.id
+}
 
 resource "azurerm_private_dns_zone" "default" {
   name                = "${var.prefix}-pdz.database.windows.net"
