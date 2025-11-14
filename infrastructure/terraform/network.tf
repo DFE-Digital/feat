@@ -85,7 +85,7 @@ resource "azapi_resource" "feat_ingestion_subnet" {
 
   body = {
     properties = {
-      addressPrefixes = ["10.0.2.0/24"]
+      addressPrefixes = ["10.0.2.0/23"]
       delegations = [
         {
           name = "ing-delegation"
