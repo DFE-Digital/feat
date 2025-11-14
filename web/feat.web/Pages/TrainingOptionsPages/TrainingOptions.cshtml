@@ -1,10 +1,14 @@
 @page
 @using feat.web.Enums
 @using feat.web.Models
+@using feat.web.Utils
 @model TrainingOptionsPages.TrainingOptionsModel
-
 @{
-    ViewBag.Title = "Explore your options after school or college - GOV.UK";
+    ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
+}
+
+@section BeforeContent {
+    <govuk-back-link href="javascript:history.back()">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">

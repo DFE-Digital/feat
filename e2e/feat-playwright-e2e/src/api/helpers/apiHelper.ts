@@ -16,4 +16,12 @@ export class ApiHelper {
             timeout: options.timeout,
         });
     }
+    
+    //Executes a GET request to the given endpoint
+    async get(endpoint: string, options: RequestOptions = {}): Promise<APIResponse> {
+        return await this.request.get(endpoint, {
+            headers: options.headers,
+            timeout: options.timeout,
+        });
+    }
 }

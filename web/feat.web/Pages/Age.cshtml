@@ -4,11 +4,11 @@
 @using feat.web.Models
 @model AgeModel
 @{
-    ViewBag.Title = "Explore your options after school or college - GOV.UK";
+    ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
 }
 
 @section BeforeContent {
-    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.Age))">Back</govuk-back-link>
+    <govuk-back-link href="@Url.Page(Model.Search.BackPage)">Back </govuk-back-link>
 }
 
 <h1 class="govuk-heading-l">Your age</h1>

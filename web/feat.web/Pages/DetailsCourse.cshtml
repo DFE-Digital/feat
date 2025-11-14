@@ -4,10 +4,10 @@
 @model feat.web.Pages.DetailsCourseModel
 
 @{
-    
+  ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
 }
 @section BeforeContent {
-  <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.DetailsCourse))">Back</govuk-back-link>
+  <govuk-back-link href="javascript:history.back()">Back</govuk-back-link>
 }
 
 @if (Model.CourseDetails != null)

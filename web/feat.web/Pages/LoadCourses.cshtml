@@ -6,11 +6,11 @@
 @model feat.web.Pages.LoadCoursesModel
 
 @section BeforeContent {
-  <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.LoadCourses))">Back</govuk-back-link>
+  
 }
 
 @{
-  ViewBag.Title = "Explore your options after school or college - GOV.UK";
+  ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
 
   string searchResultText = "Showing courses";
   try
@@ -105,7 +105,7 @@
                           </govuk-checkboxes-fieldset>
                         </govuk-checkboxes>
                         <!--p class="govuk-body">
-                          <a class="govuk-link" asp-page-handler="ClearFilter" >Clear filters</a>
+                        <a class="govuk-link" asp-page-handler="ClearFilter" >Clear filters</a>
                         </p-->
                       </fieldset>
                       <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
