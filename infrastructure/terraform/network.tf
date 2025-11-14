@@ -111,7 +111,7 @@ resource "azurerm_private_dns_zone" "default" {
   name                = "${var.prefix}-pdz.database.windows.net"
   resource_group_name = azurerm_resource_group.feat-rg.name
 
-  depends_on = [azapi_resource.feat_main_subnet, azurerm_subnet.feat_ingestion_subnet]
+  depends_on = [azapi_resource.feat_main_subnet, azapi_resource.feat_ingestion_subnet]
 
 
 }
@@ -122,7 +122,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "default" {
   virtual_network_id    = azurerm_virtual_network.feat_vnet.id
   resource_group_name   = azurerm_resource_group.feat-rg.name
 
-  depends_on = [azapi_resource.feat_main_subnet, azurerm_subnet.feat_ingestion_subnet]
+  depends_on = [azapi_resource.feat_main_subnet, azapi_resource.feat_ingestion_subnet]
 
 
 }
@@ -136,7 +136,7 @@ resource "azurerm_mssql_virtual_network_rule" "mssql_vnet_rule" {
 resource "azurerm_mssql_virtual_network_rule" "mssql_ing_vnet_rule" {
   name      = "${var.prefix}-mssql-ing-vnet-rule"
   server_id = azurerm_mssql_server.feat_mssql_server.id
-  subnet_id = azurerm_subnet.feat_ingestion_subnet.id
+  subnet_id = azapi_resource.feat_ingestion_subnet.id
 }
 
 # API VNet Integration
