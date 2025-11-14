@@ -1,4 +1,3 @@
-// src/api/helpers/responseValidator.ts
 import { APIResponse, expect } from '@playwright/test';
 import Ajv, { ValidateFunction } from 'ajv';
 
