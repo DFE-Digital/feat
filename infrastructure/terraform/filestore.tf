@@ -24,5 +24,6 @@ resource "azurerm_storage_account" "feat_storage_account" {
       # Ignore changes to the 'tags' attribute
       tags,
     ]
+    prevent_destroy = true
   }
 }
