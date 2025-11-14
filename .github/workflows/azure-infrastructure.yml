@@ -1,6 +1,13 @@
 name: Deploy Azure Infrastructure
 
 on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: 'Development'
+        type: string
   workflow_dispatch:
     inputs:
       environment:
