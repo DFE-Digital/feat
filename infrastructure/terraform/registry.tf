@@ -5,4 +5,11 @@ resource "azurerm_container_registry" "feat-registry" {
   location            = azurerm_resource_group.feat-rg.location
   sku                 = "Basic"
   admin_enabled       = true
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }

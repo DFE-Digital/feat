@@ -8,4 +8,11 @@ resource "azurerm_managed_redis" "feat_redis_enterprise" {
   default_database {
     access_keys_authentication_enabled = true
   }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }

@@ -23,4 +23,11 @@ resource "azurerm_container_app_environment" "feat-ingestion-environment" {
     Environment = var.env
     Product     = var.product
   }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }

@@ -18,4 +18,11 @@ resource "azurerm_storage_account" "feat_storage_account" {
     Environment = var.env
     Product     = var.product
   }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }

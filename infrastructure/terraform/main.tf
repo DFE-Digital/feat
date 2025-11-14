@@ -31,4 +31,11 @@ resource "azurerm_resource_group" "feat-rg" {
     Environment = var.env
     Product     = var.product
   }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }

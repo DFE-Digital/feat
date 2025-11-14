@@ -11,6 +11,13 @@ resource "azurerm_service_plan" "feat-web-asp" {
     azurerm_managed_redis.feat_redis_enterprise,
     azurerm_container_registry.feat-registry
   ]
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }
 
 # Linux Web App - API
@@ -53,6 +60,13 @@ resource "azurerm_linux_web_app" "feat-api" {
 
   https_only = true
   depends_on = [azurerm_service_plan.feat-web-asp]
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }
 
 # Linux Web App - Website
@@ -77,4 +91,11 @@ resource "azurerm_linux_web_app" "feat-website" {
 
   https_only = true
   depends_on = [azurerm_service_plan.feat-web-asp]
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }
