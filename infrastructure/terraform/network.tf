@@ -41,7 +41,7 @@ resource "azapi_resource" "feat_main_subnet" {
   name      = "${var.prefix}-subnet"
   parent_id = azurerm_virtual_network.feat_vnet.id
 
-  body =  {
+  body = {
     properties = {
       addressPrefixes = ["10.0.1.0/24"]
       delegations = [{

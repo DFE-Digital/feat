@@ -7,8 +7,5 @@ public class IngestionOptions
 {
     public static string Name => "Ingestion";
     public string Environment { get; set; } = string.Empty;
-    public string ConnectionString { get; set; } = string.Empty;
-    
-    public string BlobStorageConnectionString { get; set; } = string.Empty;
     public string ApprenticeshipApiKey { get; set; } = string.Empty;
 }

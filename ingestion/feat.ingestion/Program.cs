@@ -6,6 +6,7 @@ using Azure.AI.OpenAI;
 using Azure.Core.Serialization;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
+using Azure.Storage.Blobs;
 using feat.common;
 using feat.common.Configuration;
 using feat.ingestion.Configuration;
@@ -50,9 +51,17 @@ if (string.IsNullOrEmpty(ingestionOptions.Environment))
     return;
 }
 
-if (string.IsNullOrEmpty(ingestionOptions.ConnectionString))
+var ingestionConnectionString = config.GetConnectionString("Ingestion");
+if (string.IsNullOrEmpty(ingestionConnectionString))
 {
-    Console.WriteLine("ConnectionString missing in configuration.");
+    Console.WriteLine("ConnectionString Ingestion missing in configuration.");
+    return;
+}
+
+var blobStorageConnectionString = config.GetConnectionString("BlobStorage");
+if (string.IsNullOrEmpty(config.GetConnectionString("BlobStorage")))
+{
+    Console.WriteLine("Blob storage connection string not set");
     return;
 }
 
@@ -60,7 +69,7 @@ var services = new ServiceCollection();
 
 services.AddDbContext<IngestionDbContext>(options =>
 {
-    options.UseSqlServer(ingestionOptions.ConnectionString, o => o.UseNetTopologySuite());
+    options.UseSqlServer(ingestionConnectionString, o => o.UseNetTopologySuite());
 });
 
 services.AddTransient<IMigrationsHandler, MigrationsHandler>();
@@ -92,14 +101,20 @@ switch (cacheOptions?.Type)
             });
         break;
     case "Redis":
+        var cacheConnectionString = config.GetConnectionString("Cache");
+        if (string.IsNullOrEmpty(cacheConnectionString))
+        {
+            Console.WriteLine("ConnectionString Cache missing in configuration.");
+            return;
+        }
+        
         services.AddFusionCache()
             .WithDistributedCache(_ =>
             {
-                var connectionString = cacheOptions.ConnectionString;
-                var options = new RedisCacheOptions { Configuration = connectionString };
+                var options = new RedisCacheOptions { Configuration = cacheConnectionString };
                 return new RedisCache(options);
             })
-            .WithStackExchangeRedisBackplane(x => x.Configuration = cacheOptions.ConnectionString )
+            .WithStackExchangeRedisBackplane(x => x.Configuration = cacheConnectionString )
             .WithSerializer(
                 new FusionCacheSystemTextJsonSerializer()
             )
@@ -183,6 +198,9 @@ services.AddSingleton<SearchIndexClient>(sp =>
         new AzureKeyCredential(options.AiSearchAdminKey),
         clientOptions);
 });
+
+
+services.AddSingleton<BlobServiceClient>(_ => new BlobServiceClient(blobStorageConnectionString));
 
 services.AddSingleton<EmbeddingClient>(sp =>
 {
