@@ -126,6 +126,10 @@ public class Search
                     History.RemoveAt(History.Count - 1);
                     BackPage = History.LastOrDefault();
                 }
+                else if (VisitedCheckAnswers)
+                {
+                    BackPage = History.LastOrDefault();
+                }
             }
         }
         catch (Exception e)
