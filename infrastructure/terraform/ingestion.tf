@@ -1,12 +1,20 @@
 # Azure Container App Environment
 resource "azurerm_container_app_environment" "feat-ingestion-environment" {
-  name                  = "${var.prefix}-cg-ingestion"
-  resource_group_name   = azurerm_resource_group.feat-rg.name
-  location              = azurerm_resource_group.feat-rg.location
-  public_network_access = "Disabled"
+  name                           = "${var.prefix}-cg-ingestion"
+  resource_group_name            = azurerm_resource_group.feat-rg.name
+  location                       = azurerm_resource_group.feat-rg.location
+  public_network_access          = "Disabled"
+  internal_load_balancer_enabled = true
 
   # VNet integration
   infrastructure_subnet_id = azapi_resource.feat_ingestion_subnet.id
+
+  workload_profile {
+    name                  = "Consumption"
+    workload_profile_type = "Consumption"
+  }
+
+  infrastructure_resource_group_name = "${var.prefix}rg-uks-feat-ingestion"
 
   # Logs
   logs_destination           = "log-analytics"
