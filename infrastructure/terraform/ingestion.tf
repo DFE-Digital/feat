@@ -11,12 +11,7 @@ resource "azurerm_container_app_environment" "feat-ingestion-environment" {
   # Logs
   logs_destination           = "log-analytics"
   log_analytics_workspace_id = azurerm_log_analytics_workspace.feat_logging.id
-
-  workload_profile {
-    name                  = "${var.prefix}-wp-ingestion"
-    workload_profile_type = "Consumption"
-  }
-
+  
   tags = {
     Environment = var.env
     Product     = var.product
