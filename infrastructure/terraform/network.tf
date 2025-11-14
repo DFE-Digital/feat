@@ -47,7 +47,7 @@ resource "azapi_resource" "feat_main_subnet" {
 
   body = {
     properties = {
-      addressPrefixes = ["10.1.0.0/24"]
+      addressPrefixes = ["10.0.1.0/24"]
       delegations = [
         {
           name = "asp-delegation"
@@ -85,26 +85,17 @@ resource "azapi_resource" "feat_ingestion_subnet" {
 
   body = {
     properties = {
-      addressPrefixes = ["10.2.0.0/21"]
+      addressPrefixes = ["10.0.2.0/23"]
       delegations = [
         {
           name = "ing-delegation"
           properties = {
             serviceName = "Microsoft.App/environments"
           }
-          
+
         }
       ]
-      serviceEndpoints = [
-        {
-          service   = "Microsoft.Sql"
-          locations = [azurerm_resource_group.feat-rg.location]
-        },
-        {
-          service   = "Microsoft.Storage"
-          locations = [azurerm_resource_group.feat-rg.location]
-        }
-      ]
+
       # the association with the network security group
       networkSecurityGroup = {
         id = azurerm_network_security_group.feat-nsg.id
