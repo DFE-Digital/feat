@@ -79,11 +79,11 @@ resource "azapi_resource" "feat_main_subnet" {
 }
 
 resource "azurerm_subnet" "feat_ingestion_subnet" {
-  name      = "${var.prefix}-ingestion-subnet"
-  resource_group_name = azurerm_resource_group.feat-rg.name
+  name                 = "${var.prefix}-ingestion-subnet"
+  resource_group_name  = azurerm_resource_group.feat-rg.name
   virtual_network_name = azurerm_virtual_network.feat_vnet.name
-  address_prefixes = ["10.0.2.0/23"]
-  
+  address_prefixes     = ["10.0.2.0/23"]
+
   delegation {
     name = "Microsoft.App.environments"
     service_delegation {
