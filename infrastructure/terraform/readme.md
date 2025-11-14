@@ -77,6 +77,11 @@ az storage account create \
 az storage container create --name tfstate --account-name {prefix}feattfstatesa --auth-mode login
 ```
 
+4) Ensure that the Microsoft.App has been registered in the subscription
+```bash
+az provider register --namespace 'Microsoft.App'
+```
+
 ## Set up for local development
 1) Sign in to Azure and select a subscription:
 ```bash
