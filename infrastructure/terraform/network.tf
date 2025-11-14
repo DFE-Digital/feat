@@ -47,7 +47,7 @@ resource "azapi_resource" "feat_main_subnet" {
 
   body = {
     properties = {
-      addressPrefixes = ["10.0.1.0/24"]
+      addressPrefixes = ["10.1.0.0/24"]
       delegations = [
         {
           name = "asp-delegation"
@@ -85,13 +85,14 @@ resource "azapi_resource" "feat_ingestion_subnet" {
 
   body = {
     properties = {
-      addressPrefixes = ["10.0.2.0/23"]
+      addressPrefixes = ["10.2.0.0/21"]
       delegations = [
         {
           name = "ing-delegation"
           properties = {
             serviceName = "Microsoft.App/environments"
           }
+          
         }
       ]
       serviceEndpoints = [
@@ -141,15 +142,11 @@ resource "azurerm_mssql_virtual_network_rule" "mssql_vnet_rule" {
   name      = "${var.prefix}-mssql-vnet-rule"
   server_id = azurerm_mssql_server.feat_mssql_server.id
   subnet_id = azapi_resource.feat_main_subnet.id
-
-
 }
 resource "azurerm_mssql_virtual_network_rule" "mssql_ing_vnet_rule" {
   name      = "${var.prefix}-mssql-ing-vnet-rule"
   server_id = azurerm_mssql_server.feat_mssql_server.id
   subnet_id = azapi_resource.feat_ingestion_subnet.id
-
-
 }
 
 # API VNet Integration

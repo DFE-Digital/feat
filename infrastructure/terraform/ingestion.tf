@@ -6,7 +6,7 @@ resource "azurerm_container_app_environment" "feat-ingestion-environment" {
   public_network_access = "Disabled"
 
   # VNet integration
-  infrastructure_subnet_id = azapi_resource.feat_ingestion_subnet.id
+  infrastructure_subnet_id = azapi_resource.feat_ingestion_subnet.id  
 
   # Logs
   logs_destination           = "log-analytics"
@@ -17,6 +17,8 @@ resource "azurerm_container_app_environment" "feat-ingestion-environment" {
     Product     = var.product
   }
 
+  depends_on = [azapi_resource.feat_ingestion_subnet]
+  
   lifecycle {
     ignore_changes = [
       # Ignore changes to the 'tags' attribute
