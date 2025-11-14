@@ -10,7 +10,7 @@ resource "azurerm_storage_account" "feat_storage_account" {
     default_action = "Deny"
     virtual_network_subnet_ids = [
       azapi_resource.feat_main_subnet.id,
-      azurerm_subnet.feat_ingestion_subnet.id
+      azapi_resource.feat_ingestion_subnet.id
     ]
   }
 

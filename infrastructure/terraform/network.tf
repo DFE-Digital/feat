@@ -78,26 +78,34 @@ resource "azapi_resource" "feat_main_subnet" {
 
 }
 
-resource "azurerm_subnet" "feat_ingestion_subnet" {
-  name                 = "${var.prefix}-ingestion-subnet"
-  resource_group_name  = azurerm_resource_group.feat-rg.name
-  virtual_network_name = azurerm_virtual_network.feat_vnet.name
-  address_prefixes     = ["10.0.2.0/23"]
+resource "azapi_resource" "feat_ingestion_subnet" {
+  type      = "Microsoft.Network/virtualNetworks/subnets@2024-05-01"
+  name      = "${var.prefix}-subnet"
+  parent_id = azurerm_virtual_network.feat_vnet.id
 
-  delegation {
-    name = "Microsoft.App.environments"
-    service_delegation {
-      name = "Microsoft.App/environments"
-      actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action"
+  body = {
+    properties = {
+      addressPrefixes = ["10.0.2.0/23"]
+      delegations = [
+        {
+          name = "Microsoft.App.environments"
+          properties = {
+            serviceName = "Microsoft.App/environments"
+          }
+        }
       ]
+      # the association with the network security group
+      networkSecurityGroup = {
+        id = azurerm_network_security_group.feat-nsg.id
+      }
     }
   }
+
+  depends_on = [azurerm_network_security_group.feat-nsg]
+
+
 }
-resource "azurerm_subnet_network_security_group_association" "feat_ingestion_nsg" {
-  subnet_id                 = azurerm_subnet.feat_ingestion_subnet.id
-  network_security_group_id = azurerm_network_security_group.feat-nsg.id
-}
+
 
 resource "azurerm_private_dns_zone" "default" {
   name                = "${var.prefix}-pdz.database.windows.net"
