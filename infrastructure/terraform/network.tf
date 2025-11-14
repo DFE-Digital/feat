@@ -44,12 +44,20 @@ resource "azapi_resource" "feat_main_subnet" {
   body = {
     properties = {
       addressPrefixes = ["10.0.1.0/24"]
-      delegations = [{
-        name = "asp-delegation"
-        properties = {
-          serviceName = "Microsoft.Web/serverFarms"
+      delegations = [
+        {
+          name = "asp-delegation"
+          properties = {
+            serviceName = "Microsoft.Web/serverFarms"
+          }
+        },
+        {
+          name = "ing-delegation"
+          properties = {
+            serviceName = "Microsoft.App/environments"
+          }
         }
-      }]
+      ]
       serviceEndpoints = [
         {
           service   = "Microsoft.Sql"
