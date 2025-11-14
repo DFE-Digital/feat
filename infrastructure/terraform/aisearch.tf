@@ -16,5 +16,6 @@ resource "azurerm_search_service" "feat_search_service" {
       # Ignore changes to the 'tags' attribute
       tags,
     ]
+    prevent_destroy = true
   }
 }

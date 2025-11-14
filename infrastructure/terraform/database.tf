@@ -16,6 +16,7 @@ resource "azurerm_mssql_server" "feat_mssql_server" {
       # Ignore changes to the 'tags' attribute
       tags,
     ]
+    prevent_destroy = true
   }
 }
 
@@ -38,6 +39,7 @@ resource "azurerm_mssql_database" "feat_mssql_db" {
       # Ignore changes to the 'tags' attribute
       tags,
     ]
+    prevent_destroy = true
   }
 
   depends_on = [azurerm_mssql_server.feat_mssql_server]
