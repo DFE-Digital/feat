@@ -15,7 +15,6 @@ resource "azurerm_container_app_environment" "feat-ingestion-environment" {
   workload_profile {
     name                  = "${var.prefix}-wp-ingestion"
     workload_profile_type = "Consumption"
-    maximum_count         = 1
   }
 
   tags = {
