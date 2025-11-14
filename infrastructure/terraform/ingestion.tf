@@ -11,7 +11,7 @@ resource "azurerm_container_app_environment" "feat-ingestion-environment" {
   # Logs
   logs_destination           = "log-analytics"
   log_analytics_workspace_id = azurerm_log_analytics_workspace.feat_logging.id
-  
+
   tags = {
     Environment = var.env
     Product     = var.product
