@@ -50,7 +50,7 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
             Distance = Search.Distance;
         
         Search.Updated = true;
-        Search.SetPage(PageName.Location); 
+        Search.SetPage(PageName.Location);
         HttpContext.Session.Set("Search", Search);
         
         return Page();
@@ -80,6 +80,10 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
 
         HttpContext.Session.Set("Search", Search);
 
-        return RedirectToPage(PageName.Interests); 
+        if (!Search.VisitedCheckAnswers) 
+            return RedirectToPage(PageName.Interests);
+        
+        var hasInterests = Search.Interests.Any(searchInterest => !string.IsNullOrEmpty(searchInterest));
+        return RedirectToPage(hasInterests ? PageName.CheckAnswers : PageName.Interests);
     }
 }

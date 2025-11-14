@@ -2,9 +2,12 @@
 @using feat.web.Enums
 @using feat.web.Models
 @model TrainingOptionsPages.TrainingOptionsModel
-
 @{
     ViewBag.Title = "Explore your options after school or college - GOV.UK";
+}
+
+@section BeforeContent {
+    <govuk-back-link href="javascript:history.back()">Back</govuk-back-link>
 }
 
 <div class="govuk-grid-row">

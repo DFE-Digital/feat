@@ -1,9 +1,13 @@
 @page
 @model feat.web.Pages.TrainingOptionsPages.AboutALevelsModel
-
 @{
-    
+    ViewBag.Title = "Explore your options after school or college - GOV.UK";
 }
+
+@section BeforeContent {
+    <govuk-back-link href="javascript:history.back()">Back</govuk-back-link>
+}
+
 <div class="govuk-width-container">
     <div class="govuk-grid-row">
 

@@ -4,14 +4,14 @@
 @model feat.web.Pages.DetailsUniversityDegreeModel
 
 @section BeforeContent {
-    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage(PageName.DetailsUniversityDegree))">Back</govuk-back-link> 
+  <govuk-back-link href="javascript:history.back()">Back</govuk-back-link> 
 }
 
 @if (Model.UniversityCourseDetails != null)
 {
   <h2>@(Model.UniversityCourseDetails.Title + " "+ Model.UniversityCourseDetails.TypeDisplay)</h2>
   
-  <!-- University Degree base on Beta v8-->
+  <!-- University Degree -->
   <div class="govuk-width-container">
     <main class="govuk-main-wrapper" id="main-content">
       <div class="govuk-grid-row">
