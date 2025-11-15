@@ -70,7 +70,4 @@ jobs:
           az webapp config container set \
             --name "$WEBSITE_NAME" \
             --resource-group "$RESOURCE_GROUP" \
-            --docker-custom-image-name "$ACR_LOGIN_SERVER/feat-web:${{ github.sha }}" \
-            --docker-registry-server-url "https://$ACR_LOGIN_SERVER" \
-            --docker-registry-server-user "$ACR_USERNAME" \
-            --docker-registry-server-password "$ACR_PASSWORD"
+            --docker-custom-image-name "$ACR_LOGIN_SERVER/feat-web:${{ github.sha }}"
