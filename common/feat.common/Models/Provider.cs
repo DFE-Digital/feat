@@ -35,7 +35,7 @@ public class Provider
     public SourceSystem? SourceSystem { get; set; }
     
     [StringLength(200)]
-    public string? SourceReference { get; set; }
+    public string SourceReference { get; set; }
 
     [InverseProperty("Provider")]
     public ICollection<Entry> Entries { get; set; } = new List<Entry>();

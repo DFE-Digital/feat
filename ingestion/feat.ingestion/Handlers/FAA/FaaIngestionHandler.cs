@@ -185,10 +185,12 @@ public class FaaIngestionHandler(
         {
             Created = DateTime.UtcNow,
             Name = a.First().ProviderName ?? "Unknown provider",
-            Ukprn = a.Key.ToString()
+            Ukprn = a.Key.ToString(),
+            SourceSystem = SourceSystem.FAA,
+            SourceReference = a.Key.ToString()
         }).ToList();
         
-        await dbContext.BulkSynchronizeAsync(providers, options =>
+        await dbContext.BulkMergeAsync(providers, options =>
         {
             options.IgnoreOnSynchronizeUpdateExpression = p => new
             {
@@ -244,10 +246,11 @@ public class FaaIngestionHandler(
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
                 Url = a.ApplicationUrl ?? string.Empty,
-                SourceSystem = SourceSystem.FAA,
                 Type = EntryType.Apprenticeship,
                 Level = MapCourseLevel(a.CourseLevel),
-                StudyTime = StudyTime.Daytime
+                StudyTime = StudyTime.Daytime,
+                SourceSystem = SourceSystem.FAA,
+                SourceReference = a.VacancyReference!
             };
         }).ToList();
         
@@ -258,11 +261,13 @@ public class FaaIngestionHandler(
                 e.Id,
                 e.Created
             };
-            options.ColumnPrimaryKeyExpression = e => e.Reference;
+            options.ColumnPrimaryKeyExpression = e => e.SourceReference;
+            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem == SourceSystem.FAA;
         }, cancellationToken);
 
         var entryLookup = dbContext.Set<Entry>()
-            .ToDictionary(e => e.Reference, e => e.Id);
+            .Where(e => e.SourceSystem == SourceSystem.FAA)
+            .ToDictionary(e => e.SourceReference, e => e.Id);
 
         Console.WriteLine($"Entries synchronized: {entries.Count}");
         
@@ -278,7 +283,9 @@ public class FaaIngestionHandler(
                 StartDate = a.StartDate,
                 Duration = ParseMonthStringToTimeSpan(a.ExpectedDuration, a.StartDate),
                 StudyMode = LearningMethod.Workbased,
-                Reference = a.VacancyReference!
+                Reference = a.VacancyReference!,
+                SourceSystem = SourceSystem.FAA,
+                SourceReference = a.VacancyReference!
             };
         }).ToList();
         
@@ -289,7 +296,8 @@ public class FaaIngestionHandler(
                 ei.Id,
                 ei.Created
             };
-            options.ColumnPrimaryKeyExpression = ei => ei.Reference;
+            options.ColumnPrimaryKeyExpression = ei => ei.SourceReference;
+            options.ColumnSynchronizeDeleteKeySubsetExpression = ei => ei.SourceSystem == SourceSystem.FAA;
         }, cancellationToken);
         
         Console.WriteLine($"EntryInstances synchronized: {entries.Count}");
@@ -402,7 +410,9 @@ public class FaaIngestionHandler(
                     Postcode = a.Key.Postcode,
                     GeoLocation = longitude != null && latitude != null
                         ? new Point(longitude.Value, latitude.Value) { SRID = 4326 }
-                        : null
+                        : null,
+                    SourceSystem = SourceSystem.FAA,
+                    SourceReference = $"{a.First().Id}"
                 };
             }).ToList();
 
@@ -419,6 +429,7 @@ public class FaaIngestionHandler(
                 l.Address1,
                 l.Address4
             };
+            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem == SourceSystem.FAA;
         }, cancellationToken);
 
         Console.WriteLine($"Locations synchronized: {locations.Count}");
@@ -532,10 +543,10 @@ public class FaaIngestionHandler(
                         Description = entry.Description,
                         EntryType = nameof(EntryType.Apprenticeship),
                         Source = nameof(SourceSystem.FAA),
-                        QualificationLevel = entry.Level?.ToString() ?? "Not Specified",
+                        QualificationLevel = entry.Level?.ToString() ?? string.Empty,
                         LearningMethod = nameof(LearningMethod.Workbased),
-                        CourseHours = entry.AttendancePattern?.ToString() ?? "Not Specified",
-                        StudyTime = entry.StudyTime?.ToString() ?? "Not Specified",
+                        CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
+                        StudyTime = entry.StudyTime?.ToString() ?? string.Empty,
                         Location = locationPoint
                     };
                     

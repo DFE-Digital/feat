@@ -53,7 +53,7 @@ public class Location
     public SourceSystem? SourceSystem { get; set; }
     
     [StringLength(200)]
-    public string? SourceReference { get; set; }
+    public string SourceReference { get; set; }
 
     [InverseProperty("Location")]
     public ICollection<EmployerLocation> EmployerLocations { get; set; } = new List<EmployerLocation>();
