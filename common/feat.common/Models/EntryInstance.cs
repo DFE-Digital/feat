@@ -25,6 +25,11 @@ public class EntryInstance
     
     [StringLength(255)]
     public required string Reference { get; set; } = string.Empty; 
+    
+    public SourceSystem? SourceSystem { get; set; }
+    
+    [StringLength(200)]
+    public string? SourceReference { get; set; }
 
     [ForeignKey("EntryId")]
     [InverseProperty("EntryInstances")]

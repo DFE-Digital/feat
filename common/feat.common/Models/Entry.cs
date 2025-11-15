@@ -44,6 +44,9 @@ public class Entry
     public required string Url { get; set; } = string.Empty;
     
     public SourceSystem? SourceSystem { get; set; }
+    
+    [StringLength(200)]
+    public string? SourceReference { get; set; }
 
     public DateTime? SourceUpdated { get; set; }
 

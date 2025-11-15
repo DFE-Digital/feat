@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using feat.common.Models.Enums;
 
 namespace feat.common.Models;
 
@@ -30,6 +31,11 @@ public class Provider
 
     [StringLength(1000)]
     public string? OtherNames { get; set; }
+    
+    public SourceSystem? SourceSystem { get; set; }
+    
+    [StringLength(200)]
+    public string? SourceReference { get; set; }
 
     [InverseProperty("Provider")]
     public ICollection<Entry> Entries { get; set; } = new List<Entry>();
