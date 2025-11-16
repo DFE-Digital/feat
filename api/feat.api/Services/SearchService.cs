@@ -7,30 +7,21 @@ using feat.api.Models;
 using feat.api.Models.External;
 using feat.common;
 using feat.common.Configuration;
+using feat.common.Models.AiSearch;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
 
 namespace feat.api.Services;
 
-public class SearchService : ISearchService
+public class SearchService(
+    IOptionsMonitor<AzureOptions> options,
+    IApiClient apiClient,
+    SearchClient aiSearchClient,
+    EmbeddingClient embeddingClient)
+    : ISearchService
 {
-    private readonly AzureOptions _azureOptions;
-    private readonly IApiClient _apiClient;
-    private readonly SearchClient _aiSearchClient;
-    private readonly EmbeddingClient _embeddingClient;
-    
-    public SearchService(
-        IOptionsMonitor<AzureOptions> options,
-        IApiClient apiClient,
-        SearchClient aiSearchClient,
-        EmbeddingClient embeddingClient)
-    {
-        _azureOptions = options.CurrentValue;
-        _apiClient = apiClient;
-        _aiSearchClient = aiSearchClient;
-        _embeddingClient = embeddingClient;
-    }
-    
+    private readonly AzureOptions _azureOptions = options.CurrentValue;
+
     public async Task<SearchResponse?> SearchAsync(SearchRequest request)
     {
         GeoLocation? geoLocation = null;
@@ -40,32 +31,34 @@ public class SearchService : ISearchService
             geoLocation = await GetGeoLocationAsync(request.Location);
         }
         
-        string filter;
+        var filter = String.Empty;
         var orderBy = string.Empty;
         var radiusInKm = request.Radius * 1.60934;
         
         if (geoLocation != null)
         {
-            filter = $"(geo.distance(GEOPOINT_LATLONG, geography'POINT({geoLocation.Latitude} {geoLocation.Longitude})') lt {radiusInKm})";
+            filter = $"(geo.distance(Location, geography'POINT({geoLocation.Latitude} {geoLocation.Longitude})') lt {radiusInKm})";
 
+            /*
             if (request.IncludeOnlineCourses)
             {
-                filter += " or (DELIVERY_MODE eq 'Online')";
+                filter += " or (LearningMethod eq 'Online')";
             }
             else
             {
-                filter += " and (DELIVERY_MODE ne 'Online')";
+                filter += " and (LearningMethod ne 'Online')";
             }
+             */
         }
         else
         {
-            filter = request.IncludeOnlineCourses ? "DELIVERY_MODE eq 'Online'" : "DELIVERY_MODE ne 'Online'";
+            // filter = request.IncludeOnlineCourses ? "LearningMethod eq 'Online'" : "LearningMethod ne 'Online'";
         }
 
         if (geoLocation != null && request.OrderBy == OrderBy.Distance)
         {
             orderBy =
-                $"geo.distance(GEOPOINT_LATLONG, geography'POINT({geoLocation.Latitude} {geoLocation.Longitude})')";
+                $"geo.distance(Location, geography'POINT({geoLocation.Latitude} {geoLocation.Longitude})')";
         }
         
         var search = await AiSearchAsync(
@@ -101,7 +94,7 @@ public class SearchService : ISearchService
         return result;
     }
 
-    private async Task<Response<SearchResults<AiSearchCourse>>> AiSearchAsync(
+    private async Task<Response<SearchResults<AiSearchEntry>>> AiSearchAsync(
         string query,
         string filter,
         string orderBy,
@@ -109,15 +102,15 @@ public class SearchService : ISearchService
         int pageSize,
         string? sessionId)
     {
-        var embedding = await _embeddingClient.GenerateEmbeddingAsync(query);
+        var embedding = await embeddingClient.GenerateEmbeddingAsync(query);
         var vector = embedding.Value.ToFloats();
         
-        return await _aiSearchClient.SearchAsync<AiSearchCourse>(
+        return await aiSearchClient.SearchAsync<AiSearchEntry>(
             query,
             new SearchOptions
             {
-                ScoringProfile = _azureOptions.AiSearchIndexScoringProfile,
-                ScoringParameters = { _azureOptions.AiSearchIndexScoringParameters },
+                // ScoringProfile = _azureOptions.AiSearchIndexScoringProfile,
+                // ScoringParameters = { _azureOptions.AiSearchIndexScoringParameters },
                 VectorSearch = new VectorSearchOptions
                 {
                     Queries =
@@ -125,24 +118,23 @@ public class SearchService : ISearchService
                         new VectorizedQuery(vector)
                         {
                             KNearestNeighborsCount = _azureOptions.Knn,
-                            Fields = { "COURSE_NAME_Vector", "DESCRIPTION_Vector", "ENTRY_Vector", "SECTOR_Vector", "SSAT1_Vector", "SSAT2_Vector"},
+                            Fields = { "TitleVector", "DescriptionVector", "SectorVector", "LearningAimTitleVector"},
                             Weight = _azureOptions.Weight,
                         }
                     },
                 },
                 SearchFields =
                 {
-                    nameof(AiSearchCourse.COURSE_NAME), 
-                    nameof(AiSearchCourse.WHO_THIS_COURSE_IS_FOR)
+                    nameof(AiSearchEntry.Title), 
+                    nameof(AiSearchEntry.Description)
                 },
                 Facets =
                 {
-                    nameof(AiSearchCourse.DELIVERY_MODE), 
-                    nameof(AiSearchCourse.STUDY_MODE), 
-                    nameof(AiSearchCourse.SECTOR), 
-                    nameof(AiSearchCourse.DATA_SOURCE), 
-                    nameof(AiSearchCourse.LEVEL),
-                    nameof(AiSearchCourse.QUALIFICATION_TYPE)
+                    nameof(AiSearchEntry.EntryType), 
+                    nameof(AiSearchEntry.QualificationLevel), 
+                    nameof(AiSearchEntry.LearningMethod), 
+                    nameof(AiSearchEntry.CourseHours), 
+                    nameof(AiSearchEntry.StudyTime)
                 },
                 Filter = filter,
                 IncludeTotalCount = true,
@@ -157,8 +149,8 @@ public class SearchService : ISearchService
                 SearchMode = SearchMode.Any,
                 HighlightFields =
                 {
-                    nameof(AiSearchCourse.COURSE_NAME), 
-                    nameof(AiSearchCourse.WHO_THIS_COURSE_IS_FOR)
+                    nameof(AiSearchEntry.Title), 
+                    nameof(AiSearchEntry.Description)
                 },
                 QueryType = SearchQueryType.Semantic,
             }
@@ -172,7 +164,7 @@ public class SearchService : ISearchService
         
         if (isPostcode)
         {
-            var response = await _apiClient
+            var response = await apiClient
                 .GetAsync<PostcodeResult>(ApiClientNames.Postcode, $"postcodes/{location}");
             
             if (response.Result != null)
@@ -186,7 +178,7 @@ public class SearchService : ISearchService
         }
         else
         {
-            var response = await _apiClient
+            var response = await apiClient
                 .GetAsync<PlaceResult>(ApiClientNames.Postcode, $"places/?q={location}&limit=1");
             
             if (response?.Result?.Count > 0)
