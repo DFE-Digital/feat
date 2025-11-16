@@ -32,7 +32,90 @@ public class SearchService(
         {
             userLocation = await GetGeoLocationAsync(request.Location);
         }
+
+        var (uniqueCourses, facets, totalCount) = await AiSearchAsync(request);
         
+        var courseIds = uniqueCourses
+            .Select(x => x.Id)
+            .ToList();
+
+        var courses = await dbContext.Entries
+            .Where(e => courseIds.Contains(e.Id))
+            .Select(e => new Course
+            {
+                Id = e.Id,
+                Title = e.Title,
+                Provider = e.Provider.Name,
+                CourseType = e.CourseType.GetDescription(),
+                Requirements = e.EntryRequirements,
+                Overview = e.Description
+            }).ToListAsync();
+        
+        var locationIds = uniqueCourses
+            .Select(x => x.InstanceId.Split("_").Last())
+            .ToList();
+
+        var locations = await dbContext.Locations
+            .Where(l => locationIds.Contains(l.Id.ToString()))
+            .ToListAsync();
+        
+        var courseDictionary = courses.ToDictionary(c => c.Id);
+
+        var orderedCourses = uniqueCourses
+            .Where(c => courseDictionary.ContainsKey(c.Id))
+            .Select(c =>
+            {
+                var course = courseDictionary[c.Id];
+                course.Score = c.RerankerScore;
+                
+                var locationId = c.InstanceId.Split("_").Last();
+                var location = locations.First(l => l.Id.ToString() == locationId);
+
+                var courseLocation = location.GeoLocation != null
+                    ? new GeoLocation { Longitude = location.GeoLocation.X, Latitude = location.GeoLocation.Y }
+                    : null;
+                
+                var locationName = location.Town
+                    ?? location.Address4
+                    ?? location.Address3
+                    ?? location.Address2
+                    ?? location.Address1;
+                
+                course.SetLocation(courseLocation, locationName, userLocation);
+                
+                return course;
+            });
+
+        if (request.OrderBy == OrderBy.Distance)
+        {
+            orderedCourses = orderedCourses
+                .Where(c => c.Distance.HasValue && c.Distance.Value <= request.Radius)
+                .OrderBy(c => c.Distance)
+                .ToList();
+        }
+        else if (request.OrderBy == OrderBy.Relevance)
+        {
+            orderedCourses = orderedCourses
+                .OrderByDescending(c => c.Score)
+                .ToList();
+        }
+
+        orderedCourses = orderedCourses
+            .Take(request.PageSize)
+            .ToList();
+
+        return new SearchResponse
+        {
+            Courses = orderedCourses,
+            Facets = facets,
+            Page = request.Page,
+            PageSize = request.PageSize,
+            TotalCount = totalCount
+        };
+    }
+
+    private async Task<(List<AiSearchResult>, List<Facet>, int)> AiSearchAsync(SearchRequest request)
+    {
         var fetchSize = request.PageSize * 1;
         
         var embedding = await embeddingClient.GenerateEmbeddingAsync(request.Query);
@@ -86,17 +169,10 @@ public class SearchService(
         };
 
         var search = await aiSearchClient.SearchAsync<AiSearchResponse>(request.Query, searchOptions);
-
         var searchResults = search.Value;
-        
-        var facets = searchResults.Facets?
-                         .Where(f => f.Value?.Any() == true)
-                         .Select(f => new Facet(f.Key, f.Value))
-                         .ToList()
-                     ?? [];
 
         var checkedIds = new HashSet<Guid>();
-        var orderedUniqueResults = new List<AiSearchResult>();
+        var uniqueCourses = new List<AiSearchResult>();
 
         await foreach (var searchResult in searchResults.GetResultsAsync())
         {
@@ -107,89 +183,21 @@ public class SearchService(
                 RerankerScore = searchResult.SemanticSearch?.RerankerScore
             };
             
-            if (checkedIds.Add(result.Id))
+            if (checkedIds.Add(result.Id)) 
             {
-                orderedUniqueResults.Add(result);
+                uniqueCourses.Add(result);
             }
         }
         
-        var entryIds = orderedUniqueResults
-            .Select(x => x.Id)
-            .ToList();
+        var facets = searchResults.Facets?
+                         .Where(f => f.Value?.Any() == true)
+                         .Select(f => new Facet(f.Key, f.Value))
+                         .ToList()
+                     ?? [];
 
-        var courses = await dbContext.Entries
-            .Where(e => entryIds.Contains(e.Id))
-            .Select(e => new Course
-            {
-                Id = e.Id,
-                Title = e.Title,
-                Provider = e.Provider.Name,
-                CourseType = e.CourseType.GetDescription(),
-                Requirements = e.EntryRequirements,
-                Overview = e.Description
-            }).ToListAsync();
+        var totalCount = (int)search.Value.TotalCount!;
         
-        var locationIds = orderedUniqueResults
-            .Select(x => x.InstanceId.Split("_").Last())
-            .ToList();
-
-        var locations = await dbContext.Locations
-            .Where(l => locationIds.Contains(l.Id.ToString()))
-            .ToListAsync();
-        
-        var courseDictionary = courses.ToDictionary(c => c.Id);
-
-        var orderedCourses = orderedUniqueResults
-            .Where(r => courseDictionary.ContainsKey(r.Id))
-            .Select(r =>
-            {
-                var course = courseDictionary[r.Id];
-                course.Score = r.RerankerScore;
-                
-                var locationId = r.InstanceId.Split("_").Last();
-                var location = locations.First(l => l.Id.ToString() == locationId);
-
-                var courseLocation = location.GeoLocation != null
-                    ? new GeoLocation { Longitude = location.GeoLocation.X, Latitude = location.GeoLocation.Y }
-                    : null;
-                
-                var locationName = location.Town
-                    ?? location.Address4
-                    ?? location.Address3
-                    ?? location.Address2
-                    ?? location.Address1;
-                
-                course.SetLocation(courseLocation, locationName, userLocation);
-                
-                return course;
-            });
-
-        if (request.OrderBy == OrderBy.Distance)
-        {
-            orderedCourses = orderedCourses
-                .Where(c => c.Distance.HasValue && c.Distance.Value <= request.Radius)
-                .OrderBy(c => c.Distance)
-                .ToList();
-        }
-        else if (request.OrderBy == OrderBy.Relevance)
-        {
-            orderedCourses = orderedCourses
-                .OrderByDescending(c => c.Score)
-                .ToList();
-        }
-
-        orderedCourses = orderedCourses
-            .Take(request.PageSize)
-            .ToList();
-
-        return new SearchResponse
-        {
-            Courses = orderedCourses,
-            Facets = facets,
-            Page = request.Page,
-            PageSize = request.PageSize,
-            TotalCount = (int)search.Value.TotalCount!
-        };
+        return (uniqueCourses, facets, totalCount);
     }
     
     private async Task<GeoLocation?> GetGeoLocationAsync(string location)
