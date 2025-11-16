@@ -51,6 +51,8 @@ public class Entry
     public string? EntryRequirements { get; set; }
 
     public EntryType? Type { get; set; }
+    
+    public CourseType? CourseType { get; set; }
 
     public QualificationLevel? Level { get; set; }
     

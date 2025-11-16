@@ -19,8 +19,16 @@ public class SearchRequest
     
     public double Radius { get; set; } = 1000;
     
-    public bool IncludeOnlineCourses { get; set; }
-    
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public OrderBy OrderBy { get; set; } = OrderBy.Relevance;
+
+    public IEnumerable<string>? EntryType { get; set; }
+
+    public IEnumerable<string>? QualificationLevel { get; set; }
+
+    public IEnumerable<string>? LearningMethod { get; set; }
+
+    public IEnumerable<string>? CourseHours { get; set; }
+
+    public IEnumerable<string>? StudyTime { get; set; }
 }

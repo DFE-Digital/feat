@@ -3,7 +3,7 @@ using feat.common.Models;
 
 namespace feat.api.Data;
 
-public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : DbContext(options)
+public class CourseDbContext(DbContextOptions<CourseDbContext> options) : DbContext(options)
 {
     public DbSet<Employer> Employers { get; set; }
     public DbSet<EmployerLocation> EmployerLocations { get; set; }

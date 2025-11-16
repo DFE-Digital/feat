@@ -6,7 +6,7 @@ using Location = feat.api.Models.Location;
 
 namespace feat.api.Services;
 
-public class CourseService(IngestionDbContext dbContext) : ICourseService
+public class CourseService(CourseDbContext dbContext) : ICourseService
 {
     public async Task<CourseDetailsResponse?> GetCourseByIdAsync(Guid courseId)
     {

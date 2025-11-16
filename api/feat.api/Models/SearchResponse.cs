@@ -6,9 +6,9 @@ public class SearchResponse
     
     public int PageSize { get; set; }
     
-    public long? TotalCount { get; set; }
+    public int TotalCount { get; set; }
 
-    public List<Course> Courses { get; set; } = [];
+    public IEnumerable<Course> Courses { get; set; } = [];
     
-    public IList<Facet> Facets { get; set; } = new List<Facet>();
+    public IEnumerable<Facet> Facets { get; set; } = [];
 }

@@ -7,17 +7,17 @@ namespace feat.api.tests.Services;
 
 [TestFixture]
 public class CourseServiceTests(
-    IngestionDbContext dbContext,
+    CourseDbContext dbContext,
     CourseService courseService)
 {
-    private IngestionDbContext _dbContext = dbContext;
+    private CourseDbContext _dbContext = dbContext;
     
     private CourseService _courseService = courseService;
 
     [SetUp]
     public void Setup()
     {
-        _dbContext = Substitute.For<IngestionDbContext>();
+        _dbContext = Substitute.For<CourseDbContext>();
         
         _courseService = new CourseService(_dbContext);
     }
