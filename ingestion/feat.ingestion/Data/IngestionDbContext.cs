@@ -12,6 +12,19 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
         options.UseSqlServer(b => b.MigrationsAssembly("feat.ingestion"));
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Create our composite keys
+        modelBuilder.Entity<EntryLocation>()
+            .HasKey(nameof(EntryLocation.EntryId), nameof(EntryLocation.LocationId));
+        modelBuilder.Entity<EntrySector>()
+            .HasKey(nameof(EntrySector.EntryId), nameof(EntrySector.SectorId));
+        modelBuilder.Entity<ProviderLocation>()
+            .HasKey(nameof(ProviderLocation.ProviderId), nameof(ProviderLocation.LocationId));
+        modelBuilder.Entity<EmployerLocation>()
+            .HasKey(nameof(EmployerLocation.EmployerId), nameof(EmployerLocation.LocationId));
+    }
+
     #region Our models
     
     public DbSet<Employer> Employers { get; set; }
@@ -39,6 +52,8 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
     public DbSet<UniversityCourse> UniversityCourses { get; set; }
 
     public DbSet<Vacancy> Vacancies { get; set; }
+    
+    public DbSet<PostcodeLatLong> Postcodes { get; set; }
     
     #endregion
     

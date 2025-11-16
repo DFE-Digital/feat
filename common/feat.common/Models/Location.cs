@@ -41,7 +41,7 @@ public class Location
     [StringLength(10)]
     public string? Postcode { get; set; }
 
-    [StringLength(20)]
+    [StringLength(200)]
     public string? Telephone { get; set; }
 
     [StringLength(100)]
