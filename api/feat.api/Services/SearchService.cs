@@ -46,7 +46,7 @@ public class SearchService(
                 Id = e.Id,
                 Title = e.Title,
                 Provider = e.Provider.Name,
-                CourseType = e.CourseType.GetDescription(),
+                CourseType = e.CourseType != null ? e.CourseType.GetDescription() : "Not available",
                 Requirements = e.EntryRequirements,
                 Overview = e.Description
             }).ToListAsync();
