@@ -10,6 +10,14 @@ resource "azurerm_mssql_server" "feat_mssql_server" {
     Environment = var.env
     Product     = var.product
   }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+    prevent_destroy = true
+  }
 }
 
 resource "azurerm_mssql_database" "feat_mssql_db" {
@@ -24,6 +32,14 @@ resource "azurerm_mssql_database" "feat_mssql_db" {
   tags = {
     Environment = var.env
     Product     = var.product
+  }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+    prevent_destroy = true
   }
 
   depends_on = [azurerm_mssql_server.feat_mssql_server]

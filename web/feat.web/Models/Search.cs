@@ -1,6 +1,7 @@
 using System.Text;
 using feat.web.Enums;
 using feat.web.Extensions;
+using feat.web.Utils;
 
 namespace feat.web.Models;
 
@@ -31,9 +32,8 @@ public class Search
     // Course id for Details request
     public string? CourseId { get; set; }
     
-
+    
     private bool _pageIsChanging = false;
-    private bool _pageBackIsChanging = false;
     
     public string? Query {
         get
@@ -92,6 +92,16 @@ public class Search
         };
     }
 
+
+    public string? BackPage { get; set; }
+    public bool VisitedCheckAnswers { get; set; }
+    
+    public void ResetHistory(string startPage)
+    {
+        History.Clear();
+        History.Add(startPage);
+    }
+
     public void SetPage(string page)
     {
         try
@@ -102,12 +112,24 @@ public class Search
 
             if (!History.Contains(page))
             {
+                if (History.Count > 0)
+                    BackPage = History.LastOrDefault();
                 History.Add(page);
+                
+                if (page == PageName.CheckAnswers) 
+                    VisitedCheckAnswers = true;
             }
             else
             {
-                var index = History.LastIndexOf(page);
-                History.RemoveRange(index, History.Count - index);
+                if (!History.Contains(PageName.CheckAnswers))
+                {
+                    History.RemoveAt(History.Count - 1);
+                    BackPage = History.LastOrDefault();
+                }
+                else if (VisitedCheckAnswers)
+                {
+                    BackPage = History.LastOrDefault();
+                }
             }
         }
         catch (Exception e)
@@ -119,37 +141,5 @@ public class Search
         {
             _pageIsChanging = false;
         }
-    }
-    
-    public string GetBackPage(string page)
-    {
-        try
-        {
-            if (_pageBackIsChanging)
-                return string.Empty;
-            _pageBackIsChanging = true;
-            
-            if (!History.Contains(page))
-            {
-                return History.LastOrDefault() ?? "Index";
-            }
-
-            var index = History.LastIndexOf(page);
-            return index == 0 ? "Index" : History[index - 1];
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-        finally
-        {
-            _pageBackIsChanging = false;
-        }
-        return string.Empty;
-    }
-
-    public Search ClearSearch()
-    {
-        return new Search();
     }
 }

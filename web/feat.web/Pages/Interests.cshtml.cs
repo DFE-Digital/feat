@@ -61,7 +61,7 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
 
         Search.SetPage(PageName.Interests);
         HttpContext.Session.Set("Search", Search);
-
+        
         return Page();
     }
 
@@ -85,7 +85,7 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
         
         Search.Interests.Clear();
         
-        List<string> interests = new List<string>();
+        List<string> interests = [];
         if (!string.IsNullOrWhiteSpace(UserInterest1))
             interests.Add(UserInterest1.Trim());
         if (!string.IsNullOrWhiteSpace(UserInterest2))
@@ -96,7 +96,11 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
 
         Search.Updated = true;
         HttpContext.Session.Set("Search", Search);
-        
+
+        if (Search.VisitedCheckAnswers)
+        {
+            return RedirectToPage(PageName.CheckAnswers);
+        }
         return RedirectToPage(PageName.QualificationLevel); 
     }
 }

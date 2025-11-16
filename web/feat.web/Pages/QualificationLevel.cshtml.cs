@@ -60,13 +60,18 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
             }
             
             HttpContext.Session.Set("Search", Search);
-        
+
             if (SelectedQualificationOptions != null && 
                 (SelectedQualificationOptions.Contains(Enums.QualificationLevel.None) || 
                  SelectedQualificationOptions.Contains(Enums.QualificationLevel.OneAndTwo)))
             {
+                if (Search.VisitedCheckAnswers && Search.AgeGroup.HasValue)
+                {
+                    return RedirectToPage(PageName.CheckAnswers);
+                }
                 return RedirectToPage(PageName.Age);
             }
+            
             return RedirectToPage(PageName.CheckAnswers);
         }
         catch (Exception e)

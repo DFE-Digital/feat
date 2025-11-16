@@ -2,6 +2,8 @@ export const apiConfig = {
     // Endpoint paths only (baseURL comes from Playwright config)
     endpoints: {
         search: '/api/Search',
+        coursesBase: '/api/Courses', // base path for by-id calls
+        courseById: (id: string) => `/api/Courses/${encodeURIComponent(id)}`,
     },
 
     // Logical defaults for API payloads

@@ -8,4 +8,16 @@ resource "azurerm_managed_redis" "feat_redis_enterprise" {
   default_database {
     access_keys_authentication_enabled = true
   }
+
+  tags = {
+    Environment = var.env
+    Product     = var.product
+  }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+  }
 }

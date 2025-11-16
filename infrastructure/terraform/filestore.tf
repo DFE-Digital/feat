@@ -7,12 +7,23 @@ resource "azurerm_storage_account" "feat_storage_account" {
   public_network_access_enabled = true
 
   network_rules {
-    default_action             = "Deny"
-    virtual_network_subnet_ids = [azapi_resource.feat_main_subnet.id]
+    default_action = "Deny"
+    virtual_network_subnet_ids = [
+      azapi_resource.feat_main_subnet.id,
+      azapi_resource.feat_ingestion_subnet.id
+    ]
   }
 
   tags = {
     Environment = var.env
     Product     = var.product
+  }
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to the 'tags' attribute
+      tags,
+    ]
+    prevent_destroy = true
   }
 }

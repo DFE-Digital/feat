@@ -1,8 +1,12 @@
 @page
+@using feat.web.Utils
 @model feat.web.Pages.TrainingOptionsPages.AboutDegreesModel
-
 @{
-    
+  ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
+}
+
+@section BeforeContent {
+  <govuk-back-link href="javascript:history.back()">Back</govuk-back-link>
 }
 
 <div class="govuk-width-container">
