@@ -10,6 +10,7 @@ using feat.ingestion.Models.FAA;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Spatial;
 using NetTopologySuite.Geometries;
+using Z.BulkOperations;
 using External = feat.ingestion.Models.FAA.External;
 using Location = feat.common.Models.Location;
 
@@ -185,7 +186,9 @@ public class FaaIngestionHandler(
         {
             Created = DateTime.UtcNow,
             Name = a.First().ProviderName ?? "Unknown provider",
-            Ukprn = a.Key.ToString()
+            Ukprn = a.Key.ToString(),
+            SourceSystem = SourceSystem.FAA,
+            SourceReference = a.Key.ToString()
         }).ToList();
         
         await dbContext.BulkSynchronizeAsync(providers, options =>
@@ -196,6 +199,7 @@ public class FaaIngestionHandler(
                 p.Created
             };
             options.ColumnPrimaryKeyExpression = p => p.Ukprn;
+            options.ColumnSynchronizeDeleteKeySubsetExpression = s => s.SourceSystem;
         }, cancellationToken);
 
         var providerLookup = dbContext.Set<Provider>()
@@ -209,8 +213,8 @@ public class FaaIngestionHandler(
             .GroupBy(a => a.CourseRoute!.Trim(), StringComparer.OrdinalIgnoreCase)
             .Select(a => new Sector
             {
-                Created = DateTime.UtcNow,
-                Name = a.Key
+                Name = a.Key,
+                SourceSystem = SourceSystem.FAA
             }).ToList();
 
         await dbContext.BulkSynchronizeAsync(sectors, options =>
@@ -218,9 +222,9 @@ public class FaaIngestionHandler(
             options.IgnoreOnSynchronizeUpdateExpression = s => new
             {
                 s.Id,
-                s.Created
             };
             options.ColumnPrimaryKeyExpression = s => s.Name;
+            options.ColumnSynchronizeDeleteKeySubsetExpression = s => s.SourceSystem;
         }, cancellationToken);
 
         var sectorLookup = dbContext.Set<Sector>()
@@ -229,7 +233,7 @@ public class FaaIngestionHandler(
         Console.WriteLine($"Sectors synchronized: {sectors.Count}");
         
         // ENTRY
-        
+        var auditEntries = new List<AuditEntry>();
         var entries = apprenticeships.Select(a =>
         {
             var providerId = providerLookup[a.Ukprn.ToString()];
@@ -244,10 +248,11 @@ public class FaaIngestionHandler(
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
                 Url = a.ApplicationUrl ?? string.Empty,
-                SourceSystem = SourceSystem.FAA,
                 Type = EntryType.Apprenticeship,
                 Level = MapCourseLevel(a.CourseLevel),
-                StudyTime = StudyTime.Daytime
+                StudyTime = StudyTime.Daytime,
+                SourceSystem = SourceSystem.FAA,
+                SourceReference = a.VacancyReference!
             };
         }).ToList();
         
@@ -256,13 +261,20 @@ public class FaaIngestionHandler(
             options.IgnoreOnSynchronizeUpdateExpression = e => new
             {
                 e.Id,
-                e.Created
+                e.Created,
+                e.IngestionState
             };
-            options.ColumnPrimaryKeyExpression = e => e.Reference;
+            options.ColumnPrimaryKeyExpression = e => e.SourceReference;
+            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            options.UseAudit = true;
+            options.AuditEntries = auditEntries;
+            
         }, cancellationToken);
-
+        
+        
         var entryLookup = dbContext.Set<Entry>()
-            .ToDictionary(e => e.Reference, e => e.Id);
+            .Where(e => e.SourceSystem == SourceSystem.FAA)
+            .ToDictionary(e => e.SourceReference, e => e.Id);
 
         Console.WriteLine($"Entries synchronized: {entries.Count}");
         
@@ -278,7 +290,9 @@ public class FaaIngestionHandler(
                 StartDate = a.StartDate,
                 Duration = ParseMonthStringToTimeSpan(a.ExpectedDuration, a.StartDate),
                 StudyMode = LearningMethod.Workbased,
-                Reference = a.VacancyReference!
+                Reference = a.VacancyReference!,
+                SourceSystem = SourceSystem.FAA,
+                SourceReference = a.VacancyReference!
             };
         }).ToList();
         
@@ -289,7 +303,8 @@ public class FaaIngestionHandler(
                 ei.Id,
                 ei.Created
             };
-            options.ColumnPrimaryKeyExpression = ei => ei.Reference;
+            options.ColumnPrimaryKeyExpression = ei => ei.SourceReference;
+            options.ColumnSynchronizeDeleteKeySubsetExpression = ei => ei.SourceSystem;
         }, cancellationToken);
         
         Console.WriteLine($"EntryInstances synchronized: {entries.Count}");
@@ -304,7 +319,6 @@ public class FaaIngestionHandler(
 
         await dbContext.BulkSynchronizeAsync(entrySectors, options =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = es => es.Id;
             options.ColumnPrimaryKeyExpression = es => new
             {
                 es.EntryId,
@@ -402,7 +416,9 @@ public class FaaIngestionHandler(
                     Postcode = a.Key.Postcode,
                     GeoLocation = longitude != null && latitude != null
                         ? new Point(longitude.Value, latitude.Value) { SRID = 4326 }
-                        : null
+                        : null,
+                    SourceSystem = SourceSystem.FAA,
+                    SourceReference = $"{a.First().Id}"
                 };
             }).ToList();
 
@@ -419,6 +435,7 @@ public class FaaIngestionHandler(
                 l.Address1,
                 l.Address4
             };
+            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
         }, cancellationToken);
 
         Console.WriteLine($"Locations synchronized: {locations.Count}");
@@ -455,7 +472,6 @@ public class FaaIngestionHandler(
         
         await dbContext.BulkSynchronizeAsync(employerLocations, options =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = el => el.Id;
             options.ColumnPrimaryKeyExpression = el => new
             {
                 el.EmployerId,
@@ -532,10 +548,10 @@ public class FaaIngestionHandler(
                         Description = entry.Description,
                         EntryType = nameof(EntryType.Apprenticeship),
                         Source = nameof(SourceSystem.FAA),
-                        QualificationLevel = entry.Level?.ToString() ?? "Not Specified",
+                        QualificationLevel = entry.Level?.ToString() ?? string.Empty,
                         LearningMethod = nameof(LearningMethod.Workbased),
-                        CourseHours = entry.AttendancePattern?.ToString() ?? "Not Specified",
-                        StudyTime = entry.StudyTime?.ToString() ?? "Not Specified",
+                        CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
+                        StudyTime = entry.StudyTime?.ToString() ?? string.Empty,
                         Location = locationPoint
                     };
                     
@@ -550,7 +566,7 @@ public class FaaIngestionHandler(
         }
 
         Console.WriteLine($"Created {searchEntries.Count} records for indexing.");
-        var result = searchIndexHandler.Ingest(searchEntries);
+        var result = await searchIndexHandler.Ingest(searchEntries);
 
         Console.WriteLine($"Find An Apprenticeship AI Search indexing {(result ? "complete" : "failed")}.");
         return result;

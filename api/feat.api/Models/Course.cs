@@ -1,3 +1,4 @@
+using feat.common.Models.AiSearch;
 using GeographicLib;
 
 namespace feat.api.Models;
@@ -57,6 +58,32 @@ public class Course
         EmployerName = CleanString(course.EMPLOYER_NAME);
         CourseName = CleanString(course.COURSE_NAME);
         WhoThisCourseIsFor = CleanString(course.WHO_THIS_COURSE_IS_FOR);
+        
+        if (Latitude.HasValue && Longitude.HasValue && location != null)
+        {
+            Distance = KilometersToMiles(CalculateDistance(
+                new GeoLocation { Latitude = Latitude.Value, Longitude = Longitude.Value },
+                location)
+            );
+        }
+        else
+        {
+            Distance = null;
+        }
+        
+        Score = score;
+    }
+    
+    public Course(
+        AiSearchEntry course,
+        double? score,
+        GeoLocation? location)
+    {
+        Id = course.Id;
+        CourseName = course.Title;
+        WhoThisCourseIsFor = course.Description;
+        Latitude = course.Location?.Latitude;
+        Longitude = course.Location?.Longitude;
         
         if (Latitude.HasValue && Longitude.HasValue && location != null)
         {

@@ -44,6 +44,9 @@ public class Entry
     public required string Url { get; set; } = string.Empty;
     
     public SourceSystem? SourceSystem { get; set; }
+    
+    [StringLength(200)]
+    public string SourceReference { get; set; }
 
     public DateTime? SourceUpdated { get; set; }
 
@@ -55,6 +58,10 @@ public class Entry
     public QualificationLevel? Level { get; set; }
     
     public StudyTime? StudyTime { get; set; }
+    
+    public IngestionState? IngestionState { get; set; } 
+    
+    public CourseType? CourseType { get; set; }
 
     [InverseProperty("Entry")]
     public ICollection<EntryCost> EntryCosts { get; set; } = new List<EntryCost>();
