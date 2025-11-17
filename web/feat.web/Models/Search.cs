@@ -124,7 +124,6 @@ public class Search
                 if (!History.Contains(PageName.CheckAnswers))
                 {
                     History.RemoveAt(History.Count - 1);
-                    //BackPage = History.LastOrDefault();
                     BackPage = History.Contains(page) ? History.ElementAt(History.Count - 2) : History.LastOrDefault();
                 }
                 else if (VisitedCheckAnswers)
