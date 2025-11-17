@@ -62,8 +62,6 @@ public class Entry
     public StudyTime? StudyTime { get; set; }
     
     public IngestionState? IngestionState { get; set; } 
-    
-    public CourseType? CourseType { get; set; }
 
     [InverseProperty("Entry")]
     public ICollection<EntryCost> EntryCosts { get; set; } = new List<EntryCost>();
