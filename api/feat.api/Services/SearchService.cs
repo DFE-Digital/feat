@@ -11,6 +11,7 @@ using feat.common.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
+using Location = feat.common.Models.Location;
 
 namespace feat.api.Services;
 
@@ -52,7 +53,9 @@ public class SearchService(
             }).ToListAsync();
         
         var locationIds = uniqueCourses
-            .Select(x => x.InstanceId.Split("_").Last())
+            .Select(x => x.InstanceId.Split('_'))
+            .Where(parts => parts.Length == 2)
+            .Select(parts => parts[1])
             .ToList();
 
         var locations = await dbContext.Locations
@@ -68,21 +71,26 @@ public class SearchService(
                 var course = courseDictionary[c.Id];
                 course.Score = c.RerankerScore;
                 
-                var locationId = c.InstanceId.Split("_").Last();
-                var location = locations.First(l => l.Id.ToString() == locationId);
+                var locationIdParts = c.InstanceId.Split('_');
+                var locationId = locationIdParts.Length > 1 ? locationIdParts[1] : null;
 
-                var courseLocation = location.GeoLocation != null
-                    ? new GeoLocation { Longitude = location.GeoLocation.X, Latitude = location.GeoLocation.Y }
-                    : null;
-                
-                var locationName = location.Town
-                    ?? location.Address4
-                    ?? location.Address3
-                    ?? location.Address2
-                    ?? location.Address1;
-                
-                course.SetLocation(courseLocation, locationName, userLocation);
-                
+                if (locationId != null)
+                {
+                    var location = locations.FirstOrDefault(l => l.Id.ToString() == locationId);
+
+                    var courseLocation = location?.GeoLocation != null
+                        ? new GeoLocation { Longitude = location.GeoLocation.X, Latitude = location.GeoLocation.Y }
+                        : null;
+
+                    var locationName = GetLocationName(location);
+
+                    course.SetLocation(courseLocation, locationName, userLocation);
+                }
+                else
+                {
+                    course.SetLocation(null, null, userLocation);
+                }
+
                 return course;
             });
 
@@ -125,6 +133,8 @@ public class SearchService(
 
         var searchOptions = new SearchOptions
         {
+            //ScoringProfile = _azureOptions.AiSearchIndexScoringProfile,
+            //ScoringParameters = { _azureOptions.AiSearchIndexScoringParameters },
             SessionId = request.SessionId,
             SearchMode = SearchMode.Any,
             QueryType = SearchQueryType.Semantic,
@@ -263,5 +273,15 @@ public class SearchService(
             var ors = values.Select(v => $"{field} eq '{v.Replace("'", "''")}'");
             filters.Add("(" + string.Join(" or ", ors) + ")");
         }
+    }
+    
+    private static string? GetLocationName(Location? location)
+    {
+        return location?.Town
+               ?? location?.Address4
+               ?? location?.Address3
+               ?? location?.Address2
+               ?? location?.Address1
+               ?? null;
     }
 }
