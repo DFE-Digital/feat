@@ -3,7 +3,6 @@ using System.Text;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
-using Azure.Search.Documents.Models;
 using feat.common.Configuration;
 using feat.common.Models.AiSearch;
 using Microsoft.Extensions.Options;

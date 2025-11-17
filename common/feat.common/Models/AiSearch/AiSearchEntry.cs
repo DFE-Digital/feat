@@ -38,19 +38,19 @@ public class AiSearchEntry
     [VectorSearchField(IsHidden = true, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
     public IReadOnlyList<float> SectorVector { get; set; }
     
-    [SimpleField(IsFacetable = true)]
+    [SimpleField(IsFacetable = true, IsFilterable = true)]
     public required string EntryType { get; set; }
     
-    [SimpleField(IsFacetable = true)]
+    [SimpleField(IsFacetable = true, IsFilterable = true)]
     public required string QualificationLevel { get; set; }
     
-    [SimpleField(IsFacetable = true)]
+    [SimpleField(IsFacetable = true, IsFilterable = true)]
     public required string LearningMethod { get; set; }
     
-    [SimpleField(IsFacetable = true)]
+    [SimpleField(IsFacetable = true, IsFilterable = true)]
     public required string CourseHours { get; set; }
     
-    [SimpleField(IsFacetable = true)]
+    [SimpleField(IsFacetable = true, IsFilterable = true)]
     public required string StudyTime { get; set; }
     
     [SimpleField(IsFilterable = true)]
