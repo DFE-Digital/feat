@@ -41,6 +41,7 @@ public class SearchService(
             .ToList();
 
         var courses = await dbContext.Entries
+            .AsNoTracking()
             .Where(e => courseIds.Contains(e.Id))
             .Select(e => new Course
             {
@@ -59,6 +60,7 @@ public class SearchService(
             .ToList();
 
         var locations = await dbContext.Locations
+            .AsNoTracking()
             .Where(l => locationIds.Contains(l.Id.ToString()))
             .ToListAsync();
         
