@@ -1,18 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using feat.common.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace feat.common.Models;
 
 [Table("EntryLocation")]
 public class EntryLocation
 {
-    [Key]
-    public Guid Id { get; set; }
-
     public Guid EntryId { get; set; }
 
     public Guid LocationId { get; set; }
 
+    public SourceSystem? SourceSystem { get; set; }
+    
     [ForeignKey("EntryId")]
     [InverseProperty("EntryLocations")]
     public Entry Entry { get; set; } = null!;

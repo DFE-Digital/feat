@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using feat.common.Models.Enums;
 using NetTopologySuite.Geometries;
 
 namespace feat.common.Models;
@@ -40,7 +41,7 @@ public class Location
     [StringLength(10)]
     public string? Postcode { get; set; }
 
-    [StringLength(20)]
+    [StringLength(200)]
     public string? Telephone { get; set; }
 
     [StringLength(100)]
@@ -48,6 +49,11 @@ public class Location
 
     [StringLength(2083)] // Maximum length for a URL
     public string? Url { get; set; }
+    
+    public SourceSystem? SourceSystem { get; set; }
+    
+    [StringLength(200)]
+    public string SourceReference { get; set; }
 
     [InverseProperty("Location")]
     public ICollection<EmployerLocation> EmployerLocations { get; set; } = new List<EmployerLocation>();

@@ -77,11 +77,20 @@ public class SearchIndexHandler(
         return true;
     }
 
-    public bool Ingest(List<AiSearchEntry> entries)
+    public async Task<bool> Ingest(List<AiSearchEntry> entries)
     {
         var searchClient = aiSearchClient.GetSearchClient(_azureOptions.AiSearchIndex);
-        var result = searchClient.MergeOrUploadDocuments(entries);
-        return result.Value.Results.All(x => x.Succeeded);
+        await using SearchIndexingBufferedSender<AiSearchEntry> indexer =
+            new (searchClient, new SearchIndexingBufferedSenderOptions<AiSearchEntry>()
+        {
+            InitialBatchActionCount = 100,
+        });
+        
+        await indexer.MergeOrUploadDocumentsAsync(entries);
+
+        await indexer.FlushAsync();
+        
+        return true;
     }
     
     public IReadOnlyList<float> GetVector(string? text)
@@ -91,6 +100,13 @@ public class SearchIndexHandler(
             return new List<float>();
         }
 
+        // If we have large text, let's not try and cache it
+        if (text?.Length > 200)
+        {
+            var result = embeddingClient.GenerateEmbedding(text.ToLowerInvariant());
+            return result.Value.ToFloats().ToArray();
+        }
+        
         using var sha256Hash = SHA256.Create();
         var hash = GetHash(sha256Hash, text.ToLowerInvariant());
 

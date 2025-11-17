@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251116165337_composite-keys")]
+    partial class compositekeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -174,9 +177,6 @@ namespace feat.ingestion.Migrations
                     b.Property<Guid>("EntryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("SourceSystem")
-                        .HasColumnType("int");
-
                     b.Property<double?>("Value")
                         .HasColumnType("float");
 
@@ -239,9 +239,6 @@ namespace feat.ingestion.Migrations
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("SourceSystem")
-                        .HasColumnType("int");
-
                     b.HasKey("EntryId", "LocationId");
 
                     b.HasIndex("LocationId");
@@ -256,9 +253,6 @@ namespace feat.ingestion.Migrations
 
                     b.Property<Guid>("SectorId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("SourceSystem")
-                        .HasColumnType("int");
 
                     b.HasKey("EntryId", "SectorId");
 
@@ -414,9 +408,6 @@ namespace feat.ingestion.Migrations
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("SourceSystem")
-                        .HasColumnType("int");
-
                     b.HasKey("ProviderId", "LocationId");
 
                     b.HasIndex("LocationId");
@@ -430,13 +421,16 @@ namespace feat.ingestion.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("SourceSystem")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 

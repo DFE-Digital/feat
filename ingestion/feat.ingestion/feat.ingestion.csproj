@@ -61,6 +61,7 @@
 
     <ItemGroup>
       <Folder Include="Handlers\DiscoverUni\" />
+      <Folder Include="Models\ONS\" />
     </ItemGroup>
 
 </Project>

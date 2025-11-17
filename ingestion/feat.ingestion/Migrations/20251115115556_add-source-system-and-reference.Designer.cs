@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251115115556_add-source-system-and-reference")]
+    partial class addsourcesystemandreference
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,13 +66,19 @@ namespace feat.ingestion.Migrations
 
             modelBuilder.Entity("feat.common.Models.EmployerLocation", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("EmployerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("EmployerId", "LocationId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployerId");
 
                     b.HasIndex("LocationId");
 
@@ -90,9 +99,6 @@ namespace feat.ingestion.Migrations
                     b.Property<int?>("AttendancePattern")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CourseType")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -105,9 +111,6 @@ namespace feat.ingestion.Migrations
 
                     b.Property<bool>("FlexibleStart")
                         .HasColumnType("bit");
-
-                    b.Property<int?>("IngestionState")
-                        .HasColumnType("int");
 
                     b.Property<int?>("Level")
                         .HasColumnType("int");
@@ -125,7 +128,6 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("SourceReference")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -174,9 +176,6 @@ namespace feat.ingestion.Migrations
                     b.Property<Guid>("EntryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("SourceSystem")
-                        .HasColumnType("int");
-
                     b.Property<double?>("Value")
                         .HasColumnType("float");
 
@@ -208,7 +207,6 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("SourceReference")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -233,16 +231,19 @@ namespace feat.ingestion.Migrations
 
             modelBuilder.Entity("feat.common.Models.EntryLocation", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("EntryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("SourceSystem")
-                        .HasColumnType("int");
+                    b.HasKey("Id");
 
-                    b.HasKey("EntryId", "LocationId");
+                    b.HasIndex("EntryId");
 
                     b.HasIndex("LocationId");
 
@@ -251,16 +252,19 @@ namespace feat.ingestion.Migrations
 
             modelBuilder.Entity("feat.common.Models.EntrySector", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("EntryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SectorId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("SourceSystem")
-                        .HasColumnType("int");
+                    b.HasKey("Id");
 
-                    b.HasKey("EntryId", "SectorId");
+                    b.HasIndex("EntryId");
 
                     b.HasIndex("SectorId");
 
@@ -312,7 +316,6 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("SourceReference")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -320,8 +323,8 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Telephone")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Town")
                         .HasMaxLength(100)
@@ -337,23 +340,6 @@ namespace feat.ingestion.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Location");
-                });
-
-            modelBuilder.Entity("feat.common.Models.PostcodeLatLong", b =>
-                {
-                    b.Property<string>("Postcode")
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
-
-                    b.Property<double?>("Latitude")
-                        .HasColumnType("float");
-
-                    b.Property<double?>("Longitude")
-                        .HasColumnType("float");
-
-                    b.HasKey("Postcode");
-
-                    b.ToTable("postcodelatlng");
                 });
 
             modelBuilder.Entity("feat.common.Models.Provider", b =>
@@ -383,7 +369,6 @@ namespace feat.ingestion.Migrations
                         .HasColumnName("PUBUKPRN");
 
                     b.Property<string>("SourceReference")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -408,18 +393,21 @@ namespace feat.ingestion.Migrations
 
             modelBuilder.Entity("feat.common.Models.ProviderLocation", b =>
                 {
-                    b.Property<Guid>("ProviderId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("SourceSystem")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ProviderId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("ProviderId", "LocationId");
+                    b.HasKey("Id");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("ProviderId");
 
                     b.ToTable("ProviderLocation");
                 });
@@ -430,13 +418,16 @@ namespace feat.ingestion.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("SourceSystem")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
