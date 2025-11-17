@@ -6,6 +6,7 @@ namespace feat.common.Configuration;
 public class AzureOptions
 {
     public static string Name => "Azure";
+    
     public string OpenAiEndpoint { get; set; } = string.Empty;
 
     public string OpenAiKey { get; set; } = string.Empty;
@@ -17,6 +18,7 @@ public class AzureOptions
     public string AiSearchKey { get; set; } = string.Empty;
     
     public string AiSearchAdminKey { get; set; } = string.Empty;
+    
     public string AiSearchIndexScoringProfile { get; set; } = string.Empty;
     
     public string AiSearchIndexScoringParameters { get; set; } = string.Empty;

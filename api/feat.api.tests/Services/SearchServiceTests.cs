@@ -1,4 +1,5 @@
 using Azure.Search.Documents;
+using feat.api.Data;
 using feat.api.Services;
 using feat.common;
 using feat.common.Configuration;
@@ -15,12 +16,14 @@ public class SearchServiceTests(
     IApiClient apiClient,
     SearchClient searchClient,
     EmbeddingClient embeddingClient,
+    CourseDbContext dbContext,
     SearchService searchService)
 {
     private IOptionsMonitor<AzureOptions> _azureOptions = azureOptions;
     private IApiClient _apiClient = apiClient;
     private SearchClient _searchClient = searchClient;
     private EmbeddingClient _embeddingClient = embeddingClient;
+    private CourseDbContext _dbContext = dbContext;
     
     private SearchService _searchService = searchService;
 
@@ -31,12 +34,14 @@ public class SearchServiceTests(
         _apiClient = Substitute.For<IApiClient>();
         _searchClient = Substitute.For<SearchClient>();
         _embeddingClient = Substitute.For<EmbeddingClient>();
+        _dbContext = Substitute.For<CourseDbContext>();
         
         _searchService = new SearchService(
             _azureOptions,
             _apiClient,
             _searchClient,
-            _embeddingClient
+            _embeddingClient,
+            _dbContext
         );
     }
 }

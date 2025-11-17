@@ -1,15 +1,17 @@
 using System.Text.RegularExpressions;
-using Azure;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Models;
+using feat.api.Data;
 using feat.api.Enums;
 using feat.api.Models;
 using feat.api.Models.External;
 using feat.common;
 using feat.common.Configuration;
-using feat.common.Models.AiSearch;
+using feat.common.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
+using Location = feat.common.Models.Location;
 
 namespace feat.api.Services;
 
@@ -17,146 +19,199 @@ public class SearchService(
     IOptionsMonitor<AzureOptions> options,
     IApiClient apiClient,
     SearchClient aiSearchClient,
-    EmbeddingClient embeddingClient)
+    EmbeddingClient embeddingClient,
+    CourseDbContext dbContext)
     : ISearchService
 {
     private readonly AzureOptions _azureOptions = options.CurrentValue;
 
     public async Task<SearchResponse?> SearchAsync(SearchRequest request)
     {
-        GeoLocation? geoLocation = null;
+        GeoLocation? userLocation = null;
 
         if (request.Location != null)
         {
-            geoLocation = await GetGeoLocationAsync(request.Location);
-        }
-        
-        var filter = String.Empty;
-        var orderBy = string.Empty;
-        var radiusInKm = request.Radius * 1.60934;
-        
-        if (geoLocation != null)
-        {
-            filter = $"(geo.distance(Location, geography'POINT({geoLocation.Latitude} {geoLocation.Longitude})') lt {radiusInKm})";
-
-            /*
-            if (request.IncludeOnlineCourses)
-            {
-                filter += " or (LearningMethod eq 'Online')";
-            }
-            else
-            {
-                filter += " and (LearningMethod ne 'Online')";
-            }
-             */
-        }
-        else
-        {
-            // filter = request.IncludeOnlineCourses ? "LearningMethod eq 'Online'" : "LearningMethod ne 'Online'";
+            userLocation = await GetGeoLocationAsync(request.Location);
         }
 
-        if (geoLocation != null && request.OrderBy == OrderBy.Distance)
+        var (uniqueCourses, facets, totalCount) = await AiSearchAsync(request, userLocation);
+        
+        var courseIds = uniqueCourses
+            .Select(x => x.Id)
+            .ToList();
+
+        var courses = await dbContext.Entries
+            .AsNoTracking()
+            .Where(e => courseIds.Contains(e.Id))
+            .Select(e => new Course
+            {
+                Id = e.Id,
+                Title = e.Title,
+                Provider = e.Provider.Name,
+                CourseType = e.CourseType != null ? e.CourseType.GetDescription() : "Not available",
+                Requirements = e.EntryRequirements,
+                Overview = e.Description
+            }).ToListAsync();
+        
+        var locationIds = uniqueCourses
+            .Select(x => x.InstanceId.Split('_'))
+            .Where(parts => parts.Length == 2)
+            .Select(parts => parts[1])
+            .ToList();
+
+        var locations = await dbContext.Locations
+            .AsNoTracking()
+            .Where(l => locationIds.Contains(l.Id.ToString()))
+            .ToListAsync();
+        
+        var courseDictionary = courses.ToDictionary(c => c.Id);
+
+        var orderedCourses = uniqueCourses
+            .Where(c => courseDictionary.ContainsKey(c.Id))
+            .Select(c =>
+            {
+                var course = courseDictionary[c.Id];
+                course.Score = c.RerankerScore;
+                
+                var locationIdParts = c.InstanceId.Split('_');
+                var locationId = locationIdParts.Length > 1 ? locationIdParts[1] : null;
+
+                if (locationId != null)
+                {
+                    var location = locations.FirstOrDefault(l => l.Id.ToString() == locationId);
+
+                    var courseLocation = location?.GeoLocation != null
+                        ? new GeoLocation { Longitude = location.GeoLocation.X, Latitude = location.GeoLocation.Y }
+                        : null;
+
+                    var locationName = GetLocationName(location);
+
+                    course.SetLocation(courseLocation, locationName, userLocation);
+                }
+                else
+                {
+                    course.SetLocation(null, null, userLocation);
+                }
+
+                return course;
+            });
+
+        if (request.OrderBy == OrderBy.Distance)
         {
-            orderBy =
-                $"geo.distance(Location, geography'POINT({geoLocation.Latitude} {geoLocation.Longitude})')";
+            orderedCourses = orderedCourses
+                .Where(c => c.Distance.HasValue && c.Distance.Value <= request.Radius)
+                .OrderBy(c => c.Distance)
+                .ToList();
         }
-        
-        var search = await AiSearchAsync(
-            request.Query,
-            filter,
-            orderBy,
-            request.Page,
-            request.PageSize,
-            request.SessionId);
-        
-        var searchResults = search.Value;
-        
-        var result = new SearchResponse
+        else if (request.OrderBy == OrderBy.Relevance)
         {
+            orderedCourses = orderedCourses
+                .OrderByDescending(c => c.Score)
+                .ToList();
+        }
+
+        orderedCourses = orderedCourses
+            .Take(request.PageSize)
+            .ToList();
+
+        return new SearchResponse
+        {
+            Courses = orderedCourses,
+            Facets = facets,
             Page = request.Page,
             PageSize = request.PageSize,
-            Courses = [],
-            Facets = searchResults.Facets?
+            TotalCount = totalCount
+        };
+    }
+
+    private async Task<(List<AiSearchResult>, List<Facet>, int)> AiSearchAsync(SearchRequest request, GeoLocation? userLocation)
+    {
+        var fetchSize = request.PageSize * 1;
+        
+        var embedding = await embeddingClient.GenerateEmbeddingAsync(request.Query);
+        var vector = embedding.Value.ToFloats();
+
+        var filterExpression = BuildFacetFilterExpression(request, userLocation);
+
+        var searchOptions = new SearchOptions
+        {
+            //ScoringProfile = _azureOptions.AiSearchIndexScoringProfile,
+            //ScoringParameters = { _azureOptions.AiSearchIndexScoringParameters },
+            SessionId = request.SessionId,
+            SearchMode = SearchMode.Any,
+            QueryType = SearchQueryType.Semantic,
+            SemanticSearch = new SemanticSearchOptions
+            {
+                SemanticConfigurationName = "semantic-title-description",
+            },
+            Size = fetchSize,
+            Skip = (request.Page - 1) * fetchSize,
+            IncludeTotalCount = true,
+            VectorSearch = new VectorSearchOptions
+            {
+                Queries =
+                {
+                    new VectorizedQuery(vector)
+                    {
+                        KNearestNeighborsCount = _azureOptions.Knn,
+                        Fields = { "TitleVector", "LearningAimTitleVector", "DescriptionVector", "SectorVector" },
+                        Weight = _azureOptions.Weight,
+                    }
+                },
+            },
+            SearchFields =
+            {
+                nameof(SearchIndexFields.Title), 
+                nameof(SearchIndexFields.Description)
+            },
+            HighlightFields =
+            {
+                nameof(SearchIndexFields.Title), 
+                nameof(SearchIndexFields.Description)
+            },
+            Facets =
+            {
+                nameof(SearchIndexFields.EntryType), 
+                nameof(SearchIndexFields.QualificationLevel), 
+                nameof(SearchIndexFields.LearningMethod), 
+                nameof(SearchIndexFields.CourseHours), 
+                nameof(SearchIndexFields.StudyTime),
+            },
+            Filter = filterExpression
+        };
+
+        var search = await aiSearchClient.SearchAsync<AiSearchResponse>(request.Query, searchOptions);
+        var searchResults = search.Value;
+
+        var checkedIds = new HashSet<Guid>();
+        var uniqueCourses = new List<AiSearchResult>();
+
+        await foreach (var searchResult in searchResults.GetResultsAsync())
+        {
+            var result = new AiSearchResult
+            {
+                Id = searchResult.Document.Id,
+                InstanceId = searchResult.Document.InstanceId,
+                RerankerScore = searchResult.SemanticSearch?.RerankerScore
+            };
+            
+            if (checkedIds.Add(result.Id)) 
+            {
+                uniqueCourses.Add(result);
+            }
+        }
+        
+        var facets = searchResults.Facets?
                          .Where(f => f.Value?.Any() == true)
                          .Select(f => new Facet(f.Key, f.Value))
                          .ToList()
-                     ?? new List<Facet>()
-        };
+                     ?? [];
 
-        await foreach (var searchResult in search.Value.GetResultsAsync())
-        {
-            var course = new Course(searchResult.Document, searchResult.SemanticSearch?.RerankerScore, geoLocation);
-            result.Courses.Add(course);
-        }
-
-        result.TotalCount = searchResults.TotalCount;
-
-        return result;
-    }
-
-    private async Task<Response<SearchResults<AiSearchEntry>>> AiSearchAsync(
-        string query,
-        string filter,
-        string orderBy,
-        int page,
-        int pageSize,
-        string? sessionId)
-    {
-        var embedding = await embeddingClient.GenerateEmbeddingAsync(query);
-        var vector = embedding.Value.ToFloats();
+        var totalCount = (int)search.Value.TotalCount!;
         
-        return await aiSearchClient.SearchAsync<AiSearchEntry>(
-            query,
-            new SearchOptions
-            {
-                // ScoringProfile = _azureOptions.AiSearchIndexScoringProfile,
-                // ScoringParameters = { _azureOptions.AiSearchIndexScoringParameters },
-                VectorSearch = new VectorSearchOptions
-                {
-                    Queries =
-                    {
-                        new VectorizedQuery(vector)
-                        {
-                            KNearestNeighborsCount = _azureOptions.Knn,
-                            Fields = { "TitleVector", "DescriptionVector", "SectorVector", "LearningAimTitleVector"},
-                            Weight = _azureOptions.Weight,
-                        }
-                    },
-                },
-                SearchFields =
-                {
-                    nameof(AiSearchEntry.Title), 
-                    nameof(AiSearchEntry.Description)
-                },
-                Facets =
-                {
-                    nameof(AiSearchEntry.EntryType), 
-                    nameof(AiSearchEntry.QualificationLevel), 
-                    nameof(AiSearchEntry.LearningMethod), 
-                    nameof(AiSearchEntry.CourseHours), 
-                    nameof(AiSearchEntry.StudyTime)
-                },
-                Filter = filter,
-                IncludeTotalCount = true,
-                Size = pageSize,
-                Skip = (page - 1) * pageSize,
-                SessionId = sessionId,
-                OrderBy = { orderBy },
-                SemanticSearch = new SemanticSearchOptions()
-                {
-                    SemanticConfigurationName = "semantic-title-description",
-                },
-                SearchMode = SearchMode.Any,
-                HighlightFields =
-                {
-                    nameof(AiSearchEntry.Title), 
-                    nameof(AiSearchEntry.Description)
-                },
-                QueryType = SearchQueryType.Semantic,
-            }
-        );
+        return (uniqueCourses, facets, totalCount);
     }
-
+    
     private async Task<GeoLocation?> GetGeoLocationAsync(string location)
     {
         const string postcodePattern = @"^[a-z]{1,2}\d[a-z\d]?\s*\d[a-z]{2}$";
@@ -181,7 +236,7 @@ public class SearchService(
             var response = await apiClient
                 .GetAsync<PlaceResult>(ApiClientNames.Postcode, $"places/?q={location}&limit=1");
             
-            if (response?.Result?.Count > 0)
+            if (response.Result?.Count > 0)
             {
                 var place = response.Result[0];
                 
@@ -194,5 +249,50 @@ public class SearchService(
         }
 
         return null;
+    }
+    
+    private static string? BuildFacetFilterExpression(SearchRequest request, GeoLocation? userLocation)
+    {
+        var filters = new List<string>();
+
+        AddFacet(nameof(SearchIndexFields.EntryType), request.EntryType);
+        AddFacet(nameof(SearchIndexFields.QualificationLevel), request.QualificationLevel);
+        AddFacet(nameof(SearchIndexFields.LearningMethod), request.LearningMethod);
+        AddFacet(nameof(SearchIndexFields.CourseHours), request.CourseHours);
+        AddFacet(nameof(SearchIndexFields.StudyTime), request.StudyTime);
+        
+        if (request.OrderBy == OrderBy.Distance && userLocation != null)
+        {
+            var radiusKm = request.Radius * 1.60934;
+            
+            filters.Add(
+                $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radiusKm}"
+            );
+        }
+
+        return filters.Count != 0
+            ? string.Join(" and ", filters)
+            : null;
+
+        void AddFacet(string field, IEnumerable<string>? values)
+        {
+            if (values == null || !values.Any())
+            {
+                return;
+            }
+            
+            var ors = values.Select(v => $"{field} eq '{v.Replace("'", "''")}'");
+            filters.Add("(" + string.Join(" or ", ors) + ")");
+        }
+    }
+    
+    private static string? GetLocationName(Location? location)
+    {
+        return location?.Town
+               ?? location?.Address4
+               ?? location?.Address3
+               ?? location?.Address2
+               ?? location?.Address1
+               ?? null;
     }
 }

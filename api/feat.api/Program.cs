@@ -33,7 +33,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 var connectionString = builder.Configuration.GetConnectionString("Courses");
-builder.Services.AddDbContext<IngestionDbContext>(options =>
+builder.Services.AddDbContext<CourseDbContext>(options =>
     options.UseSqlServer(connectionString, x => x.UseNetTopologySuite()));
 
 builder.Services.AddOpenApi();

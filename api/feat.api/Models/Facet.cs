@@ -16,6 +16,7 @@ public class Facet
             {
                 continue;
             }
+            
             Values.Add(values.Value, values.Count);
         }
     }
