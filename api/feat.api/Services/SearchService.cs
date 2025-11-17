@@ -34,7 +34,7 @@ public class SearchService(
             userLocation = await GetGeoLocationAsync(request.Location);
         }
 
-        var (uniqueCourses, facets, totalCount) = await AiSearchAsync(request);
+        var (uniqueCourses, facets, totalCount) = await AiSearchAsync(request, userLocation);
         
         var courseIds = uniqueCourses
             .Select(x => x.Id)
@@ -122,14 +122,14 @@ public class SearchService(
         };
     }
 
-    private async Task<(List<AiSearchResult>, List<Facet>, int)> AiSearchAsync(SearchRequest request)
+    private async Task<(List<AiSearchResult>, List<Facet>, int)> AiSearchAsync(SearchRequest request, GeoLocation? userLocation)
     {
         var fetchSize = request.PageSize * 1;
         
         var embedding = await embeddingClient.GenerateEmbeddingAsync(request.Query);
         var vector = embedding.Value.ToFloats();
 
-        var filterExpression = BuildFacetFilterExpression(request);
+        var filterExpression = BuildFacetFilterExpression(request, userLocation);
 
         var searchOptions = new SearchOptions
         {
@@ -249,7 +249,7 @@ public class SearchService(
         return null;
     }
     
-    private static string? BuildFacetFilterExpression(SearchRequest request)
+    private static string? BuildFacetFilterExpression(SearchRequest request, GeoLocation? userLocation)
     {
         var filters = new List<string>();
 
@@ -258,6 +258,15 @@ public class SearchService(
         AddFacet(nameof(SearchIndexFields.LearningMethod), request.LearningMethod);
         AddFacet(nameof(SearchIndexFields.CourseHours), request.CourseHours);
         AddFacet(nameof(SearchIndexFields.StudyTime), request.StudyTime);
+        
+        if (request.OrderBy == OrderBy.Distance && userLocation != null)
+        {
+            var radiusKm = request.Radius * 1.60934;
+            
+            filters.Add(
+                $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radiusKm}"
+            );
+        }
 
         return filters.Count != 0
             ? string.Join(" and ", filters)
