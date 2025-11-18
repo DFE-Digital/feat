@@ -557,12 +557,16 @@ public class FacIngestionHandler(
     {
         var resultInfo = new ResultInfo();
         var auditEntries = new List<AuditEntry>();
+        bool skip = false;
         
         Console.WriteLine("Starting sync of Find A Course data");
 
-        Console.WriteLine("Skipped");
-        return true;
-        
+        if (skip)
+        {
+            Console.WriteLine("Skipped");
+            return true;
+        }
+
         // LOCATIONS
         
         Console.WriteLine("Generating locations...");
@@ -704,6 +708,7 @@ public class FacIngestionHandler(
                 AimOrAltTitle = td.Name,
                 Description = t.WhoFor,
                 EntryRequirements = t.EntryRequirements,
+                WhatYouWillLearn = t.WhatYoullLearn,
 
 
                 Url = t.Website ?? c.COURSE_URL ?? string.Empty,
@@ -724,6 +729,8 @@ public class FacIngestionHandler(
             from a in aimdata.DefaultIfEmpty()
             join p in dbContext.Providers on
                 c.PROVIDER_UKPRN.ToString() equals p.Ukprn
+            join c2 in dbContext.FAC_Courses on
+                c.COURSE_ID equals c2.CourseId
             where 
                 c.COURSE_TYPE != CourseType.Apprenticeship 
                 && c.COURSE_TYPE != CourseType.TLevels
@@ -742,6 +749,7 @@ public class FacIngestionHandler(
                 AimOrAltTitle = a != null ? a.LearnAimRefTitle ?? string.Empty : string.Empty,
                 Description = c.WHO_THIS_COURSE_IS_FOR,
                 EntryRequirements = c.ENTRY_REQUIREMENTS,
+                WhatYouWillLearn = c2.WhatYoullLearn,
 
                 Url = c.COURSE_URL ?? string.Empty,
                 FlexibleStart = c.FLEXIBLE_STARTDATE.GetValueOrDefault(false),
@@ -1080,7 +1088,7 @@ public class FacIngestionHandler(
         public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine("Starting Find A Course AI Search indexing...");
-        
+
         var entries = dbContext.Entries
             .Where(x => x.SourceSystem == SourceSystem.FAC)
             .Include(entry => entry.EntrySectors)
@@ -1091,16 +1099,15 @@ public class FacIngestionHandler(
             .ThenInclude(provider => provider.ProviderLocations)
             .ThenInclude(providerLocation => providerLocation.Location)
             .Where(x => x.IngestionState == IngestionState.Pending)
-            .Take(125)
-            .ToList();
+            .Take(50);
 
-        if (entries.Count == 0)
+        if (!entries.Any())
         {
             Console.WriteLine("No entries found to index.");
-            return false;
+            return true;
         }
 
-        Console.WriteLine($"Loaded {entries.Count} entries for indexing.");
+        Console.WriteLine($"Loaded {entries.Count()} entries for indexing.");
         
         var searchEntries = new List<AiSearchEntry>();
 
@@ -1189,7 +1196,10 @@ public class FacIngestionHandler(
         var result = await searchIndexHandler.Ingest(searchEntries);
         
         // Update the entries above to complete
-        entries.ForEach(e => e.IngestionState = IngestionState.Complete);
+        foreach (var entry in entries)
+        {
+            entry.IngestionState = IngestionState.Complete;
+        }
         await dbContext.BulkUpdateAsync(entries, options =>
         {
             options.ColumnInputExpression = e => e.IngestionState;

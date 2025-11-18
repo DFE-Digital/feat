@@ -52,6 +52,9 @@ public class Entry
 
     [StringLength(2083)]
     public string? EntryRequirements { get; set; }
+    
+    [StringLength(2083)]
+    public string? WhatYouWillLearn { get; set; }
 
     public EntryType? Type { get; set; }
     
