@@ -29,7 +29,7 @@ public class Course
         Location = courseLocation;
         LocationName = locationName;
 
-        Distance = courseLocation != null
+        Distance = courseLocation != null && userLocation != null
             ? CalculateDistanceInMiles(courseLocation, userLocation)
             : null;
     }

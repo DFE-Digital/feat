@@ -31,7 +31,8 @@ public class CourseService(CourseDbContext dbContext) : ICourseService
         {
             Id = entry.Id,
             Title = entry.Title,
-            Type = entry.Type,
+            EntryType = entry.Type,
+            CourseType = entry.CourseType,
             Level = entry.Level,
             EntryRequirements = entry.EntryRequirements,
             Description = entry.Description,

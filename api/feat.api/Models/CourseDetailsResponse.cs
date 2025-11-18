@@ -8,7 +8,9 @@ public class CourseDetailsResponse
     
     public string? Title { get; set; }
     
-    public EntryType? Type { get; set; }
+    public EntryType? EntryType { get; set; }
+    
+    public CourseType? CourseType { get; set; }
     
     public QualificationLevel? Level { get; set; }
     
