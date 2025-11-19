@@ -28,102 +28,114 @@
   }
 }
 
-<div>
-  <div class="govuk-width-container">
-    <main class="govuk-main-wrapper" id="main-content">
-      <div class="govuk-grid-row">
+<div class="govuk-width-container">
+  
+    <div class="govuk-grid-row">
+      <!--Header section -->
+      <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-l">Your search results</h1>
+        <p class="govuk-body-l">@(searchResultText)</p>
+        <p><a asp-page="@PageName.Location">Search again</a></p>
+        <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+      </div>
+    </div>
 
-        <!--Header section -->
-        <div class="govuk-grid-column-full">
-          <h1 class="govuk-heading-l">Your search results</h1>
-          <p class="govuk-body-l">@(searchResultText)</p>
-          <p><a asp-page="@PageName.Location">Search again</a></p>
-          <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
-        </div>
+    <div class="govuk-grid-row">
+      <!--Filters-->
+      <div class="govuk-grid-column-one-third">
+        <button type="button"
+                class="govuk-button govuk-button--secondary mobile-filter-toggle"
+                data-module="govuk-button"
+                id="filterToggleBtn"
+                aria-expanded="true"
+                aria-controls="filterSection">
+          <span class="filter-toggle-text">Hide filters</span>
+        </button>
 
-        <!--Filters-->
-        <div class="govuk-grid-column-one-third">
-          <!--<button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-3 govuk-!-display-none-print" 
-                      id="toggle-filters" type="button">
-            Show filters
-          </button>-->
-          
+        <div id="filter-panel" class="filter-container">
+          <form method="post" asp-page-handler="UpdateSelection">
+            <div class="filter-container">
+              <div id="filterSection" class="filter-section">
+                <div class="govuk-summary-card">
+                  <div class="govuk-summary-card__title-wrapper">
+                    <div class="filter-heading">
+                      <h2 class="govuk-heading-m">Filter</h2>
+                    </div>
+                  </div>
 
-          <div id="filter-panel" class="filter-container" > 
-            <form method="post" asp-page-handler="UpdateSelection">
-              <div class="filter-container">
-                <div class="filter-search-terms">
-                  <div class="filter-heading">
-                    <h2 class="govuk-heading-m">Filter</h2>
+                  <div class="govuk-summary-card__content">
+                    <dl class="govuk-summary-list">
+                      @if (Model.AllFacets != null && Model.AllFacets.Count > 0)
+                      {
+                        int iFacetPosition = 0;
+
+                        foreach (var curFacet in Model.AllFacets)
+                        {
+                          iFacetPosition++;
+                          if (iFacetPosition == 2)
+                          {
+                            <!-- 2) Travel Distance (Drop down) ...-->
+                            <div class="govuk-summary-list__row">
+                              <div class="govuk-form-group">
+                                <govuk-select for="SelectedTravelDistance">
+                                  <govuk-select-label>Travel Distance</govuk-select-label>
+                                  @foreach (var option in Enum.GetValues<Distance>())
+                                  {
+                                    <govuk-select-item selected="@(Model.SelectedTravelDistance == option)">@option.GetDisplayName()</govuk-select-item>
+                                  }
+                                </govuk-select>
+                              </div>
+                            </div>
+                          }
+
+                          <!-- Render selectable checkboxes for supplied facets-->
+                          <div class="govuk-summary-list__row">
+                            <fieldset class="govuk-fieldset">
+                              <govuk-checkboxes for="SelectedFilterFacetItems">
+                                <govuk-checkboxes-fieldset>
+                                  <govuk-checkboxes-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--s">
+                                    @curFacet.Description
+                                  </govuk-checkboxes-fieldset-legend>
+                                  @{
+                                    int i = 0;
+                                    foreach (var facetValue in curFacet.Values)
+                                    {
+                                      var isTrue = facetValue.Value == 1L;
+
+                                      <govuk-checkboxes-item id="facetValue.Key+@(i)" class="govuk-checkboxes__item"
+                                                             value="@(facetValue.Key)"
+                                                             checked="@(isTrue)">
+                                        @facetValue.Key
+                                      </govuk-checkboxes-item>
+                                      i++;
+                                    }
+                                  }
+                                </govuk-checkboxes-fieldset>
+                              </govuk-checkboxes>
+                            </fieldset>
+                          </div>
+                        }
+                      }
+                      <br>
+                      <button class="govuk-button" type="submit">Apply filters</button>
+                      <p class="govuk-body">
+                        <a class="govuk-link" asp-page-handler="ClearFilters">Clear All filters</a>
+                      </p>
+                    </dl>
                   </div>
                 </div>
 
-                <div class="filter-list">
-                  @if (Model.AllFacets != null && Model.AllFacets.Count > 0)
-                  {
-                    int iFacetPosition = 0;
-
-                    foreach (var curFacet in Model.AllFacets)
-                    {
-                      iFacetPosition++;
-                      if (iFacetPosition == 2)
-                      {
-                        <!-- 2) Travel Distance (Drop down) ...-->
-                        <div class="govuk-form-group">
-                          <govuk-select for="SelectedTravelDistance">
-                            <govuk-select-label>Travel Distance</govuk-select-label>
-                            @foreach (var option in Enum.GetValues<Distance>())
-                            {
-                              <govuk-select-item selected="@(Model.SelectedTravelDistance == option)">@option.GetDisplayName()</govuk-select-item>
-                            }
-                          </govuk-select>
-                        </div>
-                        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-                      }
-                      
-                      <!-- Render selectable checkboxes for supplied facets-->
-                      <fieldset class="govuk-fieldset">
-                        <govuk-checkboxes for="SelectedFilterFacetItems">
-                          <govuk-checkboxes-fieldset>
-                            <govuk-checkboxes-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--s">
-                              @curFacet.Description
-                            </govuk-checkboxes-fieldset-legend>
-                            @{
-                              int i = 0;
-                              foreach (var facetValue in curFacet.Values)
-                              {
-                                var isTrue = facetValue.Value == 1L;
-
-                                <govuk-checkboxes-item id="facetValue.Key+@(i)" class="govuk-checkboxes__item"
-                                                       value="@(facetValue.Key)"
-                                                       checked="@(isTrue)">
-                                  @facetValue.Key
-                                </govuk-checkboxes-item>
-                                i++;
-                              }
-                            }
-                          </govuk-checkboxes-fieldset>
-                        </govuk-checkboxes>
-                        <!--p class="govuk-body">
-                        <a class="govuk-link" asp-page-handler="ClearFilter" >Clear filters</a>
-                        </p-->
-                      </fieldset>
-                      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-                    }
-                  }
-                  <br>
-                  <button class="govuk-button" type="submit">Apply filters</button>
-                  <p class="govuk-body">
-                    <a class="govuk-link" asp-page-handler="ClearFilters" >Clear All filters</a>
-                  </p>
-
-                </div>
               </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
-        
-        @if (!Model.Courses.Any()) 
+      </div>
+
+      <!-- Results Section (Right Column) -->
+      <div class="govuk-grid-column-two-thirds">
+
+        <!--Already done-->
+        @if (!Model.Courses.Any())
         {
           <h2 class="govuk-heading-m" role="status" aria-live="polite">It looks like we can’t find anything based on your answers.</h2>
           <p>Here are some things you can try:</p>
@@ -136,7 +148,7 @@
         else
         {
           <!-- Results & Pagination -->
-          <div class="govuk-grid-column-two-thirds">
+          <div class="course-results">
             <h2 class="govuk-heading-m">Available courses</h2>
 
             <!-- Sort Region-->
@@ -144,21 +156,21 @@
               <span class="govuk-!-font-weight-bold">Sort courses by:</span>
               <span class="govuk-!-margin-left-2">
                 @{
-                  if (Model.Search.OrderBy == OrderBy.Distance) 
+                  if (Model.Search.OrderBy == OrderBy.Distance)
                   {
                     <span aria-current="true">Distance | </span>
                     <a asp-page="@PageName.LoadCourses" asp-route-orderBy="relevance">Relevance</a>
                   }
                   else
                   {
-                    <a asp-page="@PageName.LoadCourses" asp-route-orderBy="distance" >Distance</a>
+                    <a asp-page="@PageName.LoadCourses" asp-route-orderBy="distance">Distance</a>
                     <span aria-current="true">| Relevance</span>
-                  } 
+                  }
                 }
               </span>
             </p>
 
-            @foreach (var searchResult in Model.Courses) 
+            @foreach (var searchResult in Model.Courses)
             {
               await Html.RenderPartialAsync("Partials/CourseV8", searchResult);
             }
@@ -173,7 +185,7 @@
                     <a class="govuk-link govuk-pagination__link"
                        asp-page="LoadCourses" asp-route-pageNumber="@(Model.PreviousPage)"
                        aria-label="Previous">
-                      <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" 
+                      <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg"
                            height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
                         <path d="m6.5938-0.0088125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
                       </svg>
@@ -213,7 +225,7 @@
                        asp-page="LoadCourses" asp-route-pageNumber="@Model.NextPage"
                        rel="next">
                       <span class="govuk-pagination__link-title">Next<span class="govuk-visually-hidden"> page</span></span>
-                      <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" 
+                      <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg"
                            height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
                         <path d="m8.108-0.0088125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
                       </svg>
@@ -226,6 +238,57 @@
         }
       </div>
 
-    </main>
-  </div>
+    </div>
 </div>
+
+@section Scripts {
+  <script src="~/js/moj-frontend.min.js"></script>
+  <script src="~/js/filter-toggle.js"></script>
+}
+
+<style>
+    /* Mobile filter toggle button - hidden by default */
+    .mobile-filter-toggle {
+        display: none;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    /* Show toggle button only on mobile/tablet */
+    @@media (max-width: 768px) {
+        .mobile-filter-toggle {
+            display: block;
+        }
+
+        /* Filter section transitions */
+        .filter-section {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+
+        .filter-section.collapsed {
+            max-height: 0;
+            margin-bottom: 0;
+        }
+    }
+
+    /* Ensure proper stacking on mobile */
+    @@media (max-width: 768px) {
+        .govuk-grid-column-one-third {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .govuk-grid-column-two-thirds {
+            width: 100%;
+        }
+    }
+
+    /* Course results styling */
+    .course-results {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+</style>
