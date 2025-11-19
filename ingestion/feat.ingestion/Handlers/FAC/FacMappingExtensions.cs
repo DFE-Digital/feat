@@ -68,7 +68,14 @@ public static class FacMappingExtensions
 
     public static GeographyPoint? ToGeographyPoint(this Point? point)
     {
-        return point == null ? null : GeographyPoint.Create(point.Y, point.X);
+        // We don't have to swap the X (Longitude) and Y (Latitude) round, because in creating
+        // a Point, we've already had to do this
+        return point == null ? null : GeographyPoint.Create(point.X, point.Y);
+    }
+    
+    public static GeographyPoint? ToGeographyPoint(this PostcodeLatLong postcode)
+    {
+        return postcode is { Latitude: not null, Longitude: not null } ?  GeographyPoint.Create(postcode.Longitude.Value, postcode.Latitude.Value) : null;
     }
 
     public static string Scrub(this string? source)
