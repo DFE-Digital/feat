@@ -1,6 +1,8 @@
 using System.Globalization;
+using System.Text;
 using Azure.Storage.Blobs;
 using CsvHelper;
+using feat.common.Extensions;
 using feat.common.Models;
 using feat.common.Models.AiSearch;
 using feat.common.Models.Enums;
@@ -10,10 +12,7 @@ using feat.ingestion.Enums;
 using feat.ingestion.Models.FAC;
 using feat.ingestion.Models.FAC.Enums;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Spatial;
-using NetTopologySuite.Geometries;
 using Z.BulkOperations;
-using DeliveryMode = feat.common.Models.Enums.DeliveryMode;
 using Location = feat.common.Models.Location;
 using Provider = feat.common.Models.Provider;
 
@@ -557,7 +556,7 @@ public class FacIngestionHandler(
     {
         var resultInfo = new ResultInfo();
         var auditEntries = new List<AuditEntry>();
-        bool skip = false;
+        bool skip = true;
         
         Console.WriteLine("Starting sync of Find A Course data");
 
@@ -745,7 +744,7 @@ public class FacIngestionHandler(
                 ProviderId = p.Id,
 
                 Title = c.COURSE_NAME ?? string.Empty,
-                AimOrAltTitle = a != null ? a.LearnAimRefTitle ?? string.Empty : string.Empty,
+                AimOrAltTitle = a != null ? a.LearnAimRefTitle : string.Empty,
                 Description = c.WHO_THIS_COURSE_IS_FOR,
                 EntryRequirements = c.ENTRY_REQUIREMENTS,
                 WhatYouWillLearn = c2.WhatYoullLearn,
@@ -1040,6 +1039,7 @@ public class FacIngestionHandler(
         while (true)
         {
             Console.WriteLine("Starting Find A Course AI Search indexing...");
+            var sb = new StringBuilder();
 
             var entries = dbContext.Entries.Where(x => x.SourceSystem == SourceSystem.FAC)
                 .Include(entry => entry.EntrySectors)
@@ -1050,7 +1050,7 @@ public class FacIngestionHandler(
                 .ThenInclude(provider => provider.ProviderLocations)
                 .ThenInclude(providerLocation => providerLocation.Location)
                 .Where(x => x.IngestionState == IngestionState.Pending)
-                .Take(50);
+                .Take(250);
 
             if (!entries.Any())
             {
@@ -1067,6 +1067,12 @@ public class FacIngestionHandler(
                 foreach (var instance in entry.EntryInstances)
                 {
                     var location = instance.Location ?? entry.Provider.ProviderLocations.FirstOrDefault()?.Location;
+                    
+                    // Temporary fix to merge description and what you'll learn
+                    sb.Clear();
+                    sb.AppendLine(entry.Description);
+                    sb.AppendLine(entry.WhatYouWillLearn);
+                    
                     var searchEntry = new AiSearchEntry
                     {
                         Id = entry.Id.ToString(),
@@ -1074,7 +1080,7 @@ public class FacIngestionHandler(
                         Sector = string.Join(", ", entry.EntrySectors.Select(es => es.Sector.Name)),
                         Title = entry.Title,
                         LearningAimTitle = entry.AimOrAltTitle,
-                        Description = entry.Description.Scrub(),
+                        Description = sb.ToString().Scrub(),
                         EntryType = nameof(EntryType.Course),
                         Source = nameof(SourceSystem.FAC),
                         QualificationLevel = entry.Level?.ToString() ?? string.Empty,
@@ -1094,8 +1100,10 @@ public class FacIngestionHandler(
                 entry.IngestionState = IngestionState.Processing;
             }
 
+            var list = entries.ToList();
+
             // Update the entries above to processing
-            await dbContext.BulkUpdateAsync(entries, options =>
+            await dbContext.BulkUpdateAsync(list, options =>
             {
                 options.ColumnInputExpression = e => e.IngestionState;
                 options.IncludeGraph = false;
@@ -1105,13 +1113,13 @@ public class FacIngestionHandler(
 
             var result = await searchIndexHandler.Ingest(searchEntries);
 
+            Console.WriteLine($"Indexed {searchEntries.Count} records.");
+            
             // Update the entries above to complete
-            foreach (var entry in entries)
-            {
-                entry.IngestionState = IngestionState.Complete;
-            }
+            list.ForEach(e => e.IngestionState = IngestionState.Complete);
+            
 
-            await dbContext.BulkUpdateAsync(entries, options =>
+            await dbContext.BulkUpdateAsync(list, options =>
             {
                 options.ColumnInputExpression = e => e.IngestionState;
                 options.IncludeGraph = false;
@@ -1121,60 +1129,9 @@ public class FacIngestionHandler(
 
 
             // Keep going until we've ingested everything
-            if (!dbContext.Entries.Any(e => e.IngestionState == IngestionState.Pending)) return result;
+            if (!dbContext.Entries.Any(e => e.IngestionState == IngestionState.Pending && e.SourceSystem == SourceSystem.FAC)) return result;
             dbContext.ChangeTracker.Clear();
 
         }
-    }
-
-
-    private static string MapStudyTime(AttendancePattern? attendancePattern)
-    {
-        return attendancePattern switch
-        {
-            AttendancePattern.Daytime => nameof(StudyTime.Daytime),
-            AttendancePattern.Weekend => nameof(StudyTime.Weekend),
-            AttendancePattern.Evening => nameof(StudyTime.Evening),
-            _ => string.Empty
-        };
-    }
-
-    private static string MapCourseHours(StudyMode? studyMode)
-    {
-        return studyMode switch
-        {
-            StudyMode.Flexible => nameof(CourseHours.Flexible),
-            StudyMode.FullTime => nameof(CourseHours.FullTime),
-            StudyMode.PartTime => nameof(CourseHours.PartTime),
-            _ => string.Empty
-        };
-    }
-
-    private static string MapLearningMethod(DeliveryMode? deliveryMode)
-    {
-        return deliveryMode switch
-        {
-            DeliveryMode.BlendedLearning => nameof(LearningMethod.Hybrid),
-            DeliveryMode.ClassroomBased => nameof(LearningMethod.ClassroomBased),
-            DeliveryMode.Online => nameof(LearningMethod.Online),
-            DeliveryMode.WorkBased => nameof(LearningMethod.Workbased),
-            _ => string.Empty
-        };
-    }
-
-    private static string MapQualificationLevel(EducationLevel? qualificationLevel)
-    {
-        return qualificationLevel switch
-        {
-            EducationLevel.Level1 => nameof(QualificationLevel.Level1),
-            EducationLevel.Level2 => nameof(QualificationLevel.Level2),
-            EducationLevel.Level3 => nameof(QualificationLevel.Level3),
-            EducationLevel.Level4 => nameof(QualificationLevel.Level4),
-            EducationLevel.Level5 => nameof(QualificationLevel.Level5),
-            EducationLevel.Level6 => nameof(QualificationLevel.Level6),
-            EducationLevel.Level7 => nameof(QualificationLevel.Level7),
-            EducationLevel.Level0 => nameof(QualificationLevel.Entry),
-            _ => string.Empty
-        };
     }
 }

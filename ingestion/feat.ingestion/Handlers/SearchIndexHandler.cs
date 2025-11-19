@@ -25,8 +25,8 @@ public class SearchIndexHandler(
         Console.WriteLine("Creating index...");
         
         var fieldBuilder = new FieldBuilder();
-        string vectorSearchProfileName = "my-vector-profile";
-        string vectorSearchHnswConfig = "hnsw-m10-const1000-search1000";
+        const string vectorSearchProfileName = "my-vector-profile";
+        const string vectorSearchHnswConfig = "hnsw-m10-const1000-search1000";
 
         var index = new SearchIndex(_azureOptions.AiSearchIndex)
         {
@@ -69,7 +69,7 @@ public class SearchIndexHandler(
             }
         };
         
-        var result = aiSearchClient.CreateOrUpdateIndex(index);
+        aiSearchClient.CreateOrUpdateIndex(index);
 
         Console.WriteLine("Done.");
         
@@ -100,7 +100,7 @@ public class SearchIndexHandler(
         }
 
         // If we have large text, let's not try and cache it
-        if (text?.Length > 200)
+        if (text.Length > 500)
         {
             var result = embeddingClient.GenerateEmbedding(text.ToLowerInvariant());
             return result.Value.ToFloats().ToArray();
@@ -125,7 +125,7 @@ public class SearchIndexHandler(
     {
 
         // Convert the input string to a byte array and compute the hash.
-        byte[] data = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(input));
+        var data = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(input));
 
         // Create a new Stringbuilder to collect the bytes
         // and create a string.
@@ -133,24 +133,13 @@ public class SearchIndexHandler(
 
         // Loop through each byte of the hashed data
         // and format each one as a hexadecimal string.
-        for (int i = 0; i < data.Length; i++)
+        foreach (var t in data)
         {
-            sBuilder.Append(data[i].ToString("x2"));
+            sBuilder.Append(t.ToString("x2"));
         }
 
         // Return the hexadecimal string.
         return sBuilder.ToString();
     }
 
-    // Verify a hash against a string.
-    private static bool VerifyHash(HashAlgorithm hashAlgorithm, string input, string hash)
-    {
-        // Hash the input.
-        var hashOfInput = GetHash(hashAlgorithm, input);
-
-        // Create a StringComparer an compare the hashes.
-        StringComparer comparer = StringComparer.OrdinalIgnoreCase;
-
-        return comparer.Compare(hashOfInput, hash) == 0;
-    }
 }
