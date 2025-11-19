@@ -1,6 +1,6 @@
 using feat.common.Models.Enums;
 
-namespace feat.api.Models;
+namespace feat.web.Models;
 
 public class CourseDetailsResponse
 {

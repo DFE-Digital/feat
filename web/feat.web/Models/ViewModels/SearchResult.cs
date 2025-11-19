@@ -5,8 +5,7 @@ namespace feat.web.Models.ViewModels;
 
 public class SearchResult
 {
-    public required string CourseId { get; set; }
-    public decimal DistanceSudo { get; set; } = 1;
+    public required Guid Id { get; set; }
     
     public required string CourseTitle { get; init; }
     
@@ -16,7 +15,7 @@ public class SearchResult
     
     public string? Distance { get; init; }
     
-    public CourseType? CourseType { get; init; }
+    public CourseType? CourseType { private get; init; }
     
     public string CourseTypeDisplay => CourseType?.GetDescription() ?? "Not available";
     

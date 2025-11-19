@@ -41,7 +41,7 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
         var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
         if (searchResponse.Facets.Any())
         {
-            HttpContext.Session.Set(SharedStrings.AllClientFacets, searchResponse.Facets.ToClientFacets());    
+            //HttpContext.Session.Set(SharedStrings.AllClientFacets, searchResponse.Facets.ToClientFacets());    
         }
         
         if (!string.IsNullOrEmpty(Search.Location))

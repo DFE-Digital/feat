@@ -1,0 +1,191 @@
+@using feat.web.Utils
+@model feat.web.Models.ViewModels.CourseDetailsCourse
+
+@{
+  ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
+}
+@section BeforeContent {
+  <govuk-back-link href="javascript:history.back()">Back</govuk-back-link>
+}
+
+<h2>@Model.Title</h2>
+
+<div class="govuk-width-container">
+  <main class="govuk-main-wrapper" id="main-content">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full"></div>
+
+      <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">
+              About the course
+            </h2>
+          </div>
+
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Course type</dt>
+                <dd class="govuk-summary-list__value">@Model.CourseTypeDisplay</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Level</dt>
+                <dd class="govuk-summary-list__value">@Model.Level</dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Entry requirements</dt>
+                <dd class="govuk-summary-list__value">@Model.EntryRequirements</dd>
+              </div>
+              
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Cost</dt>
+                <dd class="govuk-summary-list__value">@Model.CostDisplay</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Course overview</dt>
+                <dd class="govuk-summary-list__value">
+                  @Model.Description
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+        
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Location</h2>
+          </div>
+
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Provider</dt>
+                <dd class="govuk-summary-list__value">@Model.ProviderName</dd>
+                <dd class="govuk-summary-list__actions">
+                  <a class="govuk-link" href="@(Model.ProviderUrl)">View website
+                    @* <span class="govuk-visually-hidden">@displayNameAndAddress</span> *@
+                  </a>
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Provider location</dt>
+                <dd class="govuk-summary-list__value">
+                  @* Leaving existing logic *@
+                  @if (Model.ProviderAddresses?.Count > 1)
+                  {
+                    var firstLocation = Model.ProviderAddresses?.First();
+                    var iCount = Model.ProviderAddresses?.Count;
+                    var isFirst = true;
+
+                    <p>@firstLocation?.Display</p>
+
+                    <details class="govuk-details govuk-!-margin-top-2" data-module="govuk-details">
+                      <summary class="govuk-details__summary">
+                        @{
+                          var sPlural = iCount > 2 ? "s are" : " is";
+                          <span class="govuk-details__summary-text">@($"{iCount - 1} other location{sPlural} available")</span>
+                        }
+                      </summary>
+                      <div class="govuk-details__text">
+                        @foreach (var location in Model.ProviderAddresses!)
+                        {
+                          if (!isFirst)
+                          {
+                            <p>@location.Display</p>
+                          }
+
+                          isFirst = false;
+                        }
+                      </div>
+                    </details>
+                  }
+                  else
+                  {
+                    @Model.ProviderAddresses?.FirstOrDefault()?.Display
+                  }
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                  <a class="govuk-link" href="#">View on a map
+                    @* <span class="govuk-visually-hidden">@displayNameAndAddress</span> *@
+                  </a>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Course details</h2>
+          </div>
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Delivery method</dt>
+                <dd class="govuk-summary-list__value">@Model.DeliveryModeDisplay</dd>
+              </div>
+              @if (Model.StartDates?.Count > 1)
+              {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Start dates</dt>
+                  <dd class="govuk-summary-list__value">
+                    @foreach (var startDate in Model.StartDates)
+                    {
+                      <p>@startDate.Display</p>
+                    }
+                  </dd>
+                </div>
+              }
+              else
+              {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Start date</dt>
+                  <dd class="govuk-summary-list__value">@Model.StartDates?.First().Display</dd>
+                </div>
+              }
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Duration</dt>
+                <dd class="govuk-summary-list__value">@Model.DurationDisplay</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Hours</dt>
+                <dd class="govuk-summary-list__value">@Model.HoursDisplay</dd>
+              </div>
+
+            </dl>
+          </div>
+        </div>
+
+        <button type="submit" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
+          Go to course
+        </button>
+        <p>The details we show you comes from the provider. There may be extra information on their website. You can also email or call them if you have any questions or want to discuss your options. </p>
+
+      </div>
+      
+      <div class="govuk-grid-column-one-third">
+        <div class="x-govuk-related-navigation">
+          <nav class="x-govuk-related-navigation__nav-section" aria-labelledby="related-navigation-related-content">
+
+            <h2 class="x-govuk-related-navigation__main-heading" id="related-navigation-related-content">Related links</h2>
+            <ul class="x-govuk-related-navigation__link-list">
+              <li class="x-govuk-related-navigation__link">
+                <a class="govuk-link x-govuk-related-navigation__section-link" href="/browse/education/school-life">Explore jobs and careers you could do after this course</a>
+              </li>
+              <li class="x-govuk-related-navigation__link">
+                <a asp-page="/AboutALevels" class="govuk-link x-govuk-related-navigation__section-link">More information about A Levels</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>

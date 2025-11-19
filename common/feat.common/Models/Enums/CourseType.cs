@@ -1,7 +1,9 @@
 using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace feat.common.Models.Enums;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum CourseType
 {
     [Description("Essential Skills")]
@@ -34,5 +36,6 @@ public enum CourseType
     [Description("Diploma")]
     Diploma = 10,
     
+    [Description("Unknown")]
     Unknown = -1
 }

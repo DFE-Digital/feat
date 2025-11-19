@@ -365,3 +365,5 @@ MigrationBackup/
 
 # Local dev overrides
 appsettings.Local.json
+
+**/wwwroot/**

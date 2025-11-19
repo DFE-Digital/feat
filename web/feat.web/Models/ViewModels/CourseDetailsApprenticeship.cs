@@ -4,21 +4,21 @@ namespace feat.web.Models.ViewModels;
 
 public class CourseDetailsApprenticeship : CourseDetailsBase
 {
-    public decimal? Wage { private get; init; }
+    public decimal? Wage { private get; set; }
     
     public string WageDisplay => Wage?.ToString("C", new CultureInfo("en-GB")) ?? NotAvailableString;
     
-    public string? PositionAvailable { get; init; }
+    public string? PositionAvailable { get; set; }
     
-    public string? EmployerName { get; init; }
+    public string? EmployerName { get; set; }
     
-    public Location? EmployerAddress { get; init; }
+    public Location? EmployerAddress { get; set; }
     
-    public string? EmployerUrl { get; init; }
+    public string? EmployerUrl { get; set; }
     
-    public string? EmployerDescription { get; init; }
+    public string? EmployerDescription { get; set; }
     
-    public string? TrainingProvider { get; init; }
+    public string? TrainingProvider { get; set; }
     
-    public StartDate? StartDate { get; init; }
+    public StartDate? StartDate { get; set; }
 }
