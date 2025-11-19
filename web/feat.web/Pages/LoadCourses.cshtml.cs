@@ -105,13 +105,6 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
         return RedirectToPage(); 
     }
 
-    public IActionResult OnPostClearFilter()
-    {
-        logger.LogDebug("OnPostClearFilter called");
-
-        return RedirectToPage();
-    }
-
     public IActionResult OnPostUpdateSelection()
     {
         logger.LogDebug("OnPostUpdateSelection called");
