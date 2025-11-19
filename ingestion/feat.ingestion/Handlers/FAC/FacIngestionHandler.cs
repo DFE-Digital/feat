@@ -557,12 +557,16 @@ public class FacIngestionHandler(
     {
         var resultInfo = new ResultInfo();
         var auditEntries = new List<AuditEntry>();
+        bool skip = false;
         
         Console.WriteLine("Starting sync of Find A Course data");
 
-        Console.WriteLine("Skipped");
-        return true;
-        
+        if (skip)
+        {
+            Console.WriteLine("Skipped");
+            return true;
+        }
+
         // LOCATIONS
         
         Console.WriteLine("Generating locations...");
@@ -611,7 +615,6 @@ public class FacIngestionHandler(
         resultInfo = new ResultInfo();
         
         // PROVIDERS
-        
         Console.WriteLine("Generating providers...");
         var providers =
             from p in dbContext.FAC_Providers
@@ -663,7 +666,7 @@ public class FacIngestionHandler(
                 SourceSystem = SourceSystem.FAC
             };
         
-        await dbContext.BulkSynchronizeAsync(providerLocations, options =>
+        await dbContext.BulkSynchronizeAsync(providerLocations.Distinct(), options =>
         {
             options.ColumnPrimaryKeyExpression = p => new
             {
@@ -704,6 +707,7 @@ public class FacIngestionHandler(
                 AimOrAltTitle = td.Name,
                 Description = t.WhoFor,
                 EntryRequirements = t.EntryRequirements,
+                WhatYouWillLearn = t.WhatYoullLearn,
 
 
                 Url = t.Website ?? c.COURSE_URL ?? string.Empty,
@@ -724,6 +728,8 @@ public class FacIngestionHandler(
             from a in aimdata.DefaultIfEmpty()
             join p in dbContext.Providers on
                 c.PROVIDER_UKPRN.ToString() equals p.Ukprn
+            join c2 in dbContext.FAC_Courses on
+                c.COURSE_ID equals c2.CourseId
             where 
                 c.COURSE_TYPE != CourseType.Apprenticeship 
                 && c.COURSE_TYPE != CourseType.TLevels
@@ -742,6 +748,7 @@ public class FacIngestionHandler(
                 AimOrAltTitle = a != null ? a.LearnAimRefTitle ?? string.Empty : string.Empty,
                 Description = c.WHO_THIS_COURSE_IS_FOR,
                 EntryRequirements = c.ENTRY_REQUIREMENTS,
+                WhatYouWillLearn = c2.WhatYoullLearn,
 
                 Url = c.COURSE_URL ?? string.Empty,
                 FlexibleStart = c.FLEXIBLE_STARTDATE.GetValueOrDefault(false),
@@ -755,7 +762,7 @@ public class FacIngestionHandler(
         Console.WriteLine("Generating entries for t-levels...");
         var dictionary = await tlevels.Distinct().ToDictionaryAsync(e => e.SourceReference, cancellationToken: cancellationToken);
 
-        Console.WriteLine("Generating entries for other courses...");
+        Console.WriteLine($"Generating entries for {courses.LongCount()} other courses...");
         await foreach (var entry in courses.AsAsyncEnumerable().WithCancellation(cancellationToken))
         {
             dictionary[entry.SourceReference] = entry;
@@ -777,7 +784,7 @@ public class FacIngestionHandler(
             options.UseRowsAffected = true;
             options.ColumnPrimaryKeyExpression = e => e.SourceReference;
             options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
-            options.UseAudit = true;
+            options.UseAudit = false;
             options.AuditEntries = auditEntries;
             options.ResultInfo = resultInfo;
         }, cancellationToken);
@@ -815,6 +822,10 @@ public class FacIngestionHandler(
                 c.COURSE_ID equals t.TLevelId
             join e in dbContext.Entries on
                 c.COURSE_ID.ToString() equals e.SourceReference
+            join tl in dbContext.FAC_TLevelLocations on 
+                t.TLevelId equals tl.TLevelId
+            join l in dbContext.Locations on
+                tl.VenueId.ToString() equals l.SourceReference
             where t.TLevelStatus == Status.Live && c.COURSE_TYPE == CourseType.TLevels
             select new EntryInstance()
             {
@@ -826,13 +837,19 @@ public class FacIngestionHandler(
                 Reference = c.COURSE_RUN_ID.ToString(),
                 StartDate = c.STARTDATE,
                 EntryId = e.Id,
+                LocationId = l.Id,
                 StudyMode = c.DELIVER_MODE.ToLearningMethod()
             };
                 
         var courseRuns =
             from c in dbContext.FAC_AllCourses
+            join cr in dbContext.FAC_CourseRuns on
+                c.COURSE_RUN_ID equals cr.CourseRunId
+            join l in dbContext.Locations on
+                cr.VenueId.ToString() equals l.SourceReference into instanceLocations
             join e in dbContext.Entries on
                 c.COURSE_ID.ToString() equals e.SourceReference
+            from l in instanceLocations.DefaultIfEmpty()
             where c.COURSE_TYPE != CourseType.TLevels && c.COURSE_TYPE != CourseType.Apprenticeship
             select new EntryInstance()
             {
@@ -844,6 +861,7 @@ public class FacIngestionHandler(
                 Reference = c.COURSE_RUN_ID.ToString(),
                 StartDate = c.STARTDATE,
                 EntryId = e.Id,
+                LocationId = l != null ? l.Id : null,
                 StudyMode = c.DELIVER_MODE.ToLearningMethod()
             };
         
@@ -876,66 +894,6 @@ public class FacIngestionHandler(
             options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
             options.ResultInfo = resultInfo;
         }, cancellationToken);
-        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
-        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
-        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
-        resultInfo = new ResultInfo();
-        
-        // ENTRY LOCATIONS
-        
-        Console.WriteLine("Generating course locations...");
-        
-        var tLevelLocations =
-            from tl in dbContext.FAC_TLevelLocations
-            join t in dbContext.FAC_TLevels on
-                tl.TLevelId equals t.TLevelId
-            join v in dbContext.FAC_Venues on
-                tl.VenueId equals v.VenueId
-            join l in dbContext.Locations on
-                v.VenueId.ToString() equals l.SourceReference
-            join e in dbContext.Entries on
-                tl.TLevelId.ToString() equals e.SourceReference
-            where v.VenueStatus == VenueStatus.Live && tl.TLevelLocationStatus == Status.Live
-            select new EntryLocation 
-            {
-                EntryId = e.Id,
-                LocationId = l.Id,
-                SourceSystem = SourceSystem.FAC
-            };
-            
-        var courseLocations =
-            from cr in dbContext.FAC_CourseRuns
-            join c in dbContext.FAC_Courses on
-                cr.CourseId equals c.CourseId
-            join v in dbContext.FAC_Venues on
-                cr.VenueId equals v.VenueId
-            join l in dbContext.Locations on
-                v.VenueId.ToString() equals l.SourceReference
-            join e in dbContext.Entries on
-                c.CourseId.ToString() equals e.SourceReference
-            where v.VenueStatus == VenueStatus.Live && c.CourseType != CourseType.TLevels
-            select new EntryLocation()
-            {
-                EntryId = e.Id,
-                LocationId = l.Id,
-                SourceSystem = SourceSystem.FAC
-            };
-
-        var distinctTLevelLocations = tLevelLocations.Distinct();
-        var distinctCourseLocations = courseLocations.Distinct();
-        var entryLocations = distinctTLevelLocations.Union(distinctCourseLocations);
-        
-        await dbContext.BulkSynchronizeAsync(entryLocations, options =>
-        {
-            options.ColumnPrimaryKeyExpression = p => new
-            {
-                p.EntryId, p.LocationId
-            };
-            options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
-        }, cancellationToken);
-        
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
@@ -1076,54 +1034,43 @@ public class FacIngestionHandler(
 
         return true;
     }
-    
-        public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
+
+    public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine("Starting Find A Course AI Search indexing...");
-        
-        var entries = dbContext.Entries
-            .Where(x => x.SourceSystem == SourceSystem.FAC)
-            .Include(entry => entry.EntrySectors)
-            .ThenInclude(entrySector => entrySector.Sector)
-            .Include(entry => entry.EntryLocations)
-            .Include(entry => entry.EntryInstances)
-            .Include(entry => entry.Provider)
-            .ThenInclude(provider => provider.ProviderLocations)
-            .ThenInclude(providerLocation => providerLocation.Location)
-            .Where(x => x.IngestionState == IngestionState.Pending)
-            .Take(125)
-            .ToList();
-
-        if (entries.Count == 0)
+        while (true)
         {
-            Console.WriteLine("No entries found to index.");
-            return false;
-        }
+            Console.WriteLine("Starting Find A Course AI Search indexing...");
 
-        Console.WriteLine($"Loaded {entries.Count} entries for indexing.");
-        
-        var searchEntries = new List<AiSearchEntry>();
+            var entries = dbContext.Entries.Where(x => x.SourceSystem == SourceSystem.FAC)
+                .Include(entry => entry.EntrySectors)
+                .ThenInclude(entrySector => entrySector.Sector)
+                .Include(entry => entry.EntryInstances)
+                .ThenInclude(instance => instance.Location)
+                .Include(entry => entry.Provider)
+                .ThenInclude(provider => provider.ProviderLocations)
+                .ThenInclude(providerLocation => providerLocation.Location)
+                .Where(x => x.IngestionState == IngestionState.Pending)
+                .Take(50);
 
-        foreach (var entry in entries)
-        {
-            foreach (var instance in entry.EntryInstances)
+            if (!entries.Any())
             {
-                var locations = entry.EntryLocations.Select(el => el.Location).ToList();
-                AiSearchEntry searchEntry;
-                
-                // If we can't get locations from the entry locations, grab one from the provider
-                if (locations.Count == 0)
+                Console.WriteLine("No entries found to index.");
+                return true;
+            }
+
+            Console.WriteLine($"Loaded {entries.Count()} entries for indexing.");
+
+            var searchEntries = new List<AiSearchEntry>();
+
+            foreach (var entry in entries)
+            {
+                foreach (var instance in entry.EntryInstances)
                 {
-                    locations.AddRange(entry.Provider.ProviderLocations.Select(pl => pl.Location));
-                }
-                
-                // If we still have no locations, we need to create an entry without a location
-                if (locations.Count == 0)
-                {
-                    searchEntry = new AiSearchEntry
+                    var location = instance.Location ?? entry.Provider.ProviderLocations.FirstOrDefault()?.Location;
+                    var searchEntry = new AiSearchEntry
                     {
                         Id = entry.Id.ToString(),
-                        InstanceId = instance.Id.ToString(),
+                        InstanceId = instance.LocationId != null ? $"{instance.Id}_{instance.LocationId}" : $"{instance.Id}",
                         Sector = string.Join(", ", entry.EntrySectors.Select(es => es.Sector.Name)),
                         Title = entry.Title,
                         LearningAimTitle = entry.AimOrAltTitle,
@@ -1131,78 +1078,53 @@ public class FacIngestionHandler(
                         EntryType = nameof(EntryType.Course),
                         Source = nameof(SourceSystem.FAC),
                         QualificationLevel = entry.Level?.ToString() ?? string.Empty,
-                        LearningMethod = instance.StudyMode.ToString() ??  string.Empty,
+                        LearningMethod = instance.StudyMode.ToString() ?? string.Empty,
                         CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
                         StudyTime = entry.StudyTime?.ToString() ?? string.Empty,
-                        Location = null
+                        Location = location?.GeoLocation.ToGeographyPoint()
                     };
-                    
+
                     searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
                     searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
                     searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
                     searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
                     searchEntries.Add(searchEntry);
                 }
-                else
-                {
-                    foreach (var location in locations)
-                    {
-                        searchEntry = new AiSearchEntry
-                        {
-                            Id = entry.Id.ToString(),
-                            InstanceId = $"{instance.Id}_{location.Id}",
-                            Sector = string.Join(", ", entry.EntrySectors.Select(es => es.Sector.Name)),
-                            Title = entry.Title,
-                            LearningAimTitle = entry.AimOrAltTitle,
-                            Description = entry.Description.Scrub(),
-                            EntryType = nameof(EntryType.Course),
-                            Source = nameof(SourceSystem.FAC),
-                            QualificationLevel = entry.Level?.ToString() ?? string.Empty,
-                            LearningMethod = instance.StudyMode.ToString() ??  string.Empty,
-                            CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
-                            StudyTime = entry.StudyTime?.ToString() ?? string.Empty,
-                            Location = location.GeoLocation.ToGeographyPoint()
-                        };
-                        
-                        searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
-                        searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
-                        searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
-                        searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
-                        searchEntries.Add(searchEntry);
-                        
-                    }
-                }
+
+                entry.IngestionState = IngestionState.Processing;
             }
 
-            entry.IngestionState = IngestionState.Processing;
+            // Update the entries above to processing
+            await dbContext.BulkUpdateAsync(entries, options =>
+            {
+                options.ColumnInputExpression = e => e.IngestionState;
+                options.IncludeGraph = false;
+            }, cancellationToken);
+
+            Console.WriteLine($"Created {searchEntries.Count} records for indexing.");
+
+            var result = await searchIndexHandler.Ingest(searchEntries);
+
+            // Update the entries above to complete
+            foreach (var entry in entries)
+            {
+                entry.IngestionState = IngestionState.Complete;
+            }
+
+            await dbContext.BulkUpdateAsync(entries, options =>
+            {
+                options.ColumnInputExpression = e => e.IngestionState;
+                options.IncludeGraph = false;
+            }, cancellationToken);
+
+            Console.WriteLine($"Find A Course AI Search indexing {(result ? "complete" : "failed")}.");
+
+
+            // Keep going until we've ingested everything
+            if (!dbContext.Entries.Any(e => e.IngestionState == IngestionState.Pending)) return result;
+            dbContext.ChangeTracker.Clear();
+
         }
-
-        // Update the entries above to processing
-        await dbContext.BulkUpdateAsync(entries, options =>
-        {
-            options.ColumnInputExpression = e => e.IngestionState;
-            options.IncludeGraph = false;
-        }, cancellationToken);
-        
-        Console.WriteLine($"Created {searchEntries.Count} records for indexing.");
-        
-        var result = await searchIndexHandler.Ingest(searchEntries);
-        
-        // Update the entries above to complete
-        entries.ForEach(e => e.IngestionState = IngestionState.Complete);
-        await dbContext.BulkUpdateAsync(entries, options =>
-        {
-            options.ColumnInputExpression = e => e.IngestionState;
-            options.IncludeGraph = false;
-        }, cancellationToken);
-
-        Console.WriteLine($"Find A Course AI Search indexing {(result ? "complete" : "failed")}.");
-
-        // Keep going until we've ingested everything
-        if (dbContext.Entries.Count(e => e.IngestionState == IngestionState.Pending) > 0)
-            return await IndexAsync(cancellationToken);
-        
-        return result;
     }
 
 
