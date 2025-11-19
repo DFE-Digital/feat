@@ -66,21 +66,21 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             
             // Call Api
             var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
-            if (searchResponse.SearchResults.Count == 0)
-            {
-                return RedirectToPage(PageName.NoResultsSearch);
-            }
+            // if (searchResponse.SearchResults.Count == 0)
+            // {
+            //     return RedirectToPage(PageName.NoResultsSearch);
+            // }
 
             // Set up data :
             TotalCourseCount = (int)searchResponse.TotalCount;
-            Courses = searchResponse.SearchResults.ToCourses();
+            //Courses = searchResponse.SearchResults.ToCourses();
             
             // Filtering & Facets 
             List<ClientFacet>? allFacets = HttpContext.Session.Get<List<ClientFacet>>(SharedStrings.AllClientFacets);
-            List<ClientFacet>? tickedFacets = searchResponse.Facets.ToClientFacets();
+            //List<ClientFacet>? tickedFacets = searchResponse.Facets.ToClientFacets();
             
-            if (allFacets != null) 
-                AllFacets = MergeSelectedFacets(allFacets, tickedFacets);
+            // if (allFacets != null) 
+            //     AllFacets = MergeSelectedFacets(allFacets, tickedFacets);
             
             // Set distance - as it was chosen by the user previously
             SelectedTravelDistance = Search.Distance;

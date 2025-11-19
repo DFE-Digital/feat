@@ -36,5 +36,6 @@ public enum CourseType
     [Description("Diploma")]
     Diploma = 10,
     
+    [Description("Unknown")]
     Unknown = -1
 }

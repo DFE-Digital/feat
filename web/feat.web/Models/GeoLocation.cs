@@ -1,4 +1,4 @@
-namespace feat.web.Models.ViewModels;
+namespace feat.web.Models;
 
 public class GeoLocation
 {

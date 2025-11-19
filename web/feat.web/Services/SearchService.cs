@@ -1,36 +1,38 @@
 using feat.common;
+using feat.common.Models.Enums;
 using feat.web.Configuration;
+using feat.web.Extensions;
 using feat.web.Models;
+using feat.web.Models.ViewModels;
 using Microsoft.Extensions.Options;
 
 namespace feat.web.Services;
 
-public class SearchService : ISearchService
+public class SearchService(
+    IApiClient apiClient,
+    IOptions<SearchOptions> options) : ISearchService
 {
-    private readonly IApiClient _apiClient;
-    private readonly IOptions<SearchOptions> _options;
-
-    public SearchService(
-        IApiClient apiClient,
-        IOptions<SearchOptions> options)
-    {
-        _apiClient = apiClient;
-        _options = options;
-    }
-
     public async Task<SearchResponse> Search(Search search, string sessionId)
     {
         var request = search.ToSearchRequest();
         request.SessionId = sessionId;
         
-        var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search").ToString();
-        return await _apiClient.PostAsync<SearchResponse>(ApiClientNames.Feat, endpoint, request);
+        var endpoint = new Uri(new Uri(options.Value.ApiBaseUrl), "api/search").ToString();
+        
+        return await apiClient.PostAsync<SearchResponse>(ApiClientNames.Feat, endpoint, request);
     }
     
-    public async Task<SearchResponse> GetCourseDetails(Search search, string sessionId)
+    public async Task<CourseDetailsBase?> GetCourseDetails(string courseId)
     {
-        var endpoint = new Uri(new Uri(_options.Value.ApiBaseUrl), "api/search/courseId").ToString();
-        await Task.Delay(1);
-        return await _apiClient.GetAsync<SearchResponse>(ApiClientNames.Feat, endpoint);
+        var endpoint = new Uri(new Uri(options.Value.ApiBaseUrl), $"api/courses/{courseId}").ToString();
+        var response = await apiClient.GetAsync<CourseDetailsResponse>(ApiClientNames.Feat, endpoint);
+
+        return response.EntryType switch
+        {
+            EntryType.Course => response.ToCourseViewModel(),
+            EntryType.Apprenticeship => response.ToApprenticeshipViewModel(),
+            EntryType.UniversityCourse => response.ToUniversityViewModel(),
+            _ => null
+        };
     }
 }

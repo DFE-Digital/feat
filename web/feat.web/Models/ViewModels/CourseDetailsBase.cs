@@ -7,11 +7,13 @@ public abstract class CourseDetailsBase
 {
     public string? Title { get; init; }
     
-    public CourseType Type { private get; init; }
+    public EntryType? EntryType { get; init; }
     
-    public string TypeDisplay => Type.GetDescription() ?? NotAvailableString;
+    public CourseType? CourseType { private get; init; }
     
-    public int Level { get; init; }
+    public string CourseTypeDisplay => CourseType?.GetDescription() ?? NotAvailableString;
+    
+    public int? Level { get; init; }
     
     public string? EntryRequirements { get; init; }
     

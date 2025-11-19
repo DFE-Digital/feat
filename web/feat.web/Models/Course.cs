@@ -1,39 +1,26 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using feat.common.Models.Enums;
-using feat.web.Extensions;
+using feat.web.Models.ViewModels;
 
 namespace feat.web.Models;
 
 public class Course
 {
-    public required string CourseId { get; set; } 
-    public decimal DistanceSudo { get; set; } = 1;
+    public Guid Id { get; set; }
+        
+    public required string Title { get; set; }
+        
+    public required string Provider { get; set; }
     
-    public required string CourseTitle { get; init; }
+    public required string CourseType { get; set; }
     
-    public string? ProviderName { get; init; }
+    public required string Requirements { get; set; }
     
-    public string? Location { get; init; }
+    public required string Overview { get; set; }
     
-    public string? Distance { get; init; }
-    public CourseType? CourseType { get; init; }
-    public string CourseTypeDisplay => CourseType?.GetDescription() ?? "Not available";
+    public GeoLocation? Location { get; set; }
     
-    public string? Requirements { get; init; }
+    public string? LocationName { get; set; }
     
-    public string? Overview { get; init; }
+    public double? Distance { get; set; }
     
-    public string ToJson()
-    {
-        var json = JsonSerializer.Serialize(this, new JsonSerializerOptions()
-        {
-            WriteIndented = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
-            Converters = { new JsonStringEnumConverter() }
-        });
-
-        return json;
-    }
+    public double? Score { get; set; }
 }

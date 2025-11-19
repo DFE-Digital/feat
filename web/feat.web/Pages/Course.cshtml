@@ -1,0 +1,16 @@
+@page "/courses/{id:guid}"
+@model feat.web.Pages.CourseModel
+@using feat.web.Models.ViewModels
+
+@switch (Model.Course)
+{
+    case CourseDetailsCourse course:
+        <partial name="Partials/_CourseDetailsCourse" model="course" />
+        break;
+    case CourseDetailsApprenticeship apprenticeship:
+        <partial name="Partials/_CourseDetailsApprenticeship" model="apprenticeship" />
+        break;
+    case CourseDetailsUniversity university:
+        <partial name="Partials/_CourseDetailsUniversity" model="university" />
+        break;
+}
