@@ -73,9 +73,6 @@ public class Entry
     public ICollection<EntryInstance> EntryInstances { get; set; } = new List<EntryInstance>();
     
     [InverseProperty("Entry")]
-    public ICollection<EntryLocation> EntryLocations { get; set; } = new List<EntryLocation>();
-
-    [InverseProperty("Entry")]
     public ICollection<EntrySector> EntrySectors { get; set; } = new List<EntrySector>();
 
     [InverseProperty("Entry")]
