@@ -37,12 +37,14 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
             Search.SetPage(PageName.Index); 
         }
         
+        /*
         // Set up full list of facets;
         var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
         if (searchResponse.Facets.Any())
         {
             //HttpContext.Session.Set(SharedStrings.AllClientFacets, searchResponse.Facets.ToClientFacets());    
         }
+        */
         
         if (!string.IsNullOrEmpty(Search.Location))
             Location = Search.Location;
@@ -63,11 +65,16 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
         // TODO validate entered location is real or entered post-code is real.
         
         var distanceValue = Distance.HasValue? Distance.Value : new Distance();
+        
         if (!string.IsNullOrEmpty(Location) && distanceValue == 0)
         {
-            ModelState.AddModelError("Distance", SharedStrings.SelectHowFarTravel);
+            ModelState.AddModelError("Distance", SharedStrings.SelectHowFarCanUTravel);
         }
-        
+        if (string.IsNullOrEmpty(Location) && distanceValue > 0)
+        {
+            ModelState.AddModelError("Location", SharedStrings.EnterCityOrPostcode);
+        }
+
         if (!ModelState.IsValid)
             return Page();
         
