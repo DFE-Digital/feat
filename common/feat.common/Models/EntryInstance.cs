@@ -23,6 +23,8 @@ public class EntryInstance
 
     public LearningMethod? StudyMode { get; set; }
     
+    public Guid? LocationId { get; set; }
+    
     [StringLength(255)]
     public required string Reference { get; set; } = string.Empty; 
     
@@ -34,5 +36,9 @@ public class EntryInstance
     [ForeignKey("EntryId")]
     [InverseProperty("EntryInstances")]
     public Entry Entry { get; set; } = null!;
+    
+    [ForeignKey("LocationId")]
+    [InverseProperty("EntryInstances")]
+    public Location? Location { get; set; } = null!;
 }
 

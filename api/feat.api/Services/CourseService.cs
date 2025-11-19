@@ -39,7 +39,8 @@ public class CourseService(CourseDbContext dbContext) : ICourseService
             DeliveryMode = entry.EntryInstances.First().StudyMode,
             Duration = entry.EntryInstances.First().Duration,
             HoursType = entry.AttendancePattern,
-            StartDates = entry.EntryInstances.Select(e => e.StartDate)
+            StartDates = entry.EntryInstances.Select(e => e.StartDate),
+            WhatYouWillLearn = entry.WhatYouWillLearn
         };
 
         switch (entry.Type)

@@ -59,7 +59,7 @@ public class Location
     public ICollection<EmployerLocation> EmployerLocations { get; set; } = new List<EmployerLocation>();
 
     [InverseProperty("Location")]
-    public ICollection<EntryLocation> EntryLocations { get; set; } = new List<EntryLocation>();
+    public ICollection<EntryInstance> EntryInstances { get; set; } = new List<EntryInstance>();
 
     [InverseProperty("Location")]
     public ICollection<ProviderLocation> ProviderLocations { get; set; } = new List<ProviderLocation>();

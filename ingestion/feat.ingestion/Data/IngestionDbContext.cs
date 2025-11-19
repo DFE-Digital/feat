@@ -15,8 +15,6 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Create our composite keys
-        modelBuilder.Entity<EntryLocation>()
-            .HasKey(nameof(EntryLocation.EntryId), nameof(EntryLocation.LocationId));
         modelBuilder.Entity<EntrySector>()
             .HasKey(nameof(EntrySector.EntryId), nameof(EntrySector.SectorId));
         modelBuilder.Entity<ProviderLocation>()
@@ -36,8 +34,6 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
     public DbSet<EntryCost> EntryCosts { get; set; }
 
     public DbSet<EntryInstance> EntryInstances { get; set; }
-
-    public DbSet<EntryLocation> EntryLocations { get; set; }
 
     public DbSet<EntrySector> EntrySectors { get; set; }
 

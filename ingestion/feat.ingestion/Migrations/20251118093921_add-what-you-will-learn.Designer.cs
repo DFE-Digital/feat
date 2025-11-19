@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251118093921_add-what-you-will-learn")]
+    partial class addwhatyouwilllearn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -206,9 +209,6 @@ namespace feat.ingestion.Migrations
                     b.Property<Guid>("EntryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("LocationId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Reference")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -235,9 +235,25 @@ namespace feat.ingestion.Migrations
 
                     b.HasIndex("EntryId");
 
+                    b.ToTable("EntryInstance");
+                });
+
+            modelBuilder.Entity("feat.common.Models.EntryLocation", b =>
+                {
+                    b.Property<Guid>("EntryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("LocationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("SourceSystem")
+                        .HasColumnType("int");
+
+                    b.HasKey("EntryId", "LocationId");
+
                     b.HasIndex("LocationId");
 
-                    b.ToTable("EntryInstance");
+                    b.ToTable("EntryLocation");
                 });
 
             modelBuilder.Entity("feat.common.Models.EntrySector", b =>
@@ -1278,9 +1294,22 @@ namespace feat.ingestion.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Entry");
+                });
+
+            modelBuilder.Entity("feat.common.Models.EntryLocation", b =>
+                {
+                    b.HasOne("feat.common.Models.Entry", "Entry")
+                        .WithMany("EntryLocations")
+                        .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("feat.common.Models.Location", "Location")
-                        .WithMany("EntryInstances")
-                        .HasForeignKey("LocationId");
+                        .WithMany("EntryLocations")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Entry");
 
@@ -1379,6 +1408,8 @@ namespace feat.ingestion.Migrations
 
                     b.Navigation("EntryInstances");
 
+                    b.Navigation("EntryLocations");
+
                     b.Navigation("EntrySectors");
 
                     b.Navigation("UniversityCourses");
@@ -1390,7 +1421,7 @@ namespace feat.ingestion.Migrations
                 {
                     b.Navigation("EmployerLocations");
 
-                    b.Navigation("EntryInstances");
+                    b.Navigation("EntryLocations");
 
                     b.Navigation("ProviderLocations");
                 });

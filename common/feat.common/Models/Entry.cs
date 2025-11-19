@@ -52,6 +52,9 @@ public class Entry
 
     [StringLength(2083)]
     public string? EntryRequirements { get; set; }
+    
+    [StringLength(2083)]
+    public string? WhatYouWillLearn { get; set; }
 
     public EntryType? Type { get; set; }
     
@@ -69,9 +72,6 @@ public class Entry
     [InverseProperty("Entry")]
     public ICollection<EntryInstance> EntryInstances { get; set; } = new List<EntryInstance>();
     
-    [InverseProperty("Entry")]
-    public ICollection<EntryLocation> EntryLocations { get; set; } = new List<EntryLocation>();
-
     [InverseProperty("Entry")]
     public ICollection<EntrySector> EntrySectors { get; set; } = new List<EntrySector>();
 

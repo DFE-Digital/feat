@@ -18,6 +18,8 @@ public class CourseDetailsResponse
     
     public string? Description { get; set; }
     
+    public string? WhatYouWillLearn { get; set; }
+    
     public LearningMethod? DeliveryMode { get; set; }
     
     public TimeSpan? Duration { get; set; }
