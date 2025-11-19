@@ -18,6 +18,8 @@ public abstract class CourseDetailsBase
     public string? EntryRequirements { get; init; }
     
     public string? Description { get; init; }
+    
+    public string? WhatYouWillLearn { get; set; }
 
     public DeliveryMode? DeliveryMode { private get; init; }
     
