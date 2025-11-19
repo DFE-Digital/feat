@@ -219,15 +219,16 @@ public class SearchService(
         
         if (isPostcode)
         {
-            var response = await apiClient
-                .GetAsync<PostcodeResult>(ApiClientNames.Postcode, $"postcodes/{location}");
-            
-            if (response.Result != null)
+            var postcode = dbContext.Postcodes.FirstOrDefault(p =>
+                p.Postcode.ToLower().Replace(" ", "") == location.ToLower().Replace(" ", "")
+            );
+
+            if (postcode is { Latitude: not null, Longitude: not null })
             {
                 return new GeoLocation
                 {
-                    Latitude = response.Result.Latitude.GetValueOrDefault(),
-                    Longitude = response.Result.Longitude.GetValueOrDefault()
+                    Latitude = postcode.Latitude.Value,
+                    Longitude = postcode.Longitude.Value
                 };
             }
         }
@@ -261,7 +262,7 @@ public class SearchService(
         AddFacet(nameof(SearchIndexFields.CourseHours), request.CourseHours);
         AddFacet(nameof(SearchIndexFields.StudyTime), request.StudyTime);
         
-        if (request.OrderBy == OrderBy.Distance && userLocation != null)
+        if (userLocation != null)
         {
             var radiusKm = request.Radius * 1.60934;
             
@@ -269,7 +270,7 @@ public class SearchService(
                 $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radiusKm}"
             );
         }
-
+        
         return filters.Count != 0
             ? string.Join(" and ", filters)
             : null;
