@@ -38,15 +38,11 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
         {
             Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
             
-            if (SelectedQualificationOptions?.Count == 0)
-            {
-                ModelState.AddModelError("SelectedQualificationOptions", "Please select a level");
-            }
             if (!ModelState.IsValid) 
                 return Page();
             
             Search.QualificationLevels?.Clear();
-            if (SelectedQualificationOptions != null)
+            if (SelectedQualificationOptions.Count > 0)
             {
                 foreach (var qualificationOption in SelectedQualificationOptions)
                 {
@@ -56,16 +52,19 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
                         Search.QualificationLevels.Add(qualificationOption);
                     }
                 }
-                Search.Updated = true;
             }
-            
+            else
+            {
+                Search.QualificationLevels = new List<QualificationLevel>(Enum.GetValues<QualificationLevel>());
+            }
+            Search.Updated = true;
+
             HttpContext.Session.Set("Search", Search);
 
-            if (SelectedQualificationOptions != null && 
-                (SelectedQualificationOptions.Contains(Enums.QualificationLevel.None) || 
+            if ((SelectedQualificationOptions.Contains(Enums.QualificationLevel.None) || 
                  SelectedQualificationOptions.Contains(Enums.QualificationLevel.OneAndTwo)))
             {
-                if (Search.VisitedCheckAnswers && Search.AgeGroup.HasValue)
+                if (Search.AgeGroup.HasValue && Search.VisitedCheckAnswers)
                 {
                     return RedirectToPage(PageName.CheckAnswers);
                 }
