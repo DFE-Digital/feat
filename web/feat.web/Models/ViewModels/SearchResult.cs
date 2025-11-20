@@ -10,11 +10,11 @@ public class SearchResult
     public required string CourseTitle { get; init; }
     
     public string? ProviderName { get; init; }
-
+    
     public string? Location { get; init; }
     
     public double? Distance { get; init; }
-
+    
     public string DistanceDisplay => Distance != null ? $"{Math.Round(Distance.Value)} miles" : string.Empty;
     
     public CourseType? CourseType { private get; init; }

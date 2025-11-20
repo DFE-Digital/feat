@@ -509,8 +509,6 @@ public class FaaIngestionHandler(
             .Include(entry => entry.Vacancies)
             .Include(entry => entry.EntryInstances).Include(entry => entry.EntrySectors)
             .ThenInclude(entrySector => entrySector.Sector)
-            .Skip(0)
-            .Take(500)
             .ToList();
 
         if (entries.Count == 0)
