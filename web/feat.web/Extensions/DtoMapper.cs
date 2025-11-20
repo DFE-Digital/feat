@@ -6,20 +6,6 @@ namespace feat.web.Extensions;
 
 public static class DtoMapper
 {
-    private static ClientFacet ToClientFacet(this Facet facet)
-    {
-        return new ClientFacet
-        {
-            Name = facet.Name,
-            Values = new Dictionary<string, long>(facet.Values) 
-        };
-    }
-    
-    public static List<ClientFacet> ToClientFacets(this List<Facet> facets)
-    {
-        return facets.Count > 0 ? facets.Select(f => f.ToClientFacet()).ToList() : [];
-    }
-
     public static SearchResult ToResultViewModel(this Course course)
     {
         return new SearchResult

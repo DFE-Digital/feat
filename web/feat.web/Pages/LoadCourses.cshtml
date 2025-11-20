@@ -1,6 +1,4 @@
 @page
-@using feat.common.Models.Enums
-@using feat.web.Models
 @using feat.web.Enums
 @using feat.web.Utils
 @model feat.web.Pages.LoadCoursesModel
@@ -94,7 +92,7 @@
                               <govuk-checkboxes for="SelectedFilterFacetItems">
                                 <govuk-checkboxes-fieldset>
                                   <govuk-checkboxes-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--s">
-                                    @curFacet.Description
+                                    @(curFacet.Name.Contains('_') ? curFacet.Name.Replace('_', ' ') : curFacet.Name)
                                   </govuk-checkboxes-fieldset-legend>
                                   @{
                                     int i = 0;

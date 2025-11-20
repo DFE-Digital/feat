@@ -20,7 +20,7 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     public int TotalCourseCount { get; private set; }
     
     // Filtering 
-    public List<ClientFacet>? AllFacets { get; set; } = [];
+    public List<Facet>? AllFacets { get; set; } = [];
 
     [BindProperty] 
     public List<string>? SelectedFilterFacetItems { get; set; } = new();
@@ -71,12 +71,14 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             Courses = searchResponse.Courses.ToList();
             
             // Filtering & Facets 
-            // List<ClientFacet>? allFacets = HttpContext.Session.Get<List<ClientFacet>>(SharedStrings.AllClientFacets);
-            // List<ClientFacet>? tickedFacets = searchResponse.Facets.ToClientFacets();
-            
-            // if (allFacets != null) 
-            //     AllFacets = MergeSelectedFacets(allFacets, tickedFacets);
-            
+            List<Facet>? allFacets = HttpContext.Session.Get<List<Facet>>(SharedStrings.AllClientFacets);
+            List<Facet>? tickedFacets = searchResponse.Facets.ToList();
+
+            if (allFacets != null)
+            {
+                AllFacets = MergeSelectedFacets(allFacets, tickedFacets);
+            }
+
             // Set distance - as it was chosen by the user previously
             SelectedTravelDistance = Search.Distance;
             
@@ -148,7 +150,7 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
         return pages;
     }
     
-    private List<ClientFacet> MergeSelectedFacets(List<ClientFacet> allFacets, List<ClientFacet>? changedFacets)
+    private List<Facet> MergeSelectedFacets(List<Facet> allFacets, List<Facet>? changedFacets)
     {
         if (changedFacets == null) 
             return [];
@@ -157,7 +159,7 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
         {
             var changedFacet = changedFacets.FirstOrDefault(cf => cf.Name == cfOriginal.Name);
 
-            return new ClientFacet
+            return new Facet
             {
                 Name = cfOriginal.Name,
                 Values = cfOriginal.Values.Keys.ToDictionary(

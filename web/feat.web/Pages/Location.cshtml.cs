@@ -34,17 +34,18 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
         if (Search.History.Contains(PageName.LoadCourses))
         {
             Search = new Search();
-            Search.SetPage(PageName.Index); 
+            Search.SetPage(PageName.Index);
         }
         
-        /*
         // Set up full list of facets;
+        Search.Interests.Add("facets");
         var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
+        Search.Interests.Remove("facets");
+        
         if (searchResponse.Facets.Any())
         {
-            //HttpContext.Session.Set(SharedStrings.AllClientFacets, searchResponse.Facets.ToClientFacets());    
+            HttpContext.Session.Set(SharedStrings.AllClientFacets, searchResponse.Facets);
         }
-        */
         
         if (!string.IsNullOrEmpty(Search.Location))
             Location = Search.Location;
