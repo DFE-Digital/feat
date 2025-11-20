@@ -4,9 +4,7 @@ using feat.web.Models;
 using feat.web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using feat.common.Models.Enums;
 using feat.web.Utils;
-using NetTopologySuite.Index.Quadtree;
 
 namespace feat.web.Pages;
 
@@ -14,7 +12,6 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
 {   
     [BindProperty]
     public Distance? SelectedTravelDistance { get; set; } = new();
-    
     
     public required Search Search { get; set; }
     
@@ -64,20 +61,18 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             Search.SetPage(PageName.LoadCourses);
             HttpContext.Session.Set("Search", Search);
             
-            // Call Api
             var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
-            // if (searchResponse.SearchResults.Count == 0)
-            // {
-            //     return RedirectToPage(PageName.NoResultsSearch);
-            // }
-
-            // Set up data :
-            TotalCourseCount = (int)searchResponse.TotalCount;
-            //Courses = searchResponse.SearchResults.ToCourses();
+            if (!searchResponse.Courses.Any())
+            {
+                return RedirectToPage(PageName.NoResultsSearch);
+            }
+            
+            TotalCourseCount = searchResponse.TotalCount;
+            Courses = searchResponse.Courses.ToList();
             
             // Filtering & Facets 
-            List<ClientFacet>? allFacets = HttpContext.Session.Get<List<ClientFacet>>(SharedStrings.AllClientFacets);
-            //List<ClientFacet>? tickedFacets = searchResponse.Facets.ToClientFacets();
+            // List<ClientFacet>? allFacets = HttpContext.Session.Get<List<ClientFacet>>(SharedStrings.AllClientFacets);
+            // List<ClientFacet>? tickedFacets = searchResponse.Facets.ToClientFacets();
             
             // if (allFacets != null) 
             //     AllFacets = MergeSelectedFacets(allFacets, tickedFacets);

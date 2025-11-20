@@ -210,6 +210,7 @@ public class FaaIngestionHandler(
         // SECTOR
         
         var sectors = apprenticeships
+            .Where(a => !string.IsNullOrEmpty(a.CourseRoute))
             .GroupBy(a => a.CourseRoute!.Trim(), StringComparer.OrdinalIgnoreCase)
             .Select(a => new Sector
             {
@@ -311,11 +312,13 @@ public class FaaIngestionHandler(
         
         // ENTRYSECTOR
 
-        var entrySectors = apprenticeships.Select(a => new EntrySector
-        {
-            EntryId = entryLookup[a.VacancyReference!],
-            SectorId = sectorLookup[a.CourseRoute!.ToLower().Trim()]
-        }).ToList();
+        var entrySectors = apprenticeships
+            .Where(a => !string.IsNullOrEmpty(a.CourseRoute))
+            .Select(a => new EntrySector
+            {
+                EntryId = entryLookup[a.VacancyReference!],
+                SectorId = sectorLookup[a.CourseRoute!.ToLower().Trim()]
+            }).ToList();
 
         await dbContext.BulkSynchronizeAsync(entrySectors, options =>
         {
@@ -391,15 +394,14 @@ public class FaaIngestionHandler(
         Console.WriteLine($"Vacancies synchronized: {vacancies.Count}");
         
         // LOCATION
-        // TODO: Fix lowercase AddressLine1 and Postcode in DB. Create Comparer
-
+        
         var locations = apprenticeships
             .SelectMany(a => a.Addresses)
             .GroupBy(a => new
             {
-                Postcode = a.Postcode!.ToLower().Trim(),
-                AddressLine1 = a.AddressLine1?.ToLower().Trim() ?? string.Empty,
-                AddressLine4 = a.AddressLine4?.ToLower().Trim() ?? string.Empty
+                Postcode = a.Postcode?.Trim(),
+                AddressLine1 = a.AddressLine1?.Trim(),
+                AddressLine4 = a.AddressLine4?.Trim()
             })
             .Select(a =>
             {
@@ -412,7 +414,7 @@ public class FaaIngestionHandler(
                     Address1 = a.Key.AddressLine1,
                     Address2 = a.First().AddressLine2,
                     Address3 = a.First().AddressLine3,
-                    Address4 = a.First().AddressLine4,
+                    Address4 = a.Key.AddressLine4,
                     Postcode = a.Key.Postcode,
                     GeoLocation = longitude != null && latitude != null
                         ? new Point(longitude.Value, latitude.Value) { SRID = 4326 }
@@ -435,30 +437,37 @@ public class FaaIngestionHandler(
                 l.Address1,
                 l.Address4
             };
+            options.AllowDuplicateKeys = true;
             options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
         }, cancellationToken);
+        
+        var locationLookup = new Dictionary<(string?, string?, string?), Guid>();
 
+        foreach (var location in dbContext.Set<Location>())
+        {
+            var key = (
+                location.Postcode?.ToLower().Trim(),
+                location.Address1?.ToLower().Trim(),
+                location.Address4?.ToLower().Trim()
+            );
+
+            if (!locationLookup.ContainsKey(key))
+            {
+                locationLookup[key] = location.Id;
+            }
+        }
+        
         Console.WriteLine($"Locations synchronized: {locations.Count}");
         
         // EMPLOYERLOCATION
         
-        var locationLookup = dbContext.Set<Location>()
-            .ToDictionary(
-                l => (
-                    Postcode: (l.Postcode ?? string.Empty).ToLower().Trim(),
-                    Address1: (l.Address1 ?? string.Empty).ToLower().Trim(),
-                    Address4: (l.Address4 ?? string.Empty).ToLower().Trim()
-                ),
-                l => l.Id
-            );
-        
         var employerLocationKeys = apprenticeships
             .SelectMany(ap => ap.Addresses.Select(ad => new
             {
-                EmployerName = ap.EmployerName?.ToLower().Trim(),
-                Postcode = (ad.Postcode ?? string.Empty).ToLower().Trim(),
-                Address1 = (ad.AddressLine1 ?? string.Empty).ToLower().Trim(),
-                Address4 = (ad.AddressLine4 ?? string.Empty).ToLower().Trim()
+                EmployerName = ap.EmployerName!.ToLower().Trim(),
+                Postcode = ad.Postcode?.ToLower().Trim(),
+                Address1 = ad.AddressLine1?.ToLower().Trim(),
+                Address4 = ad.AddressLine4?.ToLower().Trim()
             }))
             .Distinct()
             .ToList();
@@ -466,9 +475,10 @@ public class FaaIngestionHandler(
         var employerLocations = employerLocationKeys
             .Select(x => new EmployerLocation
             {
-                EmployerId = employerLookup[x.EmployerName!.ToLower().Trim()],
+                EmployerId = employerLookup[x.EmployerName],
                 LocationId = locationLookup[(x.Postcode, x.Address1, x.Address4)],
-            }).ToList();
+            })
+            .ToList();
         
         await dbContext.BulkSynchronizeAsync(employerLocations, options =>
         {
@@ -517,6 +527,8 @@ public class FaaIngestionHandler(
         Console.WriteLine($"Loaded {employerLocations.Count} employer locations.");
         
         var searchEntries = new List<AiSearchEntry>();
+        var entriesCount = entries.Count;
+        var currentEntry = 1;
 
         foreach (var entry in entries)
         {
@@ -525,8 +537,12 @@ public class FaaIngestionHandler(
                 var filteredEmployerLocations = employerLocations
                     .Where(el => el.EmployerId == vacancy.EmployerId)
                     .ToList();
+                
+                var locationCount = filteredEmployerLocations.Count;
+                
+                Console.WriteLine($"Indexing course {currentEntry}/{entriesCount} ({locationCount} document(s))...");
 
-                if (filteredEmployerLocations.Count == 0)
+                if (locationCount == 0)
                 {
                     Console.WriteLine($"No locations found for employer '{vacancy.Employer.Name}' (Vacancy '{entry.Reference}'). Skipping.");
                     continue;
@@ -554,7 +570,7 @@ public class FaaIngestionHandler(
                         StudyTime = entry.StudyTime?.ToString() ?? string.Empty,
                         Location = locationPoint
                     };
-                    
+
                     searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
                     searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
                     searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
@@ -563,6 +579,8 @@ public class FaaIngestionHandler(
                     searchEntries.Add(searchEntry);
                 }
             }
+            
+            currentEntry++;
         }
 
         Console.WriteLine($"Created {searchEntries.Count} records for indexing.");

@@ -1,0 +1,90 @@
+@model feat.web.Models.ViewModels.SearchResult
+
+@functions {
+  static string? TruncateString(string? fullString, out string remainder, int cutoff = 300)
+  {
+    remainder = string.Empty;
+    
+    if (string.IsNullOrWhiteSpace(fullString) || fullString.Length <= cutoff)
+    {
+      return fullString;
+    }
+
+    var cutPosition = fullString.LastIndexOf(' ', cutoff);
+    if (cutPosition == -1)
+    {
+      cutPosition = cutoff;
+    }
+
+    remainder = fullString[(cutPosition + 1)..];
+    return fullString[..cutPosition];
+  }
+}
+
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">@Model.CourseTitle</h2>
+    <ul class="govuk-summary-card__actions">
+      <li class="govuk-summary-card__action">
+        <a class="govuk-link" asp-page="/Course" asp-route-id="@Model.Id">
+          View more details
+          @* <span class="govuk-visually-hidden">about @(Model.CourseTypeDisplay)</span> *@
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="govuk-summary-card__content">
+    <dl class="govuk-summary-list">
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Provider</dt>
+        <dd class="govuk-summary-list__value">@Model.ProviderName</dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Location</dt>
+        <dd class="govuk-summary-list__value">
+          @if (Model.Distance == null)
+          {
+            @Model.Location
+          }
+          else
+          {
+            @(Model.Location + ", " + Model.DistanceDisplay)
+          }
+        </dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Course type</dt>
+        <dd class="govuk-summary-list__value">@Model.CourseTypeDisplay</dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Requirements</dt>
+        <dd class="govuk-summary-list__value">@Model.Requirements</dd>
+      </div>
+      <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Overview</dt>
+        <dd class="govuk-summary-list__value">
+          @{
+            var truncatedOverview = TruncateString(Model.Overview, out var remainderText);
+            
+            if (string.IsNullOrEmpty(remainderText))
+            {
+              <p>@Model.Overview</p>
+            }
+            else
+            {
+              <p>@truncatedOverview</p>
+
+              <details class="govuk-details govuk-!-margin-top-2" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                  <span class="govuk-details__summary-text">Read more of the course overview</span>
+                </summary>
+                <div class="govuk-details__text">@remainderText</div>
+              </details>
+            }
+          }
+        </dd>
+      </div>
+    </dl>
+  </div>
+</div>
