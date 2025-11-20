@@ -48,7 +48,7 @@ public class SearchService(
                 Id = e.Id,
                 Title = e.Title,
                 Provider = e.Provider.Name,
-                CourseType = e.CourseType != null ? e.CourseType.GetDescription() : "Not available",
+                CourseType = e.CourseType,
                 Requirements = e.EntryRequirements,
                 Overview = e.Description
             }).ToListAsync();
@@ -120,14 +120,13 @@ public class SearchService(
             Facets = facets,
             Page = request.Page,
             PageSize = request.PageSize,
+            CurrentPageSize = uniqueCourses.Count,
             TotalCount = totalCount
         };
     }
 
     private async Task<(List<AiSearchResult>, List<Facet>, int)> AiSearchAsync(SearchRequest request, GeoLocation? userLocation)
     {
-        var fetchSize = request.PageSize * 1;
-        
         var embedding = await embeddingClient.GenerateEmbeddingAsync(request.Query);
         var vector = embedding.Value.ToFloats();
 
@@ -144,8 +143,8 @@ public class SearchService(
             {
                 SemanticConfigurationName = "semantic-title-description",
             },
-            Size = fetchSize,
-            Skip = (request.Page - 1) * fetchSize,
+            Size = request.PageSize,
+            Skip = (request.Page - 1) * request.PageSize,
             IncludeTotalCount = true,
             VectorSearch = new VectorSearchOptions
             {

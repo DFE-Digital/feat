@@ -172,7 +172,7 @@
 
             @foreach (var searchResult in Model.Courses)
             {
-              await Html.RenderPartialAsync("Partials/CourseV8", searchResult);
+              await Html.RenderPartialAsync("Partials/_SearchResult", searchResult.ToResultViewModel());
             }
 
             <!-- Pagination -->

@@ -144,7 +144,7 @@
               {
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start date</dt>
-                  <dd class="govuk-summary-list__value">@Model.StartDates?.First().Display</dd>
+                  <dd class="govuk-summary-list__value">@Model.StartDates?.FirstOrDefault()?.Display</dd>
                 </div>
               }
 

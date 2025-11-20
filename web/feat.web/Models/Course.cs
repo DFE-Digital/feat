@@ -1,26 +1,22 @@
-using feat.web.Models.ViewModels;
+using feat.common.Models.Enums;
 
 namespace feat.web.Models;
 
 public class Course
 {
-    public Guid Id { get; set; }
+    public required Guid Id { get; set; }
         
     public required string Title { get; set; }
         
-    public required string Provider { get; set; }
+    public string? Provider { get; set; }
     
-    public required string CourseType { get; set; }
+    public CourseType? CourseType { get; set; }
     
-    public required string Requirements { get; set; }
+    public string? Requirements { get; set; }
     
-    public required string Overview { get; set; }
-    
-    public GeoLocation? Location { get; set; }
+    public string? Overview { get; set; }
     
     public string? LocationName { get; set; }
     
     public double? Distance { get; set; }
-    
-    public double? Score { get; set; }
 }

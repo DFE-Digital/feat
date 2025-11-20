@@ -541,14 +541,14 @@ public class FaaIngestionHandler(
                     .ToList();
                 
                 var locationCount = filteredEmployerLocations.Count;
+                
+                Console.WriteLine($"Indexing course {currentEntry}/{entriesCount} ({locationCount} document(s))...");
 
                 if (locationCount == 0)
                 {
                     Console.WriteLine($"No locations found for employer '{vacancy.Employer.Name}' (Vacancy '{entry.Reference}'). Skipping.");
                     continue;
                 }
-                
-                Console.WriteLine($"Indexing course {currentEntry}/{entriesCount} ({locationCount} document(s))...");
 
                 foreach (var el in filteredEmployerLocations)
                 {

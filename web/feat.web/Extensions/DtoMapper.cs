@@ -19,6 +19,21 @@ public static class DtoMapper
     {
         return facets.Count > 0 ? facets.Select(f => f.ToClientFacet()).ToList() : [];
     }
+
+    public static SearchResult ToResultViewModel(this Course course)
+    {
+        return new SearchResult
+        {
+            Id = course.Id,
+            CourseTitle = course.Title,
+            ProviderName = course.Provider,
+            Location = course.LocationName,
+            Distance = course.Distance,
+            CourseType = course.CourseType,
+            Requirements = course.Requirements,
+            Overview = course.Overview
+        };
+    }
     
     private static T MapCourseDetailsBase<T>(CourseDetailsResponse response) where T : CourseDetailsBase, new()
     {
