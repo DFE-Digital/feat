@@ -27,7 +27,10 @@
                 </govuk-radios-fieldset-legend>
                 @foreach (var option in Enum.GetValues<Distance>())
                 {
-                    <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
+                    if (option > 0)
+                    {
+                        <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
+                    }
                 }
             </govuk-radios-fieldset>
         </govuk-radios>

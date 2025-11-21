@@ -18,7 +18,6 @@ public class CheckAnswersModel (ILogger<CheckAnswersModel> logger): PageModel
         if (!Search.Updated)
             return RedirectToPage("Index");
 
-        Search.VisitedCheckAnswers = true;
         Search.SetPage(PageName.CheckAnswers);
         Search.ResetHistory(PageName.CheckAnswers);
         HttpContext.Session.Set("Search", Search);
