@@ -76,10 +76,16 @@
                               <div class="govuk-form-group">
                                 <govuk-select for="SelectedTravelDistance">
                                   <govuk-select-label><br/>Travel Distance</govuk-select-label>
+            
                                   @foreach (var option in Enum.GetValues<Distance>())
                                   {
-                                    <govuk-select-item selected="@(Model.SelectedTravelDistance == option)">@option.GetDisplayName()</govuk-select-item>
+                                    <govuk-select-item 
+                                      value="@( (int)option )" 
+                                      selected="@(Model.SelectedTravelDistance == option)">
+                                      @option.GetDisplayName()
+                                    </govuk-select-item>
                                   }
+            
                                 </govuk-select>
                               </div>
                             </div>

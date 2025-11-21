@@ -34,26 +34,30 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     
     public async Task<IActionResult> OnGetAsync(string orderBy, int pageNumber = 1, [FromQuery] bool debug = false) 
     {
-        logger.LogInformation("OnGetAsync called");
         try
         {
             Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+            
             if (!Search.Updated)
             {
                 return RedirectToPage(PageName.Index);
             }
-            
-            // Pagination
-            if(pageNumber > 0)
+
+            if (pageNumber > 0)
+            {
                 Search.CurrentPage = pageNumber;
+            }
+
             Search.TotalPages = TotalPages;
             Search.PageSize = PageSize;
-            
+
             if (!string.IsNullOrEmpty(orderBy))
             {
-                Search.OrderBy = orderBy.Equals("distance", StringComparison.InvariantCultureIgnoreCase) ? OrderBy.Distance : OrderBy.Relevance;
+                Search.OrderBy = orderBy.Equals("distance", StringComparison.InvariantCultureIgnoreCase) 
+                    ? OrderBy.Distance 
+                    : OrderBy.Relevance;
             }
-            
+
             Search.Debug = debug;
             Search.SetPage(PageName.LoadCourses);
             HttpContext.Session.Set("Search", Search);
@@ -63,26 +67,47 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             {
                 return RedirectToPage(PageName.NoResultsSearch);
             }
-            
+
             TotalCourseCount = searchResponse.TotalCount;
             Courses = searchResponse.Courses.ToList();
             
             AllFacets = searchResponse.Facets.ToViewModels();
-            Search.Facets = AllFacets;
-            HttpContext.Session.Set("AllFacets", AllFacets);
-
-            // Set distance - as it was chosen by the user previously
-            SelectedTravelDistance = Search.Distance;
             
+            var sessionFacets = HttpContext.Session.Get<List<Models.ViewModels.Facet>>("AllFacets");
+            if (sessionFacets != null)
+            {
+                foreach (var facet in AllFacets)
+                {
+                    var sessionFacet = sessionFacets.FirstOrDefault(f => f.Name == facet.Name);
+                    if (sessionFacet != null)
+                    {
+                        foreach (var value in facet.Values)
+                        {
+                            var sessionVal = sessionFacet.Values.FirstOrDefault(v => v.Name == value.Name);
+                            
+                            if (sessionVal != null)
+                            {
+                                value.Selected = sessionVal.Selected;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            HttpContext.Session.Set("AllFacets", AllFacets);
+            Search.Facets = AllFacets;
+            
+            SelectedTravelDistance = Search.Distance;
+
             CurrentPage = searchResponse.Page;
             PageSize = searchResponse.PageSize;
             TotalPages = (int)Math.Ceiling(searchResponse.TotalCount / (double)searchResponse.PageSize);
-            
         }
         catch (Exception e)
         {
             logger.LogError(e.Message);
         }
+
         return Page();
     }
 
@@ -97,13 +122,15 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     public IActionResult OnPostUpdateSelection()
     {
         logger.LogDebug("OnPostUpdateSelection called");
-
+        
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+        Search.Distance = SelectedTravelDistance;
         
         MergeSelectedFacets(AllFacets);
+        
         HttpContext.Session.Set("AllFacets", AllFacets);
         HttpContext.Session.Set("Search", Search);
-        
+
         return RedirectToPage();
     }
 
