@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using feat.api.Enums;
 
 namespace feat.api.Models;
@@ -19,7 +18,6 @@ public class SearchRequest
     
     public double Radius { get; set; } = 1000;
     
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public OrderBy OrderBy { get; set; } = OrderBy.Relevance;
 
     public IEnumerable<string>? EntryType { get; set; }

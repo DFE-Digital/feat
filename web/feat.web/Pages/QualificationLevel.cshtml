@@ -7,7 +7,6 @@
     ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK; 
 }
 
-
 @section BeforeContent {
     <govuk-back-link href="@Url.Page(Model.Search.BackPage)">Back </govuk-back-link>
 }
@@ -16,7 +15,7 @@
     
     <h1 class="govuk-heading-l">What qualification level are you looking for?</h1>
     <p>Most qualifications have a difficulty level. The higher the level, the more difficult. Some qualifications like Apprenticeships or vocational qualifications can be studied at different levels.</p>
-    <p><a class="govuk-link" href="https://www.gov.uk/what-different-qualification-levels-mean/list-of-qualification-levels" target="_blank">What qualification levels mean (opens in new tab)</a></p>
+    <p><a class="govuk-link" href="https://www.gov.uk/what-different-qualification-levels-mean/list-of-qualification-levels" >What qualification levels mean</a></p>
     
     <govuk-checkboxes for="SelectedQualificationOptions" >
         <govuk-checkboxes-fieldset>
