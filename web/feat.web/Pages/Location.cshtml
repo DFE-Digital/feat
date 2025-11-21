@@ -1,12 +1,10 @@
 ﻿@page
 @using feat.web.Enums
-@using feat.web.Models
 @using feat.web.Utils
 @model LocationModel
 @{
     ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
 }
-
 
 @section BeforeContent {
     <govuk-back-link href="@Url.Page(Model.Search.BackPage)">Back </govuk-back-link>

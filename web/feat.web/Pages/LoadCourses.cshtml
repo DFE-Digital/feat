@@ -1,6 +1,4 @@
 @page
-@using feat.common.Models.Enums
-@using feat.web.Models
 @using feat.web.Enums
 @using feat.web.Utils
 @model feat.web.Pages.LoadCoursesModel
@@ -17,8 +15,8 @@
   {
     var totalResults = Model.TotalCourseCount;
     var pluralText = (totalResults == 1 ? String.Empty : "s");
-    string locationText = string.IsNullOrEmpty(Model.Search.Location)?"near your area": " near " + Model.Search.Location;
-    string interestText = Model.Search.Interests.Count > 0 ? $" for {Model.Search.Interests[0]}" : string.Empty;
+    string locationText = string.IsNullOrEmpty(Model.Search.Location)?"near your area": " near <b>" + Model.Search.Location + "</b>";
+    string interestText = Model.Search.Interests.Count > 0 ? $" for <b>{string.Join(", ", Model.Search.Interests)}</b>" : string.Empty;
     
     searchResultText = $"Showing {totalResults} course{pluralText} {locationText} {interestText}";
   }
@@ -34,7 +32,7 @@
       <!--Header section -->
       <div class="govuk-grid-column-full">
         <h1 class="govuk-heading-l">Your search results</h1>
-        <p class="govuk-body-l">@(searchResultText)</p>
+        <p class="govuk-body-l">@Html.Raw(searchResultText)</p>
         <p><a asp-page="@PageName.Location">Search again</a></p>
         <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
       </div>
@@ -65,55 +63,81 @@
 
                   <div class="govuk-summary-card__content">
                     <dl class="govuk-summary-list">
-                      @if (Model.AllFacets != null && Model.AllFacets.Count > 0)
+                      @if (Model.AllFacets is { Count: > 0 })
                       {
-                        int iFacetPosition = 0;
+                        var facetIndex = 0;
 
-                        foreach (var curFacet in Model.AllFacets)
+                        foreach (var facet in Model.AllFacets.OrderBy(f => f.Index))
                         {
-                          iFacetPosition++;
-                          if (iFacetPosition == 2)
+                          if (facetIndex == 1)
                           {
-                            <!-- 2) Travel Distance (Drop down) ...-->
+                            <!-- Travel Distance -->
                             <div class="govuk-summary-list__row">
                               <div class="govuk-form-group">
                                 <govuk-select for="SelectedTravelDistance">
-                                  <govuk-select-label>Travel Distance</govuk-select-label>
+                                  <govuk-select-label><br/>Travel Distance</govuk-select-label>
+            
                                   @foreach (var option in Enum.GetValues<Distance>())
                                   {
-                                    <govuk-select-item selected="@(Model.SelectedTravelDistance == option)">@option.GetDisplayName()</govuk-select-item>
+                                    <govuk-select-item 
+                                      value="@( (int)option )" 
+                                      selected="@(Model.SelectedTravelDistance == option)">
+                                      @option.GetDisplayName()
+                                    </govuk-select-item>
                                   }
+            
                                 </govuk-select>
                               </div>
                             </div>
                           }
-
-                          <!-- Render selectable checkboxes for supplied facets-->
+                          
                           <div class="govuk-summary-list__row">
-                            <fieldset class="govuk-fieldset">
-                              <govuk-checkboxes for="SelectedFilterFacetItems">
-                                <govuk-checkboxes-fieldset>
-                                  <govuk-checkboxes-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--s">
-                                    @curFacet.Description
-                                  </govuk-checkboxes-fieldset-legend>
-                                  @{
-                                    int i = 0;
-                                    foreach (var facetValue in curFacet.Values)
-                                    {
-                                      var isTrue = facetValue.Value == 1L;
+                              <fieldset class="govuk-fieldset">
+                                
+                                  <input type="hidden" name="AllFacets[@facetIndex].Name" value="@facet.Name" />
 
-                                      <govuk-checkboxes-item id="facetValue.Key+@(i)" class="govuk-checkboxes__item"
-                                                             value="@(facetValue.Key)"
-                                                             checked="@(isTrue)">
-                                        @facetValue.Key
-                                      </govuk-checkboxes-item>
-                                      i++;
-                                    }
+                                  <govuk-checkboxes name="facet-@facetIndex">
+                                      <govuk-checkboxes-fieldset>
+                                          <govuk-checkboxes-fieldset-legend 
+                                              is-page-heading="true" 
+                                              class="govuk-fieldset__legend--s">
+                                              <br />@facet.Name
+                                          </govuk-checkboxes-fieldset-legend>
+
+                                          @for (var valueIndex = 0; valueIndex < facet.Values.Count; valueIndex++)
+                                          {
+                                              var facetValue = facet.Values[valueIndex];
+
+                                              <govuk-checkboxes-item
+                                                  id="facet-@facetIndex-value-@valueIndex"
+                                                  name="AllFacets[@facetIndex].Values[@valueIndex].Selected"
+                                                  value="true"
+                                                  checked="@(facetValue.Selected)"
+                                                  disabled="@(!facetValue.Available)">
+                                                  @facetValue.DisplayName
+                                              </govuk-checkboxes-item>
+                                          }
+
+                                      </govuk-checkboxes-fieldset>
+                                  </govuk-checkboxes>
+                                  
+                                  @for (var valueIndex = 0; valueIndex < facet.Values.Count; valueIndex++)
+                                  {
+                                      var facetValue = facet.Values[valueIndex];
+
+                                      <input type="hidden"
+                                             name="AllFacets[@facetIndex].Values[@valueIndex].Name"
+                                             value="@facetValue.Name" />
+
+                                      <input type="hidden"
+                                             name="AllFacets[@facetIndex].Values[@valueIndex].Selected"
+                                             value="false" />
                                   }
-                                </govuk-checkboxes-fieldset>
-                              </govuk-checkboxes>
-                            </fieldset>
+
+                              </fieldset>
                           </div>
+
+                          facetIndex++;
                         }
                       }
                       <br>

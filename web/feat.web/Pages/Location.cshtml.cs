@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 using feat.web.Enums;
 using feat.web.Extensions;
 using feat.web.Models;
@@ -34,17 +33,8 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
         if (Search.History.Contains(PageName.LoadCourses))
         {
             Search = new Search();
-            Search.SetPage(PageName.Index); 
+            Search.SetPage(PageName.Index);
         }
-        
-        /*
-        // Set up full list of facets;
-        var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
-        if (searchResponse.Facets.Any())
-        {
-            //HttpContext.Session.Set(SharedStrings.AllClientFacets, searchResponse.Facets.ToClientFacets());    
-        }
-        */
         
         if (!string.IsNullOrEmpty(Search.Location))
             Location = Search.Location;

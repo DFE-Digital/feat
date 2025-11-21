@@ -1,6 +1,4 @@
-using System.Text;
 using feat.web.Enums;
-using feat.web.Extensions;
 using feat.web.Utils;
 
 namespace feat.web.Models;
@@ -16,9 +14,9 @@ public class Search
     public List<string> Interests { get; set; } = []; 
     public List<QualificationLevel> QualificationLevels { get; set; } = new(); 
     public AgeGroup? AgeGroup { get; set; }
-    public List<string>? SelectedFilterFacetItems { get; set; } = [];  
     
-    public bool IncludeOnlineCourses { get; set; } = true;
+    public List<Models.ViewModels.Facet> Facets { get; set; } = [];
+    
     public bool Debug { get; set; } = false;
     
     // Store Pagination 
@@ -27,71 +25,31 @@ public class Search
     public int PageSize { get; set; } = 10;
     
     //Sorting: Distance | Relevance
-    public OrderBy OrderBy { get; set; }  = OrderBy.Relevance;
-    
-    // Course id for Details request
-    public string? CourseId { get; set; }
-    
+    public OrderBy OrderBy { get; set; } = OrderBy.Relevance;
     
     private bool _pageIsChanging = false;
-    
-    public string? Query {
-        get
-        {   
-            // TODO List<QualificationLevel> and AgeGroup? -> Build up querry or send parameter?
-              
-            var selectedAgeGroup = AgeGroup.ToString();
-            var selectedQualificationLevels = QualificationLevels.Select(x=> x.GetDisplayName()).ToList();
 
-            var mergedList = new List<string>();
-            Interests.ForEach((interest) =>
-            {
-                if (!string.IsNullOrEmpty(interest))
-                    mergedList.Add(interest);
-            });
-            if (selectedAgeGroup != null) 
-                mergedList.Add(selectedAgeGroup);
-
-            if (selectedQualificationLevels.Count != 0)
-                mergedList.AddRange(selectedQualificationLevels);
-            
-            if (mergedList.Count == 0)
-            {
-                return "*";
-            }
-            
-            var sb = new StringBuilder();
-            foreach (var entry in mergedList.Distinct())
-            {
-                // If we have quotes in the terms, don't quite them
-                if (entry.IndexOf('"') >= 0 && entry.LastIndexOf('"') < entry.Length - 1 && entry.IndexOf('"') < entry.LastIndexOf('"'))
-                    sb.Append(entry + " ");
-                // Otherwise, wrap the term in quotes
-                else
-                    sb.Append($"\"{entry}\" ");
-            }
-            
-            return sb.ToString().Trim();
-        }
-    }
+    private string Query => string.Join(", ", Interests.Select(i => i.ToLower().Trim()));
     
     public SearchRequest ToSearchRequest()
     {
-        return new SearchRequest
+        var request = new SearchRequest
         {
-            Query = Query ?? string.Empty,
-            IncludeOnlineCourses = IncludeOnlineCourses,
+            Query = Query,
+            Page = CurrentPage,
+            PageSize = PageSize,
             Location = Location,
             Radius = Distance.HasValue ? (int)Distance.Value : 1000,
             OrderBy = OrderBy,
-            PageNumber = CurrentPage,
-            PageSize = PageSize, 
-            Debug = Debug, 
-            CourseId = CourseId, //TODO Course detail request; possibly a different Api
-            
+            EntryType = GetSelectedFilters(nameof(SearchRequest.EntryType)),
+            QualificationLevel = GetSelectedFilters(nameof(SearchRequest.QualificationLevel)),
+            LearningMethod = GetSelectedFilters(nameof(SearchRequest.LearningMethod)),
+            CourseHours = GetSelectedFilters(nameof(SearchRequest.CourseHours)),
+            StudyTime = GetSelectedFilters(nameof(SearchRequest.StudyTime))
         };
-    }
 
+        return request;
+    }
 
     public string? BackPage { get; set; }
     public bool VisitedCheckAnswers { get; set; }
@@ -141,5 +99,14 @@ public class Search
         {
             _pageIsChanging = false;
         }
+    }
+    
+    private IEnumerable<string>? GetSelectedFilters(string name)
+    {
+        var facet = Facets.FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+
+        return facet?.Values
+            .Where(fv => fv.Selected)
+            .Select(fv => fv.Name);
     }
 }
