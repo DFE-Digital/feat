@@ -77,10 +77,18 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
 
         HttpContext.Session.Set("Search", Search);
 
-        if (!Search.VisitedCheckAnswers) 
+        if (Search.VisitedCheckAnswers)
+        {
+            bool mustAnswerInterests = Distance == null || Distance == Enums.Distance.ThirtyPlus;
+            if (!mustAnswerInterests) 
+                return RedirectToPage(PageName.CheckAnswers);
+
+            var hasInterests = Search.Interests.Any(searchInterest => !string.IsNullOrEmpty(searchInterest));
+            return RedirectToPage(hasInterests ? PageName.CheckAnswers : PageName.Interests);
+        }
+        else
+        {
             return RedirectToPage(PageName.Interests);
-        
-        var hasInterests = Search.Interests.Any(searchInterest => !string.IsNullOrEmpty(searchInterest));
-        return RedirectToPage(hasInterests ? PageName.CheckAnswers : PageName.Interests);
+        }
     }
 }
