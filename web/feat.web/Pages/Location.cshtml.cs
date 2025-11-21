@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 using feat.web.Enums;
 using feat.web.Extensions;
 using feat.web.Models;
@@ -35,16 +34,6 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
         {
             Search = new Search();
             Search.SetPage(PageName.Index);
-        }
-        
-        // Set up full list of facets;
-        Search.Interests.Add("facets");
-        var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
-        Search.Interests.Remove("facets");
-        
-        if (searchResponse.Facets.Any())
-        {
-            HttpContext.Session.Set(SharedStrings.AllClientFacets, searchResponse.Facets);
         }
         
         if (!string.IsNullOrEmpty(Search.Location))

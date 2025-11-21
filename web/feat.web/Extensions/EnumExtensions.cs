@@ -6,38 +6,40 @@ namespace feat.web.Extensions;
 
 public static class EnumExtensions
 {
-    public static string GetDescription<TEnum>(this TEnum value) where TEnum : Enum
+    public static string GetDescription(this Enum value)
     {
-        var memberInfo = typeof(TEnum).GetMember(value.ToString());
-        
-        if (memberInfo.Length == 0)
+        var type = value.GetType();
+        var member = type.GetMember(value.ToString()).FirstOrDefault();
+
+        if (member == null)
         {
             return value.ToString();
         }
 
-        var member = memberInfo[0];
-        
-        if (member.GetCustomAttribute<DisplayAttribute>() is { } displayAttr)
+        if (member.GetCustomAttribute<DisplayAttribute>() is { } displayAttribute)
         {
-            if (!string.IsNullOrWhiteSpace(displayAttr.Description))
+            if (!string.IsNullOrWhiteSpace(displayAttribute.Description))
             {
-                return displayAttr.Description;
+                return displayAttribute.Description;
             }
 
-            if (!string.IsNullOrWhiteSpace(displayAttr.Name))
+            if (!string.IsNullOrWhiteSpace(displayAttribute.Name))
             {
-                return displayAttr.Name;
+                return displayAttribute.Name;
             }
         }
         
-        if (member.GetCustomAttribute<DescriptionAttribute>() is { } descAttr &&
-            !string.IsNullOrWhiteSpace(descAttr.Description))
+        if (member.GetCustomAttribute<DescriptionAttribute>() is { } descriptionAttribute &&
+            !string.IsNullOrWhiteSpace(descriptionAttribute.Description))
         {
-            return descAttr.Description;
+            return descriptionAttribute.Description;
         }
-        
+
         return value.ToString();
     }
+
+    public static string GetDescription<TEnum>(this TEnum value) where TEnum : Enum
+        => ((Enum)value).GetDescription();
     
     public static string GetDisplayName<TEnum>(this TEnum value) where TEnum : Enum
     {

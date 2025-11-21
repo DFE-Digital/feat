@@ -19,12 +19,9 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     
     public int TotalCourseCount { get; private set; }
     
-    // Filtering 
-    public List<Facet>? AllFacets { get; set; } = [];
-
-    [BindProperty] 
-    public List<string>? SelectedFilterFacetItems { get; set; } = new();
-
+    [BindProperty]
+    public List<Models.ViewModels.Facet> AllFacets { get; set; } = [];
+    
     // Pagination 
     public int CurrentPage { get; set; } = 1;
     public int TotalPages { get; set; }
@@ -70,14 +67,9 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             TotalCourseCount = searchResponse.TotalCount;
             Courses = searchResponse.Courses.ToList();
             
-            // Filtering & Facets 
-            List<Facet>? allFacets = HttpContext.Session.Get<List<Facet>>(SharedStrings.AllClientFacets);
-            List<Facet>? tickedFacets = searchResponse.Facets.ToList();
-
-            if (allFacets != null)
-            {
-                AllFacets = MergeSelectedFacets(allFacets, tickedFacets);
-            }
+            AllFacets = searchResponse.Facets.ToViewModels();
+            Search.Facets = AllFacets;
+            HttpContext.Session.Set("AllFacets", AllFacets);
 
             // Set distance - as it was chosen by the user previously
             SelectedTravelDistance = Search.Distance;
@@ -107,9 +99,11 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
         logger.LogDebug("OnPostUpdateSelection called");
 
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-        Search.SelectedFilterFacetItems = SelectedFilterFacetItems;
         
+        MergeSelectedFacets(AllFacets);
+        HttpContext.Session.Set("AllFacets", AllFacets);
         HttpContext.Session.Set("Search", Search);
+        
         return RedirectToPage();
     }
 
@@ -150,26 +144,69 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
         return pages;
     }
     
-    private List<Facet> MergeSelectedFacets(List<Facet> allFacets, List<Facet>? changedFacets)
+    private void MergeSelectedFacets(List<Models.ViewModels.Facet>? postedFacets)
     {
-        if (changedFacets == null) 
-            return [];
-        
-        var modifiedFacets = allFacets.Select(cfOriginal =>
+        if (postedFacets == null || postedFacets.Count == 0)
         {
-            var changedFacet = changedFacets.FirstOrDefault(cf => cf.Name == cfOriginal.Name);
+            return;
+        }
 
-            return new Facet
+        var fullFacets = HttpContext.Session.Get<List<Models.ViewModels.Facet>>("AllFacets") ?? [];
+
+        if (fullFacets.Count == 0)
+        {
+            AllFacets = postedFacets;
+            Search.Facets = postedFacets;
+            
+            return;
+        }
+
+        for (var pIndex = 0; pIndex < postedFacets.Count; pIndex++)
+        {
+            var posted = postedFacets[pIndex];
+
+            Models.ViewModels.Facet? original = null;
+
+            if (!string.IsNullOrEmpty(posted.Name))
             {
-                Name = cfOriginal.Name,
-                Values = cfOriginal.Values.Keys.ToDictionary(
-                    key => key,
-                    key => changedFacet?.Values.ContainsKey(key) == true ? 1L : 0L
-                ),
-            };
-        }).ToList();
+                original = fullFacets.FirstOrDefault(f =>
+                    string.Equals(f.Name, posted.Name, StringComparison.InvariantCultureIgnoreCase));
+            }
 
-        return modifiedFacets;
+            if (original == null && pIndex < fullFacets.Count)
+            {
+                original = fullFacets[pIndex];
+            }
+
+            if (original == null)
+            {
+                continue;
+            }
+
+            var postedValues = posted.Values;
+
+            for (var origValueIndex = 0; origValueIndex < original.Values.Count; origValueIndex++)
+            {
+                var originalValue = original.Values[origValueIndex];
+
+                Models.ViewModels.FacetValue? postedValue = null;
+
+                if (!string.IsNullOrEmpty(originalValue.Name))
+                {
+                    postedValue = postedValues.FirstOrDefault(v =>
+                        string.Equals(v.Name, originalValue.Name, StringComparison.InvariantCultureIgnoreCase));
+                }
+
+                if (postedValue == null && origValueIndex < postedValues.Count)
+                {
+                    postedValue = postedValues[origValueIndex];
+                }
+
+                originalValue.Selected = postedValue?.Selected ?? false;
+            }
+        }
+
+        AllFacets = fullFacets;
+        Search.Facets = fullFacets;
     }
-
 }

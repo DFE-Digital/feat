@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using feat.common.Models.Enums;
 using feat.web.Models;
 using feat.web.Models.ViewModels;
@@ -6,6 +7,11 @@ namespace feat.web.Extensions;
 
 public static class DtoMapper
 {
+    public static List<Models.ViewModels.Facet> ToViewModels(this IEnumerable<Models.Facet> facets)
+    {
+        return facets.Select(ToViewModel).ToList();
+    }
+    
     public static SearchResult ToResultViewModel(this Course course)
     {
         return new SearchResult
@@ -105,5 +111,46 @@ public static class DtoMapper
             Postcode = l.Postcode,
             GeoLocation = l.GeoLocation
         }).ToList();
+    }
+    
+    private static Models.ViewModels.Facet ToViewModel(this Models.Facet facet)
+    {
+        var enumsAssembly = typeof(LearningMethod).Assembly;
+        
+        var enumType = enumsAssembly
+            .GetTypes()
+            .FirstOrDefault(t => t.IsEnum && t.Name == facet.Name);
+        
+        var mappedFacet = new Models.ViewModels.Facet
+        {
+            Name = enumType.Name,
+            DisplayName = Regex.Replace(enumType.Name, "(\\B[A-Z])", " $1"),
+            Index = GetFacetIndex(enumType.Name)
+        };
+        
+        foreach (var enumValue in Enum.GetValues(enumType).Cast<Enum>())
+        {
+            mappedFacet.Values.Add(new FacetValue
+            {
+                Name =  enumValue.ToString(),
+                DisplayName = enumValue.GetDescription(),
+                Available = facet.Values.ContainsKey(enumValue.ToString())
+            });
+        }
+
+        return mappedFacet;
+    }
+
+    private static int GetFacetIndex(string enumName)
+    {
+        return enumName switch
+        {
+            nameof(EntryType) => 0,
+            nameof(QualificationLevel) => 1,
+            nameof(LearningMethod) => 2,
+            nameof(CourseHours) => 3,
+            nameof(StudyTime) => 4,
+            _ => 5
+        };
     }
 }

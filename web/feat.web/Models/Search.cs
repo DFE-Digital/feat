@@ -14,7 +14,8 @@ public class Search
     public List<string> Interests { get; set; } = []; 
     public List<QualificationLevel> QualificationLevels { get; set; } = new(); 
     public AgeGroup? AgeGroup { get; set; }
-    public List<string>? SelectedFilterFacetItems { get; set; } = [];  
+    
+    public List<Models.ViewModels.Facet> Facets { get; set; } = [];
     
     public bool Debug { get; set; } = false;
     
@@ -24,15 +25,15 @@ public class Search
     public int PageSize { get; set; } = 10;
     
     //Sorting: Distance | Relevance
-    public OrderBy OrderBy { get; set; }  = OrderBy.Relevance;
+    public OrderBy OrderBy { get; set; } = OrderBy.Relevance;
     
     private bool _pageIsChanging = false;
 
     private string Query => string.Join(", ", Interests.Select(i => i.ToLower().Trim()));
-
+    
     public SearchRequest ToSearchRequest()
     {
-        return new SearchRequest
+        var request = new SearchRequest
         {
             Query = Query,
             Page = CurrentPage,
@@ -40,13 +41,14 @@ public class Search
             Location = Location,
             Radius = Distance.HasValue ? (int)Distance.Value : 1000,
             OrderBy = OrderBy,
-            //SessionId = SessionId,
-            // EntryType = ,
-            // QualificationLevel = ,
-            // LearningMethod = ,
-            // CourseHours = ,
-            // StudyTime = 
+            EntryType = GetSelectedFilters(nameof(SearchRequest.EntryType)),
+            QualificationLevel = GetSelectedFilters(nameof(SearchRequest.QualificationLevel)),
+            LearningMethod = GetSelectedFilters(nameof(SearchRequest.LearningMethod)),
+            CourseHours = GetSelectedFilters(nameof(SearchRequest.CourseHours)),
+            StudyTime = GetSelectedFilters(nameof(SearchRequest.StudyTime))
         };
+
+        return request;
     }
 
     public string? BackPage { get; set; }
@@ -97,5 +99,14 @@ public class Search
         {
             _pageIsChanging = false;
         }
+    }
+    
+    private IEnumerable<string>? GetSelectedFilters(string name)
+    {
+        var facet = Facets.FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+
+        return facet?.Values
+            .Where(fv => fv.Selected)
+            .Select(fv => fv.Name);
     }
 }
