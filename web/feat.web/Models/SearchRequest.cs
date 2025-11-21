@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using feat.web.Enums;
 
 namespace feat.web.Models;
@@ -6,23 +5,26 @@ namespace feat.web.Models;
 public class SearchRequest
 {
     public required string Query { get; set; }
-
-    public string? Location { get; set; }
     
-    public string? SessionId { get; set; }
-
-    public bool IncludeOnlineCourses { get; set; }
-
-    public double Radius { get; set; } = 1000;
-
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public OrderBy OrderBy { get; set; } = OrderBy.Relevance;
-
-    public int PageNumber { get; set; } = 1;
+    public string? SessionId { get; set; } = Guid.NewGuid().ToString();
+    
+    public int Page { get; set; } = 1;
 
     public int PageSize { get; set; } = 10;
     
-    public string? CourseId { get; set; }
-   
-    public bool Debug { get; set; } = false;
+    public string? Location { get; set; }
+    
+    public double Radius { get; set; } = 1000;
+    
+    public OrderBy OrderBy { get; set; } = OrderBy.Relevance;
+
+    public IEnumerable<string>? EntryType { get; set; }
+
+    public IEnumerable<string>? QualificationLevel { get; set; }
+
+    public IEnumerable<string>? LearningMethod { get; set; }
+
+    public IEnumerable<string>? CourseHours { get; set; }
+
+    public IEnumerable<string>? StudyTime { get; set; }
 }

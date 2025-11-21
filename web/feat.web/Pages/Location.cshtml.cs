@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 using feat.web.Enums;
 using feat.web.Extensions;
 using feat.web.Models;
@@ -16,45 +15,36 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
     [BindProperty]
     [MaxLength(100, ErrorMessage = SharedStrings.LessThan100Char)]
     public string? Location { get; set; }
-
-    [BindProperty] 
+    
+    [BindProperty]
     public Distance? Distance { get; set; }
-
+    
     public required Search Search { get; set; }
-
+    
     public async Task<IActionResult> OnGetAsync()
     {
         logger.LogInformation("OnGet");
-
+        
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         if (!Search.Updated)
-            return RedirectToPage(PageName.Index);
-
+            return RedirectToPage(PageName.Index); 
+        
         // If you've come here from LoadCourses page then start to 'new Search'
         if (Search.History.Contains(PageName.LoadCourses))
         {
             Search = new Search();
             Search.SetPage(PageName.Index);
         }
-
-        /*
-        // Set up full list of facets;
-        var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
-        if (searchResponse.Facets.Any())
-        {
-            //HttpContext.Session.Set(SharedStrings.AllClientFacets, searchResponse.Facets.ToClientFacets());
-        }
-        */
-
+        
         if (!string.IsNullOrEmpty(Search.Location))
             Location = Search.Location;
         if (Search.Distance.HasValue)
             Distance = Search.Distance;
-
+        
         Search.Updated = true;
         Search.SetPage(PageName.Location);
         HttpContext.Session.Set("Search", Search);
-
+        
         return Page();
     }
 
@@ -63,14 +53,13 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
         // TODO validate entered location is real or entered post-code is real.
-
-        var distanceValue = Distance.HasValue ? Distance.Value : new Distance();
-
+        
+        var distanceValue = Distance.HasValue? Distance.Value : new Distance();
+        
         if (!string.IsNullOrEmpty(Location) && distanceValue == 0)
         {
             ModelState.AddModelError("Distance", SharedStrings.SelectHowFarCanUTravel);
         }
-
         if (string.IsNullOrEmpty(Location) && distanceValue > 0)
         {
             ModelState.AddModelError("Location", SharedStrings.EnterCityOrPostcode);
@@ -78,12 +67,12 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
 
         if (!ModelState.IsValid)
             return Page();
-
+        
         Search.Updated = true;
-
-        if (!string.IsNullOrEmpty(Location))
+        
+        if (!string.IsNullOrEmpty(Location)) 
             Search.Location = Location.Trim();
-        if (Distance != null)
+        if (Distance != null) 
             Search.Distance = Distance.Value;
 
         HttpContext.Session.Set("Search", Search);
@@ -93,13 +82,13 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
             bool mustAnswerInterests = Distance == null || Distance == Enums.Distance.ThirtyPlus;
             if (!mustAnswerInterests) 
                 return RedirectToPage(PageName.CheckAnswers);
-            
+
             var hasInterests = Search.Interests.Any(searchInterest => !string.IsNullOrEmpty(searchInterest));
             return RedirectToPage(hasInterests ? PageName.CheckAnswers : PageName.Interests);
         }
         else
         {
-            return RedirectToPage(PageName.Interests);    
+            return RedirectToPage(PageName.Interests);
         }
     }
 }

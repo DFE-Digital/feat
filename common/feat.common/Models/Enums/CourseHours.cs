@@ -1,4 +1,3 @@
-
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 
@@ -9,8 +8,10 @@ public enum CourseHours
 {
     [Description("Full time")]
     FullTime,
+    
     [Description("Part time")]
     PartTime,
+    
     [Description("Flexible")]
     Flexible 
 }
