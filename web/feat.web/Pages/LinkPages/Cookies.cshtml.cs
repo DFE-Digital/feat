@@ -1,4 +1,5 @@
 using feat.web.Services;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -25,12 +26,5 @@ public class Cookies : PageModel
         {
             MarketingCookie = matketingCookieValue;
         }
-        
-    }
-
-    public void OnPost()
-    {
-        Response.Cookies.Append("analytics-cookies", "true");
-        Response.Cookies.Append("marketing-cookies", "true");
     }
 }
