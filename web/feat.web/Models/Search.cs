@@ -5,27 +5,30 @@ namespace feat.web.Models;
 
 public class Search
 {
-    //For navigation.
     public List<string> History { get; set; } = [];
     public bool Updated { get; set; } = true;
     
     public string? Location { get; set; } 
     public Distance? Distance { get; set; }
     public List<string> Interests { get; set; } = []; 
-    public List<QualificationLevel> QualificationLevels { get; set; } = new(); 
+    public List<QualificationLevel> QualificationLevels { get; set; } = []; 
     public AgeGroup? AgeGroup { get; set; }
     
     public List<Models.ViewModels.Facet> Facets { get; set; } = [];
     
-    public bool Debug { get; set; } = false;
-    
-    // Store Pagination 
     public int CurrentPage { get; set; } = 1;
     public int TotalPages { get; set; }
     public int PageSize { get; set; } = 10;
     
-    //Sorting: Distance | Relevance
     public OrderBy OrderBy { get; set; } = OrderBy.Relevance;
+    
+    public static Dictionary<QualificationLevel, int[]> QualificationLevelMap { get; } = new()
+    {
+        { QualificationLevel.None, [0] },
+        { QualificationLevel.OneAndTwo, [1, 2] },
+        { QualificationLevel.Three, [3] },
+        { QualificationLevel.FourToSeven, [4, 5, 6, 7] }
+    };
     
     private bool _pageIsChanging = false;
 
@@ -42,7 +45,7 @@ public class Search
             Radius = Distance.HasValue ? (int)Distance.Value : 1000,
             OrderBy = OrderBy,
             EntryType = GetSelectedFilters(nameof(SearchRequest.EntryType)),
-            QualificationLevel = GetSelectedFilters(nameof(SearchRequest.QualificationLevel)),
+            QualificationLevel = GetQualificationLevelFilters(),
             LearningMethod = GetSelectedFilters(nameof(SearchRequest.LearningMethod)),
             CourseHours = GetSelectedFilters(nameof(SearchRequest.CourseHours)),
             StudyTime = GetSelectedFilters(nameof(SearchRequest.StudyTime))
@@ -106,10 +109,35 @@ public class Search
     
     private IEnumerable<string>? GetSelectedFilters(string name)
     {
-        var facet = Facets.FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+        var facet = Facets
+            .FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 
         return facet?.Values
             .Where(fv => fv.Selected)
             .Select(fv => fv.Name);
+    }
+
+    private IEnumerable<string> GetQualificationLevelFilters(List<Models.ViewModels.Facet>? facets = null)
+    {
+        const string name = nameof(SearchRequest.QualificationLevel);
+        
+        var facet = (facets ?? Facets)
+            .FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+
+        if (facet != null)
+        {
+            return facet.Values
+                .Where(v => v.Selected)
+                .Select(v => v.Name);
+        }
+
+        if (QualificationLevels.Count == 0)
+        {
+            return [];
+        }
+        
+        return QualificationLevels
+            .SelectMany(ql => QualificationLevelMap[ql])
+            .Select(x => ((feat.common.Models.Enums.QualificationLevel)x).ToString());
     }
 }
