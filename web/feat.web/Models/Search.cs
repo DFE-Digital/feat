@@ -10,6 +10,7 @@ public class Search
     
     public string? Location { get; set; } 
     public Distance? Distance { get; set; }
+    public Distance? OriginalDistance { get; set; }
     public List<string> Interests { get; set; } = []; 
     public List<QualificationLevel> QualificationLevels { get; set; } = []; 
     public AgeGroup? AgeGroup { get; set; }

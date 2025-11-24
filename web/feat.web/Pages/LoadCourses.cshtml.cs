@@ -11,7 +11,7 @@ namespace feat.web.Pages;
 public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesModel> logger) : PageModel
 {   
     [BindProperty]
-    public Distance? SelectedTravelDistance { get; set; } = new();
+    public Distance? SelectedTravelDistance { get; set; }
     
     public required Search Search { get; set; }
     
@@ -117,12 +117,22 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
         return Page();
     }
 
-    public IActionResult OnPostClearFilters()
+    public IActionResult OnGetClearFilters()
     {
-        logger.LogDebug("OnPostClearFilter called");
+        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         
-        ModelState.Clear();
-        return RedirectToPage(); 
+        HttpContext.Session.Remove("AllFacets");
+        AllFacets = [];
+        
+        Search.Facets = [];
+        Search.Distance = Search.OriginalDistance;
+        Search.CurrentPage = 1;
+        
+        Search.QualificationLevels = [];
+        
+        HttpContext.Session.Set("Search", Search);
+        
+        return RedirectToPage();
     }
 
     public IActionResult OnPostUpdateSelection()

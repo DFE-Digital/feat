@@ -74,6 +74,8 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
             Search.Location = Location.Trim();
         if (Distance != null) 
             Search.Distance = Distance.Value;
+        
+        Search.OriginalDistance = Distance;
 
         HttpContext.Session.Set("Search", Search);
 
