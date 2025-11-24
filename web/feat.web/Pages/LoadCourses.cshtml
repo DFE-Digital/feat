@@ -71,7 +71,6 @@
                         {
                           if (facetIndex == 1 && Model.SelectedTravelDistance != null)
                           {
-                            <!-- Travel Distance -->
                             <div class="govuk-summary-list__row">
                               <div class="govuk-form-group">
                                 <govuk-select for="SelectedTravelDistance">
@@ -84,7 +83,6 @@
                                       @option.GetDisplayName()
                                     </govuk-select-item>
                                   }
-            
                                 </govuk-select>
                               </div>
                             </div>
@@ -92,7 +90,6 @@
                           
                           <div class="govuk-summary-list__row">
                               <fieldset class="govuk-fieldset">
-                                
                                   <input type="hidden" name="AllFacets[@facetIndex].Name" value="@facet.Name" />
 
                                   <govuk-checkboxes name="facet-@facetIndex">
@@ -116,7 +113,6 @@
                                                   @facetValue.DisplayName
                                               </govuk-checkboxes-item>
                                           }
-
                                       </govuk-checkboxes-fieldset>
                                   </govuk-checkboxes>
                                   
@@ -132,7 +128,9 @@
                                              name="AllFacets[@facetIndex].Values[@valueIndex].Selected"
                                              value="false" />
                                   }
-
+                                  <p class="govuk-body">
+                                    <a class="govuk-link" asp-page-handler="ClearFacet" asp-route-facet="@facet.Name">Clear filter</a>
+                                  </p>
                               </fieldset>
                           </div>
 

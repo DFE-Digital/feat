@@ -125,13 +125,39 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
         AllFacets = [];
         
         Search.Facets = [];
-        Search.Distance = Search.OriginalDistance;
         Search.CurrentPage = 1;
         
+        Search.Distance = Search.OriginalDistance;
         Search.QualificationLevels = [];
         
         HttpContext.Session.Set("Search", Search);
         
+        return RedirectToPage();
+    }
+    
+    public IActionResult OnGetClearFacet(string facetName)
+    {
+        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+
+        var allFacets = HttpContext.Session.Get<List<Models.ViewModels.Facet>>("AllFacets") ?? [];
+        
+        var facet = allFacets.FirstOrDefault(f =>
+            f.Name.Equals(facetName, StringComparison.InvariantCultureIgnoreCase));
+
+        if (facet != null)
+        {
+            foreach (var value in facet.Values)
+            {
+                value.Selected = false;
+            }
+        }
+        
+        Search.Facets = allFacets;
+        Search.CurrentPage = 1;
+
+        HttpContext.Session.Set("AllFacets", allFacets);
+        HttpContext.Session.Set("Search", Search);
+
         return RedirectToPage();
     }
 
