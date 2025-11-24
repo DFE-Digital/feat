@@ -2,7 +2,7 @@ using feat.web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace feat.web.Pages;
+namespace feat.web.Pages.LinkPages;
 
 public class Cookies : PageModel
 {

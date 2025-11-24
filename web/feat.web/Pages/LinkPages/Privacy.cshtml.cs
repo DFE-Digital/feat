@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace feat.web.Pages;
+namespace feat.web.Pages.LinkPages;
 
-public class AccessibilityStatement : PageModel
+public class Privacy : PageModel
 {
     public void OnGet()
     {
