@@ -108,8 +108,7 @@
                                                   id="facet-@facetIndex-value-@valueIndex"
                                                   name="AllFacets[@facetIndex].Values[@valueIndex].Selected"
                                                   value="true"
-                                                  checked="@(facetValue.Selected)"
-                                                  disabled="@(!facetValue.Available)">
+                                                  checked="@(facetValue.Selected)">
                                                   @facetValue.DisplayName
                                               </govuk-checkboxes-item>
                                           }
@@ -129,7 +128,7 @@
                                              value="false" />
                                   }
                                   <p class="govuk-body">
-                                    <a class="govuk-link" asp-page-handler="ClearFacet" asp-route-facet="@facet.Name">Clear filter</a>
+                                    <a class="govuk-link" asp-page-handler="ClearFacet" asp-route-facetname="@facet.Name">Clear filter</a>
                                   </p>
                               </fieldset>
                           </div>

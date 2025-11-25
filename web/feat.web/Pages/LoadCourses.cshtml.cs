@@ -296,7 +296,7 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             
             foreach (var value in facet.Values)
             {
-                value.Selected = value.Available && selectedOptions.Contains(value.Name);
+                value.Selected = selectedOptions.Contains(value.Name);
             }
         }
     }
