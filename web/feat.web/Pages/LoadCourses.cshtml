@@ -229,7 +229,7 @@
                     }
                     else
                     {
-                      <li class="govuk-pagination__item ">
+                      <li class="govuk-pagination__item">
                         <a class="govuk-link govuk-pagination__link"
                            asp-page="" asp-route-pageNumber="@pageNumber"
                            aria-label="@($"Page {pageNumber}")">
@@ -304,6 +304,12 @@
         .govuk-grid-column-two-thirds {
             width: 100%;
         }
+    }
+
+    @@media (max-width: 40.0625em) {
+      .govuk-pagination__list .govuk-pagination__item {
+        display: inline-block;
+      }
     }
     
 </style>
