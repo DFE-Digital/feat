@@ -69,23 +69,20 @@
 
                         foreach (var facet in Model.AllFacets.OrderBy(f => f.Index))
                         {
-                          if (facetIndex == 1)
+                          if (facetIndex == 1 && Model.SelectedTravelDistance != null)
                           {
-                            <!-- Travel Distance -->
                             <div class="govuk-summary-list__row">
                               <div class="govuk-form-group">
                                 <govuk-select for="SelectedTravelDistance">
                                   <govuk-select-label><br/>Travel Distance</govuk-select-label>
-            
                                   @foreach (var option in Enum.GetValues<Distance>())
                                   {
                                     <govuk-select-item 
-                                      value="@( (int)option )" 
+                                      value="@((int)option)"
                                       selected="@(Model.SelectedTravelDistance == option)">
                                       @option.GetDisplayName()
                                     </govuk-select-item>
                                   }
-            
                                 </govuk-select>
                               </div>
                             </div>
@@ -93,7 +90,6 @@
                           
                           <div class="govuk-summary-list__row">
                               <fieldset class="govuk-fieldset">
-                                
                                   <input type="hidden" name="AllFacets[@facetIndex].Name" value="@facet.Name" />
 
                                   <govuk-checkboxes name="facet-@facetIndex">
@@ -112,12 +108,10 @@
                                                   id="facet-@facetIndex-value-@valueIndex"
                                                   name="AllFacets[@facetIndex].Values[@valueIndex].Selected"
                                                   value="true"
-                                                  checked="@(facetValue.Selected)"
-                                                  disabled="@(!facetValue.Available)">
+                                                  checked="@(facetValue.Selected)">
                                                   @facetValue.DisplayName
                                               </govuk-checkboxes-item>
                                           }
-
                                       </govuk-checkboxes-fieldset>
                                   </govuk-checkboxes>
                                   
@@ -133,7 +127,9 @@
                                              name="AllFacets[@facetIndex].Values[@valueIndex].Selected"
                                              value="false" />
                                   }
-
+                                  <p class="govuk-body">
+                                    <a class="govuk-link" asp-page-handler="ClearFacet" asp-route-facetname="@facet.Name">Clear filter</a>
+                                  </p>
                               </fieldset>
                           </div>
 
@@ -143,12 +139,11 @@
                       <br>
                       <button class="govuk-button" type="submit">Apply filters</button>
                       <p class="govuk-body">
-                        <a class="govuk-link" asp-page-handler="ClearFilters">Clear All filters</a>
+                        <a class="govuk-link" asp-page-handler="ClearFilters">Clear all filters</a>
                       </p>
                     </dl>
                   </div>
                 </div>
-
               </div>
             </div>
           </form>

@@ -15,5 +15,5 @@ public enum Distance
     [Display(Name = $"Up to 30 miles")]
     Thirty = 30,
     [Display(Name = $"Over 30 miles")]
-    ThirtyPlus = 300,
+    ThirtyPlus = 1000,
 }

@@ -22,6 +22,9 @@ public class CheckAnswersModel (ILogger<CheckAnswersModel> logger): PageModel
         Search.ResetHistory(PageName.CheckAnswers);
         HttpContext.Session.Set("Search", Search);
         
+        HttpContext.Session.Remove("AllFacets");
+        Search.Facets.Clear();
+        
         return Page();
     }
 

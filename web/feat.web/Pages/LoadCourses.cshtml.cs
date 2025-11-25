@@ -11,7 +11,7 @@ namespace feat.web.Pages;
 public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesModel> logger) : PageModel
 {   
     [BindProperty]
-    public Distance? SelectedTravelDistance { get; set; } = new();
+    public Distance? SelectedTravelDistance { get; set; }
     
     public required Search Search { get; set; }
     
@@ -32,7 +32,7 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     public int PreviousPage => CurrentPage - 1;
     public int NextPage => CurrentPage + 1;
     
-    public async Task<IActionResult> OnGetAsync(string orderBy, int pageNumber = 1, [FromQuery] bool debug = false) 
+    public async Task<IActionResult> OnGetAsync(string orderBy, int pageNumber = 1) 
     {
         try
         {
@@ -57,8 +57,7 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
                     ? OrderBy.Distance 
                     : OrderBy.Relevance;
             }
-
-            Search.Debug = debug;
+            
             Search.SetPage(PageName.LoadCourses);
             HttpContext.Session.Set("Search", Search);
             
@@ -72,6 +71,13 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             Courses = searchResponse.Courses.ToList();
             
             AllFacets = searchResponse.Facets.ToViewModels();
+            
+            if (Search.Facets.Count == 0) // Initial search
+            {
+                SelectQualificationLevels();
+
+                Search.Facets = AllFacets;
+            }
             
             var sessionFacets = HttpContext.Session.Get<List<Models.ViewModels.Facet>>("AllFacets");
             if (sessionFacets != null)
@@ -111,12 +117,48 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
         return Page();
     }
 
-    public IActionResult OnPostClearFilters()
+    public IActionResult OnGetClearFilters()
     {
-        logger.LogDebug("OnPostClearFilter called");
+        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         
-        ModelState.Clear();
-        return RedirectToPage(); 
+        HttpContext.Session.Remove("AllFacets");
+        AllFacets = [];
+        
+        Search.Facets = [];
+        Search.CurrentPage = 1;
+        
+        Search.Distance = Search.OriginalDistance;
+        Search.QualificationLevels = [];
+        
+        HttpContext.Session.Set("Search", Search);
+        
+        return RedirectToPage();
+    }
+    
+    public IActionResult OnGetClearFacet(string facetName)
+    {
+        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+
+        var allFacets = HttpContext.Session.Get<List<Models.ViewModels.Facet>>("AllFacets") ?? [];
+        
+        var facet = allFacets.FirstOrDefault(f =>
+            f.Name.Equals(facetName, StringComparison.InvariantCultureIgnoreCase));
+
+        if (facet != null)
+        {
+            foreach (var value in facet.Values)
+            {
+                value.Selected = false;
+            }
+        }
+        
+        Search.Facets = allFacets;
+        Search.CurrentPage = 1;
+
+        HttpContext.Session.Set("AllFacets", allFacets);
+        HttpContext.Session.Set("Search", Search);
+
+        return RedirectToPage();
     }
 
     public IActionResult OnPostUpdateSelection()
@@ -235,5 +277,27 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
 
         AllFacets = fullFacets;
         Search.Facets = fullFacets;
+    }
+
+    private void SelectQualificationLevels()
+    {
+        const string name = nameof(SearchRequest.QualificationLevel);
+        
+        var facet = AllFacets
+            .FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+        
+        if (facet != null)
+        {
+            var selectedOptions = Search.QualificationLevelMap
+                .Where(x => Search.QualificationLevels.Contains(x.Key))
+                .SelectMany(x => x.Value)
+                .Select(x => ((feat.common.Models.Enums.QualificationLevel)x).ToString())
+                .ToHashSet();
+            
+            foreach (var value in facet.Values)
+            {
+                value.Selected = selectedOptions.Contains(value.Name);
+            }
+        }
     }
 }
