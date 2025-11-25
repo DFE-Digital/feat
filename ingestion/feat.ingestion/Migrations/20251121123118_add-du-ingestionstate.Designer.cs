@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251121123118_add-du-ingestionstate")]
+    partial class addduingestionstate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -525,146 +528,6 @@ namespace feat.ingestion.Migrations
                     b.ToTable("Vacancy");
                 });
 
-            modelBuilder.Entity("feat.ingestion.Models.DU.Aim", b =>
-                {
-                    b.Property<int>("AimCode")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AimCode"));
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("AimCode");
-
-                    b.ToTable("DU_Aims");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.DU.Course", b =>
-                {
-                    b.Property<int>("UKPRN")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CourseId")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("StudyMode")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Aim")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AssessmentUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("CostsUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("CourseUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int?>("DistanceLearning")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("FoundationYear")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Hecos")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Hecos2")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Hecos3")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Hecos4")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Hecos5")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("Honours")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LearningUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<bool?>("NHS")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("NumberOfYears")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PubUKPRN")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Sandwich")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int?>("YearAbroad")
-                        .HasColumnType("int");
-
-                    b.HasKey("UKPRN", "CourseId", "StudyMode");
-
-                    b.ToTable("DU_Courses");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.DU.CourseLocation", b =>
-                {
-                    b.Property<int>("UKPRN")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PubUKPRN")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CourseId")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("StudyMode")
-                        .HasColumnType("int");
-
-                    b.Property<string>("LocationId")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("UKPRN", "PubUKPRN", "CourseId", "StudyMode", "LocationId");
-
-                    b.ToTable("DU_CourseLocations");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.DU.Hecos", b =>
-                {
-                    b.Property<int>("Code")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Code"));
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Code");
-
-                    b.ToTable("DU_HECOS");
-                });
-
             modelBuilder.Entity("feat.ingestion.Models.DU.IngestionState", b =>
                 {
                     b.Property<Guid>("Id")
@@ -674,96 +537,18 @@ namespace feat.ingestion.Migrations
                     b.Property<bool>("DownloadComplete")
                         .HasColumnType("bit");
 
-                    b.Property<string>("ETag")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("Extracted")
                         .HasColumnType("bit");
 
+                    b.Property<double?>("FileSize")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("LastDownloaded")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
-                    b.ToTable("DU_IngestionState");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.DU.Institution", b =>
-                {
-                    b.Property<int>("UKPRN")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PubUKPRN")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<int>("Country")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("OtherNames")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("StudentUnionUrl")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<string>("Telephone")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("TradingName")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("Url")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.HasKey("UKPRN", "PubUKPRN");
-
-                    b.ToTable("DU_Institutions");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.DU.Location", b =>
-                {
-                    b.Property<int>("UKPRN")
-                        .HasColumnType("int");
-
-                    b.Property<string>("LocationId")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("AccommodationUrl")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<int>("Country")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Latitude")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Longitude")
-                        .HasColumnType("float");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("StudentUnionUrl")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.HasKey("UKPRN", "LocationId");
-
-                    b.ToTable("DU_Locations");
+                    b.ToTable("DiscoverUni_IngestionState");
                 });
 
             modelBuilder.Entity("feat.ingestion.Models.FAA.Address", b =>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251125102409_du-fix-locations")]
+    partial class dufixlocations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -604,9 +607,6 @@ namespace feat.ingestion.Migrations
                     b.Property<int?>("NumberOfYears")
                         .HasColumnType("int");
 
-                    b.Property<int>("PubUKPRN")
-                        .HasColumnType("int");
-
                     b.Property<int?>("Sandwich")
                         .HasColumnType("int");
 
@@ -628,9 +628,6 @@ namespace feat.ingestion.Migrations
                     b.Property<int>("UKPRN")
                         .HasColumnType("int");
 
-                    b.Property<int>("PubUKPRN")
-                        .HasColumnType("int");
-
                     b.Property<string>("CourseId")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -642,7 +639,7 @@ namespace feat.ingestion.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.HasKey("UKPRN", "PubUKPRN", "CourseId", "StudyMode", "LocationId");
+                    b.HasKey("UKPRN", "CourseId", "StudyMode", "LocationId");
 
                     b.ToTable("DU_CourseLocations");
                 });

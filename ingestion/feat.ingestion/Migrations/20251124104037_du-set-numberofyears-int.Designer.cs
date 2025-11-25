@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251124104037_du-set-numberofyears-int")]
+    partial class dusetnumberofyearsint
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -570,11 +573,11 @@ namespace feat.ingestion.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("DistanceLearning")
-                        .HasColumnType("int");
+                    b.Property<bool?>("DistanceLearning")
+                        .HasColumnType("bit");
 
-                    b.Property<int?>("FoundationYear")
-                        .HasColumnType("int");
+                    b.Property<bool?>("FoundationYear")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("Hecos")
                         .HasColumnType("int");
@@ -604,65 +607,20 @@ namespace feat.ingestion.Migrations
                     b.Property<int?>("NumberOfYears")
                         .HasColumnType("int");
 
-                    b.Property<int>("PubUKPRN")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Sandwich")
-                        .HasColumnType("int");
+                    b.Property<bool?>("Sandwich")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("YearAbroad")
-                        .HasColumnType("int");
+                    b.Property<bool?>("YearAbroad")
+                        .HasColumnType("bit");
 
                     b.HasKey("UKPRN", "CourseId", "StudyMode");
 
                     b.ToTable("DU_Courses");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.DU.CourseLocation", b =>
-                {
-                    b.Property<int>("UKPRN")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PubUKPRN")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CourseId")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("StudyMode")
-                        .HasColumnType("int");
-
-                    b.Property<string>("LocationId")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("UKPRN", "PubUKPRN", "CourseId", "StudyMode", "LocationId");
-
-                    b.ToTable("DU_CourseLocations");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.DU.Hecos", b =>
-                {
-                    b.Property<int>("Code")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Code"));
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Code");
-
-                    b.ToTable("DU_HECOS");
                 });
 
             modelBuilder.Entity("feat.ingestion.Models.DU.IngestionState", b =>
@@ -688,10 +646,10 @@ namespace feat.ingestion.Migrations
             modelBuilder.Entity("feat.ingestion.Models.DU.Institution", b =>
                 {
                     b.Property<int>("UKPRN")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("PubUKPRN")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UKPRN"));
 
                     b.Property<string>("Address")
                         .HasMaxLength(300)
@@ -725,7 +683,7 @@ namespace feat.ingestion.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.HasKey("UKPRN", "PubUKPRN");
+                    b.HasKey("UKPRN");
 
                     b.ToTable("DU_Institutions");
                 });

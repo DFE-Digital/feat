@@ -1,6 +1,7 @@
 using System.Globalization;
 using Azure.Storage.Blobs;
 using CsvHelper;
+using feat.common.Extensions;
 using feat.common.Models;
 using feat.common.Models.AiSearch;
 using feat.common.Models.Enums;
@@ -10,10 +11,7 @@ using feat.ingestion.Enums;
 using feat.ingestion.Models.FAC;
 using feat.ingestion.Models.FAC.Enums;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Spatial;
-using NetTopologySuite.Geometries;
 using Z.BulkOperations;
-using DeliveryMode = feat.common.Models.Enums.DeliveryMode;
 using Location = feat.common.Models.Location;
 using Provider = feat.common.Models.Provider;
 
@@ -48,7 +46,7 @@ public class FacIngestionHandler(
         // Check the container exists
         if (!exists)
         {
-            Console.WriteLine("Unable create the FAC Azure Storage Container");
+            Console.WriteLine($"Unable create the {Name} Azure Storage Container");
             return false;
         }
 
@@ -548,7 +546,7 @@ public class FacIngestionHandler(
 
         }
 
-        Console.WriteLine("FAC Ingestion Done");
+        Console.WriteLine($"{Name} Ingestion Done");
 
         return true;
     }
@@ -559,7 +557,7 @@ public class FacIngestionHandler(
         var auditEntries = new List<AuditEntry>();
         bool skip = false;
         
-        Console.WriteLine("Starting sync of Find A Course data");
+        Console.WriteLine($"Starting sync of {Name} data");
 
         if (skip)
         {
@@ -640,6 +638,7 @@ public class FacIngestionHandler(
                 p.Updated
             };
             options.ColumnPrimaryKeyExpression = l => l.Ukprn;
+            options.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
             options.UseRowsAffected = true;
             options.ResultInfo = resultInfo;
         }, cancellationToken);
@@ -1030,7 +1029,7 @@ public class FacIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
         
-        Console.WriteLine("FAC Sync Done");
+        Console.WriteLine($"{Name} Sync Done");
 
         return true;
     }
@@ -1039,7 +1038,7 @@ public class FacIngestionHandler(
     {
         while (true)
         {
-            Console.WriteLine("Starting Find A Course AI Search indexing...");
+            Console.WriteLine($"Starting {Name} AI Search indexing...");
 
             var entries = dbContext.Entries.Where(x => x.SourceSystem == SourceSystem.FAC)
                 .Include(entry => entry.EntrySectors)
@@ -1117,64 +1116,13 @@ public class FacIngestionHandler(
                 options.IncludeGraph = false;
             }, cancellationToken);
 
-            Console.WriteLine($"Find A Course AI Search indexing {(result ? "complete" : "failed")}.");
+            Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
 
 
             // Keep going until we've ingested everything
-            if (!dbContext.Entries.Any(e => e.IngestionState == IngestionState.Pending)) return result;
+            if (!dbContext.Entries.Any(e => e.IngestionState == IngestionState.Pending && e.SourceSystem == SourceSystem.FAC)) return result;
             dbContext.ChangeTracker.Clear();
 
         }
-    }
-
-
-    private static string MapStudyTime(AttendancePattern? attendancePattern)
-    {
-        return attendancePattern switch
-        {
-            AttendancePattern.Daytime => nameof(StudyTime.Daytime),
-            AttendancePattern.Weekend => nameof(StudyTime.Weekend),
-            AttendancePattern.Evening => nameof(StudyTime.Evening),
-            _ => string.Empty
-        };
-    }
-
-    private static string MapCourseHours(StudyMode? studyMode)
-    {
-        return studyMode switch
-        {
-            StudyMode.Flexible => nameof(CourseHours.Flexible),
-            StudyMode.FullTime => nameof(CourseHours.FullTime),
-            StudyMode.PartTime => nameof(CourseHours.PartTime),
-            _ => string.Empty
-        };
-    }
-
-    private static string MapLearningMethod(DeliveryMode? deliveryMode)
-    {
-        return deliveryMode switch
-        {
-            DeliveryMode.BlendedLearning => nameof(LearningMethod.Hybrid),
-            DeliveryMode.ClassroomBased => nameof(LearningMethod.ClassroomBased),
-            DeliveryMode.Online => nameof(LearningMethod.Online),
-            DeliveryMode.WorkBased => nameof(LearningMethod.Workbased),
-            _ => string.Empty
-        };
-    }
-
-    private static string MapQualificationLevel(EducationLevel? qualificationLevel)
-    {
-        return qualificationLevel switch
-        {
-            EducationLevel.Level1 => nameof(QualificationLevel.Level1),
-            EducationLevel.Level2 => nameof(QualificationLevel.Level2),
-            EducationLevel.Level3 => nameof(QualificationLevel.Level3),
-            EducationLevel.Level4 => nameof(QualificationLevel.Level4),
-            EducationLevel.Level5 => nameof(QualificationLevel.Level5),
-            EducationLevel.Level6 => nameof(QualificationLevel.Level6),
-            EducationLevel.Level7 => nameof(QualificationLevel.Level7),
-            EducationLevel.Level0 => nameof(QualificationLevel.Entry),
-            _ => string.Empty
-        };
     }
 }

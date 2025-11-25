@@ -59,9 +59,4 @@
       <ProjectReference Include="..\..\common\feat.common\feat.common.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Handlers\DiscoverUni\" />
-      <Folder Include="Models\ONS\" />
-    </ItemGroup>
-
 </Project>
