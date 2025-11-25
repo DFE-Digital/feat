@@ -47,7 +47,7 @@ public class FacIngestionHandler(
         // Check the container exists
         if (!exists)
         {
-            Console.WriteLine("Unable create the FAC Azure Storage Container");
+            Console.WriteLine($"Unable create the {Name} Azure Storage Container");
             return false;
         }
 
@@ -547,7 +547,7 @@ public class FacIngestionHandler(
 
         }
 
-        Console.WriteLine("FAC Ingestion Done");
+        Console.WriteLine($"{Name} Ingestion Done");
 
         return true;
     }
@@ -556,9 +556,9 @@ public class FacIngestionHandler(
     {
         var resultInfo = new ResultInfo();
         var auditEntries = new List<AuditEntry>();
-        bool skip = true;
+        bool skip = false;
         
-        Console.WriteLine("Starting sync of Find A Course data");
+        Console.WriteLine($"Starting sync of {Name} data");
 
         if (skip)
         {
@@ -639,6 +639,7 @@ public class FacIngestionHandler(
                 p.Updated
             };
             options.ColumnPrimaryKeyExpression = l => l.Ukprn;
+            options.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
             options.UseRowsAffected = true;
             options.ResultInfo = resultInfo;
         }, cancellationToken);
@@ -1029,7 +1030,7 @@ public class FacIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
         
-        Console.WriteLine("FAC Sync Done");
+        Console.WriteLine($"{Name} Sync Done");
 
         return true;
     }
@@ -1038,7 +1039,7 @@ public class FacIngestionHandler(
     {
         while (true)
         {
-            Console.WriteLine("Starting Find A Course AI Search indexing...");
+            Console.WriteLine($"Starting {Name} AI Search indexing...");
             var sb = new StringBuilder();
 
             var entries = dbContext.Entries.Where(x => x.SourceSystem == SourceSystem.FAC)
@@ -1125,7 +1126,7 @@ public class FacIngestionHandler(
                 options.IncludeGraph = false;
             }, cancellationToken);
 
-            Console.WriteLine($"Find A Course AI Search indexing {(result ? "complete" : "failed")}.");
+            Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
 
 
             // Keep going until we've ingested everything

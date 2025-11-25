@@ -12,6 +12,7 @@ using feat.common.Configuration;
 using feat.ingestion.Configuration;
 using feat.ingestion.Data;
 using feat.ingestion.Handlers;
+using feat.ingestion.Handlers.DiscoverUni;
 using feat.ingestion.Handlers.FAA;
 using feat.ingestion.Handlers.FAC;
 using Microsoft.EntityFrameworkCore;
@@ -75,7 +76,8 @@ services.AddDbContext<IngestionDbContext>(options =>
 services.AddTransient<IMigrationsHandler, MigrationsHandler>();
 services.AddTransient<ISearchIndexHandler, SearchIndexHandler>();
 services.AddTransient<FacIngestionHandler>();
-services.AddTransient<FaaIngestionHandler>();
+services.AddTransient<FacIngestionHandler>();
+services.AddTransient<DiscoverUniIngestionHandler>();
 services.AddSingleton<IApiClient, ApiClient>();
 services.AddSingleton<IIngestionHandlerFactory, IngestionHandlerFactory>();
 services.AddSingleton(ingestionOptions);
