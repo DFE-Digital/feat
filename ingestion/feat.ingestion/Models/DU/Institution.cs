@@ -8,6 +8,7 @@ namespace feat.ingestion.Models.DU;
 [Table("DU_Institutions")]
 public class Institution
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int UKPRN { get; set; }
     
     public int PubUKPRN { get; set; }

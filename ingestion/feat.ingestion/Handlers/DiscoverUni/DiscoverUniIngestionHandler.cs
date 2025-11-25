@@ -347,8 +347,7 @@ public class DiscoverUniIngestionHandler(
             {
 
                 if (
-                    Providers == ProcessMode.Force
-                    || dbContext.DU_Institutions.Count() != records.Count
+                    Providers != ProcessMode.Skip
                 )
                 {
                     Console.WriteLine($"Preparing {records.Count} records to DB...");
@@ -497,6 +496,8 @@ public class DiscoverUniIngestionHandler(
         resultInfo = new ResultInfo();
 
         // INSTITUTIONS
+        
+        
         Console.WriteLine("Generating providers...");
         var providers =
             from i in dbContext.DU_Institutions
@@ -512,7 +513,7 @@ public class DiscoverUniIngestionHandler(
                 TradingName = i.TradingName,
                 OtherNames = i.OtherNames
             };
-
+        
         await dbContext.BulkSynchronizeAsync(providers, options =>
         {
             options.IgnoreOnSynchronizeUpdateExpression = p => new
@@ -604,8 +605,6 @@ public class DiscoverUniIngestionHandler(
 
         Console.WriteLine($"Generating entries for {courses.LongCount()} courses...");
         var distinctEntries = courses.Distinct();
-
-        // ENTRY - Merged List
 
         await dbContext.BulkSynchronizeAsync(distinctEntries, options =>
         {
@@ -824,7 +823,7 @@ public class DiscoverUniIngestionHandler(
             };
 
         var distinctHecosSectors = hecosSectors.ToList().Distinct();
-
+        
         var less = "more";
         /*
         
