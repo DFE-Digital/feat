@@ -39,7 +39,7 @@ public class Search
     {
         var request = new SearchRequest
         {
-            Query = Query,
+            Query = !string.IsNullOrWhiteSpace(Query) ? Query : "*",
             Page = CurrentPage,
             PageSize = PageSize,
             Location = Location,
