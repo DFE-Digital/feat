@@ -22,7 +22,7 @@ public class Cookies : PageModel
         {
             AnalyticsCookie = analyticsCookieValue;
         }
-        if (analyticsCookieValue != null)
+        if (matketingCookieValue != null)
         {
             MarketingCookie = matketingCookieValue;
         }
