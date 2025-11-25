@@ -317,8 +317,9 @@ public class FaaIngestionHandler(
             .Select(a => new EntrySector
             {
                 EntryId = entryLookup[a.VacancyReference!],
-                SectorId = sectorLookup[a.CourseRoute!.ToLower().Trim()]
-            }).ToList();
+                SectorId = sectorLookup[a.CourseRoute!.ToLower().Trim()],
+            SourceSystem = SourceSystem.FAA
+        }).ToList();
 
         await dbContext.BulkSynchronizeAsync(entrySectors, options =>
         {
@@ -327,6 +328,8 @@ public class FaaIngestionHandler(
                 es.EntryId,
                 es.SectorId
             };
+            options.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
+            
         }, cancellationToken);
 
         Console.WriteLine($"EntrySectors synchronized: {entrySectors.Count}");
