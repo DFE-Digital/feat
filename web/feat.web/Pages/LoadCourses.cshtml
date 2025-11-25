@@ -158,7 +158,6 @@
       <!-- Results Section (Right Column) -->
       <div class="govuk-grid-column-two-thirds">
 
-        <!--Already done-->
         @if (!Model.Courses.Any())
         {
           <h2 class="govuk-heading-m" role="status" aria-live="polite">It looks like we can’t find anything based on your answers.</h2>
@@ -172,34 +171,33 @@
         else
         {
           <!-- Results & Pagination -->
-          <div class="course-results">
-            <h2 class="govuk-heading-m">Available courses</h2>
-
-            <!-- Sort Region-->
-            <p class="govuk-body govuk-!-margin-bottom-6">
-              <span class="govuk-!-font-weight-bold">Sort courses by:</span>
-              <span class="govuk-!-margin-left-2">
-                @{
-                  if (Model.Search.OrderBy == OrderBy.Distance)
-                  {
-                    <span aria-current="true">Distance | </span>
-                    <a asp-page="@PageName.LoadCourses" asp-route-orderBy="relevance">Relevance</a>
-                  }
-                  else
-                  {
-                    <a asp-page="@PageName.LoadCourses" asp-route-orderBy="distance">Distance</a>
-                    <span aria-current="true">| Relevance</span>
-                  }
+          <h2 class="govuk-heading-m">Available courses</h2>
+          
+          <!-- Sort Region-->
+          <p class="govuk-body govuk-!-margin-bottom-6">
+            <span class="govuk-!-font-weight-bold">Sort courses by:</span>
+            <span class="govuk-!-margin-left-2">
+              @{
+                if (Model.Search.OrderBy == OrderBy.Distance)
+                {
+                  <span aria-current="true">Distance | </span>
+                  <a asp-page="@PageName.LoadCourses" asp-route-orderBy="relevance">Relevance</a>
                 }
-              </span>
-            </p>
+                else
+                {
+                  <a asp-page="@PageName.LoadCourses" asp-route-orderBy="distance">Distance</a>
+                  <span aria-current="true">| Relevance</span>
+                }
+              }
+            </span>
+          </p>
+          
+          @foreach (var searchResult in Model.Courses)
+          {
+            await Html.RenderPartialAsync("Partials/_SearchResult", searchResult.ToResultViewModel());
+          }
 
-            @foreach (var searchResult in Model.Courses)
-            {
-              await Html.RenderPartialAsync("Partials/_SearchResult", searchResult.ToResultViewModel());
-            }
-
-            <!-- Pagination -->
+          <!-- Pagination -->
             @if (Model.TotalPages > 1)
             {
               <nav class="govuk-pagination" aria-label="Pagination">
@@ -224,7 +222,7 @@
                     {
                       <li class="govuk-pagination__item govuk-pagination__item--current">
                         <a class="govuk-link govuk-pagination__link"
-                           aria-label=@($"Page {pageNumber}") aria-current="page">
+                           aria-label="@($"Page {pageNumber}")" aria-current="page">
                           @pageNumber
                         </a><span></span>
                       </li>
@@ -234,14 +232,14 @@
                       <li class="govuk-pagination__item ">
                         <a class="govuk-link govuk-pagination__link"
                            asp-page="" asp-route-pageNumber="@pageNumber"
-                           aria-label=@($"Page {pageNumber}")>
+                           aria-label="@($"Page {pageNumber}")">
                           @pageNumber
                         </a>
                       </li>
                     }
                   }
                 </ul>
-
+                
                 @if (Model.HasNextPage)
                 {
                   <div class="govuk-pagination__next">
@@ -258,7 +256,6 @@
                 }
               </nav>
             }
-          </div>
         }
       </div>
 
@@ -308,11 +305,5 @@
             width: 100%;
         }
     }
-
-    /* Course results styling */
-    .course-results {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
+    
 </style>
