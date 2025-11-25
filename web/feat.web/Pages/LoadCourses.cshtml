@@ -173,15 +173,22 @@
             <span class="govuk-!-font-weight-bold">Sort courses by:</span>
             <span class="govuk-!-margin-left-2">
               @{
-                if (Model.Search.OrderBy == OrderBy.Distance)
+                if (Model.Search.Location == null)
                 {
-                  <span aria-current="true">Distance | </span>
-                  <a asp-page="@PageName.LoadCourses" asp-route-orderBy="relevance">Relevance</a>
+                  <span aria-current="true">Relevance</span>
                 }
                 else
                 {
-                  <a asp-page="@PageName.LoadCourses" asp-route-orderBy="distance">Distance</a>
-                  <span aria-current="true">| Relevance</span>
+                  if (Model.Search.OrderBy == OrderBy.Distance)
+                  {
+                    <span aria-current="true">Distance | </span>
+                    <a asp-page="@PageName.LoadCourses" asp-route-orderBy="relevance">Relevance</a>
+                  }
+                  else
+                  {
+                    <a asp-page="@PageName.LoadCourses" asp-route-orderBy="distance">Distance</a>
+                    <span aria-current="true">| Relevance</span>
+                  }
                 }
               }
             </span>

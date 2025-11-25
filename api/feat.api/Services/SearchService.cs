@@ -127,57 +127,7 @@ public class SearchService(
 
     private async Task<(List<AiSearchResult>, List<Facet>, int)> AiSearchAsync(SearchRequest request, GeoLocation? userLocation)
     {
-        var embedding = await embeddingClient.GenerateEmbeddingAsync(request.Query);
-        var vector = embedding.Value.ToFloats();
-
-        var filterExpression = BuildFacetFilterExpression(request, userLocation);
-
-        var searchOptions = new SearchOptions
-        {
-            //ScoringProfile = _azureOptions.AiSearchIndexScoringProfile,
-            //ScoringParameters = { _azureOptions.AiSearchIndexScoringParameters },
-            SessionId = request.SessionId,
-            SearchMode = SearchMode.Any,
-            QueryType = SearchQueryType.Semantic,
-            SemanticSearch = new SemanticSearchOptions
-            {
-                SemanticConfigurationName = "semantic-title-description",
-            },
-            Size = request.PageSize,
-            Skip = (request.Page - 1) * request.PageSize,
-            IncludeTotalCount = true,
-            VectorSearch = new VectorSearchOptions
-            {
-                Queries =
-                {
-                    new VectorizedQuery(vector)
-                    {
-                        KNearestNeighborsCount = _azureOptions.Knn,
-                        Fields = { "TitleVector", "LearningAimTitleVector", "DescriptionVector", "SectorVector" },
-                        Weight = _azureOptions.Weight,
-                    }
-                },
-            },
-            SearchFields =
-            {
-                nameof(SearchIndexFields.Title), 
-                nameof(SearchIndexFields.Description)
-            },
-            HighlightFields =
-            {
-                nameof(SearchIndexFields.Title), 
-                nameof(SearchIndexFields.Description)
-            },
-            Facets =
-            {
-                nameof(SearchIndexFields.EntryType), 
-                nameof(SearchIndexFields.QualificationLevel), 
-                nameof(SearchIndexFields.LearningMethod), 
-                nameof(SearchIndexFields.CourseHours), 
-                nameof(SearchIndexFields.StudyTime),
-            },
-            Filter = filterExpression
-        };
+        var searchOptions = await BuildSearchOptions(request, userLocation);
 
         var search = await aiSearchClient.SearchAsync<AiSearchResponse>(request.Query, searchOptions);
         var searchResults = search.Value;
@@ -209,6 +159,89 @@ public class SearchService(
         var totalCount = (int)search.Value.TotalCount!;
         
         return (uniqueCourses, facets, totalCount);
+    }
+
+    private async Task<SearchOptions> BuildSearchOptions(SearchRequest request, GeoLocation? userLocation)
+    {
+        var embedding = await embeddingClient.GenerateEmbeddingAsync(request.Query);
+        var vector = embedding.Value.ToFloats();
+        
+        var filterExpression = BuildFacetFilterExpression(request, userLocation);
+        
+        SearchOptions searchOptions;
+
+        if (request.Query == "*")
+        {
+            searchOptions = new SearchOptions
+            {
+                //ScoringParameters = { _azureOptions.AiSearchIndexScoringParameters },
+                SearchFields =
+                {
+                    nameof(SearchIndexFields.Title), 
+                    nameof(SearchIndexFields.Description)
+                },
+                Facets =
+                {
+                    nameof(SearchIndexFields.EntryType), 
+                    nameof(SearchIndexFields.QualificationLevel), 
+                    nameof(SearchIndexFields.LearningMethod), 
+                    nameof(SearchIndexFields.CourseHours), 
+                    nameof(SearchIndexFields.StudyTime)
+                }
+            };
+        }
+        else
+        {
+            searchOptions = new SearchOptions
+            {
+                //ScoringParameters = { _azureOptions.AiSearchIndexScoringParameters },
+                SearchFields =
+                {
+                    nameof(SearchIndexFields.Title), 
+                    nameof(SearchIndexFields.Description)
+                },
+                Facets =
+                {
+                    nameof(SearchIndexFields.EntryType), 
+                    nameof(SearchIndexFields.QualificationLevel), 
+                    nameof(SearchIndexFields.LearningMethod), 
+                    nameof(SearchIndexFields.CourseHours), 
+                    nameof(SearchIndexFields.StudyTime)
+                },
+                HighlightFields =
+                {
+                    nameof(SearchIndexFields.Title),
+                    nameof(SearchIndexFields.Description)
+                }
+            };
+        }
+
+        //searchOptions.ScoringProfile = _azureOptions.AiSearchIndexScoringProfile;
+        searchOptions.SessionId = request.SessionId;
+        searchOptions.Size = request.PageSize;
+        searchOptions.Skip = (request.Page - 1) * request.PageSize;
+        searchOptions.IncludeTotalCount = true;
+        searchOptions.Filter = filterExpression;
+        searchOptions.SearchMode = SearchMode.Any;
+        searchOptions.QueryType = SearchQueryType.Semantic;
+        searchOptions.SemanticSearch = new SemanticSearchOptions
+        {
+            SemanticConfigurationName = "semantic-title-description",
+        };
+        searchOptions.VectorSearch = new VectorSearchOptions
+        {
+            Queries =
+            {
+                new VectorizedQuery(vector)
+                {
+                    KNearestNeighborsCount = _azureOptions.Knn,
+                    Fields = { "TitleVector", "LearningAimTitleVector", "DescriptionVector", "SectorVector" },
+                    Weight = _azureOptions.Weight,
+                }
+            },
+        };
+
+        return searchOptions;
     }
     
     private async Task<GeoLocation?> GetGeoLocationAsync(string location)
