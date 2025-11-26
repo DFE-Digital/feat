@@ -10,6 +10,7 @@ public class SearchRequest
     
     public string? SessionId { get; set; } = Guid.NewGuid().ToString();
     
+    [Range(1, int.MaxValue, ErrorMessage = "Page must be at least 1.")]
     public int Page { get; set; } = 1;
 
     public int PageSize { get; set; } = 10;
