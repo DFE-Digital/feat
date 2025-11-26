@@ -234,6 +234,7 @@ public class FaaIngestionHandler(
         Console.WriteLine($"Sectors synchronized: {sectors.Count}");
         
         // ENTRY
+        
         var auditEntries = new List<AuditEntry>();
         var entries = apprenticeships.Select(a =>
         {
@@ -372,7 +373,7 @@ public class FaaIngestionHandler(
                 EmployerId = employerId,
                 Level = MapApprenticeshipLevel(a.ApprenticeshipLevel),
                 Positions = (short?)a.NumberOfPositions,
-                Wage = (decimal?)a.WageAmount ?? ParseWageAmount(a.WageAdditionalInformation),
+                Wage = a.WageAdditionalInformation,
                 WageUnit = MapWageUnit(a.WageUnit),
                 WageType = Enum.Parse<WageType>(a.WageType),
                 HoursPerWeek = a.HoursPerWeek,
@@ -631,27 +632,6 @@ public class FaaIngestionHandler(
             "annually" or "yearly" => WageUnit.Year,
             _ => null
         };
-    }
-
-    private static decimal? ParseWageAmount(string? wageInfo)
-    {
-        if (string.IsNullOrWhiteSpace(wageInfo))
-        {
-            return null;
-        }
-
-        var digitsOnly = new string(wageInfo.Where(c => char.IsDigit(c) || c == '.' || c == ',').ToArray());
-
-        if (string.IsNullOrEmpty(digitsOnly))
-        {
-            return null;
-        }
-
-        digitsOnly = digitsOnly.Replace(",", "");
-
-        return decimal.TryParse(digitsOnly, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var result)
-            ? result
-            : null;
     }
 
     private static ApprenticeshipLevel? MapApprenticeshipLevel(string? apprenticeshipLevel)
