@@ -9,6 +9,7 @@ namespace feat.ingestion.Models.DU;
 public class Aim
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public required int AimCode { get; set; }
     
     [StringLength(20)]

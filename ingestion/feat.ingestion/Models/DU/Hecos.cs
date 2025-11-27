@@ -9,6 +9,7 @@ namespace feat.ingestion.Models.DU;
 public class Hecos
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public required int Code { get; set; }
     
     [StringLength(100)]

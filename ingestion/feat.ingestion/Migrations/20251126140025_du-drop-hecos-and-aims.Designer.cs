@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251126140025_du-drop-hecos-and-aims")]
+    partial class dudrophecosandaims
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -525,21 +528,6 @@ namespace feat.ingestion.Migrations
                     b.ToTable("Vacancy");
                 });
 
-            modelBuilder.Entity("feat.ingestion.Models.DU.Aim", b =>
-                {
-                    b.Property<int>("AimCode")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("AimCode");
-
-                    b.ToTable("DU_Aims");
-                });
-
             modelBuilder.Entity("feat.ingestion.Models.DU.Course", b =>
                 {
                     b.Property<int>("UKPRN")
@@ -642,21 +630,6 @@ namespace feat.ingestion.Migrations
                     b.HasKey("UKPRN", "PubUKPRN", "CourseId", "StudyMode", "LocationId");
 
                     b.ToTable("DU_CourseLocations");
-                });
-
-            modelBuilder.Entity("feat.ingestion.Models.DU.Hecos", b =>
-                {
-                    b.Property<int>("Code")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Code");
-
-                    b.ToTable("DU_HECOS");
                 });
 
             modelBuilder.Entity("feat.ingestion.Models.DU.IngestionState", b =>
