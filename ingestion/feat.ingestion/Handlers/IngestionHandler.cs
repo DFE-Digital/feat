@@ -1,3 +1,4 @@
+using feat.common.Models.Enums;
 using feat.ingestion.Configuration;
 using feat.ingestion.Enums;
 
@@ -8,7 +9,10 @@ public abstract class IngestionHandler(IngestionOptions options) : IIngestionHan
     public virtual IngestionType IngestionType => IngestionType.Manual;
     public virtual string Name => "Default Ingestion Handler";
     public virtual string Description => "This should not be used and should be inherited as the base class";
-    
+#pragma warning disable CS0618 // Type or member is obsolete
+    public virtual SourceSystem SourceSystem => SourceSystem.NotSpecified;
+#pragma warning restore CS0618 // Type or member is obsolete
+
     public bool Ingest()
     {
         return IngestAsync(CancellationToken.None).GetAwaiter().GetResult();

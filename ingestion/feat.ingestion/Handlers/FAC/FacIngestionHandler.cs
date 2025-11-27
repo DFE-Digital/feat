@@ -28,6 +28,7 @@ public class FacIngestionHandler(
     public override IngestionType IngestionType => IngestionType.Csv | IngestionType.Manual;
     public override string Name => "Find A Course";
     public override string Description => "File based ingestion from Find A Course, Publish To Course Directory, and Learning AIM Datasets Manually Uploaded into Blob Storage";
+    public override SourceSystem SourceSystem => SourceSystem.FAC;
 
     private const string ContainerName = "fac";
     
@@ -593,7 +594,7 @@ public class FacIngestionHandler(
                 Telephone = v.Telephone,
 
                 SourceReference = v.VenueId.ToString(),
-                SourceSystem = SourceSystem.FAC
+                SourceSystem = SourceSystem
 
             };
 
@@ -621,7 +622,7 @@ public class FacIngestionHandler(
             from p in dbContext.FAC_Providers
             select new Provider()
             {
-                SourceSystem = SourceSystem.FAC,
+                SourceSystem = SourceSystem,
                 SourceReference = p.ProviderId.ToString(),
                 Created = DateTime.Now,
                 Updated = p.UpdatedOn ?? DateTime.Now,
@@ -665,7 +666,7 @@ public class FacIngestionHandler(
             {
                 ProviderId = p.Id,
                 LocationId = l.Id,
-                SourceSystem = SourceSystem.FAC
+                SourceSystem = SourceSystem
             };
         
         await dbContext.BulkSynchronizeAsync(providerLocations.Distinct(), options =>
@@ -699,7 +700,7 @@ public class FacIngestionHandler(
                 Created = t.CreatedOn,
                 Updated = t.UpdatedOn ?? DateTime.Now,
                 SourceReference = c.COURSE_ID.ToString(),
-                SourceSystem = SourceSystem.FAC,
+                SourceSystem = SourceSystem,
                 SourceUpdated = DateTime.Now,
                 Type = EntryType.Course,
 
@@ -740,7 +741,7 @@ public class FacIngestionHandler(
                 Created = c.CREATED_DATE ?? DateTime.Now,
                 Updated = c.UPDATED_DATE ?? DateTime.Now,
                 SourceReference = c.COURSE_ID.ToString(),
-                SourceSystem = SourceSystem.FAC,
+                SourceSystem = SourceSystem,
                 SourceUpdated = DateTime.Now,
                 Type = EntryType.Course,
 
@@ -831,7 +832,7 @@ public class FacIngestionHandler(
                 Updated = t.UpdatedOn,
                 Duration = c.DURATION,
                 SourceReference = c.COURSE_RUN_ID.ToString(),
-                SourceSystem = SourceSystem.FAC,
+                SourceSystem = SourceSystem,
                 Reference = c.COURSE_RUN_ID.ToString(),
                 StartDate = c.STARTDATE,
                 EntryId = e.Id,
@@ -855,7 +856,7 @@ public class FacIngestionHandler(
                 Updated = c.UPDATED_DATE ?? DateTime.Now,
                 Duration = c.DURATION,
                 SourceReference = c.COURSE_RUN_ID.ToString(),
-                SourceSystem = SourceSystem.FAC,
+                SourceSystem = SourceSystem,
                 Reference = c.COURSE_RUN_ID.ToString(),
                 StartDate = c.STARTDATE,
                 EntryId = e.Id,
@@ -912,7 +913,7 @@ public class FacIngestionHandler(
             {
                 EntryId = e.Id,
                 Description = cr.CostDescription,
-                SourceSystem = SourceSystem.FAC,
+                SourceSystem = SourceSystem,
                 Value = cr.Cost != null && cr.Cost.Value > 0 ? decimal.ToDouble(cr.Cost.Value) : null
             };
         
@@ -942,7 +943,7 @@ public class FacIngestionHandler(
             where c.SECTOR != null
             select new Sector()
             {
-                SourceSystem = SourceSystem.FAC,
+                SourceSystem = SourceSystem,
                 Name = c.SECTOR!
             };
         
@@ -950,7 +951,7 @@ public class FacIngestionHandler(
             from aq in dbContext.FAC_ApprovedQualifications
             select new Sector()
             {
-                SourceSystem = SourceSystem.FAC,
+                SourceSystem = SourceSystem,
                 Name = aq.SectorSubjectArea
             };
 
@@ -987,7 +988,7 @@ public class FacIngestionHandler(
                 c.SECTOR equals s.Name
             select new EntrySector()
             {
-                SourceSystem = SourceSystem.FAC,
+                SourceSystem = SourceSystem,
                 EntryId = e.Id,
                 SectorId = s.Id
             };
@@ -1003,7 +1004,7 @@ public class FacIngestionHandler(
             where c.SECTOR == null
             select new EntrySector()
             {
-                SourceSystem = SourceSystem.FAC,
+                SourceSystem = SourceSystem,
                 EntryId = e.Id,
                 SectorId = s.Id
             };
@@ -1048,7 +1049,7 @@ public class FacIngestionHandler(
                 .Include(entry => entry.Provider)
                 .ThenInclude(provider => provider.ProviderLocations)
                 .ThenInclude(providerLocation => providerLocation.Location)
-                .Where(x => x.SourceSystem == SourceSystem.FAC && 
+                .Where(x => x.SourceSystem == SourceSystem && 
                             x.IngestionState == IngestionState.Pending)
                 .Take(250)
                 .ToList();
@@ -1083,7 +1084,7 @@ public class FacIngestionHandler(
                         LearningAimTitle = entry.AimOrAltTitle,
                         Description = sb.ToString().Scrub(),
                         EntryType = nameof(EntryType.Course),
-                        Source = nameof(SourceSystem.FAC),
+                        Source = nameof(SourceSystem),
                         QualificationLevel = entry.Level?.ToString() ?? string.Empty,
                         LearningMethod = instance.StudyMode.ToString() ?? string.Empty,
                         CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
@@ -1121,7 +1122,7 @@ public class FacIngestionHandler(
             // Keep going until we've ingested everything
             if (!dbContext.Entries.Any(e =>
                     e.IngestionState == IngestionState.Pending 
-                    && e.SourceSystem == SourceSystem.FAC))
+                    && e.SourceSystem == SourceSystem))
             {
                 Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
                 return result;

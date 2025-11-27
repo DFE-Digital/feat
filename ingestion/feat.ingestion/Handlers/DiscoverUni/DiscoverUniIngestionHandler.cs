@@ -30,6 +30,7 @@ public class DiscoverUniIngestionHandler(
     public override IngestionType IngestionType => IngestionType.Csv | IngestionType.Manual;
     public override string Name => "Discover Uni";
     public override string Description => "File based ingestion from Discover Uni dataset downloaded from the website";
+    public override SourceSystem SourceSystem => SourceSystem.DiscoverUni;
 
     private const string ContainerName = "discoveruni";
 
@@ -438,7 +439,7 @@ public class DiscoverUniIngestionHandler(
                 GeoLocation = new Point(new Coordinate(l.Longitude, l.Latitude)) { SRID = 4326 },
                 Url = l.StudentUnionUrl,
                 SourceReference = $"{l.UKPRN}_{l.LocationId}",
-                SourceSystem = SourceSystem.DiscoverUni
+                SourceSystem = SourceSystem
             };
 
        
@@ -470,7 +471,7 @@ public class DiscoverUniIngestionHandler(
             where i.UKPRN == i.PubUKPRN
             select new Provider()
             {
-                SourceSystem = SourceSystem.DiscoverUni,
+                SourceSystem = SourceSystem,
                 SourceReference = i.UKPRN.ToString(),
                 Created = DateTime.Now,
                 Updated = DateTime.Now,
@@ -507,13 +508,13 @@ public class DiscoverUniIngestionHandler(
                 on i.UKPRN equals ul.UKPRN
             join l in dbContext.Locations
                 on Convert.ToString(ul.UKPRN) + "_" + ul.LocationId equals l.SourceReference
-            where l.SourceSystem == SourceSystem.DiscoverUni
+            where l.SourceSystem == SourceSystem
             && i.UKPRN == i.PubUKPRN
             select new ProviderLocation()
             {
                 ProviderId = p.Id,
                 LocationId = l.Id,
-                SourceSystem = SourceSystem.DiscoverUni
+                SourceSystem = SourceSystem
             };
 
         var providerLocationList = providerLocations.ToList();
@@ -549,7 +550,7 @@ public class DiscoverUniIngestionHandler(
                 Created = DateTime.Now,
                 Updated = DateTime.Now,
                 SourceReference = $"{c.UKPRN}_{c.CourseId}_{(int)c.StudyMode}",
-                SourceSystem = SourceSystem.DiscoverUni,
+                SourceSystem = SourceSystem,
                 SourceUpdated = DateTime.Now,
                 Type = EntryType.UniversityCourse,
                 ProviderId = p.Id,
@@ -636,7 +637,7 @@ public class DiscoverUniIngestionHandler(
                 SourceReference = cl != null ?
                     $"{c.UKPRN}_{c.CourseId}_{(int)c.StudyMode}_{cl.LocationId}" :
                     $"{c.UKPRN}_{c.CourseId}_{(int)c.StudyMode}",
-                SourceSystem = SourceSystem.DiscoverUni,
+                SourceSystem = SourceSystem,
                 Reference = cl != null ?
                     $"{c.UKPRN}_{c.CourseId}_{(int)c.StudyMode}_{cl.LocationId}" :
                     $"{c.UKPRN}_{c.CourseId}_{(int)c.StudyMode}",
@@ -675,7 +676,7 @@ public class DiscoverUniIngestionHandler(
             from h in dbContext.DU_HECOS 
             select new Sector()
             {
-                SourceSystem = SourceSystem.DiscoverUni,
+                SourceSystem = SourceSystem,
                 Name = h.Label
             };
         
@@ -706,7 +707,7 @@ public class DiscoverUniIngestionHandler(
             from s in dbContext.Sectors
             join h in dbContext.DU_HECOS on
                 s.Name equals h.Label
-            where s.SourceSystem == SourceSystem.DiscoverUni
+            where s.SourceSystem == SourceSystem
             select new
             {
                 Hecos = h, Sector = s
@@ -743,7 +744,7 @@ public class DiscoverUniIngestionHandler(
                     {
                         EntryId = c.EntryId,
                         SectorId = sector.Sector.Id,
-                        SourceSystem = SourceSystem.DiscoverUni
+                        SourceSystem = SourceSystem
                     });
                 }
             }
@@ -821,7 +822,7 @@ public class DiscoverUniIngestionHandler(
                 .ThenInclude(provider => provider.ProviderLocations)
                 .ThenInclude(providerLocation => providerLocation.Location)
                 .Where(x => 
-                    x.SourceSystem == SourceSystem.DiscoverUni &&
+                    x.SourceSystem == SourceSystem &&
                     x.IngestionState == IngestionState.Pending)
                 .Take(250)
                 .ToList();
@@ -851,7 +852,7 @@ public class DiscoverUniIngestionHandler(
                         LearningAimTitle = entry.AimOrAltTitle,
                         Description = entry.Description.Scrub(),
                         EntryType = nameof(EntryType.UniversityCourse),
-                        Source = nameof(SourceSystem.DiscoverUni),
+                        Source = nameof(SourceSystem),
                         QualificationLevel = entry.Level?.ToString() ?? string.Empty,
                         LearningMethod = instance.StudyMode.ToString() ?? string.Empty,
                         CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
@@ -883,7 +884,7 @@ public class DiscoverUniIngestionHandler(
             // Keep going until we've ingested everything
             if (!dbContext.Entries.Any(e =>
                     e.IngestionState == IngestionState.Pending
-                    && e.SourceSystem == SourceSystem.DiscoverUni))
+                    && e.SourceSystem == SourceSystem))
             {
                 Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
                 return result;

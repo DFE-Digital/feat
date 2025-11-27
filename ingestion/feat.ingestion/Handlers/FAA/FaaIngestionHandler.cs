@@ -28,6 +28,7 @@ public class FaaIngestionHandler(
     public override IngestionType IngestionType => IngestionType.Api | IngestionType.Automatic;
     public override string Name => "Find An Apprenticeship";
     public override string Description => "Ingestion from Find An Apprenticeship API";
+    public override SourceSystem SourceSystem => SourceSystem.FAA;
 
     public override async Task<bool> ValidateAsync(CancellationToken cancellationToken)
     {
@@ -199,7 +200,7 @@ public class FaaIngestionHandler(
             Created = DateTime.UtcNow,
             Name = a.First().ProviderName ?? "Unknown provider",
             Ukprn = a.Key.ToString(),
-            SourceSystem = SourceSystem.FAA,
+            SourceSystem = SourceSystem,
             SourceReference = a.Key.ToString()
         }).ToList();
         
@@ -232,7 +233,7 @@ public class FaaIngestionHandler(
             .Select(a => new Sector
             {
                 Name = a.Key,
-                SourceSystem = SourceSystem.FAA
+                SourceSystem = SourceSystem
             }).ToList();
 
         await dbContext.BulkSynchronizeAsync(sectors, options =>
@@ -271,7 +272,7 @@ public class FaaIngestionHandler(
                 Type = EntryType.Apprenticeship,
                 Level = MapCourseLevel(a.CourseLevel),
                 StudyTime = StudyTime.Daytime,
-                SourceSystem = SourceSystem.FAA,
+                SourceSystem = SourceSystem,
                 SourceReference = a.VacancyReference!
             };
         }).ToList();
@@ -320,7 +321,7 @@ public class FaaIngestionHandler(
         
         
         var entryLookup = dbContext.Set<Entry>()
-            .Where(e => e.SourceSystem == SourceSystem.FAA)
+            .Where(e => e.SourceSystem == SourceSystem)
             .ToDictionary(e => e.SourceReference, e => e.Id);
 
         
@@ -337,7 +338,7 @@ public class FaaIngestionHandler(
                 Duration = ParseMonthStringToTimeSpan(a.ExpectedDuration, a.StartDate),
                 StudyMode = LearningMethod.Workbased,
                 Reference = a.VacancyReference!,
-                SourceSystem = SourceSystem.FAA,
+                SourceSystem = SourceSystem,
                 SourceReference = a.VacancyReference!
             };
         }).ToList();
@@ -367,7 +368,7 @@ public class FaaIngestionHandler(
             {
                 EntryId = entryLookup[a.VacancyReference!],
                 SectorId = sectorLookup[a.CourseRoute!.ToLower().Trim()],
-            SourceSystem = SourceSystem.FAA
+            SourceSystem = SourceSystem
         }).ToList();
 
         await dbContext.BulkSynchronizeAsync(entrySectors, options =>
@@ -488,7 +489,7 @@ public class FaaIngestionHandler(
                     GeoLocation = longitude != null && latitude != null
                         ? new Point(longitude.Value, latitude.Value) { SRID = 4326 }
                         : null,
-                    SourceSystem = SourceSystem.FAA,
+                    SourceSystem = SourceSystem,
                     SourceReference = $"{a.First().Id}"
                 };
             }).ToList();
@@ -592,7 +593,7 @@ public class FaaIngestionHandler(
                 .ThenInclude(providerLocation => providerLocation.Location)
                 .Include(entry => entry.Vacancies)
                 .Where(x =>
-                    x.SourceSystem == SourceSystem.FAA &&
+                    x.SourceSystem == SourceSystem &&
                     x.IngestionState == IngestionState.Pending)
                 .Take(250);
 
@@ -645,7 +646,7 @@ public class FaaIngestionHandler(
                             LearningAimTitle = entry.AimOrAltTitle,
                             Description = entry.Description,
                             EntryType = nameof(EntryType.Apprenticeship),
-                            Source = nameof(SourceSystem.FAA),
+                            Source = nameof(SourceSystem),
                             QualificationLevel = entry.Level?.ToString() ?? string.Empty,
                             LearningMethod = nameof(LearningMethod.Workbased),
                             CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
@@ -679,7 +680,7 @@ public class FaaIngestionHandler(
             // Keep going until we've ingested everything
             if (!dbContext.Entries.Any(e =>
                     e.IngestionState == IngestionState.Pending
-                    && e.SourceSystem == SourceSystem.FAA))
+                    && e.SourceSystem == SourceSystem))
             {
                 Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
                 return result;
