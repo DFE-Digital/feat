@@ -233,8 +233,7 @@ public class DiscoverUniIngestionHandler(
             {
 
                 if (
-                    Aims == ProcessMode.Force
-                    || dbContext.DU_Aims.Count() != records.Count
+                    Aims != ProcessMode.Skip
                 )
                 {
                     Console.WriteLine($"Preparing {records.Count} records to DB...");
@@ -271,8 +270,7 @@ public class DiscoverUniIngestionHandler(
             {
 
                 if (
-                    HECOS == ProcessMode.Force
-                    || dbContext.DU_Aims.Count() != records.Count
+                    HECOS != ProcessMode.Skip
                 )
                 {
                     Console.WriteLine($"Preparing {records.Count} records to DB...");
@@ -501,10 +499,11 @@ public class DiscoverUniIngestionHandler(
         Console.WriteLine("Generating providers...");
         var providers =
             from i in dbContext.DU_Institutions
+            where i.UKPRN == i.PubUKPRN
             select new Provider()
             {
                 SourceSystem = SourceSystem.DiscoverUni,
-                SourceReference = $"{i.UKPRN}_{i.PubUKPRN}",
+                SourceReference = i.UKPRN.ToString(),
                 Created = DateTime.Now,
                 Updated = DateTime.Now,
                 Name = i.Name,
@@ -518,11 +517,9 @@ public class DiscoverUniIngestionHandler(
         {
             options.IgnoreOnSynchronizeUpdateExpression = p => new
             {
-                p.Id,
-                p.Created,
-                p.Updated
+                p.Id
             };
-            options.ColumnPrimaryKeyExpression = l => new { l.Ukprn, l.Pubukprn };
+            options.ColumnPrimaryKeyExpression = l => l.Ukprn;
             options.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
             options.UseRowsAffected = true;
             options.ResultInfo = resultInfo;
@@ -537,12 +534,13 @@ public class DiscoverUniIngestionHandler(
         var providerLocations =
             from i in dbContext.DU_Institutions
             join p in dbContext.Providers
-                on Convert.ToString(i.UKPRN) + "_" + Convert.ToString(i.PubUKPRN) equals p.SourceReference
+                on Convert.ToString(i.UKPRN) equals p.SourceReference
             join ul in dbContext.DU_Locations
                 on i.UKPRN equals ul.UKPRN
             join l in dbContext.Locations
                 on Convert.ToString(ul.UKPRN) + "_" + ul.LocationId equals l.SourceReference
             where l.SourceSystem == SourceSystem.DiscoverUni
+            && i.UKPRN == i.PubUKPRN
             select new ProviderLocation()
             {
                 ProviderId = p.Id,
@@ -567,12 +565,12 @@ public class DiscoverUniIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
 
+        
         // ENTRY
         var courses = 
             from c in dbContext.DU_Courses
             join p in dbContext.Providers on
-                new { UKPRN = c.UKPRN.ToString(), PubUKPRN = c.PubUKPRN.ToString() } 
-                equals new { UKPRN = p.Ukprn, PubUKPRN = p.Pubukprn }
+                Convert.ToString(c.UKPRN) equals p.Ukprn
             join a in dbContext.DU_Aims on
                 c.Aim equals a.AimCode into aims
             from a in aims.DefaultIfEmpty()
@@ -582,7 +580,7 @@ public class DiscoverUniIngestionHandler(
             {
                 Created = DateTime.Now,
                 Updated = DateTime.Now,
-                SourceReference = $"{c.UKPRN}_{c.CourseId}_{c.StudyMode}",
+                SourceReference = $"{c.UKPRN}_{c.CourseId}_{(int)c.StudyMode}",
                 SourceSystem = SourceSystem.DiscoverUni,
                 SourceUpdated = DateTime.Now,
                 Type = EntryType.UniversityCourse,
@@ -651,14 +649,14 @@ public class DiscoverUniIngestionHandler(
         await dbContext.BulkSaveChangesAsync(cancellationToken);
         Console.WriteLine("Setting ingestion status done.");
 
-        var courseRuns =
+        var instances =
             from c in dbContext.DU_Courses
             join e in dbContext.Entries on
                 Convert.ToString(c.UKPRN) + "_" + c.CourseId + "_" + Convert.ToString((int)c.StudyMode)
                 equals e.SourceReference
             join cl in dbContext.DU_CourseLocations on
-                Convert.ToString(c.UKPRN) + "_" + c.CourseId + "_" + Convert.ToString((int)c.StudyMode)
-                equals Convert.ToString(cl.UKPRN) + "_" + cl.CourseId + "_" + Convert.ToString((int)cl.StudyMode)
+                new { c.UKPRN, c.CourseId, c.StudyMode } equals 
+                new { cl.UKPRN, cl.CourseId, cl.StudyMode }
                 into courseLocations
             from cl in courseLocations.DefaultIfEmpty()
             join l in dbContext.Locations on 
@@ -672,16 +670,23 @@ public class DiscoverUniIngestionHandler(
                 Updated = DateTime.Now,
                 Duration = c.NumberOfYears.GetValueOrDefault(0) > 0 ? 
                     TimeSpan.FromDays(c.NumberOfYears.GetValueOrDefault(0) * 365) : null,
-                SourceReference = $"{cl.UKPRN}_{cl.CourseId}_{cl.StudyMode}_{cl.LocationId}",
+                SourceReference = cl != null ?
+                    $"{c.UKPRN}_{c.CourseId}_{(int)c.StudyMode}_{cl.LocationId}" :
+                    $"{c.UKPRN}_{c.CourseId}_{(int)c.StudyMode}",
                 SourceSystem = SourceSystem.DiscoverUni,
-                Reference = $"{cl.UKPRN}_{cl.CourseId}_{cl.StudyMode}_{cl.LocationId}",
+                Reference = cl != null ?
+                    $"{c.UKPRN}_{c.CourseId}_{(int)c.StudyMode}_{cl.LocationId}" :
+                    $"{c.UKPRN}_{c.CourseId}_{(int)c.StudyMode}",
                 EntryId = e.Id,
                 LocationId = l != null ? l.Id : null,
                 StudyMode = c.DistanceLearning != null ? c.DistanceLearning.Value.ToStudyMode() : null
             };
-
-        Console.WriteLine("Generating entry instances for other courses...");
-        await dbContext.BulkSynchronizeAsync(courseRuns.Distinct(), options =>
+        
+        
+        var distinctInstances = instances.Distinct();
+        
+        Console.WriteLine($"Generating entry instances ...");
+        await dbContext.BulkSynchronizeAsync(instances, options =>
         {
             options.IgnoreOnSynchronizeUpdateExpression = p => new
             {
@@ -699,76 +704,20 @@ public class DiscoverUniIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
 
-
+        
         // SECTORS
         Console.WriteLine("Generating sectors...");
 
-        var sectors1 =
+        var distinctSectors =
             from h in dbContext.DU_HECOS 
-            join c in dbContext.DU_Courses on
-                h.Code equals c.Hecos
             select new Sector()
             {
                 SourceSystem = SourceSystem.DiscoverUni,
                 Name = h.Label
             };
-        var sectors2 =
-            from h in dbContext.DU_HECOS 
-            join c in dbContext.DU_Courses on
-                h.Code equals c.Hecos2
-            select new Sector()
-            {
-                SourceSystem = SourceSystem.DiscoverUni,
-                Name = h.Label
-            };
-        var sectors3 =
-            from h in dbContext.DU_HECOS 
-            join c in dbContext.DU_Courses on
-                h.Code equals c.Hecos3
-            select new Sector()
-            {
-                SourceSystem = SourceSystem.DiscoverUni,
-                Name = h.Label
-            };
-        var sectors4 =
-            from h in dbContext.DU_HECOS 
-            join c in dbContext.DU_Courses on
-                h.Code equals c.Hecos4
-            select new Sector()
-            {
-                SourceSystem = SourceSystem.DiscoverUni,
-                Name = h.Label
-            };
-        var sectors5 =
-            from h in dbContext.DU_HECOS 
-            join c in dbContext.DU_Courses on
-                h.Code equals c.Hecos5
-            select new Sector()
-            {
-                SourceSystem = SourceSystem.DiscoverUni,
-                Name = h.Label
-            };
+        
 
-        var joined = sectors1.ToDictionary(s => s.Name);
-        foreach (var sector in sectors2)
-        {
-            joined[sector.Name] = sector;
-        }
-        foreach (var sector in sectors3)
-        {
-            joined[sector.Name] = sector;
-        }
-        foreach (var sector in sectors4)
-        {
-            joined[sector.Name] = sector;
-        }
-        foreach (var sector in sectors5)
-        {
-            joined[sector.Name] = sector;
-        }
-
-        var distinctSectors = joined.Values;
-        await dbContext.BulkSynchronizeAsync(distinctSectors, options =>
+        await dbContext.BulkSynchronizeAsync(distinctSectors.Distinct(), options =>
         {
             options.IgnoreOnSynchronizeUpdateExpression = p => new
             {
@@ -790,42 +739,60 @@ public class DiscoverUniIngestionHandler(
 
         Console.WriteLine("Generating entry sectors...");
 
-        var sectors = dbContext.Sectors;
-        var hecosSectors = 
-            from c in dbContext.DU_Courses
-            join e in dbContext.Entries on
-                $"{c.UKPRN}_{c.CourseId}_{c.StudyMode}" equals e.SourceReference
+        var sectors = (
+            from s in dbContext.Sectors
             join h in dbContext.DU_HECOS on
-                c.Hecos equals h.Code into hecos1
-            join h in dbContext.DU_HECOS on
-                c.Hecos2 equals h.Code into hecos2
-            join h in dbContext.DU_HECOS on
-                c.Hecos3 equals h.Code into hecos3
-            join h in dbContext.DU_HECOS on
-                c.Hecos4 equals h.Code into hecos4
-            join h in dbContext.DU_HECOS on
-                c.Hecos5 equals h.Code into hecos5
-            from h1 in hecos1.DefaultIfEmpty()
-            from h2 in hecos2.DefaultIfEmpty()
-            from h3 in hecos3.DefaultIfEmpty()
-            from h4 in hecos4.DefaultIfEmpty()
-            from h5 in hecos5.DefaultIfEmpty()
+                s.Name equals h.Label
+            where s.SourceSystem == SourceSystem.DiscoverUni
             select new
             {
-                e.Id, Sectors = new List<string?>
-                {
-                    h1 != null ? h1.Label : null, 
-                    h2 != null ? h2.Label : null,
-                    h3 != null ? h3.Label : null,
-                    h4 != null ? h4.Label : null,
-                    h5 != null ? h5.Label : null
-                }.Where(x => x != null).Distinct()
-            };
+                Hecos = h, Sector = s
+            }).ToList();
 
-        var distinctHecosSectors = hecosSectors.ToList().Distinct();
+        var sectorCourses = (
+            from c in dbContext.DU_Courses
+            join e in dbContext.Entries on
+                Convert.ToString(c.UKPRN) + "_" +
+                c.CourseId + "_" +
+                Convert.ToString((int)c.StudyMode) equals e.SourceReference
+            select new
+            {
+                EntryId = e.Id, HecosCodes = new List<int?>
+                {
+                    c.Hecos, c.Hecos2, c.Hecos3, c.Hecos4, c.Hecos5
+                }
+            }).ToList();
+
+        // Remove empty sectors
+        sectorCourses.RemoveAll(s => s.HecosCodes.All(h => h == null));
+        
+        
+        
+        var entrySectors = new List<EntrySector>();
+        
+        sectorCourses.ForEach(c =>
+        {
+            foreach (var sector in 
+                     c.HecosCodes.Select(hecosCode => sectors
+                         .FirstOrDefault(s => hecosCode != null &&
+                                              s.Hecos.Code == hecosCode.Value)))
+            {
+                if (sector != null)
+                {
+                    entrySectors.Add(new EntrySector()
+                    {
+                        EntryId = c.EntryId,
+                        SectorId = sector.Sector.Id,
+                        SourceSystem = SourceSystem.DiscoverUni
+                    });
+                }
+            }
+        });
+        
+        
         
         var less = "more";
-        /*
+      
         
 
         await dbContext.BulkSynchronizeAsync(entrySectors, options =>
@@ -844,7 +811,7 @@ public class DiscoverUniIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
         
-        */
+        
 
         Console.WriteLine($"{Name} Sync Done");
 
