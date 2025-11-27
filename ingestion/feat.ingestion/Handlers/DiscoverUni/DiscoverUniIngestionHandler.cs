@@ -27,7 +27,7 @@ public class DiscoverUniIngestionHandler(
     BlobServiceClient blobServiceClient)
     : IngestionHandler(options)
 {
-    public override IngestionType IngestionType => IngestionType.Csv | IngestionType.Manual;
+    public override IngestionType IngestionType => IngestionType.Compressed | IngestionType.Csv | IngestionType.Manual;
     public override string Name => "Discover Uni";
     public override string Description => "File based ingestion from Discover Uni dataset downloaded from the website";
     public override SourceSystem SourceSystem => SourceSystem.DiscoverUni;
@@ -98,7 +98,9 @@ public class DiscoverUniIngestionHandler(
 
 
 
-        var tempPath = Path.Combine(Path.GetTempPath(), "discoveruni.zip");
+        var tempPath = Path.GetTempFileName();
+        
+        Console.WriteLine("Checking Discover Uni dataset for changes...");
         
         // We need to download the DiscoverUni zip file
         using var http = new HttpClient();
