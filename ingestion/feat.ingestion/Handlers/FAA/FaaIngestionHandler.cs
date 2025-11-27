@@ -580,9 +580,10 @@ public class FaaIngestionHandler(
 
     public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
+        Console.WriteLine($"Starting {Name} AI Search indexing...");
+        
         while (true)
         {
-            Console.WriteLine($"Starting {Name} AI Search indexing...");
             var entries = dbContext.Entries
                 .Include(entry => entry.EntrySectors)
                 .ThenInclude(entrySector => entrySector.Sector)

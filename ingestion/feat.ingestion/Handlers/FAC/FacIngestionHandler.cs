@@ -1036,9 +1036,10 @@ public class FacIngestionHandler(
 
     public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
+        Console.WriteLine($"Starting {Name} AI Search indexing...");
+        
         while (true)
         {
-            Console.WriteLine($"Starting {Name} AI Search indexing...");
             var sb = new StringBuilder();
 
             var entries = dbContext.Entries
