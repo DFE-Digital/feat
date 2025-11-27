@@ -800,6 +800,7 @@ public class DiscoverUniIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
 
 
+        await transaction.CommitAsync(cancellationToken);
         Console.WriteLine($"{Name} Sync Done");
 
         return true;

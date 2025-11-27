@@ -1,5 +1,6 @@
 using System.Globalization;
 using feat.common;
+using feat.common.Extensions;
 using feat.common.Models;
 using feat.common.Models.AiSearch;
 using feat.common.Models.Enums;
@@ -8,7 +9,6 @@ using feat.ingestion.Data;
 using feat.ingestion.Enums;
 using feat.ingestion.Models.FAA;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Spatial;
 using NetTopologySuite.Geometries;
 using Z.BulkOperations;
 using External = feat.ingestion.Models.FAA.External;
@@ -164,6 +164,18 @@ public class FaaIngestionHandler(
     
     public override async Task<bool> SyncAsync(CancellationToken cancellationToken)
     {
+        var resultInfo = new ResultInfo();
+        var auditEntries = new List<AuditEntry>();
+        bool skip = false;
+
+        Console.WriteLine($"Starting sync of {Name} data");
+
+        if (skip)
+        {
+            Console.WriteLine("Skipped");
+            return true;
+        }
+        
         var apprenticeships = dbContext.Set<Apprenticeship>()
             .Include(apprenticeship => apprenticeship.Addresses)
             .ToList();
@@ -179,7 +191,7 @@ public class FaaIngestionHandler(
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
         
         // PROVIDER
-        
+        Console.WriteLine("Generating providers...");
         var providers = apprenticeships
             .GroupBy(a => a.Ukprn)
             .Select(a => new Provider
@@ -200,15 +212,20 @@ public class FaaIngestionHandler(
             };
             options.ColumnPrimaryKeyExpression = p => p.Ukprn;
             options.ColumnSynchronizeDeleteKeySubsetExpression = s => s.SourceSystem;
+            options.UseRowsAffected = true;
+            options.ResultInfo = resultInfo;
         }, cancellationToken);
+        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
+        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
+        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        resultInfo = new ResultInfo();
 
         var providerLookup = dbContext.Set<Provider>()
             .ToDictionary(p => p.Ukprn!, p => p.Id);
 
-        Console.WriteLine($"Providers synchronized: {providers.Count}");
-        
         // SECTOR
-        
+        Console.WriteLine("Generating sectors...");
+ 
         var sectors = apprenticeships
             .Where(a => !string.IsNullOrEmpty(a.CourseRoute))
             .GroupBy(a => a.CourseRoute!.Trim(), StringComparer.OrdinalIgnoreCase)
@@ -225,16 +242,18 @@ public class FaaIngestionHandler(
                 s.Id,
             };
             options.ColumnPrimaryKeyExpression = s => s.Name;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = s => s.SourceSystem;
+            options.ColumnSynchronizeDeleteKeySubsetExpression = s => s.SourceSystem;options.UseRowsAffected = true;
+            options.ResultInfo = resultInfo;
         }, cancellationToken);
+        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
+        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
+        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        resultInfo = new ResultInfo();
 
         var sectorLookup = dbContext.Set<Sector>()
             .ToDictionary(s => s.Name.ToLower().Trim(), s => s.Id);
-
-        Console.WriteLine($"Sectors synchronized: {sectors.Count}");
         
         // ENTRY
-        var auditEntries = new List<AuditEntry>();
         var entries = apprenticeships.Select(a =>
         {
             var providerId = providerLookup[a.Ukprn.ToString()];
@@ -256,31 +275,57 @@ public class FaaIngestionHandler(
                 SourceReference = a.VacancyReference!
             };
         }).ToList();
+        Console.WriteLine($"Generating entries for {entries.LongCount()} courses...");
         
         await dbContext.BulkSynchronizeAsync(entries, options =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = e => new
+            options.IgnoreOnSynchronizeUpdateExpression = p => new
             {
-                e.Id,
-                e.Created,
-                e.IngestionState
+                p.Id,
+                p.Created,
+                p.Updated,
+                p.SourceUpdated,
+                p.IngestionState
             };
+            options.UseRowsAffected = true;
             options.ColumnPrimaryKeyExpression = e => e.SourceReference;
             options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
             options.UseAudit = true;
             options.AuditEntries = auditEntries;
-            
+            options.ResultInfo = resultInfo;
         }, cancellationToken);
+        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
+        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
+        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        resultInfo = new ResultInfo();
+        // Run through the audit entries and check to see which entries were created or updated
+        var createdIds = auditEntries.Where(e => e.Action == AuditActionType.Insert)
+            .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
+        // For all of our created entries, we'll need to set those to be indexed
+        var createdEntries = dbContext.Entries.WhereBulkContains(createdIds);
+        await createdEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending,
+            cancellationToken: cancellationToken);
+
+        // We're only interested here if any text fields have changed
+        var updatedIds = auditEntries.Where(e => e.Action == AuditActionType.Update
+                                                 && e.Values.Exists(ae =>
+                                                     ae.ColumnName is "Title" or "AimOrAltTitle" or "Description" &&
+                                                     !Equals(ae.OldValue, ae.NewValue)))
+            .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
+
+        var updatedEntries = dbContext.Entries.WhereBulkContains(updatedIds);
+        await updatedEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending,
+            cancellationToken: cancellationToken);
+        await dbContext.BulkSaveChangesAsync(cancellationToken);
         
         
         var entryLookup = dbContext.Set<Entry>()
             .Where(e => e.SourceSystem == SourceSystem.FAA)
             .ToDictionary(e => e.SourceReference, e => e.Id);
 
-        Console.WriteLine($"Entries synchronized: {entries.Count}");
         
         // ENTRYINSTANCE
-        
+        Console.WriteLine($"Generating entry instances ...");
         var entryInstances = apprenticeships.Select(a =>
         {
             var entryId = entryLookup[a.VacancyReference!];
@@ -305,12 +350,16 @@ public class FaaIngestionHandler(
                 ei.Created
             };
             options.ColumnPrimaryKeyExpression = ei => ei.SourceReference;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = ei => ei.SourceSystem;
+            options.ColumnSynchronizeDeleteKeySubsetExpression = ei => ei.SourceSystem;options.UseRowsAffected = true;
+            options.ResultInfo = resultInfo;
         }, cancellationToken);
-        
-        Console.WriteLine($"EntryInstances synchronized: {entries.Count}");
+        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
+        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
+        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        resultInfo = new ResultInfo();
         
         // ENTRYSECTOR
+        Console.WriteLine("Generating entry sectors...");
 
         var entrySectors = apprenticeships
             .Where(a => !string.IsNullOrEmpty(a.CourseRoute))
@@ -329,12 +378,17 @@ public class FaaIngestionHandler(
                 es.SectorId
             };
             options.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
-            
+            options.UseRowsAffected = true;
+            options.ResultInfo = resultInfo;
         }, cancellationToken);
 
-        Console.WriteLine($"EntrySectors synchronized: {entrySectors.Count}");
+        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
+        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
+        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        resultInfo = new ResultInfo();
         
         // EMPLOYER
+        Console.WriteLine("Generating employers...");
         
         var employers = apprenticeships
             .GroupBy(a => a.EmployerName!.Trim(), StringComparer.OrdinalIgnoreCase)
@@ -356,14 +410,20 @@ public class FaaIngestionHandler(
                 e.Created
             };
             options.ColumnPrimaryKeyExpression = e => e.Name;
+            options.UseRowsAffected = true;
+            options.ResultInfo = resultInfo;
         }, cancellationToken);
+
+        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
+        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
+        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        resultInfo = new ResultInfo();
 
         var employerLookup = dbContext.Set<Employer>()
             .ToDictionary(e => e.Name.ToLower().Trim(), e => e.Id);
 
-        Console.WriteLine($"Employers synchronized: {employers.Count}");
-
         // VACANCY
+        Console.WriteLine("Generating vacancies...");
         
         var vacancies = apprenticeships.Select(a =>
         {
@@ -392,11 +452,17 @@ public class FaaIngestionHandler(
         {
             options.IgnoreOnSynchronizeUpdateExpression = v => v.Id;
             options.ColumnPrimaryKeyExpression = v => v.EntryId;
+            options.UseRowsAffected = true;
+            options.ResultInfo = resultInfo;
         }, cancellationToken);
 
-        Console.WriteLine($"Vacancies synchronized: {vacancies.Count}");
+        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
+        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
+        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        resultInfo = new ResultInfo();
         
         // LOCATION
+        Console.WriteLine("Generating locations...");
         
         var locations = apprenticeships
             .SelectMany(a => a.Addresses)
@@ -442,7 +508,14 @@ public class FaaIngestionHandler(
             };
             options.AllowDuplicateKeys = true;
             options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            options.UseRowsAffected = true;
+            options.ResultInfo = resultInfo;
         }, cancellationToken);
+
+        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
+        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
+        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        resultInfo = new ResultInfo();
         
         var locationLookup = new Dictionary<(string?, string?, string?), Guid>();
 
@@ -460,9 +533,8 @@ public class FaaIngestionHandler(
             }
         }
         
-        Console.WriteLine($"Locations synchronized: {locations.Count}");
-        
         // EMPLOYERLOCATION
+        Console.WriteLine("Generating employer locations...");
         
         var employerLocationKeys = apprenticeships
             .SelectMany(ap => ap.Addresses.Select(ad => new
@@ -489,110 +561,136 @@ public class FaaIngestionHandler(
             {
                 el.EmployerId,
                 el.LocationId
-            };
+            };           
+            options.UseRowsAffected = true;
+            options.ResultInfo = resultInfo;
         }, cancellationToken);
 
-        Console.WriteLine($"EmployerLocations synchronized: {employerLocations.Count}");
+        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
+        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
+        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+
         
         await transaction.CommitAsync(cancellationToken);
-        Console.WriteLine("Find An Apprenticeship table sync complete.");
+        Console.WriteLine($"{Name} table sync complete.");
 
         return true;
     }
 
     public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine("Starting Find An Apprenticeship AI Search indexing...");
-        
-        var entries = dbContext.Entries
-            .Include(e => e.EntryInstances)
-            .Include(e => e.Vacancies).ThenInclude(vacancy => vacancy.Employer)
-            .Include(e => e.Provider)
-            .Where(x => x.SourceSystem == SourceSystem.FAA)
-            .Include(entry => entry.Vacancies)
-            .Include(entry => entry.EntryInstances).Include(entry => entry.EntrySectors)
-            .ThenInclude(entrySector => entrySector.Sector)
-            .ToList();
-
-        if (entries.Count == 0)
+        while (true)
         {
-            Console.WriteLine("No entries found to index.");
-            return false;
-        }
+            Console.WriteLine($"Starting {Name} AI Search indexing...");
+            var entries = dbContext.Entries
+                .Include(entry => entry.EntrySectors)
+                .ThenInclude(entrySector => entrySector.Sector)
+                .Include(entry => entry.EntryInstances)
+                .ThenInclude(instance => instance.Location)
+                .Include(entry => entry.Provider)
+                .ThenInclude(provider => provider.ProviderLocations)
+                .ThenInclude(providerLocation => providerLocation.Location)
+                .Include(entry => entry.Vacancies)
+                .Where(x =>
+                    x.SourceSystem == SourceSystem.FAA &&
+                    x.IngestionState == IngestionState.Pending)
+                .Take(250);
 
-        Console.WriteLine($"Loaded {entries.Count} entries for indexing.");
-        
-        var employerLocations = dbContext.Set<EmployerLocation>()
-            .Include(el => el.Location)
-            .Include(el => el.Employer).Include(employerLocation => employerLocation.Location)
-            .ToList();
-
-        Console.WriteLine($"Loaded {employerLocations.Count} employer locations.");
-        
-        var searchEntries = new List<AiSearchEntry>();
-        var entriesCount = entries.Count;
-        var currentEntry = 1;
-
-        foreach (var entry in entries)
-        {
-            foreach (var vacancy in entry.Vacancies)
+            if (!entries.Any())
             {
-                var filteredEmployerLocations = employerLocations
-                    .Where(el => el.EmployerId == vacancy.EmployerId)
-                    .ToList();
-                
-                var locationCount = filteredEmployerLocations.Count;
-                
-                Console.WriteLine($"Indexing course {currentEntry}/{entriesCount} ({locationCount} document(s))...");
-
-                if (locationCount == 0)
-                {
-                    Console.WriteLine($"No locations found for employer '{vacancy.Employer.Name}' (Vacancy '{entry.Reference}'). Skipping.");
-                    continue;
-                }
-
-                foreach (var el in filteredEmployerLocations)
-                {
-                    var locationPoint = el.Location.GeoLocation != null
-                        ? GeographyPoint.Create(el.Location.GeoLocation.Y, el.Location.GeoLocation.X)
-                        : null;
-
-                    var searchEntry = new AiSearchEntry
-                    {
-                        Id = entry.Id.ToString(),
-                        InstanceId = $"{entry.EntryInstances.First().Id}_{el.LocationId}",
-                        Sector = entry.EntrySectors.First().Sector.Name,
-                        Title = entry.Title,
-                        LearningAimTitle = entry.AimOrAltTitle,
-                        Description = entry.Description,
-                        EntryType = nameof(EntryType.Apprenticeship),
-                        Source = nameof(SourceSystem.FAA),
-                        QualificationLevel = entry.Level?.ToString() ?? string.Empty,
-                        LearningMethod = nameof(LearningMethod.Workbased),
-                        CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
-                        StudyTime = entry.StudyTime?.ToString() ?? string.Empty,
-                        Location = locationPoint
-                    };
-
-                    searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
-                    searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
-                    searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
-                    searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
-
-                    searchEntries.Add(searchEntry);
-                }
+                Console.WriteLine("No entries found to index.");
+                return false;
             }
+
+            Console.WriteLine($"Loaded {entries.LongCount()} entries for indexing.");
+
+            var employerLocations = dbContext.Set<EmployerLocation>()
+                .Include(el => el.Location)
+                .Include(el => el.Employer)
+                .Include(employerLocation => employerLocation.Location)
+                .ToList();
+
+            Console.WriteLine($"Loaded {employerLocations.Count} employer locations.");
+
+            var searchEntries = new List<AiSearchEntry>();
+            foreach (var entry in entries)
+            {
+                foreach (var vacancy in entry.Vacancies)
+                {
+                    var filteredEmployerLocations = employerLocations
+                        .Where(el => el.EmployerId == vacancy.EmployerId)
+                        .ToList();
+
+                    var locationCount = filteredEmployerLocations.Count;
+                    
+                    if (locationCount == 0)
+                    {
+                        Console.WriteLine(
+                            $"No locations found for employer '{vacancy.Employer.Name}' (Vacancy '{entry.Reference}'). Skipping.");
+                        continue;
+                    }
+
+                    foreach (var el in filteredEmployerLocations)
+                    {
+                        var locationPoint = el.Location.GeoLocation != null
+                            ? el.Location.GeoLocation.ToGeographyPoint()
+                            : null;
+
+                        var searchEntry = new AiSearchEntry
+                        {
+                            Id = entry.Id.ToString(),
+                            InstanceId = $"{entry.EntryInstances.First().Id}_{el.LocationId}",
+                            Sector = entry.EntrySectors.First().Sector.Name,
+                            Title = entry.Title,
+                            LearningAimTitle = entry.AimOrAltTitle,
+                            Description = entry.Description,
+                            EntryType = nameof(EntryType.Apprenticeship),
+                            Source = nameof(SourceSystem.FAA),
+                            QualificationLevel = entry.Level?.ToString() ?? string.Empty,
+                            LearningMethod = nameof(LearningMethod.Workbased),
+                            CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
+                            StudyTime = entry.StudyTime?.ToString() ?? string.Empty,
+                            Location = locationPoint
+                        };
+
+                        searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
+                        searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
+                        searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
+                        searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
+
+                        searchEntries.Add(searchEntry);
+                    }
+                }
+
+                entry.IngestionState = IngestionState.Processing;
+            }
+
+            Console.WriteLine($"Created {searchEntries.Count} records for indexing.");
+
+            var result = await searchIndexHandler.Ingest(searchEntries);
             
-            currentEntry++;
+            // Update the entries above to processing
+            foreach (var entry in entries)
+            {
+                entry.IngestionState = result ? IngestionState.Complete : IngestionState.Failed;
+            }
+            await dbContext.BulkSaveChangesAsync(cancellationToken);
+
+            // Keep going until we've ingested everything
+            if (!dbContext.Entries.Any(e =>
+                    e.IngestionState == IngestionState.Pending
+                    && e.SourceSystem == SourceSystem.FAA))
+            {
+                Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
+                return result;
+            }
+
+            // Clear our change tracking as we're going to get another batch next and
+            // we don't care about the old ones
+            dbContext.ChangeTracker.Clear();
         }
-
-        Console.WriteLine($"Created {searchEntries.Count} records for indexing.");
-        var result = await searchIndexHandler.Ingest(searchEntries);
-
-        Console.WriteLine($"Find An Apprenticeship AI Search indexing {(result ? "complete" : "failed")}.");
-        return result;
     }
-    
+
     private static CourseHours? MapCourseHours(decimal? hoursPerWeek)
     {
         return hoursPerWeek switch

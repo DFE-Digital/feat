@@ -566,6 +566,8 @@ public class FacIngestionHandler(
             return true;
         }
 
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+
         // LOCATIONS
         
         Console.WriteLine("Generating locations...");
@@ -784,7 +786,7 @@ public class FacIngestionHandler(
             options.UseRowsAffected = true;
             options.ColumnPrimaryKeyExpression = e => e.SourceReference;
             options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
-            options.UseAudit = false;
+            options.UseAudit = true;
             options.AuditEntries = auditEntries;
             options.ResultInfo = resultInfo;
         }, cancellationToken);
@@ -795,24 +797,20 @@ public class FacIngestionHandler(
         // Run through the audit entries and check to see which entries were created or updated
         var createdIds = auditEntries.Where(e => e.Action == AuditActionType.Insert)
             .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
-
         // For all of our created entries, we'll need to set those to be indexed
         var createdEntries = dbContext.Entries.WhereBulkContains(createdIds);
-        Console.WriteLine($"Setting ingestion status for {createdEntries.Count()} created entries...");
-        await createdEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending, cancellationToken: cancellationToken);
-        
+        await createdEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending,
+            cancellationToken: cancellationToken);
         // We're only interested here if any text fields have changed
         var updatedIds = auditEntries.Where(e => e.Action == AuditActionType.Update
                                                  && e.Values.Exists(ae =>
                                                      ae.ColumnName is "Title" or "AimOrAltTitle" or "Description" &&
                                                      !Equals(ae.OldValue, ae.NewValue)))
             .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
-        
         var updatedEntries = dbContext.Entries.WhereBulkContains(updatedIds);
-        Console.WriteLine($"Setting ingestion status for {updatedEntries.Count()} updated entries...");
-        await updatedEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending, cancellationToken: cancellationToken);
+        await updatedEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending,
+            cancellationToken: cancellationToken);
         await dbContext.BulkSaveChangesAsync(cancellationToken);
-        Console.WriteLine("Setting ingestion status done.");
         
         // ENTRY INSTANCE - T-Level
 
@@ -915,7 +913,7 @@ public class FacIngestionHandler(
                 EntryId = e.Id,
                 Description = cr.CostDescription,
                 SourceSystem = SourceSystem.FAC,
-                Value = cr.Cost.GetValueOrDefault(0) > 0 ? decimal.ToDouble(cr.Cost.Value) : null
+                Value = cr.Cost != null && cr.Cost.Value > 0 ? decimal.ToDouble(cr.Cost.Value) : null
             };
         
         await dbContext.BulkSynchronizeAsync(costs, options =>
@@ -1028,8 +1026,8 @@ public class FacIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
-        resultInfo = new ResultInfo();
         
+        await transaction.CommitAsync(cancellationToken);
         Console.WriteLine($"{Name} Sync Done");
 
         return true;
@@ -1042,7 +1040,7 @@ public class FacIngestionHandler(
             Console.WriteLine($"Starting {Name} AI Search indexing...");
             var sb = new StringBuilder();
 
-            var entries = dbContext.Entries.Where(x => x.SourceSystem == SourceSystem.FAC)
+            var entries = dbContext.Entries
                 .Include(entry => entry.EntrySectors)
                 .ThenInclude(entrySector => entrySector.Sector)
                 .Include(entry => entry.EntryInstances)
@@ -1050,8 +1048,10 @@ public class FacIngestionHandler(
                 .Include(entry => entry.Provider)
                 .ThenInclude(provider => provider.ProviderLocations)
                 .ThenInclude(providerLocation => providerLocation.Location)
-                .Where(x => x.IngestionState == IngestionState.Pending)
-                .Take(250);
+                .Where(x => x.SourceSystem == SourceSystem.FAC && 
+                            x.IngestionState == IngestionState.Pending)
+                .Take(250)
+                .ToList();
 
             if (!entries.Any())
             {
@@ -1101,14 +1101,9 @@ public class FacIngestionHandler(
                 entry.IngestionState = IngestionState.Processing;
             }
 
-            var list = entries.ToList();
-
             // Update the entries above to processing
-            await dbContext.BulkUpdateAsync(list, options =>
-            {
-                options.ColumnInputExpression = e => e.IngestionState;
-                options.IncludeGraph = false;
-            }, cancellationToken);
+            await dbContext.BulkSaveChangesAsync(cancellationToken);
+
 
             Console.WriteLine($"Created {searchEntries.Count} records for indexing.");
 
@@ -1116,21 +1111,24 @@ public class FacIngestionHandler(
 
             Console.WriteLine($"Indexed {searchEntries.Count} records.");
             
-            // Update the entries above to complete
-            list.ForEach(e => e.IngestionState = IngestionState.Complete);
-            
-
-            await dbContext.BulkUpdateAsync(list, options =>
+            // Update the entries above to processing
+            foreach (var entry in entries)
             {
-                options.ColumnInputExpression = e => e.IngestionState;
-                options.IncludeGraph = false;
-            }, cancellationToken);
-
-            Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
-
+                entry.IngestionState = result ? IngestionState.Complete : IngestionState.Failed;
+            }
+            await dbContext.BulkSaveChangesAsync(cancellationToken);
 
             // Keep going until we've ingested everything
-            if (!dbContext.Entries.Any(e => e.IngestionState == IngestionState.Pending && e.SourceSystem == SourceSystem.FAC)) return result;
+            if (!dbContext.Entries.Any(e =>
+                    e.IngestionState == IngestionState.Pending 
+                    && e.SourceSystem == SourceSystem.FAC))
+            {
+                Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
+                return result;
+            }
+            
+            // Clear our change tracking as we're going to get another batch next and
+            // we don't care about the old ones
             dbContext.ChangeTracker.Clear();
 
         }
