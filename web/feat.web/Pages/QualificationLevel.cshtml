@@ -5,10 +5,7 @@
 @model QualificationLevelModel
 @{
     ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK; 
-}
-
-@section BeforeContent {
-    <govuk-back-link href="@Url.Page(Model.Search.BackPage)">Back </govuk-back-link>
+    ViewBag.BackPageUrl = Url.Page(Model.Search.BackPage);
 }
 
 <form method="post">
