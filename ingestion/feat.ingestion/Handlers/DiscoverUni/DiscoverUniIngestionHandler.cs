@@ -62,11 +62,11 @@ public class DiscoverUniIngestionHandler(
         bool changes = false;
         var Download = ProcessMode.Skip;
         var Extract = ProcessMode.Skip;
-        var Aims = ProcessMode.Force;
-        var Locations = ProcessMode.Force;
-        var Providers = ProcessMode.Force;
-        var HECOS = ProcessMode.Force;
-        var Courses = ProcessMode.Force;
+        var Aims = ProcessMode.Process;
+        var Locations = ProcessMode.Process;
+        var Providers = ProcessMode.Process;
+        var HECOS = ProcessMode.Process;
+        var Courses = ProcessMode.Process;
         
         var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
         await containerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
@@ -76,11 +76,11 @@ public class DiscoverUniIngestionHandler(
             "https://unistatsdatasetdownloadfunction.azurewebsites.net/api/UnistatsDatasetDownload";
 
         // Let's determine when we last fetched data
-        Models.DU.IngestionState ingestionState;
+        DU.IngestionState ingestionState;
 
         if (!dbContext.DU_IngestionState.Any())
         {
-            ingestionState = new Models.DU.IngestionState()
+            ingestionState = new DU.IngestionState
             {
                 Id = Guid.NewGuid(),
                 DownloadComplete = false,
@@ -126,7 +126,7 @@ public class DiscoverUniIngestionHandler(
                 await filestream.FlushAsync(cancellationToken);
                 filestream.Close();
 
-                Console.WriteLine($"Done");
+                Console.WriteLine("Done");
                 
                 ingestionState.DownloadComplete = true;
 
@@ -224,18 +224,15 @@ public class DiscoverUniIngestionHandler(
             using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
             Console.WriteLine("Setting up CSV reader");
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<DU.AimMap>();
+            csv.Context.RegisterClassMap<AimMap>();
             Console.WriteLine("Reading data...");
-            var records = csv.GetRecords<DU.Aim>().ToList();
+            var records = csv.GetRecords<Aim>().ToList();
 
             // Determine if there are any changes
             if (records.Count != 0)
             {
 
-                if (
-                    Aims != ProcessMode.Skip
-                )
-                {
+                
                     Console.WriteLine($"Preparing {records.Count} records to DB...");
                     await dbContext.BulkSynchronizeAsync(records, options =>
                     {
@@ -243,8 +240,8 @@ public class DiscoverUniIngestionHandler(
                         options.BatchDelayInterval = 1000;
                         options.UseTableLock = true;
                     }, cancellationToken);
-                }
             }
+            
 
             Console.WriteLine("Done");
         }
@@ -261,26 +258,20 @@ public class DiscoverUniIngestionHandler(
             using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
             Console.WriteLine("Setting up CSV reader");
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<DU.HecosMap>();
+            csv.Context.RegisterClassMap<HecosMap>();
             Console.WriteLine("Reading data...");
-            var records = csv.GetRecords<DU.Hecos>().ToList();
+            var records = csv.GetRecords<Hecos>().ToList();
 
             // Determine if there are any changes
             if (records.Count != 0)
             {
-
-                if (
-                    HECOS != ProcessMode.Skip
-                )
+                Console.WriteLine($"Preparing {records.Count} records to DB...");
+                await dbContext.BulkSynchronizeAsync(records, options =>
                 {
-                    Console.WriteLine($"Preparing {records.Count} records to DB...");
-                    await dbContext.BulkSynchronizeAsync(records, options =>
-                    {
-                        options.BatchSize = batchSize;
-                        options.BatchDelayInterval = 1000;
-                        options.UseTableLock = true;
-                    }, cancellationToken);
-                }
+                    options.BatchSize = batchSize;
+                    options.BatchDelayInterval = 1000;
+                    options.UseTableLock = true;
+                }, cancellationToken);
             }
 
             Console.WriteLine("Done");
@@ -298,27 +289,20 @@ public class DiscoverUniIngestionHandler(
             using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
             Console.WriteLine("Setting up CSV reader");
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<DU.LocationMap>();
+            csv.Context.RegisterClassMap<LocationMap>();
             Console.WriteLine("Reading data...");
             var records = csv.GetRecords<DU.Location>().ToList();
 
             // Determine if there are any changes
             if (records.Count != 0)
             {
-
-                if (
-                    Locations == ProcessMode.Force
-                    || dbContext.DU_Locations.Count() != records.Count
-                )
+                Console.WriteLine($"Preparing {records.Count} records to DB...");
+                await dbContext.BulkSynchronizeAsync(records, options =>
                 {
-                    Console.WriteLine($"Preparing {records.Count} records to DB...");
-                    await dbContext.BulkSynchronizeAsync(records, options =>
-                    {
-                        options.BatchSize = batchSize;
-                        options.BatchDelayInterval = 1000;
-                        options.UseTableLock = true;
-                    }, cancellationToken);
-                }
+                    options.BatchSize = batchSize;
+                    options.BatchDelayInterval = 1000;
+                    options.UseTableLock = true;
+                }, cancellationToken);
             }
 
             Console.WriteLine("Done");
@@ -343,24 +327,19 @@ public class DiscoverUniIngestionHandler(
             // Determine if there are any changes
             if (records.Count != 0)
             {
-
-                if (
-                    Providers != ProcessMode.Skip
-                )
+                Console.WriteLine($"Preparing {records.Count} records to DB...");
+                await dbContext.BulkSynchronizeAsync(records, options =>
                 {
-                    Console.WriteLine($"Preparing {records.Count} records to DB...");
-                    await dbContext.BulkSynchronizeAsync(records, options =>
-                    {
-                        options.BatchSize = batchSize;
-                        options.BatchDelayInterval = 1000;
-                        options.UseTableLock = true;
-                    }, cancellationToken);
-                }
+                    options.BatchSize = batchSize;
+                    options.BatchDelayInterval = 1000;
+                    options.UseTableLock = true;
+                }, cancellationToken);
             }
+
 
             Console.WriteLine("Done");
         }
-        
+
         // Get our latest courses file
         var courseData = files.Where(blob =>
                 blob.Name.StartsWith("KISCOURSE", StringComparison.InvariantCultureIgnoreCase))
@@ -373,32 +352,25 @@ public class DiscoverUniIngestionHandler(
             using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
             Console.WriteLine("Setting up CSV reader");
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<DU.CourseMap>();
+            csv.Context.RegisterClassMap<CourseMap>();
             Console.WriteLine("Reading data...");
-            var records = csv.GetRecords<DU.Course>().ToList();
+            var records = csv.GetRecords<Course>().ToList();
 
             // Determine if there are any changes
             if (records.Count != 0)
             {
-
-                if (
-                    Courses == ProcessMode.Force
-                    || dbContext.DU_Courses.Count() != records.Count
-                )
+                Console.WriteLine($"Preparing {records.Count} records to DB...");
+                await dbContext.BulkSynchronizeAsync(records, options =>
                 {
-                    Console.WriteLine($"Preparing {records.Count} records to DB...");
-                    await dbContext.BulkSynchronizeAsync(records, options =>
-                    {
-                        options.BatchSize = batchSize;
-                        options.BatchDelayInterval = 1000;
-                        options.UseTableLock = true;
-                    }, cancellationToken);
-                }
+                    options.BatchSize = batchSize;
+                    options.BatchDelayInterval = 1000;
+                    options.UseTableLock = true;
+                }, cancellationToken);
             }
 
             Console.WriteLine("Done");
         }
-        
+
         // Get our latest course locations file
         var courseLocationData = files.Where(blob =>
                 blob.Name.StartsWith("COURSELOCATION", StringComparison.InvariantCultureIgnoreCase))
@@ -411,32 +383,26 @@ public class DiscoverUniIngestionHandler(
             using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
             Console.WriteLine("Setting up CSV reader");
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<DU.CourseLocationMap>();
+            csv.Context.RegisterClassMap<CourseLocationMap>();
             Console.WriteLine("Reading data...");
-            var records = csv.GetRecords<DU.CourseLocation>().ToList();
+            var records = csv.GetRecords<CourseLocation>().ToList();
 
             // Determine if there are any changes
             if (records.Count != 0)
             {
-
-                if (
-                    Courses == ProcessMode.Force
-                    || dbContext.DU_CourseLocations.Count() != records.Count
-                )
+                Console.WriteLine($"Preparing {records.Count} records to DB...");
+                await dbContext.BulkSynchronizeAsync(records, options =>
                 {
-                    Console.WriteLine($"Preparing {records.Count} records to DB...");
-                    await dbContext.BulkSynchronizeAsync(records, options =>
-                    {
-                        options.BatchSize = batchSize;
-                        options.BatchDelayInterval = 1000;
-                        options.UseTableLock = true;
-                    }, cancellationToken);
-                }
+                    options.BatchSize = batchSize;
+                    options.BatchDelayInterval = 1000;
+                    options.UseTableLock = true;
+                }, cancellationToken);
+
             }
 
             Console.WriteLine("Done");
         }
-        
+
         Console.WriteLine($"{Name} Ingestion Done");
 
         return true;
@@ -455,6 +421,8 @@ public class DiscoverUniIngestionHandler(
             Console.WriteLine("Skipped");
             return true;
         }
+        
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         // LOCATIONS
 
@@ -596,6 +564,7 @@ public class DiscoverUniIngestionHandler(
                 WhatYouWillLearn = string.Empty,
                 Url = c.CourseUrl ?? string.Empty,
                 FlexibleStart = false,
+                Level = a != null ?  a.AimCode.ToQualificationLevel() : null,
                 Reference = c.CourseId,
                 AttendancePattern = c.StudyMode.ToCourseHours(),
                 CourseType = CourseType.Degree
@@ -617,7 +586,7 @@ public class DiscoverUniIngestionHandler(
             options.UseRowsAffected = true;
             options.ColumnPrimaryKeyExpression = e => e.SourceReference;
             options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
-            options.UseAudit = false;
+            options.UseAudit = true;
             options.AuditEntries = auditEntries;
             options.ResultInfo = resultInfo;
         }, cancellationToken);
@@ -628,26 +597,20 @@ public class DiscoverUniIngestionHandler(
         // Run through the audit entries and check to see which entries were created or updated
         var createdIds = auditEntries.Where(e => e.Action == AuditActionType.Insert)
             .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
-
         // For all of our created entries, we'll need to set those to be indexed
         var createdEntries = dbContext.Entries.WhereBulkContains(createdIds);
-        Console.WriteLine($"Setting ingestion status for {createdEntries.Count()} created entries...");
         await createdEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending,
             cancellationToken: cancellationToken);
-
         // We're only interested here if any text fields have changed
         var updatedIds = auditEntries.Where(e => e.Action == AuditActionType.Update
                                                  && e.Values.Exists(ae =>
                                                      ae.ColumnName is "Title" or "AimOrAltTitle" or "Description" &&
                                                      !Equals(ae.OldValue, ae.NewValue)))
             .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
-
         var updatedEntries = dbContext.Entries.WhereBulkContains(updatedIds);
-        Console.WriteLine($"Setting ingestion status for {updatedEntries.Count()} updated entries...");
         await updatedEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending,
             cancellationToken: cancellationToken);
         await dbContext.BulkSaveChangesAsync(cancellationToken);
-        Console.WriteLine("Setting ingestion status done.");
 
         var instances =
             from c in dbContext.DU_Courses
@@ -694,9 +657,9 @@ public class DiscoverUniIngestionHandler(
                 p.Created,
                 p.Updated
             };
-            options.UseRowsAffected = true;
             options.ColumnPrimaryKeyExpression = e => e.SourceReference;
             options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            options.UseRowsAffected = true;
             options.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
@@ -765,9 +728,6 @@ public class DiscoverUniIngestionHandler(
 
         // Remove empty sectors
         sectorCourses.RemoveAll(s => s.HecosCodes.All(h => h == null));
-        
-        
-        
         var entrySectors = new List<EntrySector>();
         
         sectorCourses.ForEach(c =>
@@ -789,21 +749,15 @@ public class DiscoverUniIngestionHandler(
             }
         });
         
-        
-        
-        var less = "more";
-      
-        
-
         await dbContext.BulkSynchronizeAsync(entrySectors, options =>
         {
             options.ColumnPrimaryKeyExpression = es => new
             {
                 es.EntryId, es.SectorId
             };
+            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
             options.UseRowsAffected = true;
             options.ResultInfo = resultInfo;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
         }, cancellationToken);
 
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
@@ -811,7 +765,40 @@ public class DiscoverUniIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
         
+        // UNIVERSITY SPECIFIC DATA
+        Console.WriteLine("Generating university course specific data...");
         
+        var uniData =
+            from c in dbContext.DU_Courses
+            join e in dbContext.Entries on
+                Convert.ToString(c.UKPRN) + "_" +
+                c.CourseId + "_" +
+                Convert.ToString((int)c.StudyMode) equals e.SourceReference
+            select new UniversityCourse()
+            {
+                EntryId = e.Id,
+                Foundation = c.FoundationYear == null ? null : c.FoundationYear.Value != Availability.NotAvailable,
+                Honours = c.Honours,
+                Sandwich = c.Sandwich == null ? null : c.Sandwich.Value != Availability.NotAvailable,
+                Nhs = c.NHS,
+                YearAbroad = c.YearAbroad == null ? null : c.YearAbroad.Value != Availability.NotAvailable
+            };
+        
+        await dbContext.BulkSynchronizeAsync(uniData, options =>
+        {
+            options.IgnoreOnSynchronizeUpdateExpression = p => new
+            {
+                p.Id
+            };
+            options.ColumnPrimaryKeyExpression = course => course.EntryId;
+            options.UseRowsAffected = true;
+            options.ResultInfo = resultInfo;
+        }, cancellationToken);
+
+        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
+        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
+        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+
 
         Console.WriteLine($"{Name} Sync Done");
 
@@ -820,13 +807,11 @@ public class DiscoverUniIngestionHandler(
 
     public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
-        return false;
-        
         while (true)
         {
             Console.WriteLine($"Starting {Name} AI Search indexing...");
 
-            var entries = dbContext.Entries.Where(x => x.SourceSystem == SourceSystem.DiscoverUni)
+            var entries = dbContext.Entries
                 .Include(entry => entry.EntrySectors)
                 .ThenInclude(entrySector => entrySector.Sector)
                 .Include(entry => entry.EntryInstances)
@@ -834,8 +819,11 @@ public class DiscoverUniIngestionHandler(
                 .Include(entry => entry.Provider)
                 .ThenInclude(provider => provider.ProviderLocations)
                 .ThenInclude(providerLocation => providerLocation.Location)
-                .Where(x => x.IngestionState == IngestionState.Pending)
-                .Take(50);
+                .Where(x => 
+                    x.SourceSystem == SourceSystem.DiscoverUni &&
+                    x.IngestionState == IngestionState.Pending)
+                .Take(250)
+                .ToList();
 
             if (!entries.Any())
             {
@@ -846,7 +834,6 @@ public class DiscoverUniIngestionHandler(
             Console.WriteLine($"Loaded {entries.Count()} entries for indexing.");
 
             var searchEntries = new List<AiSearchEntry>();
-
             foreach (var entry in entries)
             {
                 foreach (var instance in entry.EntryInstances)
@@ -862,7 +849,7 @@ public class DiscoverUniIngestionHandler(
                         Title = entry.Title,
                         LearningAimTitle = entry.AimOrAltTitle,
                         Description = entry.Description.Scrub(),
-                        EntryType = nameof(EntryType.Course),
+                        EntryType = nameof(EntryType.UniversityCourse),
                         Source = nameof(SourceSystem.DiscoverUni),
                         QualificationLevel = entry.Level?.ToString() ?? string.Empty,
                         LearningMethod = instance.StudyMode.ToString() ?? string.Empty,
@@ -877,42 +864,33 @@ public class DiscoverUniIngestionHandler(
                     searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
                     searchEntries.Add(searchEntry);
                 }
-
+                
                 entry.IngestionState = IngestionState.Processing;
             }
-
-            // Update the entries above to processing
-            await dbContext.BulkUpdateAsync(entries, options =>
-            {
-                options.ColumnInputExpression = e => e.IngestionState;
-                options.IncludeGraph = false;
-            }, cancellationToken);
-
+            
             Console.WriteLine($"Created {searchEntries.Count} records for indexing.");
 
             var result = await searchIndexHandler.Ingest(searchEntries);
-
-            // Update the entries above to complete
+            
+            // Update the entries above to processing
             foreach (var entry in entries)
             {
-                entry.IngestionState = IngestionState.Complete;
+                entry.IngestionState = result ? IngestionState.Complete : IngestionState.Failed;
             }
-
-            await dbContext.BulkUpdateAsync(entries, options =>
-            {
-                options.ColumnInputExpression = e => e.IngestionState;
-                options.IncludeGraph = false;
-            }, cancellationToken);
-
-            Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
-
+            await dbContext.BulkSaveChangesAsync(cancellationToken);
 
             // Keep going until we've ingested everything
             if (!dbContext.Entries.Any(e =>
-                    e.IngestionState == IngestionState.Pending && e.SourceSystem == SourceSystem.DiscoverUni))
+                    e.IngestionState == IngestionState.Pending
+                    && e.SourceSystem == SourceSystem.DiscoverUni))
+            {
+                Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
                 return result;
-            dbContext.ChangeTracker.Clear();
+            }
 
+            // Clear our change tracking as we're going to get another batch next and
+            // we don't care about the old ones
+            dbContext.ChangeTracker.Clear();
         }
     }
 }
