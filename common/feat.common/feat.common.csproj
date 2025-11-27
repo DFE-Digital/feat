@@ -7,21 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Azure.Core" Version="1.49.0" />
-      <PackageReference Include="Azure.Search.Documents" Version="11.7.0" />
+      <PackageReference Include="Azure.Core" Version="1.50.0" />
+      <PackageReference Include="Azure.Search.Documents" Version="11.8.0-beta.1" />
       <PackageReference Include="CsvHelper" Version="33.1.0" />
       <PackageReference Include="Microsoft.Azure.Core.Spatial" Version="1.2.0-beta.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.11" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="9.0.11" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.11">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="9.0.10" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.11" />
     </ItemGroup>
 
 </Project>
