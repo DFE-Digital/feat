@@ -75,7 +75,7 @@ services.AddDbContext<IngestionDbContext>(options =>
 
 services.AddTransient<IMigrationsHandler, MigrationsHandler>();
 services.AddTransient<ISearchIndexHandler, SearchIndexHandler>();
-services.AddTransient<FacIngestionHandler>();
+services.AddTransient<FaaIngestionHandler>();
 services.AddTransient<FacIngestionHandler>();
 services.AddTransient<DiscoverUniIngestionHandler>();
 services.AddSingleton<IApiClient, ApiClient>();
