@@ -679,8 +679,17 @@ public class FaaIngestionHandler(
             }
             await dbContext.BulkSaveChangesAsync(cancellationToken);
 
-            Console.WriteLine($"Created {searchEntries.Count} records for indexing.");
+            var resultInfo = new ResultInfo();
+            await dbContext.BulkMergeAsync(searchEntries, options =>
+            {
+                options.ColumnPrimaryKeyExpression = ai => ai.InstanceId;
+                options.UseRowsAffected = true;
+                options.ResultInfo = resultInfo;
+            }, cancellationToken);
 
+            Console.WriteLine($"{resultInfo.RowsAffectedInserted} created for indexing");
+            Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated for indexing");
+            
             var result = await searchIndexHandler.Ingest(searchEntries);
             
             // Update the entries above to processing
