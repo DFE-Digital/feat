@@ -15,7 +15,10 @@ public class SearchResult
     
     public double? Distance { get; init; }
     
-    public string DistanceDisplay => Distance != null ? $"{Math.Round(Distance.Value)} miles" : string.Empty;
+    public string DistanceDisplay =>
+        Distance == null
+            ? string.Empty
+            : $"{Math.Round(Distance.Value)} {((int)Math.Round(Distance.Value) == 1 ? "mile" : "miles")}";
     
     public CourseType? CourseType { private get; init; }
     

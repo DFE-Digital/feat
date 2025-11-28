@@ -7,7 +7,6 @@ using feat.api.Models;
 using feat.api.Models.External;
 using feat.common;
 using feat.common.Configuration;
-using feat.common.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
@@ -34,9 +33,9 @@ public class SearchService(
             userLocation = await GetGeoLocationAsync(request.Location);
         }
 
-        var (uniqueCourses, facets, totalCount) = await AiSearchAsync(request, userLocation);
+        var (searchResults, facets, totalCount) = await AiSearchAsync(request, userLocation);
         
-        var courseIds = uniqueCourses
+        var courseIds = searchResults
             .Select(x => x.Id)
             .ToList();
 
@@ -53,7 +52,7 @@ public class SearchService(
                 Overview = e.Description
             }).ToListAsync();
         
-        var locationIds = uniqueCourses
+        var locationIds = searchResults
             .Select(x => x.InstanceId.Split('_'))
             .Where(parts => parts.Length == 2)
             .Select(parts => parts[1])
@@ -66,13 +65,13 @@ public class SearchService(
         
         var courseDictionary = courses.ToDictionary(c => c.Id);
 
-        var orderedCourses = uniqueCourses
+        var detailedResults = searchResults
             .Where(c => courseDictionary.ContainsKey(c.Id))
             .Select(c =>
             {
                 var course = courseDictionary[c.Id];
                 course.Score = c.RerankerScore;
-                
+
                 var locationIdParts = c.InstanceId.Split('_');
                 var locationId = locationIdParts.Length > 1 ? locationIdParts[1] : null;
 
@@ -94,87 +93,80 @@ public class SearchService(
                 }
 
                 return course;
-            });
+            }).ToList();
 
-        if (request.OrderBy == OrderBy.Distance)
-        {
-            orderedCourses = orderedCourses
-                .Where(c => c.Distance.HasValue && c.Distance.Value <= request.Radius)
-                .OrderBy(c => c.Distance)
-                .ToList();
-        }
-        else if (request.OrderBy == OrderBy.Relevance)
-        {
-            orderedCourses = orderedCourses
-                .OrderByDescending(c => c.Score)
-                .ToList();
-        }
-
-        orderedCourses = orderedCourses
-            .Take(request.PageSize)
-            .ToList();
+        RemoveDuplicateCourses(detailedResults);
 
         return new SearchResponse
         {
-            Courses = orderedCourses,
+            Courses = detailedResults,
             Facets = facets,
             Page = request.Page,
             PageSize = request.PageSize,
-            CurrentPageSize = uniqueCourses.Count,
             TotalCount = totalCount
         };
     }
+    
+    private static void RemoveDuplicateCourses(List<Course> courses)
+    {
+        if (courses.Count == 0)
+        {
+            return;
+        }
+        
+        // If the user has specified a search location, Distance will have a value,
+        // so take the closest course to display.
+        // If there is no search location, just take the first course.
+        var deduplicatedCourses = courses
+            .GroupBy(c => c.Id)
+            .Select(g => g
+                .Where(c => c.Distance != null)
+                .OrderBy(c => c.Distance)
+                .FirstOrDefault() ?? g.First())
+            .ToList();
+        
+        courses.Clear();
+        courses.AddRange(deduplicatedCourses);
+    }
 
-    private async Task<(List<AiSearchResult>, List<Facet>, int)> AiSearchAsync(SearchRequest request, GeoLocation? userLocation)
+    private async Task<(List<AiSearchResult>, List<Facet>, int)> AiSearchAsync(
+        SearchRequest request, GeoLocation? userLocation)
     {
         var searchOptions = await BuildSearchOptions(request, userLocation);
 
         var search = await aiSearchClient.SearchAsync<AiSearchResponse>(request.Query, searchOptions);
         var searchResults = search.Value;
-
-        var checkedIds = new HashSet<Guid>();
-        var uniqueCourses = new List<AiSearchResult>();
+        
+        var results = new List<AiSearchResult>();
 
         await foreach (var searchResult in searchResults.GetResultsAsync())
         {
-            var result = new AiSearchResult
+            results.Add(new AiSearchResult
             {
                 Id = searchResult.Document.Id,
                 InstanceId = searchResult.Document.InstanceId,
                 RerankerScore = searchResult.SemanticSearch?.RerankerScore
-            };
-            
-            if (checkedIds.Add(result.Id)) 
-            {
-                uniqueCourses.Add(result);
-            }
+            });
         }
         
         var facets = searchResults.Facets?
-                         .Where(f => f.Value?.Any() == true)
-                         .Select(f => new Facet(f.Key, f.Value))
-                         .ToList()
-                     ?? [];
+            .Where(f => f.Value?.Any() == true)
+            .Select(f => new Facet(f.Key, f.Value))
+            .ToList() ?? [];
 
         var totalCount = (int)search.Value.TotalCount!;
         
-        return (uniqueCourses, facets, totalCount);
+        return (results, facets, totalCount);
     }
 
     private async Task<SearchOptions> BuildSearchOptions(SearchRequest request, GeoLocation? userLocation)
     {
-        var embedding = await embeddingClient.GenerateEmbeddingAsync(request.Query);
-        var vector = embedding.Value.ToFloats();
-        
-        var filterExpression = BuildFacetFilterExpression(request, userLocation);
-        
         SearchOptions searchOptions;
 
         if (request.Query == "*")
         {
             searchOptions = new SearchOptions
             {
-                //ScoringParameters = { _azureOptions.AiSearchIndexScoringParameters },
                 SearchFields =
                 {
                     nameof(SearchIndexFields.Title), 
@@ -194,7 +186,6 @@ public class SearchService(
         {
             searchOptions = new SearchOptions
             {
-                //ScoringParameters = { _azureOptions.AiSearchIndexScoringParameters },
                 SearchFields =
                 {
                     nameof(SearchIndexFields.Title), 
@@ -215,19 +206,35 @@ public class SearchService(
                 }
             };
         }
-
-        //searchOptions.ScoringProfile = _azureOptions.AiSearchIndexScoringProfile;
+        
+        var embedding = await embeddingClient.GenerateEmbeddingAsync(request.Query);
+        var vector = embedding.Value.ToFloats();
+        
+        var filterExpression = BuildFilterExpression(request, userLocation);
+        
+        if (request.OrderBy == OrderBy.Distance && userLocation != null)
+        {
+            searchOptions.OrderBy.Add(
+                $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') asc"
+            );
+            
+            searchOptions.QueryType = SearchQueryType.Full;
+        }
+        else
+        {
+            searchOptions.QueryType = SearchQueryType.Semantic;
+            searchOptions.SemanticSearch = new SemanticSearchOptions
+            {
+                SemanticConfigurationName = "semantic-title-description",
+            };
+        }
+        
         searchOptions.SessionId = request.SessionId;
         searchOptions.Size = request.PageSize;
         searchOptions.Skip = (request.Page - 1) * request.PageSize;
         searchOptions.IncludeTotalCount = true;
         searchOptions.Filter = filterExpression;
         searchOptions.SearchMode = SearchMode.Any;
-        searchOptions.QueryType = SearchQueryType.Semantic;
-        searchOptions.SemanticSearch = new SemanticSearchOptions
-        {
-            SemanticConfigurationName = "semantic-title-description",
-        };
         searchOptions.VectorSearch = new VectorSearchOptions
         {
             Queries =
@@ -284,7 +291,7 @@ public class SearchService(
         return null;
     }
     
-    private static string? BuildFacetFilterExpression(SearchRequest request, GeoLocation? userLocation)
+    private static string? BuildFilterExpression(SearchRequest request, GeoLocation? userLocation)
     {
         var filters = new List<string>();
 
@@ -296,10 +303,10 @@ public class SearchService(
         
         if (userLocation != null)
         {
-            var radiusKm = request.Radius * 1.60934;
+            var radius = RadiusInKilometers(request.Radius);
             
             filters.Add(
-                $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radiusKm}"
+                $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius}"
             );
         }
         
@@ -327,5 +334,10 @@ public class SearchService(
                ?? location?.Address2
                ?? location?.Address1
                ?? null;
+    }
+
+    private static double RadiusInKilometers(double radius)
+    {
+        return radius * 1.60934;
     }
 }
