@@ -628,7 +628,7 @@ public class FaaIngestionHandler(
                 .Where(x =>
                     x.SourceSystem == SourceSystem &&
                     x.IngestionState == IngestionState.Pending)
-                .Take(50)
+                .Take(250)
                 .ToList();
 
             if (entries.Count == 0)
