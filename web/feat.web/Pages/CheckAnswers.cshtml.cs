@@ -1,3 +1,4 @@
+using feat.web.Enums;
 using feat.web.Extensions;
 using feat.web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,11 @@ public class CheckAnswersModel (ILogger<CheckAnswersModel> logger): PageModel
         HttpContext.Session.Remove("AllFacets");
         Search.Facets.Clear();
         
+        if (Search.Interests.Count == 0 && (Search.Distance is null or < Distance.Two) && 
+            Search.QualificationLevels.Count == 0 && Search.VisitedCheckAnswers)
+        {
+            return RedirectToPage(PageName.Location);
+        }
         return Page();
     }
 
