@@ -660,7 +660,7 @@ public class FaaIngestionHandler(
                         LearningAimTitle = entry.AimOrAltTitle,
                         Description = description,
                         EntryType = nameof(EntryType.Apprenticeship),
-                        Source = nameof(SourceSystem),
+                        Source = SourceSystem.ToString(),
                         QualificationLevel = entry.Level?.ToString() ?? string.Empty,
                         LearningMethod = instance.StudyMode.ToString() ?? string.Empty,
                         CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
