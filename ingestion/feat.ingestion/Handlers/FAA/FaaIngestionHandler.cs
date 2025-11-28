@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using feat.common;
 using feat.common.Extensions;
 using feat.common.Models;
@@ -323,41 +324,6 @@ public class FaaIngestionHandler(
         var entryLookup = dbContext.Set<Entry>()
             .Where(e => e.SourceSystem == SourceSystem)
             .ToDictionary(e => e.SourceReference, e => e.Id);
-
-        
-        // ENTRYINSTANCE
-        Console.WriteLine($"Generating entry instances ...");
-        var entryInstances = apprenticeships.Select(a =>
-        {
-            var entryId = entryLookup[a.VacancyReference!];
-            return new EntryInstance
-            {
-                Created = DateTime.UtcNow,
-                EntryId = entryId,
-                StartDate = a.StartDate,
-                Duration = ParseMonthStringToTimeSpan(a.ExpectedDuration, a.StartDate),
-                StudyMode = LearningMethod.Workbased,
-                Reference = a.VacancyReference!,
-                SourceSystem = SourceSystem,
-                SourceReference = a.VacancyReference!
-            };
-        }).ToList();
-        
-        await dbContext.BulkSynchronizeAsync(entryInstances, options =>
-        {
-            options.IgnoreOnSynchronizeUpdateExpression = ei => new
-            {
-                ei.Id,
-                ei.Created
-            };
-            options.ColumnPrimaryKeyExpression = ei => ei.SourceReference;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = ei => ei.SourceSystem;options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
-        }, cancellationToken);
-        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
-        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
-        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
-        resultInfo = new ResultInfo();
         
         // ENTRYSECTOR
         Console.WriteLine("Generating entry sectors...");
@@ -534,6 +500,72 @@ public class FaaIngestionHandler(
             }
         }
         
+        // ENTRYINSTANCE
+        Console.WriteLine($"Generating entry instances ...");
+        var entryInstances = new List<EntryInstance>();
+
+        foreach (var apprenticeship in apprenticeships)
+        {
+            var entryId = entryLookup[apprenticeship.VacancyReference!];
+            
+            if (apprenticeship.Addresses.Count > 0)
+            {
+                // Loop through and create an instance per address
+                foreach (var address in apprenticeship.Addresses)
+                {
+                    var locationId = locationLookup[(
+                        address.Postcode?.ToLower().Trim(),
+                        address.AddressLine1?.ToLower().Trim(),
+                        address.AddressLine4?.ToLower().Trim())];
+                    
+                    entryInstances.Add(new EntryInstance
+                    {
+                        Created = DateTime.UtcNow,
+                        EntryId = entryId,
+                        StartDate = apprenticeship.StartDate,
+                        Duration = ParseMonthStringToTimeSpan(apprenticeship.ExpectedDuration, apprenticeship.StartDate),
+                        StudyMode = LearningMethod.Workbased,
+                        Reference = $"{apprenticeship.VacancyReference}_{address.Id}",
+                        LocationId = locationId,
+                        SourceSystem = SourceSystem,
+                        SourceReference = $"{apprenticeship.VacancyReference}_{address.Id}"
+                    });
+                }
+            }
+            else
+            {
+                // Assume this is a national vacancy
+                entryInstances.Add(new EntryInstance
+                {
+                    Created = DateTime.UtcNow,
+                    EntryId = entryId,
+                    StartDate = apprenticeship.StartDate,
+                    Duration = ParseMonthStringToTimeSpan(apprenticeship.ExpectedDuration, apprenticeship.StartDate),
+                    StudyMode = LearningMethod.Workbased,
+                    Reference = $"{apprenticeship.VacancyReference}",
+                    SourceSystem = SourceSystem,
+                    SourceReference = $"{apprenticeship.VacancyReference}"
+                });
+            }
+        }
+        
+        await dbContext.BulkSynchronizeAsync(entryInstances, options =>
+        {
+            options.IgnoreOnSynchronizeUpdateExpression = ei => new
+            {
+                ei.Id,
+                ei.Created
+            };
+            options.ColumnPrimaryKeyExpression = ei => ei.SourceReference;
+            options.ColumnSynchronizeDeleteKeySubsetExpression = ei => ei.SourceSystem;
+            options.UseRowsAffected = true;
+            options.ResultInfo = resultInfo;
+        }, cancellationToken);
+        Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
+        Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
+        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        resultInfo = new ResultInfo();
+        
         // EMPLOYERLOCATION
         Console.WriteLine("Generating employer locations...");
         
@@ -581,6 +613,7 @@ public class FaaIngestionHandler(
     public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine($"Starting {Name} AI Search indexing...");
+        var sb = new StringBuilder();
         
         while (true)
         {
@@ -592,80 +625,59 @@ public class FaaIngestionHandler(
                 .Include(entry => entry.Provider)
                 .ThenInclude(provider => provider.ProviderLocations)
                 .ThenInclude(providerLocation => providerLocation.Location)
-                .Include(entry => entry.Vacancies)
                 .Where(x =>
                     x.SourceSystem == SourceSystem &&
                     x.IngestionState == IngestionState.Pending)
-                .Take(250);
+                .Take(50)
+                .ToList();
 
-            if (!entries.Any())
+            if (entries.Count == 0)
             {
                 Console.WriteLine("No entries found to index.");
                 return false;
             }
 
-            Console.WriteLine($"Loaded {entries.LongCount()} entries for indexing.");
-
-            var employerLocations = dbContext.Set<EmployerLocation>()
-                .Include(el => el.Location)
-                .Include(el => el.Employer)
-                .Include(employerLocation => employerLocation.Location)
-                .ToList();
-
-            Console.WriteLine($"Loaded {employerLocations.Count} employer locations.");
-
+            Console.WriteLine($"Loaded {entries.Count} entries for indexing.");
+            
             var searchEntries = new List<AiSearchEntry>();
             foreach (var entry in entries)
             {
-                foreach (var vacancy in entry.Vacancies)
+                // TODO: Split these into their own fields
+                sb.Clear();
+                sb.AppendLine(entry.Description);
+                sb.AppendLine(entry.WhatYouWillLearn);
+                var description = sb.ToString().Scrub();
+                
+                foreach (var instance in entry.EntryInstances)
                 {
-                    var filteredEmployerLocations = employerLocations
-                        .Where(el => el.EmployerId == vacancy.EmployerId)
-                        .ToList();
-
-                    var locationCount = filteredEmployerLocations.Count;
-                    
-                    if (locationCount == 0)
+                    var location = instance.Location ?? entry.Provider.ProviderLocations.FirstOrDefault()?.Location;
+                    var searchEntry = new AiSearchEntry
                     {
-                        Console.WriteLine(
-                            $"No locations found for employer '{vacancy.Employer.Name}' (Vacancy '{entry.Reference}'). Skipping.");
-                        continue;
-                    }
+                        Id = entry.Id.ToString(),
+                        InstanceId = instance.Id.ToString(),
+                        Sector = string.Join(", ", entry.EntrySectors.Select(es => es.Sector.Name)),
+                        Title = entry.Title,
+                        LearningAimTitle = entry.AimOrAltTitle,
+                        Description = description,
+                        EntryType = nameof(EntryType.Apprenticeship),
+                        Source = nameof(SourceSystem),
+                        QualificationLevel = entry.Level?.ToString() ?? string.Empty,
+                        LearningMethod = instance.StudyMode.ToString() ?? string.Empty,
+                        CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
+                        StudyTime = entry.StudyTime?.ToString() ?? string.Empty,
+                        Location = location?.GeoLocation.ToGeographyPoint()
+                    };
 
-                    foreach (var el in filteredEmployerLocations)
-                    {
-                        var locationPoint = el.Location.GeoLocation != null
-                            ? el.Location.GeoLocation.ToGeographyPoint()
-                            : null;
-
-                        var searchEntry = new AiSearchEntry
-                        {
-                            Id = entry.Id.ToString(),
-                            InstanceId = $"{entry.EntryInstances.First().Id}_{el.LocationId}",
-                            Sector = entry.EntrySectors.First().Sector.Name,
-                            Title = entry.Title,
-                            LearningAimTitle = entry.AimOrAltTitle,
-                            Description = entry.Description,
-                            EntryType = nameof(EntryType.Apprenticeship),
-                            Source = nameof(SourceSystem),
-                            QualificationLevel = entry.Level?.ToString() ?? string.Empty,
-                            LearningMethod = nameof(LearningMethod.Workbased),
-                            CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
-                            StudyTime = entry.StudyTime?.ToString() ?? string.Empty,
-                            Location = locationPoint
-                        };
-
-                        searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
-                        searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
-                        searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
-                        searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
-
-                        searchEntries.Add(searchEntry);
-                    }
+                    searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
+                    searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
+                    searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
+                    searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
+                    searchEntries.Add(searchEntry);
                 }
-
+                
                 entry.IngestionState = IngestionState.Processing;
             }
+            await dbContext.BulkSaveChangesAsync(cancellationToken);
 
             Console.WriteLine($"Created {searchEntries.Count} records for indexing.");
 

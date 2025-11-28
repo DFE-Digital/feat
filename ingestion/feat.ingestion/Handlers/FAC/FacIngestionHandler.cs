@@ -1037,10 +1037,10 @@ public class FacIngestionHandler(
     public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine($"Starting {Name} AI Search indexing...");
+        var sb = new StringBuilder();
         
         while (true)
         {
-            var sb = new StringBuilder();
 
             var entries = dbContext.Entries
                 .Include(entry => entry.EntrySectors)
@@ -1055,35 +1055,35 @@ public class FacIngestionHandler(
                 .Take(250)
                 .ToList();
 
-            if (!entries.Any())
+            if (entries.Count == 0)
             {
                 Console.WriteLine("No entries found to index.");
                 return true;
             }
 
-            Console.WriteLine($"Loaded {entries.Count()} entries for indexing.");
+            Console.WriteLine($"Loaded {entries.Count} entries for indexing.");
 
             var searchEntries = new List<AiSearchEntry>();
 
             foreach (var entry in entries)
             {
+                // TODO: Split these into their own fields
+                sb.Clear();
+                sb.AppendLine(entry.Description);
+                sb.AppendLine(entry.WhatYouWillLearn);
+                var description = sb.ToString().Scrub();
+                
                 foreach (var instance in entry.EntryInstances)
                 {
                     var location = instance.Location ?? entry.Provider.ProviderLocations.FirstOrDefault()?.Location;
-                    
-                    // Temporary fix to merge description and what you'll learn
-                    sb.Clear();
-                    sb.AppendLine(entry.Description);
-                    sb.AppendLine(entry.WhatYouWillLearn);
-                    
                     var searchEntry = new AiSearchEntry
                     {
                         Id = entry.Id.ToString(),
-                        InstanceId = instance.LocationId != null ? $"{instance.Id}_{instance.LocationId}" : $"{instance.Id}",
+                        InstanceId = instance.Id.ToString(),
                         Sector = string.Join(", ", entry.EntrySectors.Select(es => es.Sector.Name)),
                         Title = entry.Title,
                         LearningAimTitle = entry.AimOrAltTitle,
-                        Description = sb.ToString().Scrub(),
+                        Description = description,
                         EntryType = nameof(EntryType.Course),
                         Source = nameof(SourceSystem),
                         QualificationLevel = entry.Level?.ToString() ?? string.Empty,

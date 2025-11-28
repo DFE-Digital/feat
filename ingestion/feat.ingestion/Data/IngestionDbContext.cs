@@ -1,4 +1,5 @@
 using feat.common.Models;
+using feat.common.Models.AiSearch;
 using Microsoft.EntityFrameworkCore;
 using FAC = feat.ingestion.Models.FAC;
 using FAA = feat.ingestion.Models.FAA;
@@ -15,6 +16,11 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Ensure unclustered primary key for AI Search Entries
+        modelBuilder.Entity<AiSearchEntry>()
+            .HasKey(nameof(AiSearchEntry.InstanceId))
+            .IsClustered(false);
+        
         // Create our composite keys
         modelBuilder.Entity<EntrySector>()
             .HasKey(nameof(EntrySector.EntryId), nameof(EntrySector.SectorId));
@@ -63,6 +69,8 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
     public DbSet<Vacancy> Vacancies { get; set; }
     
     public DbSet<PostcodeLatLong> Postcodes { get; set; }
+    
+    public DbSet<AiSearchEntry> AiSearchEntries { get; set; }
     
     #endregion
     

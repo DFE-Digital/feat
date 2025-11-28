@@ -12,6 +12,13 @@ public static class LocationExtensions
             new Point(postcode.Longitude.Value, postcode.Latitude.Value) { SRID = 4326 } : null;
     }
 
+    public static Point? ToPoint(this GeographyPoint? geographyPoint)
+    {
+        return geographyPoint == null ? 
+            null : 
+            new Point(geographyPoint.Longitude, geographyPoint.Latitude) { SRID = 4326 };
+    }
+
     public static GeographyPoint? ToGeographyPoint(this Point? point)
     {
         return point == null ? null : GeographyPoint.Create(point.Y, point.X);
