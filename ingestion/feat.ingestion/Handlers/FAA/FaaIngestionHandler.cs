@@ -668,10 +668,13 @@ public class FaaIngestionHandler(
                         Location = location?.GeoLocation.ToGeographyPoint()
                     };
 
-                    searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
-                    searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
-                    searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
-                    searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
+                    if (options.IndexDirectly)
+                    {
+                        searchEntry.TitleVector = searchIndexHandler.GetVector(searchEntry.Title);
+                        searchEntry.DescriptionVector = searchIndexHandler.GetVector(searchEntry.Description);
+                        searchEntry.LearningAimTitleVector = searchIndexHandler.GetVector(searchEntry.LearningAimTitle);
+                        searchEntry.SectorVector = searchIndexHandler.GetVector(searchEntry.Sector);
+                    }
                     searchEntries.Add(searchEntry);
                 }
                 
@@ -690,7 +693,7 @@ public class FaaIngestionHandler(
             Console.WriteLine($"{resultInfo.RowsAffectedInserted} created for indexing");
             Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated for indexing");
             
-            var result = await searchIndexHandler.Ingest(searchEntries);
+            var result = !options.IndexDirectly || await searchIndexHandler.Ingest(searchEntries);
             
             // Update the entries above to processing
             foreach (var entry in entries)
@@ -704,6 +707,13 @@ public class FaaIngestionHandler(
                     e.IngestionState == IngestionState.Pending
                     && e.SourceSystem == SourceSystem))
             {
+                // Clear any AI search entries that aren't in our list of instances
+                await dbContext.AiSearchEntries
+                    .Where(i => i.Source == SourceSystem.ToString())
+                    .WhereBulkNotContains(dbContext.EntryInstances
+                        .Select(i => i.Id))
+                    .DeleteFromQueryAsync(cancellationToken: cancellationToken);
+                
                 Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
                 return result;
             }
