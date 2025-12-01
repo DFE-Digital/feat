@@ -566,7 +566,7 @@ public class DiscoverUniIngestionHandler(
                 Description = string.Empty,
                 EntryRequirements = string.Empty,
                 WhatYouWillLearn = string.Empty,
-                Url = c.CourseUrl ?? string.Empty,
+                Url = !string.IsNullOrEmpty(c.CourseUrl) ? c.CourseUrl : string.Empty,
                 FlexibleStart = false,
                 Level = a != null ?  a.AimCode.ToQualificationLevel() : null,
                 Reference = c.CourseId,
