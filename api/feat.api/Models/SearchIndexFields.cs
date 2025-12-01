@@ -17,6 +17,8 @@ public class SearchIndexFields
     public string Sector { get; set; }
         
     public string EntryType { get; set; }
+    
+    public string CourseType { get; set; }
         
     public string QualificationLevel { get; set; }
         

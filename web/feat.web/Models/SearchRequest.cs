@@ -18,7 +18,7 @@ public class SearchRequest
     
     public OrderBy OrderBy { get; set; } = OrderBy.Relevance;
 
-    public IEnumerable<string>? EntryType { get; set; }
+    public IEnumerable<string>? CourseType { get; set; }
 
     public IEnumerable<string>? QualificationLevel { get; set; }
 
