@@ -729,6 +729,9 @@ public class FacIngestionHandler(
             join a in dbContext.FAC_AimData on 
                 c.LEARN_AIM_REF equals a.LearnAimRef into aimdata
             from a in aimdata.DefaultIfEmpty()
+            join q in dbContext.FAC_ApprovedQualifications on
+                c.LEARN_AIM_REF equals q.QualificationNumber into qualdata
+            from q in qualdata.DefaultIfEmpty()
             join p in dbContext.Providers on
                 c.PROVIDER_UKPRN.ToString() equals p.Ukprn
             join c2 in dbContext.FAC_Courses on
@@ -759,7 +762,9 @@ public class FacIngestionHandler(
                 AttendancePattern = c.STUDY_MODE.ToCourseHours(),
                 StudyTime = c.ATTENDANCE_PATTERN.ToStudyTime(),
                 Level = a != null ? a.NotionalNVQLevelv2.ToQualificationLevel() : null,
-                CourseType = c.COURSE_TYPE
+                CourseType = c.COURSE_TYPE != null && c.COURSE_TYPE != CourseType.Unknown ?  
+                    c.COURSE_TYPE :
+                    q != null ? q.QualificationType.ToCourseType() : null
             };
         
         Console.WriteLine("Generating entries for t-levels...");

@@ -60,4 +60,15 @@ public static class FacMappingExtensions
             _ => null
         };
     }
+
+    public static CourseType? ToCourseType(this ApprovedQualificationType? source)
+    {
+        return source switch
+        {
+            ApprovedQualificationType.GCEAlevel or ApprovedQualificationType.GCEASLevel => CourseType.ALevels,
+            ApprovedQualificationType.GCSE9To1 => CourseType.GCSE,
+            ApprovedQualificationType.TLevel => CourseType.TLevels,
+            _ => null
+        };
+    }
 }

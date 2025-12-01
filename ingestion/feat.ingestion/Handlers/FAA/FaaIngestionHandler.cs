@@ -272,6 +272,7 @@ public class FaaIngestionHandler(
                 Url = a.ApplicationUrl ?? string.Empty,
                 Type = EntryType.Apprenticeship,
                 Level = MapCourseLevel(a.CourseLevel),
+                CourseType = CourseType.Apprenticeship,
                 StudyTime = StudyTime.Daytime,
                 SourceSystem = SourceSystem,
                 SourceReference = a.VacancyReference!
