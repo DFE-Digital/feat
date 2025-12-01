@@ -172,7 +172,7 @@ public class SearchService(
                 },
                 Facets =
                 {
-                    nameof(SearchIndexFields.EntryType), 
+                    nameof(SearchIndexFields.CourseType), 
                     nameof(SearchIndexFields.QualificationLevel), 
                     nameof(SearchIndexFields.LearningMethod), 
                     nameof(SearchIndexFields.CourseHours), 
@@ -191,7 +191,7 @@ public class SearchService(
                 },
                 Facets =
                 {
-                    nameof(SearchIndexFields.EntryType), 
+                    nameof(SearchIndexFields.CourseType), 
                     nameof(SearchIndexFields.QualificationLevel), 
                     nameof(SearchIndexFields.LearningMethod), 
                     nameof(SearchIndexFields.CourseHours), 
@@ -293,7 +293,7 @@ public class SearchService(
     {
         var filters = new List<string>();
 
-        AddFacet(nameof(SearchIndexFields.EntryType), request.EntryType);
+        AddFacet(nameof(SearchIndexFields.CourseType), request.CourseType);
         AddFacet(nameof(SearchIndexFields.QualificationLevel), request.QualificationLevel);
         AddFacet(nameof(SearchIndexFields.LearningMethod), request.LearningMethod);
         AddFacet(nameof(SearchIndexFields.CourseHours), request.CourseHours);

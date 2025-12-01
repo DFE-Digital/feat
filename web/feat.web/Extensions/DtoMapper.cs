@@ -145,7 +145,7 @@ public static class DtoMapper
     {
         return enumName switch
         {
-            nameof(EntryType) => 0,
+            nameof(CourseType) => 0,
             nameof(QualificationLevel) => 1,
             nameof(LearningMethod) => 2,
             nameof(CourseHours) => 3,

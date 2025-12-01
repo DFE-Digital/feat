@@ -45,7 +45,7 @@ public class Search
             Location = Location,
             Radius = Distance.HasValue ? (int)Distance.Value : 1000,
             OrderBy = OrderBy,
-            EntryType = GetSelectedFilters(nameof(SearchRequest.EntryType)),
+            CourseType = GetSelectedFilters(nameof(SearchRequest.CourseType)),
             QualificationLevel = GetQualificationLevelFilters(),
             LearningMethod = GetSelectedFilters(nameof(SearchRequest.LearningMethod)),
             CourseHours = GetSelectedFilters(nameof(SearchRequest.CourseHours)),
