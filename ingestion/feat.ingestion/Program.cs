@@ -12,10 +12,10 @@ using feat.common.Configuration;
 using feat.ingestion.Configuration;
 using feat.ingestion.Data;
 using feat.ingestion.Handlers;
+using feat.ingestion.Handlers.DiscoverUni;
 using feat.ingestion.Handlers.FAA;
 using feat.ingestion.Handlers.FAC;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +24,6 @@ using OpenAI.Embeddings;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using ZiggyCreatures.Caching.Fusion;
-using ZiggyCreatures.Caching.Fusion.Backplane.StackExchangeRedis;
 using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 Console.WriteLine("FEAT ingestion service started.");
@@ -74,8 +73,9 @@ services.AddDbContext<IngestionDbContext>(options =>
 
 services.AddTransient<IMigrationsHandler, MigrationsHandler>();
 services.AddTransient<ISearchIndexHandler, SearchIndexHandler>();
-services.AddTransient<FacIngestionHandler>();
 services.AddTransient<FaaIngestionHandler>();
+services.AddTransient<FacIngestionHandler>();
+services.AddTransient<DiscoverUniIngestionHandler>();
 services.AddSingleton<IApiClient, ApiClient>();
 services.AddSingleton<IIngestionHandlerFactory, IngestionHandlerFactory>();
 services.AddSingleton(ingestionOptions);
@@ -248,17 +248,6 @@ if (ingestionOptions.Environment.Equals("Development", StringComparison.Invarian
 }
 
 var factory = serviceProvider.GetRequiredService<IIngestionHandlerFactory>();
-
-var cache = serviceProvider.GetRequiredService<IFusionCache>();
-
-Console.WriteLine($"Starting cache test at {DateTime.Now}");
-var test = cache.GetOrSet<string>("test", entry =>
-{
-    Thread.Sleep(10000);
-    return "This is a test";
-});
-Console.WriteLine($"Cache value is [{test}]");
-Console.WriteLine($"Ending cache test at {DateTime.Now}");
 
 foreach (var argument in args)
 {

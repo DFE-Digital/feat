@@ -22,32 +22,23 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Azure.AI.OpenAI" Version="2.5.0-beta.1" />
-      <PackageReference Include="Azure.Core" Version="1.49.0" />
-      <PackageReference Include="Azure.Search.Documents" Version="11.7.0" />
-      <PackageReference Include="Azure.Storage.Blobs" Version="12.26.0" />
+      <PackageReference Include="Azure.AI.OpenAI" Version="2.7.0-beta.1" />
+      <PackageReference Include="Azure.Core" Version="1.50.0" />
+      <PackageReference Include="Azure.Search.Documents" Version="11.8.0-beta.1" />
+      <PackageReference Include="Azure.Storage.Blobs" Version="12.27.0-beta.1" />
       <PackageReference Include="CsvHelper" Version="33.1.0" />
       <PackageReference Include="Enums.NET" Version="5.0.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.11">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.10" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="9.0.10" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.10" />
-      <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.10" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.10" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.10" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.10" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.10" />
-      <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.13.1" />
-      <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.13.1" />
-      <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="9.104.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.11" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.11" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.11" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.11" />
+      <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.14.0" />
+      <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
+      <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="9.105.1.1" />
       <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.4.0" />
       <PackageReference Include="ZiggyCreatures.FusionCache.Backplane.Memory" Version="2.4.0" />
       <PackageReference Include="ZiggyCreatures.FusionCache.Backplane.StackExchangeRedis" Version="2.4.0" />
@@ -57,11 +48,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\common\feat.common\feat.common.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Handlers\DiscoverUni\" />
-      <Folder Include="Models\ONS\" />
     </ItemGroup>
 
 </Project>
