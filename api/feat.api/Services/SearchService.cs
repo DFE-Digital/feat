@@ -36,8 +36,7 @@ public class SearchService(
         var (searchResults, facets, totalCount) = await AiSearchAsync(request, userLocation);
         
         var courseIds = searchResults
-            .Select(x => x.Id)
-            .ToList();
+            .Select(x => x.Id);
 
         var courses = await dbContext.Entries
             .AsNoTracking()
@@ -55,8 +54,7 @@ public class SearchService(
         var locationIds = searchResults
             .Select(x => x.InstanceId.Split('_'))
             .Where(parts => parts.Length == 2)
-            .Select(parts => parts[1])
-            .ToList();
+            .Select(parts => parts[1]);
 
         var locations = await dbContext.Locations
             .AsNoTracking()
