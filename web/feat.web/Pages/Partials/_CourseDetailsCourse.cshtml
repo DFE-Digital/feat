@@ -58,54 +58,19 @@
                 <dt class="govuk-summary-list__key">Provider</dt>
                 <dd class="govuk-summary-list__value">@Model.ProviderName</dd>
                 <dd class="govuk-summary-list__actions">
-                @if (!string.IsNullOrEmpty(Model.ProviderUrl))
-                {
-                  <a class="govuk-link" href="@(Model.ProviderUrl)">View website
-                    <span class="govuk-visually-hidden">@(Model.ProviderName + "(" + Model.ProviderAddresses?.FirstOrDefault()?.Display + ")")</span>
-                  </a>
-                }
+                  @if (!string.IsNullOrEmpty(Model.ProviderUrl))
+                  {
+                    <a class="govuk-link" href="@(Model.ProviderUrl)">View website
+                      <span class="govuk-visually-hidden">@(Model.ProviderName + "(" + Model.ProviderAddresses?.FirstOrDefault()?.Display + ")")</span>
+                    </a>
+                  }
                 </dd>
               </div>
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Provider location</dt>
                 <dd class="govuk-summary-list__value">
-                  @* Leaving existing logic *@
-                  @if (Model.ProviderAddresses?.Count > 1)
-                  {
-                    var firstLocation = Model.ProviderAddresses?.First();
-                    var iCount = Model.ProviderAddresses?.Count;
-                    var isFirst = true;
-
-                    <p>@firstLocation?.Display</p>
-
-                    <details class="govuk-details govuk-!-margin-top-2" data-module="govuk-details">
-                      <summary class="govuk-details__summary">
-                        @{
-                          var sPlural = iCount > 2 ? "s are" : " is";
-                          <span class="govuk-details__summary-text">@($"{iCount - 1} other location{sPlural} available")</span>
-                        }
-                      </summary>
-                      <div class="govuk-details__text">
-                        @foreach (var location in Model.ProviderAddresses!)
-                        {
-                          if (!isFirst)
-                          {
-                            <p>
-                              <a class="govuk-link" href="@location.MapLocationUrl">@location.Display
-                                <span class="govuk-visually-hidden">@location.Display</span>
-                              </a>
-                            </p>
-                          }
-                          isFirst = false;
-                        }
-                      </div>
-                    </details>
-                  }
-                  else
-                  {
-                    @Model.ProviderAddresses?.FirstOrDefault()?.Display
-                  }
+                  @Model.ProviderAddresses?.FirstOrDefault()?.Display
                 </dd>
                 <dd class="govuk-summary-list__actions">
                   @if (!string.IsNullOrEmpty(Model.ProviderAddresses?.FirstOrDefault()?.MapLocationUrl))
@@ -117,6 +82,34 @@
                 </dd>
               </div>
             </dl>
+            @if (Model.ProviderAddresses?.Count > 1)
+            {
+              var addressesCount = Model.ProviderAddresses?.Count;
+              var isFirst = true;
+
+              <details class="govuk-details govuk-!-margin-top-2 govuk-!-margin-bottom-0" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                  @{
+                    var sPlural = addressesCount > 2 ? "s are" : " is";
+                    <span class="govuk-details__summary-text">@($"{addressesCount - 1} other location{sPlural} available")</span>
+                  }
+                </summary>
+                <div class="govuk-details__text">
+                  @foreach (var location in Model.ProviderAddresses!)
+                  {
+                    if (!isFirst)
+                    {
+                      <p>@($"{location.Display} - ") 
+                        <a class="govuk-link" href="@location.MapLocationUrl">View on a map
+                          <span class="govuk-visually-hidden">@location.Display</span>
+                        </a>
+                      </p>
+                    }
+                    isFirst = false;
+                  }
+                </div>
+              </details>
+            }
           </div>
         </div>
 
@@ -124,6 +117,7 @@
           <div class="govuk-summary-card__title-wrapper">
             <h2 class="govuk-summary-card__title">Course details</h2>
           </div>
+          
           <div class="govuk-summary-card__content">
             <dl class="govuk-summary-list">
               <div class="govuk-summary-list__row">

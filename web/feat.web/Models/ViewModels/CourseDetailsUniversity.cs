@@ -16,7 +16,7 @@ public class CourseDetailsUniversity : CourseDetailsBase
     
     public string? CampusName { get; set; }
     
-    public Location? CampusAddress { get; set; }
+    public List<Location>? CampusAddresses { get; set; }
     
-    public StartDate? StartDate { get; set; }
+    public List<StartDate>? StartDates { get; set; }
 }

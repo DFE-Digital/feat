@@ -88,12 +88,12 @@ public static class DtoMapper
         model.AwardingOrganisation = response.AwardingOrganisation;
         model.University = response.University;
         model.CampusName = response.CampusName;
-        model.CampusAddress = response.ProviderAddresses.ToLocationViewModels().FirstOrDefault();
+        model.CampusAddresses = response.ProviderAddresses.ToLocationViewModels();
         model.UniversityUrl = response.ProviderUrl;
-        model.StartDate = response.StartDates
+        model.StartDates = response.StartDates
             .Where(d => d.HasValue)
             .Select(d => new StartDate(d!.Value))
-            .FirstOrDefault();
+            .ToList();
 
         return model;
     }
