@@ -5,10 +5,7 @@
 @model TrainingOptionsPages.TrainingOptionsModel
 @{
     ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-}
-
-@section BeforeContent {
-    <govuk-back-link href="javascript:history.back()">Back</govuk-back-link>
+    ViewBag.ShowJSBack = true;
 }
 
 <div class="govuk-grid-row">

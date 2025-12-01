@@ -3,11 +3,9 @@
 @model feat.web.Pages.TrainingOptionsPages.AboutDegreesModel
 @{
   ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
+  ViewBag.ShowJSBack = true;
 }
 
-@section BeforeContent {
-  <govuk-back-link href="javascript:history.back()">Back</govuk-back-link>
-}
 
 <div class="govuk-width-container">
     <div class="govuk-grid-row">

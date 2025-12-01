@@ -1,9 +1,5 @@
-using System.Text.RegularExpressions;
-using feat.common.Models;
 using feat.common.Models.Enums;
 using feat.ingestion.Models.FAC.Enums;
-using Microsoft.Spatial;
-using NetTopologySuite.Geometries;
 using DeliveryMode = feat.common.Models.Enums.DeliveryMode;
 
 namespace feat.ingestion.Handlers.FAC;
@@ -61,30 +57,14 @@ public static class FacMappingExtensions
         };
     }
 
-    public static string Scrub(this string? source)
+    public static CourseType? ToCourseType(this ApprovedQualificationType? source)
     {
-        if (source == null)
-            return string.Empty;
-
-        var result = source.Trim() switch
+        return source switch
         {
-            "*" or "***" or "*****" => string.Empty,
-            "-" or "?" or "1" or "a" or "n" or "x" or "z" => string.Empty,
-            "xx" or "xxx" => string.Empty,
-            "n/a" or "TBA" or "TBC" or "PENDING" or "To follow" or "To be added" =>  string.Empty, 
-            "See website" or "This course" => string.Empty,
-            _ => CheckForWebsite(source.Trim())
+            ApprovedQualificationType.GCEAlevel or ApprovedQualificationType.GCEASLevel => CourseType.ALevels,
+            ApprovedQualificationType.GCSE9To1 => CourseType.GCSE,
+            ApprovedQualificationType.TLevel => CourseType.TLevels,
+            _ => null
         };
-        
-        return result;
-    }
-
-    private static string CheckForWebsite(string source)
-    {
-        var regex = new Regex(
-            @"https\:\/\/|web\s*site.*details|see (course |school |provider )*web\s*site|web\s*site.*information|web\s*site for (more|the|entry requirements|course booket)|please see web|refer to our web|(our|course|provider|school|college|ocr|edexcel|aqa|Eduqas|examination board)+ web\s*site|www\.|of the website",
-            RegexOptions.IgnoreCase | RegexOptions.Multiline);
-
-        return regex.IsMatch(source) ? string.Empty : source;
     }
 }

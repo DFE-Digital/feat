@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using NetTopologySuite.Geometries;
 
 namespace feat.common.Models;
 

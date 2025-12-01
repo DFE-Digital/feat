@@ -1,13 +1,12 @@
-@page
+@page "/how-we-use-ai"
 @using feat.web.Utils
 @model feat.web.Pages.AiModel
 
 @{
     ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
+    ViewBag.ShowJSBack = true;
 }
-@section BeforeContent {
-    <govuk-back-link href="javascript:history.back()">Back</govuk-back-link>
-}
+
 <!-- Page content goes here -->
 <div class="govuk-grid-row">
 

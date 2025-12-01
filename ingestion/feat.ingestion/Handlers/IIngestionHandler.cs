@@ -1,3 +1,4 @@
+using feat.common.Models.Enums;
 using feat.ingestion.Enums;
 
 namespace feat.ingestion.Handlers;
@@ -9,6 +10,8 @@ public interface IIngestionHandler
     public string Name { get; }
     
     public string Description { get; }
+    
+    public SourceSystem SourceSystem { get; }
 
     public bool Ingest();
 

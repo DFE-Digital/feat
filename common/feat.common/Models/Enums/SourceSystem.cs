@@ -9,5 +9,8 @@ public enum SourceSystem
     [Description("Find An Apprenticeship")]
     FAA,
     [Description("Discover Uni / HESA")]
-    DiscoverUni
+    DiscoverUni,
+    [Description("Not Specified - This should not be used")]
+    [Obsolete(error: false, message: "This should not be used")]
+    NotSpecified
 }
