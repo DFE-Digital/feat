@@ -4,13 +4,8 @@
 @{
   ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
 }
-@section BeforeContent {
-  <govuk-back-link href="javascript:history.back()">Back</govuk-back-link> 
-}
 
-<h2>@Model.Title</h2>
-
-<div class="govuk-width-container">
+<div class="govuk-width-container local_top_spacing">
   <main class="govuk-main-wrapper" id="main-content">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full"></div>
@@ -71,9 +66,13 @@
                 <dt class="govuk-summary-list__key">University</dt>
                 <dd class="govuk-summary-list__value">@Model.University</dd>
                 <dd class="govuk-summary-list__actions">
-                  <a class="govuk-link" href="@Model.UniversityUrl">View website
-                    @* <span class="govuk-visually-hidden"> name (Location)</span> *@
-                  </a>
+                  @if (!string.IsNullOrEmpty(Model.UniversityUrl))
+                  {
+                    <a class="govuk-link" href="@Model.UniversityUrl">View website
+                      <span class="govuk-visually-hidden">@Model.University</span>
+                      <span class="govuk-visually-hidden">@(Model.University + "(" + Model.CampusAddress?.Display + ")")</span>
+                    </a>
+                  }
                 </dd>
               </div>
 
@@ -86,9 +85,12 @@
                 <dt class="govuk-summary-list__key">Campus address</dt>
                 <dd class="govuk-summary-list__value">@Model.CampusAddress?.Display</dd>
                 <dd class="govuk-summary-list__actions">
-                  <a class="govuk-link" href="#">View on a map
-                    @* <span class="govuk-visually-hidden"> name (Location)</span> *@
-                  </a>
+                  @if (!string.IsNullOrEmpty(Model.CampusAddress?.MapLocationUrl))
+                  {
+                    <a class="govuk-link" href="@Model.CampusAddress?.MapLocationUrl">View on a map
+                      <span class="govuk-visually-hidden">@(Model.University + "(" + Model.CampusAddress?.Display + ")")</span>
+                    </a>
+                  }
                 </dd>
               </div>
             </dl>
@@ -126,24 +128,23 @@
           </div>
         </div>
         
-        <button type="submit" class="govuk-button" data-module="govuk-button" data-govuk-button-init="">
-          Go to course
-        </button>
-
+        <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to course</govuk-button-link>
         <p>The information we show you about a course comes from the provider. If you want to know more about a course visit their website. You can also email or call them if you have any questions or want to discuss your options.</p>
       </div>
       
-      <div class="govuk-grid-column-one-third">
+      <div class="govuk-grid-column-one-third local_top_border">
         <div class="x-govuk-related-navigation">
           <nav class="x-govuk-related-navigation__nav-section" aria-labelledby="related-navigation-related-content">
 
             <h2 class="x-govuk-related-navigation__main-heading" id="related-navigation-related-content">Related links</h2>
             <ul class="x-govuk-related-navigation__link-list">
               <li class="x-govuk-related-navigation__link">
-                <a class="govuk-link x-govuk-related-navigation__section-link" href="/browse/education/school-life">Explore jobs and careers you could do after this course</a>
+                <a class="govuk-link x-govuk-related-navigation__section-link" 
+                   href="https://nationalcareers.service.gov.uk/explore-careers">Explore jobs and careers you could do after this course</a>
               </li>
               <li class="x-govuk-related-navigation__link">
-                <a class="govuk-link x-govuk-related-navigation__section-link" asp-page="./AboutDegrees">More information about Degrees</a>
+                <a class="govuk-link x-govuk-related-navigation__section-link" 
+                   asp-page="./AboutDegrees">More information about Degrees</a>
               </li>
             </ul>
           </nav>
@@ -152,3 +153,14 @@
     </div>
   </main>
 </div>
+
+<style>
+  .local_top_border{
+    border-top: 2px solid #1d70b8;
+    display: block;
+  }
+  
+  .local_top_spacing{
+    margin-top: -40px;
+  }
+</style>
