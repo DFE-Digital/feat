@@ -1,12 +1,8 @@
-using System.Globalization;
-
 namespace feat.web.Models.ViewModels;
 
 public class CourseDetailsApprenticeship : CourseDetailsBase
 {
-    public decimal? Wage { private get; set; }
-    
-    public string WageDisplay => Wage?.ToString("C", new CultureInfo("en-GB")) ?? NotAvailableString;
+    public string? Wage { get; set; }
     
     public string? PositionAvailable { get; set; }
     

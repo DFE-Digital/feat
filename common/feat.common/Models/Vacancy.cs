@@ -17,9 +17,9 @@ public class Vacancy
     public ApprenticeshipLevel? Level { get; set; }
 
     public short? Positions { get; set; }
-
-    [Column(TypeName = "money")] 
-    public decimal? Wage { get; set; }
+    
+    [StringLength(250)]
+    public string? Wage { get; set; }
 
     public WageUnit? WageUnit { get; set; }
     

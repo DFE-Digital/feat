@@ -44,7 +44,7 @@ public class CourseDetailsResponse
     
     public IEnumerable<decimal?> Costs { get; set; } = [];
     
-    public decimal? Wage { get; set; }
+    public string? Wage { get; set; }
     
     public decimal? TuitionFee { get; set; }
     
