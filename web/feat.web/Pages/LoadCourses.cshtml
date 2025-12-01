@@ -123,9 +123,12 @@
                                              name="AllFacets[@facetIndex].Values[@valueIndex].Selected"
                                              value="false" />
                                   }
-                                  <p class="govuk-body">
-                                    <a class="govuk-link" asp-page-handler="ClearFacet" asp-route-facetname="@facet.Name">Clear filter</a>
-                                  </p>
+                                  @if (facet.Values.Exists(v => v.Selected))
+                                  {
+                                    <p class="govuk-body">
+                                      <a class="govuk-link" asp-page-handler="ClearFacet" asp-route-facetname="@facet.Name">Clear filter</a>
+                                    </p>
+                                  }
                               </fieldset>
                           </div>
 
@@ -281,7 +284,6 @@
 
         /* Filter section transitions */
         .filter-section {
-            max-height: 2000px;
             overflow: hidden;
             transition: max-height 0.3s ease-in-out;
         }
