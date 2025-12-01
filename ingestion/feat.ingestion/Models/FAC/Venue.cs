@@ -1,10 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using CsvHelper;
 using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
 using feat.common.Extensions;
-using feat.ingestion.Models.FAC.Converters;
 using feat.ingestion.Models.FAC.Enums;
 
 namespace feat.ingestion.Models.FAC;

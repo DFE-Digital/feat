@@ -1,9 +1,5 @@
-using System.Text.RegularExpressions;
-using feat.common.Models;
 using feat.common.Models.Enums;
 using feat.ingestion.Models.FAC.Enums;
-using Microsoft.Spatial;
-using NetTopologySuite.Geometries;
 using DeliveryMode = feat.common.Models.Enums.DeliveryMode;
 
 namespace feat.ingestion.Handlers.FAC;

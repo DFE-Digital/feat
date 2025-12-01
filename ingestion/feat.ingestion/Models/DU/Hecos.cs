@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using CsvHelper.Configuration;
-using feat.ingestion.Models.DU.Enums;
 
 namespace feat.ingestion.Models.DU;
 

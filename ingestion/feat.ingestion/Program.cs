@@ -16,7 +16,6 @@ using feat.ingestion.Handlers.DiscoverUni;
 using feat.ingestion.Handlers.FAA;
 using feat.ingestion.Handlers.FAC;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +24,6 @@ using OpenAI.Embeddings;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using ZiggyCreatures.Caching.Fusion;
-using ZiggyCreatures.Caching.Fusion.Backplane.StackExchangeRedis;
 using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 Console.WriteLine("FEAT ingestion service started.");
@@ -250,17 +248,6 @@ if (ingestionOptions.Environment.Equals("Development", StringComparison.Invarian
 }
 
 var factory = serviceProvider.GetRequiredService<IIngestionHandlerFactory>();
-
-var cache = serviceProvider.GetRequiredService<IFusionCache>();
-
-Console.WriteLine($"Starting cache test at {DateTime.Now}");
-var test = cache.GetOrSet<string>("test", entry =>
-{
-    Thread.Sleep(10000);
-    return "This is a test";
-});
-Console.WriteLine($"Cache value is [{test}]");
-Console.WriteLine($"Ending cache test at {DateTime.Now}");
 
 foreach (var argument in args)
 {

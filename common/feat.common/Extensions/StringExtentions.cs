@@ -1,9 +1,12 @@
 using System.Text.RegularExpressions;
+using UnDotNet.HtmlToText;
 
 namespace feat.common.Extensions;
 
-public static class StringExtentions
+public static class StringExtensions
 {
+    private static HtmlToTextConverter _converter = new HtmlToTextConverter();
+    
     public static string Scrub(this string? source)
     {
         if (source == null)
@@ -19,7 +22,7 @@ public static class StringExtentions
             _ => CheckForWebsite(source.Trim())
         };
         
-        return result;
+        return CleanHTML(result);
     }
 
     private static string CheckForWebsite(string source)
@@ -29,5 +32,11 @@ public static class StringExtentions
             RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
         return regex.IsMatch(source) ? string.Empty : source;
+    }
+
+    private static string CleanHTML(string source)
+    {
+        // If our string is null, empty, return the string
+        return string.IsNullOrEmpty(source) ? source : _converter.Convert(source);
     }
 }

@@ -7,7 +7,6 @@ using feat.api.Models;
 using feat.api.Models.External;
 using feat.common;
 using feat.common.Configuration;
-using feat.common.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
