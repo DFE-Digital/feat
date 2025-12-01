@@ -4,11 +4,7 @@
 @model NoResultsSearchModel
 @{
     ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-}
-
-
-@section BeforeContent {
-    <govuk-back-link href="@Url.Page(PageName.CheckAnswers)">Back</govuk-back-link>
+    ViewBag.BackPageUrl = Url.Page(PageName.CheckAnswers);
 }
 
 <h2 class="govuk-heading-m" role="status" aria-live="polite">It looks like we can’t find anything based on your answers.</h2>
