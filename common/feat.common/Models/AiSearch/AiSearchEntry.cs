@@ -58,6 +58,10 @@ public class AiSearchEntry
     
     [SimpleField(IsFacetable = true, IsFilterable = true)]
     [StringLength(50)]
+    public required string CourseType { get; set; }
+    
+    [SimpleField(IsFacetable = true, IsFilterable = true)]
+    [StringLength(50)]
     public required string QualificationLevel { get; set; }
     
     [SimpleField(IsFacetable = true, IsFilterable = true)]

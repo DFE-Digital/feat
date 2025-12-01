@@ -668,7 +668,8 @@ public class FaaIngestionHandler(
                         LearningMethod = instance.StudyMode.ToString() ?? string.Empty,
                         CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
                         StudyTime = entry.StudyTime?.ToString() ?? string.Empty,
-                        Location = location?.GeoLocation.ToGeographyPoint()
+                        Location = location?.GeoLocation.ToGeographyPoint(),
+                        CourseType = entry.CourseType?.ToString() ?? string.Empty
                     };
 
                     if (options.IndexDirectly)
