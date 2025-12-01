@@ -18,14 +18,14 @@ Begin
     SET @Sql = N'ALTER DATABASE '+  QUOTENAME(@DBNAME) + N' SET CHANGE_TRACKING = ON 
 (CHANGE_RETENTION = 2 DAYS, AUTO_CLEANUP = ON)'
     Exec sp_executesql  @Sql
-End");
+End", suppressTransaction: true);
             
             // Enable change tracking for the AiSearchEntries table
             migrationBuilder.Sql(
                 @"IF NOT EXISTS(SELECT 1 FROM sys.change_tracking_tables WHERE object_id=OBJECT_ID('AiSearchEntries'))
 Begin
     ALTER TABLE [dbo].[AiSearchEntries] ENABLE CHANGE_TRACKING  WITH (TRACK_COLUMNS_UPDATED = ON)
-End");
+End", suppressTransaction: true);
 
 
         }
@@ -38,7 +38,7 @@ End");
                 @"IF EXISTS(SELECT 1 FROM sys.change_tracking_tables WHERE object_id=OBJECT_ID('AiSearchEntries'))
 Begin
     ALTER TABLE [dbo].[AiSearchEntries] DISABLE CHANGE_TRACKING
-End");
+End", suppressTransaction: true);
             
             // Turn off change tracking for the DB if it's on
             migrationBuilder.Sql(@"
@@ -47,7 +47,7 @@ IF EXISTS (SELECT 1 FROM sys.change_tracking_databases WHERE database_id = DB_ID
 Begin
     SET @Sql = N'ALTER DATABASE '+  QUOTENAME(@DBNAME) + N' SET CHANGE_TRACKING = OFF'
     Exec sp_executesql  @Sql
-End");
+End", suppressTransaction: true);
         }
     }
 }
