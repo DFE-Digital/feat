@@ -186,15 +186,12 @@
                 <a class="govuk-link x-govuk-related-navigation__section-link" 
                    href="https://nationalcareers.service.gov.uk/explore-careers">Explore jobs and careers you could do after this course</a>
               </li>
-              @{
-                if (!string.IsNullOrEmpty(Model.CourseTypeDisplay))
-                {
-                  // Need to display course appropriate link.
-                  <li class="x-govuk-related-navigation__link">
-                    <a asp-page="#" class="govuk-link x-govuk-related-navigation__section-link">@($"More information about {Model.CourseTypeDisplay}")</a>
-                  </li>   
-                }
-              }
+              @*if (!string.IsNullOrEmpty(Model.CourseTypeDisplay))
+              {
+                <li class="x-govuk-related-navigation__link">
+                  <a asp-page="#" class="govuk-link x-govuk-related-navigation__section-link">@($"More information about {Model.CourseTypeDisplay}")</a>
+                </li>
+              }*@
             </ul>
           </nav>
         </div>
