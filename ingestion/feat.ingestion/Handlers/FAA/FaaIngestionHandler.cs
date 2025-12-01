@@ -637,7 +637,15 @@ public class FaaIngestionHandler(
             if (entries.Count == 0)
             {
                 Console.WriteLine("No entries found to index.");
-                return false;
+                
+                // Clear any AI search entries that aren't in our list of instances
+                await dbContext.AiSearchEntries
+                    .Where(i => i.Source ==  SourceSystem.ToString())
+                    .WhereBulkNotContains(dbContext.EntryInstances
+                        .Select(i => i.Id.ToString()))
+                    .DeleteFromQueryAsync(cancellationToken: cancellationToken);
+                
+                return true;
             }
 
             Console.WriteLine($"Loaded {entries.Count} entries for indexing.");
@@ -713,9 +721,9 @@ public class FaaIngestionHandler(
             {
                 // Clear any AI search entries that aren't in our list of instances
                 await dbContext.AiSearchEntries
-                    .Where(i => i.Source == SourceSystem.ToString())
+                    .Where(i => i.Source ==  SourceSystem.ToString())
                     .WhereBulkNotContains(dbContext.EntryInstances
-                        .Select(i => i.Id))
+                        .Select(i => i.Id.ToString()))
                     .DeleteFromQueryAsync(cancellationToken: cancellationToken);
                 
                 Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");

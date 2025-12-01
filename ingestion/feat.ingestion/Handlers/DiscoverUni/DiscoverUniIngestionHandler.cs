@@ -834,6 +834,14 @@ public class DiscoverUniIngestionHandler(
             if (entries.Count == 0)
             {
                 Console.WriteLine("No entries found to index.");
+                
+                // Clear any AI search entries that aren't in our list of instances
+                await dbContext.AiSearchEntries
+                    .Where(i => i.Source ==  SourceSystem.ToString())
+                    .WhereBulkNotContains(dbContext.EntryInstances
+                        .Select(i => i.Id.ToString()))
+                    .DeleteFromQueryAsync(cancellationToken: cancellationToken);
+                
                 return true;
             }
 
@@ -912,7 +920,7 @@ public class DiscoverUniIngestionHandler(
                 await dbContext.AiSearchEntries
                     .Where(i => i.Source == SourceSystem.ToString())
                     .WhereBulkNotContains(dbContext.EntryInstances
-                        .Select(i => i.Id))
+                        .Select(i => i.Id.ToString()))
                     .DeleteFromQueryAsync(cancellationToken: cancellationToken);
                 
                 Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
