@@ -36,18 +36,16 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     {
         try
         {
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            
             Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
             
             if (!Search.Updated)
             {
                 return RedirectToPage(PageName.Index);
             }
-
-            if (pageNumber > 0)
-            {
-                Search.CurrentPage = pageNumber;
-            }
-
+            
+            Search.CurrentPage = pageNumber;
             Search.TotalPages = TotalPages;
             Search.PageSize = PageSize;
 
@@ -182,7 +180,7 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
 
         if (TotalPages <= 3)
         {
-            for (int i = 0; i < TotalPages; i++)
+            for (int i = 1; i <= TotalPages; i++)
             {
                 pages.Add(i);
             }
@@ -197,7 +195,7 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             }
             else if (CurrentPage == TotalPages)
             {
-                // At the End - last 3pages
+                // At the End - last 3 pages
                 pages.Add(TotalPages - 2);
                 pages.Add(TotalPages - 1);
                 pages.Add(TotalPages);
