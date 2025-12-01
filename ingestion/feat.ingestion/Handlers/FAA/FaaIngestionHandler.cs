@@ -269,7 +269,9 @@ public class FaaIngestionHandler(
                 Description = a.Description,
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
-                Url = a.ApplicationUrl ?? string.Empty,
+                Url = !string.IsNullOrEmpty(a.ApplicationUrl) ? a.ApplicationUrl :
+                    !string.IsNullOrEmpty(a.VacancyUrl) ? a.VacancyUrl :
+                    string.Empty,
                 Type = EntryType.Apprenticeship,
                 Level = MapCourseLevel(a.CourseLevel),
                 CourseType = CourseType.Apprenticeship,
