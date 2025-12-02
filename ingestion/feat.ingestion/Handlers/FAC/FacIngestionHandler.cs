@@ -708,9 +708,9 @@ public class FacIngestionHandler(
 
                 Title = c.COURSE_NAME ?? td.Name,
                 AimOrAltTitle = td.Name,
-                Description = t.WhoFor,
-                EntryRequirements = t.EntryRequirements,
-                WhatYouWillLearn = t.WhatYoullLearn,
+                Description = t.WhoFor.CleanHTML(),
+                EntryRequirements = t.EntryRequirements.CleanHTML(),
+                WhatYouWillLearn = t.WhatYoullLearn.CleanHTML(),
 
 
                 Url = t.Website ?? c.COURSE_URL ?? string.Empty,
@@ -752,9 +752,9 @@ public class FacIngestionHandler(
 
                 Title = c.COURSE_NAME ?? string.Empty,
                 AimOrAltTitle = a != null ? a.LearnAimRefTitle : string.Empty,
-                Description = c.WHO_THIS_COURSE_IS_FOR,
-                EntryRequirements = c.ENTRY_REQUIREMENTS,
-                WhatYouWillLearn = c2.WhatYoullLearn,
+                Description = c.WHO_THIS_COURSE_IS_FOR.CleanHTML(),
+                EntryRequirements = c.ENTRY_REQUIREMENTS.CleanHTML(),
+                WhatYouWillLearn = c2.WhatYoullLearn.CleanHTML(),
 
                 Url = c.COURSE_URL ?? string.Empty,
                 FlexibleStart = c.FLEXIBLE_STARTDATE.GetValueOrDefault(false),

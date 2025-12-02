@@ -266,7 +266,7 @@ public class FaaIngestionHandler(
                 Reference = a.VacancyReference!,
                 Title = a.Title!,
                 AimOrAltTitle = a.CourseTitle!,
-                Description = a.Description,
+                Description = a.Description.CleanHTML(),
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
                 Url = !string.IsNullOrEmpty(a.ApplicationUrl) ? a.ApplicationUrl :
