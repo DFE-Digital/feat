@@ -162,7 +162,7 @@
         {
           <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to course</govuk-button-link>
         }
-        else
+        else if(!string.IsNullOrEmpty(Model.ProviderUrl))
         {
           <govuk-button-link href="@(Model.ProviderUrl)" is-start-button="false">Go to course provider</govuk-button-link>
         }
@@ -186,6 +186,9 @@
                   <a asp-page="#" class="govuk-link x-govuk-related-navigation__section-link">@($"More information about {Model.CourseTypeDisplay}")</a>
                 </li>
               }*@
+              <li class="x-govuk-related-navigation__link">
+                <a asp-page="TrainingOptionsPages/TrainingOptions" class="govuk-link x-govuk-related-navigation__section-link">@($"More information about training options")</a>
+              </li>
             </ul>
           </nav>
         </div>
