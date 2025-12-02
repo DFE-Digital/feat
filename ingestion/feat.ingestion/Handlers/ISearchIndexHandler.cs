@@ -9,4 +9,6 @@ public interface ISearchIndexHandler
     Task<bool> Ingest(List<AiSearchEntry> entries, CancellationToken cancellationToken);
 
     IReadOnlyList<float> GetVector(string? text);
+    
+    Task Delete(IEnumerable<string> idsToDelete, CancellationToken cancellationToken);
 }

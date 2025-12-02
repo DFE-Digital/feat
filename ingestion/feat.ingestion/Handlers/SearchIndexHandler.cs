@@ -120,7 +120,13 @@ public class SearchIndexHandler(
 
         return floats;
     }
-    
+
+    public async Task Delete(IEnumerable<string> idsToDelete, CancellationToken cancellationToken)
+    {
+        var searchClient = aiSearchClient.GetSearchClient(_azureOptions.AiSearchIndex);
+        await searchClient.DeleteDocumentsAsync("InstanceId", idsToDelete, cancellationToken: cancellationToken);
+    }
+
     private static string GetHash(HashAlgorithm hashAlgorithm, string input)
     {
 
