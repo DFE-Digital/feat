@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using Azure.Storage.Blobs;
+using CliProgressBar;
 using CsvHelper;
 using feat.common.Extensions;
 using feat.common.Models;
@@ -1045,10 +1046,23 @@ public class FacIngestionHandler(
     {
         Console.WriteLine($"Starting {Name} AI Search indexing...");
         var sb = new StringBuilder();
+        var total = await dbContext.Entries
+            .LongCountAsync(x => x.SourceSystem == SourceSystem, cancellationToken: cancellationToken);
+        using var pb = new ProgressBar(redirectConsoleOutput:true);
         
         while (true)
         {
+            
+            var completed = await dbContext.Entries
+                .LongCountAsync(x => x.SourceSystem == SourceSystem &&
+                                     x.IngestionState == IngestionState.Complete, cancellationToken: cancellationToken);
 
+            if (total > 0 && completed > 0)
+            {
+                var percent = (float)completed / total;
+                pb.Report(percent);
+            }
+            
             var entries = dbContext.Entries
                 .Include(entry => entry.EntrySectors)
                 .ThenInclude(entrySector => entrySector.Sector)
@@ -1059,7 +1073,7 @@ public class FacIngestionHandler(
                 .ThenInclude(providerLocation => providerLocation.Location)
                 .Where(x => x.SourceSystem == SourceSystem && 
                             x.IngestionState == IngestionState.Pending)
-                .Take(250)
+                .Take(100)
                 .ToList();
 
             if (entries.Count == 0)
