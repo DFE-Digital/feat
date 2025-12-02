@@ -35,12 +35,11 @@ public class SearchService(
 
         var (searchResults, facets, totalCount) = await AiSearchAsync(request, userLocation);
         
-        var courseIds = searchResults
-            .Select(x => x.Id);
-
         var courses = await dbContext.Entries
             .AsNoTracking()
-            .Where(e => courseIds.Contains(e.Id))
+            .Where(e => searchResults
+                .Select(sr => sr.Id)
+                .Contains(e.Id))
             .Select(e => new Course
             {
                 Id = e.Id,
@@ -49,55 +48,35 @@ public class SearchService(
                 CourseType = e.CourseType,
                 Requirements = e.EntryRequirements,
                 Overview = e.Description
-            }).ToListAsync();
+            })
+            .ToDictionaryAsync(e => e.Id);
         
-        var locationIds = searchResults
-            .Select(x => x.InstanceId.Split('_'))
-            .Where(parts => parts.Length == 2)
-            .Select(parts => parts[1]);
-
-        var locations = await dbContext.Locations
+        var locationNames = await dbContext.EntryInstances
+            .Include(ei => ei.Location)
             .AsNoTracking()
-            .Where(l => locationIds.Contains(l.Id.ToString()))
-            .ToListAsync();
-        
-        var courseDictionary = courses.ToDictionary(c => c.Id);
+            .Where(ei => searchResults
+                .Select(sr => sr.InstanceId)
+                .Contains(ei.Id))
+            .ToDictionaryAsync(ei => ei.Id, ei => GetLocationName(ei.Location));
 
-        var detailedResults = searchResults
-            .Where(c => courseDictionary.ContainsKey(c.Id))
-            .Select(c =>
+        var detailedCourses = searchResults
+            .Where(sr => courses.ContainsKey(sr.Id))
+            .Select(sr =>
             {
-                var course = courseDictionary[c.Id];
-                course.Score = c.RerankerScore;
-
-                var locationIdParts = c.InstanceId.Split('_');
-                var locationId = locationIdParts.Length > 1 ? locationIdParts[1] : null;
-
-                if (locationId != null)
-                {
-                    var location = locations.FirstOrDefault(l => l.Id.ToString() == locationId);
-
-                    var courseLocation = location?.GeoLocation != null
-                        ? new GeoLocation { Longitude = location.GeoLocation.X, Latitude = location.GeoLocation.Y }
-                        : null;
-
-                    var locationName = GetLocationName(location);
-
-                    course.SetLocation(courseLocation, locationName, userLocation);
-                }
-                else
-                {
-                    course.SetLocation(null, null, userLocation);
-                }
+                var course = courses[sr.Id];
+                course.Score = sr.RerankerScore;
+                
+                var locationName = locationNames[sr.InstanceId];
+                course.SetLocation(sr.Location, locationName, userLocation);
 
                 return course;
             }).ToList();
 
-        RemoveDuplicateCourses(detailedResults);
+        RemoveDuplicateCourses(detailedCourses);
 
         return new SearchResponse
         {
-            Courses = detailedResults,
+            Courses = detailedCourses,
             Facets = facets,
             Page = request.Page,
             PageSize = request.PageSize,
@@ -141,8 +120,15 @@ public class SearchService(
         {
             results.Add(new AiSearchResult
             {
-                Id = searchResult.Document.Id,
-                InstanceId = searchResult.Document.InstanceId,
+                Id = Guid.Parse(searchResult.Document.Id),
+                InstanceId = Guid.Parse(searchResult.Document.InstanceId),
+                Location = searchResult.Document.Location != null
+                    ? new GeoLocation
+                        {
+                            Latitude = searchResult.Document.Location.Latitude,
+                            Longitude = searchResult.Document.Location.Longitude
+                        }
+                    : null,
                 RerankerScore = searchResult.SemanticSearch?.RerankerScore
             });
         }
