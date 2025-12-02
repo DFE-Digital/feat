@@ -12,7 +12,7 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
 {
     [BindProperty]
     [Required(ErrorMessage = "Please select the level of qualification you are looking for")]
-    public List<QualificationLevel> SelectedQualificationOptions { get; set; } = new();
+    public List<QualificationLevel> SelectedQualificationOptions { get; set; } = [];
     
     public required Search Search { get; set; }
     
@@ -37,11 +37,16 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
         {
             Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
             
+            if (SelectedQualificationOptions?.Count == 0)
+            {
+                ModelState.AddModelError("SelectedQualificationOptions", SharedStrings.SelectQualificationLevel);
+            }
+            
             if (!ModelState.IsValid) 
                 return Page();
             
             Search.QualificationLevels?.Clear();
-            if (SelectedQualificationOptions.Count > 0)
+            if (SelectedQualificationOptions is { Count: > 0 })
             {
                 foreach (var qualificationOption in SelectedQualificationOptions)
                 {
