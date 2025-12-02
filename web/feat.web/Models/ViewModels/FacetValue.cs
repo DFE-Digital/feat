@@ -9,4 +9,6 @@ public class FacetValue
     public bool Available { get; set; }
     
     public bool Selected { get; set; }
+    
+    public int Index { get; set; }  
 }
