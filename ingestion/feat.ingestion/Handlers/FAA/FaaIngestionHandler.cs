@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using CliProgressBar;
 using feat.common;
 using feat.common.Extensions;
 using feat.common.Models;
@@ -617,9 +618,22 @@ public class FaaIngestionHandler(
     {
         Console.WriteLine($"Starting {Name} AI Search indexing...");
         var sb = new StringBuilder();
+        var total = await dbContext.Entries
+            .LongCountAsync(x => x.SourceSystem == SourceSystem, cancellationToken: cancellationToken);
+        using var pb = new ProgressBar(redirectConsoleOutput:true);
         
         while (true)
         {
+            var completed = await dbContext.Entries
+                .LongCountAsync(x => x.SourceSystem == SourceSystem &&
+                                     x.IngestionState == IngestionState.Complete, cancellationToken: cancellationToken);
+
+            if (total > 0 && completed > 0)
+            {
+                var percent = (float)completed / total;
+                pb.Report(percent);
+            }
+            
             var entries = dbContext.Entries
                 .Include(entry => entry.EntrySectors)
                 .ThenInclude(entrySector => entrySector.Sector)
