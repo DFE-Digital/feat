@@ -6,7 +6,7 @@ public interface ISearchIndexHandler
 {
     bool CreateIndex();
 
-    Task<bool> Ingest(List<AiSearchEntry> entries);
+    Task<bool> Ingest(List<AiSearchEntry> entries, CancellationToken cancellationToken);
 
     IReadOnlyList<float> GetVector(string? text);
 }

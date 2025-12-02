@@ -705,7 +705,7 @@ public class FaaIngestionHandler(
             Console.WriteLine($"{resultInfo.RowsAffectedInserted} created for indexing");
             Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated for indexing");
             
-            var result = !options.IndexDirectly || await searchIndexHandler.Ingest(searchEntries);
+            var result = !options.IndexDirectly || await searchIndexHandler.Ingest(searchEntries, cancellationToken);
             
             // Update the entries above to processing
             foreach (var entry in entries)

@@ -76,7 +76,7 @@ public class SearchIndexHandler(
         return true;
     }
 
-    public async Task<bool> Ingest(List<AiSearchEntry> entries)
+    public async Task<bool> Ingest(List<AiSearchEntry> entries, CancellationToken cancellationToken)
     {
         var searchClient = aiSearchClient.GetSearchClient(_azureOptions.AiSearchIndex);
         await using SearchIndexingBufferedSender<AiSearchEntry> indexer =
@@ -85,9 +85,9 @@ public class SearchIndexHandler(
             InitialBatchActionCount = 100,
         });
         
-        await indexer.MergeOrUploadDocumentsAsync(entries);
+        await indexer.MergeOrUploadDocumentsAsync(entries, cancellationToken);
 
-        await indexer.FlushAsync();
+        await indexer.FlushAsync(cancellationToken);
         
         return true;
     }
