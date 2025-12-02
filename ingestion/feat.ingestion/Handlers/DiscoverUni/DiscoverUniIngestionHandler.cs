@@ -63,8 +63,8 @@ public class DiscoverUniIngestionHandler(
     public override async Task<bool> IngestAsync(CancellationToken cancellationToken)
     {
         bool changes = false;
-        var Download = ProcessMode.Skip;
-        var Extract = ProcessMode.Skip;
+        var Download = ProcessMode.Process;
+        var Extract = ProcessMode.Process;
         var Aims = ProcessMode.Process;
         var Locations = ProcessMode.Process;
         var Providers = ProcessMode.Process;
