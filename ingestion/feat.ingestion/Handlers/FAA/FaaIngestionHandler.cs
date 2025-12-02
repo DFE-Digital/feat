@@ -652,9 +652,21 @@ public class FaaIngestionHandler(
             {
                 Console.WriteLine("No entries found to index.");
                 
+                if (options.IndexDirectly)
+                {
+                    // Fetch any AI search entries that aren't in our list of instances
+                    var idsToDelete = dbContext.AiSearchEntries
+                        .Where(i => i.Source == SourceSystem.ToString())
+                        .WhereBulkNotContains(dbContext.EntryInstances
+                            .Select(i => i.Id.ToString()))
+                        .Select(i => i.InstanceId);
+
+                    await searchIndexHandler.Delete(idsToDelete, cancellationToken);
+                }
+
                 // Clear any AI search entries that aren't in our list of instances
                 await dbContext.AiSearchEntries
-                    .Where(i => i.Source ==  SourceSystem.ToString())
+                    .Where(i => i.Source == SourceSystem.ToString())
                     .WhereBulkNotContains(dbContext.EntryInstances
                         .Select(i => i.Id.ToString()))
                     .DeleteFromQueryAsync(cancellationToken: cancellationToken);
