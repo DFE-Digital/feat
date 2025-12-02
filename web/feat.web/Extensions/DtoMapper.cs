@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using feat.common.Extensions;
 using feat.common.Models.Enums;
 using feat.web.Models;
 using feat.web.Models.ViewModels;
@@ -134,7 +135,8 @@ public static class DtoMapper
             {
                 Name =  enumValue.ToString(),
                 DisplayName = enumValue.GetDescription(),
-                Available = facet.Values.ContainsKey(enumValue.ToString())
+                Available = facet.Values.ContainsKey(enumValue.ToString()),
+                Index = enumValue.GetOrder()
             });
         }
 

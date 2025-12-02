@@ -65,6 +65,11 @@
 
                         foreach (var facet in Model.AllFacets.OrderBy(f => f.Index))
                         {
+                          var orderedFacetValues = facet.Values
+                            .Where(v => v.Index >= 0)
+                            .OrderBy(v => v.Index)
+                            .ToList();
+                          
                           if (facetIndex == 1 && Model.SelectedTravelDistance != null)
                           {
                             <div class="govuk-summary-list__row">
@@ -96,9 +101,9 @@
                                               <br />@facet.DisplayName
                                           </govuk-checkboxes-fieldset-legend>
 
-                                          @for (var valueIndex = 0; valueIndex < facet.Values.Count; valueIndex++)
+                                          @for (var valueIndex = 0; valueIndex < orderedFacetValues.Count; valueIndex++)
                                           {
-                                              var facetValue = facet.Values[valueIndex];
+                                              var facetValue = orderedFacetValues[valueIndex];
 
                                               <govuk-checkboxes-item
                                                   id="facet-@facetIndex-value-@valueIndex"
@@ -111,9 +116,9 @@
                                       </govuk-checkboxes-fieldset>
                                   </govuk-checkboxes>
                                   
-                                  @for (var valueIndex = 0; valueIndex < facet.Values.Count; valueIndex++)
+                                  @for (var valueIndex = 0; valueIndex < orderedFacetValues.Count; valueIndex++)
                                   {
-                                      var facetValue = facet.Values[valueIndex];
+                                      var facetValue = orderedFacetValues[valueIndex];
 
                                       <input type="hidden"
                                              name="AllFacets[@facetIndex].Values[@valueIndex].Name"
@@ -123,7 +128,7 @@
                                              name="AllFacets[@facetIndex].Values[@valueIndex].Selected"
                                              value="false" />
                                   }
-                                  @if (facet.Values.Exists(v => v.Selected))
+                                  @if (orderedFacetValues.Exists(v => v.Selected))
                                   {
                                     <p class="govuk-body">
                                       <a class="govuk-link" asp-page-handler="ClearFacet" asp-route-facetname="@facet.Name">Clear filter</a>

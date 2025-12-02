@@ -1,23 +1,11 @@
 using System.ComponentModel;
 using System.Reflection;
+using feat.common.Extensions.Attributes;
 
 namespace feat.common.Extensions;
 
 public static class EnumExtensions
 {
-    public static string GetDescription(this Enum value)
-    {
-        ArgumentNullException.ThrowIfNull(value);
-
-        var field = value.GetType().GetField(value.ToString());
-        if (field == null) return value.ToString();
-        
-        var attribute = field.GetCustomAttribute<DescriptionAttribute>();
-
-        return attribute?.Description ?? value.ToString();
-
-    }
-    
     /// <summary>
     /// Gets an enum value of type T from its Description attribute value.
     /// If no Description matches, tries to match the enum name itself.
@@ -39,4 +27,16 @@ public static class EnumExtensions
         }
 
         throw new ArgumentException($"No matching enum value found for description '{description}' in {typeof(T).Name}.");
-    }}
+    }
+    
+    public static int GetOrder(this Enum value)
+    {
+        var memberInfo = value.GetType().GetMember(value.ToString()).First();
+
+        var orderAttribute = (OrderAttribute?)memberInfo
+            .GetCustomAttributes(typeof(OrderAttribute), false)
+            .FirstOrDefault();
+
+        return orderAttribute?.Index ?? int.MaxValue;
+    }
+}
