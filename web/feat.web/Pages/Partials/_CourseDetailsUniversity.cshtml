@@ -66,8 +66,7 @@
                   @if (!string.IsNullOrEmpty(Model.UniversityUrl))
                   {
                     <a class="govuk-link" href="@Model.UniversityUrl">View website
-                      <span class="govuk-visually-hidden">@Model.University</span>
-                      <span class="govuk-visually-hidden">@(Model.University + "(" + Model.CampusAddress?.Display + ")")</span>
+                      <span class="govuk-visually-hidden">@(Model.University + "(" + Model.CampusAddresses?.FirstOrDefault()?.Display + ")")</span>
                     </a>
                   }
                 </dd>
@@ -80,17 +79,47 @@
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Campus address</dt>
-                <dd class="govuk-summary-list__value">@Model.CampusAddress?.Display</dd>
+                <dd class="govuk-summary-list__value">
+                  @Model.CampusAddresses?.FirstOrDefault()?.Display
+                </dd>
                 <dd class="govuk-summary-list__actions">
-                  @if (!string.IsNullOrEmpty(Model.CampusAddress?.MapLocationUrl))
+                  @if (!string.IsNullOrEmpty(Model.CampusAddresses?.FirstOrDefault()?.MapLocationUrl))
                   {
-                    <a class="govuk-link" href="@Model.CampusAddress?.MapLocationUrl">View on a map
-                      <span class="govuk-visually-hidden">@(Model.University + "(" + Model.CampusAddress?.Display + ")")</span>
+                    <a class="govuk-link" href="@Model.CampusAddresses?.FirstOrDefault()?.MapLocationUrl">View on a map
+                      <span class="govuk-visually-hidden">@(Model.University + "(" + Model.CampusAddresses?.FirstOrDefault()?.Display + ")")</span>
                     </a>
                   }
                 </dd>
               </div>
             </dl>
+            @if (Model.CampusAddresses?.Count > 1)
+            {
+              var addressCount = Model.CampusAddresses?.Count;
+              var isFirst = true;
+                    
+              <details class="govuk-details govuk-!-margin-top-2 govuk-!-margin-bottom-0" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                  @{
+                    var sPlural = addressCount > 2 ? "s are" : " is";
+                    <span class="govuk-details__summary-text">@($"{addressCount - 1} other location{sPlural} available")</span>
+                  }
+                </summary>
+                <div class="govuk-details__text">
+                  @foreach (var location in Model.CampusAddresses!)
+                  {
+                    if (!isFirst)
+                    {
+                      <p>@($"{location.Display} - ") 
+                        <a class="govuk-link" href="@location.MapLocationUrl">View on a map
+                          <span class="govuk-visually-hidden">@location.Display</span>
+                        </a>
+                      </p>
+                    }
+                    isFirst = false;
+                  }
+                </div>
+              </details>
+            }
           </div>
         </div>
 
@@ -105,12 +134,26 @@
                 <dt class="govuk-summary-list__key">Delivery method</dt>
                 <dd class="govuk-summary-list__value">@Model.DeliveryModeDisplay</dd>
               </div>
-
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Start date</dt>
-                <dd class="govuk-summary-list__value">@Model.StartDate?.Display</dd>
-              </div>
-
+              @if (Model.StartDates?.Count > 1)
+              {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Start dates</dt>
+                  <dd class="govuk-summary-list__value">
+                    @foreach (var startDate in Model.StartDates)
+                    {
+                      <p>@startDate.Display</p>
+                    }
+                  </dd>
+                </div>
+              }
+              else
+              {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Start date</dt>
+                  <dd class="govuk-summary-list__value">@Model.StartDates?.FirstOrDefault()?.Display</dd>
+                </div>
+              }
+              
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Duration</dt>
                 <dd class="govuk-summary-list__value">@Model.DurationDisplay</dd>
@@ -125,7 +168,10 @@
           </div>
         </div>
         
-        <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to course</govuk-button-link>
+        @if (!string.IsNullOrEmpty(Model.CourseUrl))
+        {
+          <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to course</govuk-button-link>
+        }
         <p>The information we show you about a course comes from the provider. If you want to know more about a course visit their website. You can also email or call them if you have any questions or want to discuss your options.</p>
       </div>
       
@@ -141,7 +187,7 @@
               </li>
               <li class="x-govuk-related-navigation__link">
                 <a class="govuk-link x-govuk-related-navigation__section-link" 
-                   asp-page="./AboutDegrees">More information about Degrees</a>
+                   asp-page="TrainingOptionsPages/AboutDegrees">More information about Degrees</a>
               </li>
             </ul>
           </nav>
