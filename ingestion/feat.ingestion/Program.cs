@@ -96,7 +96,7 @@ switch (cacheOptions?.Type)
             )
             .WithDefaultEntryOptions(new FusionCacheEntryOptions()
             {
-                Duration = cacheOptions?.Duration ?? TimeSpan.FromDays(30),
+                Duration = cacheOptions?.Duration ?? TimeSpan.FromMinutes(5),
                 SkipBackplaneNotifications = true
             });
         break;
@@ -120,8 +120,8 @@ switch (cacheOptions?.Type)
             )
             .WithDefaultEntryOptions(new FusionCacheEntryOptions()
             {
-                Duration = cacheOptions?.Duration ?? TimeSpan.FromDays(30),
-                DistributedCacheDuration = cacheOptions?.Duration ?? TimeSpan.FromDays(30)
+                Duration = cacheOptions?.Duration ?? TimeSpan.FromMinutes(5),
+                DistributedCacheDuration = cacheOptions?.L2Duration ?? TimeSpan.FromDays(30)
             });
         break;
     default:

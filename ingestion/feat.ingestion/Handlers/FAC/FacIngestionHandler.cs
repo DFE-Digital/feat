@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using Azure.Storage.Blobs;
+using CliProgressBar;
 using CsvHelper;
 using feat.common.Extensions;
 using feat.common.Models;
@@ -557,7 +558,7 @@ public class FacIngestionHandler(
     {
         var resultInfo = new ResultInfo();
         var auditEntries = new List<AuditEntry>();
-        bool skip = false;
+        bool skip = true;
         
         Console.WriteLine($"Starting sync of {Name} data");
 
@@ -708,9 +709,9 @@ public class FacIngestionHandler(
 
                 Title = c.COURSE_NAME ?? td.Name,
                 AimOrAltTitle = td.Name,
-                Description = t.WhoFor,
-                EntryRequirements = t.EntryRequirements,
-                WhatYouWillLearn = t.WhatYoullLearn,
+                Description = t.WhoFor.CleanHTML(),
+                EntryRequirements = t.EntryRequirements.CleanHTML(),
+                WhatYouWillLearn = t.WhatYoullLearn.CleanHTML(),
 
 
                 Url = t.Website ?? c.COURSE_URL ?? string.Empty,
@@ -752,9 +753,9 @@ public class FacIngestionHandler(
 
                 Title = c.COURSE_NAME ?? string.Empty,
                 AimOrAltTitle = a != null ? a.LearnAimRefTitle : string.Empty,
-                Description = c.WHO_THIS_COURSE_IS_FOR,
-                EntryRequirements = c.ENTRY_REQUIREMENTS,
-                WhatYouWillLearn = c2.WhatYoullLearn,
+                Description = c.WHO_THIS_COURSE_IS_FOR.CleanHTML(),
+                EntryRequirements = c.ENTRY_REQUIREMENTS.CleanHTML(),
+                WhatYouWillLearn = c2.WhatYoullLearn.CleanHTML(),
 
                 Url = c.COURSE_URL ?? string.Empty,
                 FlexibleStart = c.FLEXIBLE_STARTDATE.GetValueOrDefault(false),
@@ -1045,10 +1046,23 @@ public class FacIngestionHandler(
     {
         Console.WriteLine($"Starting {Name} AI Search indexing...");
         var sb = new StringBuilder();
+        var total = await dbContext.Entries
+            .LongCountAsync(x => x.SourceSystem == SourceSystem, cancellationToken: cancellationToken);
+        using var pb = new ProgressBar(redirectConsoleOutput:true);
         
         while (true)
         {
+            
+            var completed = await dbContext.Entries
+                .LongCountAsync(x => x.SourceSystem == SourceSystem &&
+                                     x.IngestionState == IngestionState.Complete, cancellationToken: cancellationToken);
 
+            if (total > 0 && completed > 0)
+            {
+                var percent = (float)completed / total;
+                pb.Report(percent);
+            }
+            
             var entries = dbContext.Entries
                 .Include(entry => entry.EntrySectors)
                 .ThenInclude(entrySector => entrySector.Sector)
@@ -1059,16 +1073,28 @@ public class FacIngestionHandler(
                 .ThenInclude(providerLocation => providerLocation.Location)
                 .Where(x => x.SourceSystem == SourceSystem && 
                             x.IngestionState == IngestionState.Pending)
-                .Take(250)
+                .Take(100)
                 .ToList();
 
             if (entries.Count == 0)
             {
                 Console.WriteLine("No entries found to index.");
                 
+                if (options.IndexDirectly)
+                {
+                    // Fetch any AI search entries that aren't in our list of instances
+                    var idsToDelete = dbContext.AiSearchEntries
+                        .Where(i => i.Source == SourceSystem.ToString())
+                        .WhereBulkNotContains(dbContext.EntryInstances
+                            .Select(i => i.Id.ToString()))
+                        .Select(i => i.InstanceId);
+
+                    await searchIndexHandler.Delete(idsToDelete, cancellationToken);
+                }
+
                 // Clear any AI search entries that aren't in our list of instances
                 await dbContext.AiSearchEntries
-                    .Where(i => i.Source ==  SourceSystem.ToString())
+                    .Where(i => i.Source == SourceSystem.ToString())
                     .WhereBulkNotContains(dbContext.EntryInstances
                         .Select(i => i.Id.ToString()))
                     .DeleteFromQueryAsync(cancellationToken: cancellationToken);
@@ -1136,7 +1162,7 @@ public class FacIngestionHandler(
             Console.WriteLine($"{resultInfo.RowsAffectedInserted} created for indexing");
             Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated for indexing");
 
-            var result = !options.IndexDirectly || await searchIndexHandler.Ingest(searchEntries);
+            var result = !options.IndexDirectly || await searchIndexHandler.Ingest(searchEntries, cancellationToken);
 
             Console.WriteLine($"Indexed {searchEntries.Count} records.");
             
@@ -1149,20 +1175,33 @@ public class FacIngestionHandler(
 
             // Keep going until we've ingested everything
             if (!dbContext.Entries.Any(e =>
-                    e.IngestionState == IngestionState.Pending 
+                    e.IngestionState == IngestionState.Pending
                     && e.SourceSystem == SourceSystem))
             {
+                if (options.IndexDirectly)
+                {
+                    // Fetch any AI search entries that aren't in our list of instances
+                    var idsToDelete = dbContext.AiSearchEntries
+                        .Where(i => i.Source == SourceSystem.ToString())
+                        .WhereBulkNotContains(dbContext.EntryInstances
+                            .Select(i => i.Id.ToString()))
+                        .Select(i => i.InstanceId);
+
+                    await searchIndexHandler.Delete(idsToDelete, cancellationToken);
+                }
+
                 // Clear any AI search entries that aren't in our list of instances
                 await dbContext.AiSearchEntries
                     .Where(i => i.Source == SourceSystem.ToString())
                     .WhereBulkNotContains(dbContext.EntryInstances
                         .Select(i => i.Id.ToString()))
                     .DeleteFromQueryAsync(cancellationToken: cancellationToken);
-                
+
+
                 Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
                 return result;
             }
-            
+
             // Clear our change tracking as we're going to get another batch next and
             // we don't care about the old ones
             dbContext.ChangeTracker.Clear();

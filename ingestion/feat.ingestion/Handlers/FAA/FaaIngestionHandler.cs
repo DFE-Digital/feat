@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using CliProgressBar;
 using feat.common;
 using feat.common.Extensions;
 using feat.common.Models;
@@ -266,7 +267,7 @@ public class FaaIngestionHandler(
                 Reference = a.VacancyReference!,
                 Title = a.Title!,
                 AimOrAltTitle = a.CourseTitle!,
-                Description = a.Description,
+                Description = a.Description.CleanHTML(),
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
                 Url = !string.IsNullOrEmpty(a.ApplicationUrl) ? a.ApplicationUrl :
@@ -617,9 +618,22 @@ public class FaaIngestionHandler(
     {
         Console.WriteLine($"Starting {Name} AI Search indexing...");
         var sb = new StringBuilder();
+        var total = await dbContext.Entries
+            .LongCountAsync(x => x.SourceSystem == SourceSystem, cancellationToken: cancellationToken);
+        using var pb = new ProgressBar(redirectConsoleOutput:true);
         
         while (true)
         {
+            var completed = await dbContext.Entries
+                .LongCountAsync(x => x.SourceSystem == SourceSystem &&
+                                     x.IngestionState == IngestionState.Complete, cancellationToken: cancellationToken);
+
+            if (total > 0 && completed > 0)
+            {
+                var percent = (float)completed / total;
+                pb.Report(percent);
+            }
+            
             var entries = dbContext.Entries
                 .Include(entry => entry.EntrySectors)
                 .ThenInclude(entrySector => entrySector.Sector)
@@ -638,9 +652,21 @@ public class FaaIngestionHandler(
             {
                 Console.WriteLine("No entries found to index.");
                 
+                if (options.IndexDirectly)
+                {
+                    // Fetch any AI search entries that aren't in our list of instances
+                    var idsToDelete = dbContext.AiSearchEntries
+                        .Where(i => i.Source == SourceSystem.ToString())
+                        .WhereBulkNotContains(dbContext.EntryInstances
+                            .Select(i => i.Id.ToString()))
+                        .Select(i => i.InstanceId);
+
+                    await searchIndexHandler.Delete(idsToDelete, cancellationToken);
+                }
+
                 // Clear any AI search entries that aren't in our list of instances
                 await dbContext.AiSearchEntries
-                    .Where(i => i.Source ==  SourceSystem.ToString())
+                    .Where(i => i.Source == SourceSystem.ToString())
                     .WhereBulkNotContains(dbContext.EntryInstances
                         .Select(i => i.Id.ToString()))
                     .DeleteFromQueryAsync(cancellationToken: cancellationToken);
@@ -705,7 +731,7 @@ public class FaaIngestionHandler(
             Console.WriteLine($"{resultInfo.RowsAffectedInserted} created for indexing");
             Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated for indexing");
             
-            var result = !options.IndexDirectly || await searchIndexHandler.Ingest(searchEntries);
+            var result = !options.IndexDirectly || await searchIndexHandler.Ingest(searchEntries, cancellationToken);
             
             // Update the entries above to processing
             foreach (var entry in entries)
@@ -719,13 +745,25 @@ public class FaaIngestionHandler(
                     e.IngestionState == IngestionState.Pending
                     && e.SourceSystem == SourceSystem))
             {
+                if (options.IndexDirectly)
+                {
+                    // Fetch any AI search entries that aren't in our list of instances
+                    var idsToDelete = dbContext.AiSearchEntries
+                        .Where(i => i.Source == SourceSystem.ToString())
+                        .WhereBulkNotContains(dbContext.EntryInstances
+                            .Select(i => i.Id.ToString()))
+                        .Select(i => i.InstanceId);
+
+                    await searchIndexHandler.Delete(idsToDelete, cancellationToken);
+                }
+
                 // Clear any AI search entries that aren't in our list of instances
                 await dbContext.AiSearchEntries
-                    .Where(i => i.Source ==  SourceSystem.ToString())
+                    .Where(i => i.Source == SourceSystem.ToString())
                     .WhereBulkNotContains(dbContext.EntryInstances
                         .Select(i => i.Id.ToString()))
                     .DeleteFromQueryAsync(cancellationToken: cancellationToken);
-                
+
                 Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
                 return result;
             }

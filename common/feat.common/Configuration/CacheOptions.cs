@@ -12,5 +12,6 @@ public class CacheOptions
 
     public string Type { get; set; } = string.Empty;
     
-    public TimeSpan Duration { get; set; } = TimeSpan.FromDays(30);
+    public TimeSpan Duration { get; set; } = TimeSpan.FromMinutes(5);
+    public TimeSpan L2Duration { get; set; } = TimeSpan.FromDays(30);
 }

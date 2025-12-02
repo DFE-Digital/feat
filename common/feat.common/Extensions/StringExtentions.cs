@@ -22,7 +22,7 @@ public static class StringExtensions
             _ => CheckForWebsite(source.Trim())
         };
         
-        return CleanHTML(result);
+        return result;
     }
 
     private static string CheckForWebsite(string source)
@@ -34,7 +34,7 @@ public static class StringExtensions
         return regex.IsMatch(source) ? string.Empty : source;
     }
 
-    private static string CleanHTML(string source)
+    public static string? CleanHTML(this string? source)
     {
         // If our string is null, empty, return the string
         return string.IsNullOrEmpty(source) ? source : _converter.Convert(source);

@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using feat.common.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace feat.common.Models;
 
 [Table("Entry")]
+[Index(nameof(IngestionState), nameof(SourceSystem))]
 public class Entry
 {
     [Key]
