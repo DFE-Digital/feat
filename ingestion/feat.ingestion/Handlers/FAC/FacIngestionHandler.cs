@@ -558,7 +558,7 @@ public class FacIngestionHandler(
     {
         var resultInfo = new ResultInfo();
         var auditEntries = new List<AuditEntry>();
-        bool skip = false;
+        bool skip = true;
         
         Console.WriteLine($"Starting sync of {Name} data");
 
@@ -1163,7 +1163,7 @@ public class FacIngestionHandler(
 
             // Keep going until we've ingested everything
             if (!dbContext.Entries.Any(e =>
-                    e.IngestionState == IngestionState.Pending 
+                    e.IngestionState == IngestionState.Pending
                     && e.SourceSystem == SourceSystem))
             {
                 if (options.IndexDirectly)
@@ -1174,23 +1174,22 @@ public class FacIngestionHandler(
                         .WhereBulkNotContains(dbContext.EntryInstances
                             .Select(i => i.Id.ToString()))
                         .Select(i => i.InstanceId);
-                    
+
                     await searchIndexHandler.Delete(idsToDelete, cancellationToken);
                 }
-                else
-                {
-                    // Clear any AI search entries that aren't in our list of instances
-                    await dbContext.AiSearchEntries
-                        .Where(i => i.Source == SourceSystem.ToString())
-                        .WhereBulkNotContains(dbContext.EntryInstances
-                            .Select(i => i.Id.ToString()))
-                        .DeleteFromQueryAsync(cancellationToken: cancellationToken);
-                }
+
+                // Clear any AI search entries that aren't in our list of instances
+                await dbContext.AiSearchEntries
+                    .Where(i => i.Source == SourceSystem.ToString())
+                    .WhereBulkNotContains(dbContext.EntryInstances
+                        .Select(i => i.Id.ToString()))
+                    .DeleteFromQueryAsync(cancellationToken: cancellationToken);
+
 
                 Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
                 return result;
             }
-            
+
             // Clear our change tracking as we're going to get another batch next and
             // we don't care about the old ones
             dbContext.ChangeTracker.Clear();

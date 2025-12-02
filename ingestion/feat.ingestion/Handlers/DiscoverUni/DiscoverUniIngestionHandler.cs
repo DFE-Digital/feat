@@ -924,19 +924,17 @@ public class DiscoverUniIngestionHandler(
                         .WhereBulkNotContains(dbContext.EntryInstances
                             .Select(i => i.Id.ToString()))
                         .Select(i => i.InstanceId);
-                    
+
                     await searchIndexHandler.Delete(idsToDelete, cancellationToken);
                 }
-                else
-                {
-                    // Clear any AI search entries that aren't in our list of instances
-                    await dbContext.AiSearchEntries
-                        .Where(i => i.Source == SourceSystem.ToString())
-                        .WhereBulkNotContains(dbContext.EntryInstances
-                            .Select(i => i.Id.ToString()))
-                        .DeleteFromQueryAsync(cancellationToken: cancellationToken);
-                }
-                
+
+                // Clear any AI search entries that aren't in our list of instances
+                await dbContext.AiSearchEntries
+                    .Where(i => i.Source == SourceSystem.ToString())
+                    .WhereBulkNotContains(dbContext.EntryInstances
+                        .Select(i => i.Id.ToString()))
+                    .DeleteFromQueryAsync(cancellationToken: cancellationToken);
+
                 Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
                 return result;
             }
