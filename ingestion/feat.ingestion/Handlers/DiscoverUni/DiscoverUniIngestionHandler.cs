@@ -560,10 +560,10 @@ public class DiscoverUniIngestionHandler(
                 ProviderId = p.Id,
 
                 Title = a != null ? 
-                    $"{a.Label}{(c.Honours.GetValueOrDefault(false) ? " (Hons)" : "")} {c.Title}" : 
-                    c.Honours.GetValueOrDefault(false) ? $"(Hons) {c.Title}" : c.Title,
+                    $"{c.Title} ({a.Label}){(c.Honours.GetValueOrDefault(false) ? " (Hons)" : "")}" : 
+                    c.Honours.GetValueOrDefault(false) ? $"{c.Title} (Hons)" : c.Title,
                 
-                AimOrAltTitle = string.Empty,
+                AimOrAltTitle = c.Title,
                 Description = string.Empty,
                 EntryRequirements = string.Empty,
                 WhatYouWillLearn = string.Empty,
