@@ -317,7 +317,7 @@ public class SearchService(
                ?? location?.Address3
                ?? location?.Address2
                ?? location?.Address1
-               ?? null;
+               ?? location?.Name;
     }
 
     private static double RadiusInKilometers(double radius)
