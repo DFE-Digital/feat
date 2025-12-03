@@ -5,6 +5,8 @@ namespace feat.web.Models;
 public class Course
 {
     public required Guid Id { get; set; }
+    
+    public required Guid InstanceId { get; set; }
         
     public required string Title { get; set; }
         
@@ -15,6 +17,8 @@ public class Course
     public string? Requirements { get; set; }
     
     public string? Overview { get; set; }
+    
+    public GeoLocation? Location { get; set; }
     
     public string? LocationName { get; set; }
     
