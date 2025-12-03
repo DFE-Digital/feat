@@ -6,7 +6,7 @@ public class CourseDetailsUniversity : CourseDetailsBase
 {
     public decimal? TuitionFee { private get; set; }
     
-    public string TuitionFeeDisplay => TuitionFee?.ToString("C", new CultureInfo("en-GB")) ?? NotAvailableString;
+    public string TuitionFeeDisplay => TuitionFee?.ToString("C", new CultureInfo("en-GB")) ?? NotProvidedString;
     
     public string? AwardingOrganisation { get; set; }
     

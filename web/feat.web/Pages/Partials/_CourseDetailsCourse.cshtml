@@ -28,7 +28,7 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Entry requirements</dt>
                 <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrEmpty(Model.EntryRequirements) ? "We do not have any information on entry requirements. Contact the provider to find out more." : Model.EntryRequirements)
+                  @(string.IsNullOrEmpty(Model.EntryRequirements) ? SharedStrings.NotProvided : Model.EntryRequirements)
                 </dd>
               </div>
               
@@ -97,6 +97,12 @@
                 <div class="govuk-details__text">
                   @foreach (var location in Model.ProviderAddresses!)
                   {
+                    var loca = location.Display;
+                    if (loca == "")
+                    {
+                      var s = string.Empty;
+                    }
+
                     if (!isFirst)
                     {
                       <p>@($"{location.Display} - ") 
@@ -140,7 +146,9 @@
               {
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start date</dt>
-                  <dd class="govuk-summary-list__value">@Model.StartDates?.FirstOrDefault()?.Display</dd>
+                  <dd class="govuk-summary-list__value">
+                    @(Model.StartDates?.FirstOrDefault()?.Display ?? SharedStrings.NotProvided)
+                  </dd>
                 </div>
               }
 

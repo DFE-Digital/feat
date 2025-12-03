@@ -65,7 +65,7 @@ public class Location
         get
         {
             var url = GeoLocationUrl();
-            return !string.IsNullOrEmpty(url) ? GetPostcodeUrl() : url;
+            return string.IsNullOrEmpty(url) ? GetPostcodeUrl() : url;
         }
     }
 

@@ -30,13 +30,15 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Entry requirements</dt>
                 <dd class="govuk-summary-list__value">
-                  @Model.EntryRequirements
+                  @(string.IsNullOrEmpty(Model.EntryRequirements) ? SharedStrings.NotProvided : Model.EntryRequirements)
                 </dd>
               </div>
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Wage</dt>
-                <dd class="govuk-summary-list__value">@Model.Wage</dd>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrEmpty(Model.Wage) ? "Competitive" : Model.Wage)
+                </dd>
               </div>
 
               <div class="govuk-summary-list__row">
@@ -81,10 +83,9 @@
                   @if (!string.IsNullOrEmpty(Model.EmployerAddress?.MapLocationUrl))
                   {
                     <a class="govuk-link" href="@Model.EmployerAddress?.MapLocationUrl">View on a map
-                      <span class="govuk-visually-hidden">@Model.EmployerAddress?.Display</span>
+                      <span class="govuk-visually-hidden">@(Model.EmployerName + "(" + Model.EmployerAddress?.Display + ")")</span>
                     </a>
                   }
-                  
                 </dd>
               </div>
 
@@ -115,7 +116,9 @@
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Start date</dt>
-                <dd class="govuk-summary-list__value">@Model.StartDate?.Display</dd>
+                <dd class="govuk-summary-list__value">
+                  @(Model.StartDate?.Display ?? SharedStrings.NotProvided)
+                </dd>
               </div>
 
               <div class="govuk-summary-list__row">
@@ -130,8 +133,10 @@
             </dl>
           </div>
         </div>
-
-        <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to Apprenticeship opportunity</govuk-button-link>
+        @if (!string.IsNullOrEmpty(Model.CourseUrl))
+        {
+          <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to Apprenticeship opportunity</govuk-button-link>
+        }
         <p>The information we show you about a course comes from the provider. If you want to know more about a course visit their website. You can also email or call them if you have any questions or want to discuss your options.</p>
       </div>
 
