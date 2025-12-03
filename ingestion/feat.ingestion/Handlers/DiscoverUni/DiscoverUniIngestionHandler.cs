@@ -473,6 +473,7 @@ public class DiscoverUniIngestionHandler(
         var providers =
             from i in dbContext.DU_Institutions
             where i.UKPRN == i.PubUKPRN
+            && i.Country == RegionCode.XF // Only include English providers
             select new Provider()
             {
                 SourceSystem = SourceSystem,
@@ -514,6 +515,8 @@ public class DiscoverUniIngestionHandler(
                 on Convert.ToString(ul.UKPRN) + "_" + ul.LocationId equals l.SourceReference
             where l.SourceSystem == SourceSystem
             && i.UKPRN == i.PubUKPRN
+            && i.Country == RegionCode.XF // Only include English providers
+            && ul.Country == RegionCode.XF // Only include English locations
             select new ProviderLocation()
             {
                 ProviderId = p.Id,
