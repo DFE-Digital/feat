@@ -18,9 +18,11 @@ public static class DtoMapper
         return new SearchResult
         {
             Id = course.Id,
+            InstanceId = course.InstanceId,
             CourseTitle = course.Title,
             ProviderName = course.Provider,
-            Location = course.LocationName,
+            Location = course.Location,
+            LocationName = course.LocationName,
             Distance = course.Distance,
             CourseType = course.CourseType,
             Requirements = course.Requirements,

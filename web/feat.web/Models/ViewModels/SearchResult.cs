@@ -7,11 +7,15 @@ public class SearchResult
 {
     public required Guid Id { get; set; }
     
+    public required Guid InstanceId { get; set; }
+    
     public required string CourseTitle { get; init; }
     
     public string? ProviderName { get; init; }
     
-    public string? Location { get; init; }
+    public GeoLocation? Location { get; init; }
+    
+    public string? LocationName { get; init; }
     
     public double? Distance { get; init; }
     

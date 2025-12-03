@@ -6,6 +6,8 @@ namespace feat.api.Models;
 public class Course
 {
     public required Guid Id { get; set; }
+    
+    public required Guid InstanceId { get; set; }
         
     public required string Title { get; set; }
         
@@ -25,13 +27,10 @@ public class Course
     
     public double? Score { get; set; }
     
-    public void SetLocation(GeoLocation? courseLocation, string? locationName, GeoLocation? userLocation)
+    public void CalculateDistance(GeoLocation? userLocation)
     {
-        Location = courseLocation;
-        LocationName = locationName;
-
-        Distance = courseLocation != null && userLocation != null
-            ? CalculateDistanceInMiles(courseLocation, userLocation)
+        Distance = Location != null && userLocation != null
+            ? CalculateDistanceInMiles(Location, userLocation)
             : null;
     }
 
