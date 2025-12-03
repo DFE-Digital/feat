@@ -23,7 +23,7 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Level</dt>
                 <dd class="govuk-summary-list__value">
-                  @Model.Level
+                  @Model.LevelDisplay
                 </dd>
               </div>
 
@@ -113,10 +113,13 @@
                 <dd class="govuk-summary-list__value">@Model.DeliveryModeDisplay</dd>
               </div>
 
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Start date</dt>
-                <dd class="govuk-summary-list__value">@Model.StartDate?.Display</dd>
-              </div>
+              @if (!string.IsNullOrEmpty(@Model.StartDate?.Display))
+              {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Start date</dt>
+                  <dd class="govuk-summary-list__value">@Model.StartDate?.Display</dd>
+                </div>
+              }
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Duration</dt>
