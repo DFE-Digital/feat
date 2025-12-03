@@ -62,7 +62,6 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
                 Search.QualificationLevels = new List<QualificationLevel>(Enum.GetValues<QualificationLevel>());
             }
             Search.Updated = true;
-
             HttpContext.Session.Set("Search", Search);
 
             if ((SelectedQualificationOptions.Contains(Enums.QualificationLevel.None) || 
@@ -73,6 +72,11 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
                     return RedirectToPage(PageName.CheckAnswers);
                 }
                 return RedirectToPage(PageName.Age);
+            }
+            else if (Search.AgeGroup.HasValue && Search.VisitedCheckAnswers)
+            {
+                Search.AgeGroup = null;
+                HttpContext.Session.Set("Search", Search);
             }
             
             return RedirectToPage(PageName.CheckAnswers);
