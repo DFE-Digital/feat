@@ -134,7 +134,10 @@
           </div>
         </div>
 
-        <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to Apprenticeship opportunity</govuk-button-link>
+        @if(!string.IsNullOrEmpty(Model.CourseUrl))
+        {
+          <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to Apprenticeship opportunity</govuk-button-link>
+        }
         <p>The information we show you about a course comes from the provider. If you want to know more about a course visit their website. You can also email or call them if you have any questions or want to discuss your options.</p>
       </div>
 
