@@ -8,10 +8,12 @@ namespace feat.api.Controllers;
 [Route("api/[controller]")]
 public class CoursesController(ICourseService courseService) : ControllerBase
 {
-    [HttpGet("{courseId:guid}")]
-    public async Task<ActionResult<CourseDetailsResponse>> GetCourseById(Guid courseId)
+    [HttpGet("{instanceId:guid}")]
+    public async Task<ActionResult<CourseDetailsResponse>> GetCourseByInstanceId(Guid instanceId)
     {
-        var course = await courseService.GetCourseByIdAsync(courseId);
+        
+        
+        var course = await courseService.GetCourseByInstanceIdAsync(instanceId);
 
         if (course == null)
         {
