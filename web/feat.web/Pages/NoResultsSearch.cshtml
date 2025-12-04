@@ -1,5 +1,5 @@
 ﻿@page
-@using feat.web.Models
+@using feat.web.Models.ViewModels
 @using feat.web.Utils
 @model NoResultsSearchModel
 @{
@@ -7,10 +7,4 @@
     ViewBag.BackPageUrl = Url.Page(PageName.CheckAnswers);
 }
 
-<h2 class="govuk-heading-m" role="status" aria-live="polite">It looks like we can’t find anything based on your answers.</h2>
-<p>Here are some things you can try:</p>
-<ul class="govuk-list govuk-list--bullet">
-    <li>removing a filter</li>
-    <li><a asp-page="@PageName.Interests">making your search broader</a></li>
-    <li>increasing the distance or looking in a <a asp-page="@PageName.Location">different location</a></li>
-</ul>
+<partial name="Partials/_NoResults" model="new NoResults { HasFilters = false }" />
