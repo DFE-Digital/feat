@@ -11,4 +11,7 @@ public static class SharedStrings
     // Site Title
     public const string SiteTitle_ExploreYourOptions_GOVUK = "Explore your options after school or college - GOV.UK";
     
+    
+    public const string NotProvided = "Not provided";
+    
 }
