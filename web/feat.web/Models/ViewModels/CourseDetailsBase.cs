@@ -1,6 +1,7 @@
 using feat.common.Extensions;
 using feat.common.Models.Enums;
 using feat.web.Extensions;
+using feat.web.Utils;
 
 namespace feat.web.Models.ViewModels;
 
@@ -12,17 +13,17 @@ public abstract class CourseDetailsBase
     
     public CourseType? CourseType { private get; init; }
     
-    public string CourseTypeDisplay => CourseType == common.Models.Enums.CourseType.Unknown ? NotAvailableString :
-        CourseType?.GetDescription() ?? NotAvailableString;
+    public string CourseTypeDisplay => CourseType == common.Models.Enums.CourseType.Unknown ? NotProvidedString :
+        CourseType?.GetDescription() ?? NotProvidedString;
     
     public int? Level { get; init; }
 
     public string LevelDisplay => Level switch
     {
-        null => NotAvailableString,
+        null => NotProvidedString,
         0 => "Entry level",
         _ => Level.ToString()
-    } ?? NotAvailableString;
+    } ?? NotProvidedString;
     
     public string? EntryRequirements { get; init; }
     
@@ -32,7 +33,7 @@ public abstract class CourseDetailsBase
 
     public DeliveryMode? DeliveryMode { private get; init; }
     
-    public string DeliveryModeDisplay => DeliveryMode?.GetDescription() ?? NotAvailableString;
+    public string DeliveryModeDisplay => DeliveryMode?.GetDescription() ?? NotProvidedString;
     
     public TimeSpan? Duration { private get; init; }
 
@@ -40,17 +41,17 @@ public abstract class CourseDetailsBase
 
     public CourseHours? Hours { private get; init; }
 
-    public string HoursDisplay => Hours?.GetDescription() ?? NotAvailableString;
+    public string HoursDisplay => Hours?.GetDescription() ?? NotProvidedString;
     
     public string? CourseUrl { get; init; }
 
-    protected static string NotAvailableString => "Not available";
+    protected static string NotProvidedString => SharedStrings.NotProvided;
     
     private static string FormatDuration(TimeSpan? duration)
     {
         if (duration == null ||  duration == TimeSpan.Zero ||  duration == TimeSpan.MinValue)
         {
-            return NotAvailableString;
+            return NotProvidedString;
         }
         
         var totalDays = duration.Value.TotalDays;
