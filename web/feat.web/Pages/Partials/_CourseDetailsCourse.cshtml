@@ -96,12 +96,6 @@
                 <div class="govuk-details__text">
                   @foreach (var location in Model.ProviderAddresses!)
                   {
-                    var loca = location.Display;
-                    if (loca == "")
-                    {
-                      var s = string.Empty;
-                    }
-
                     if (!isFirst)
                     {
                       <p>@($"{location.Display} - ") 
