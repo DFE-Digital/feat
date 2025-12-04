@@ -9,9 +9,14 @@ using Azure.Search.Documents;
 using feat.api.Services;
 using feat.common;
 using feat.common.Configuration;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
+using ZiggyCreatures.Caching.Fusion;
+using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +40,12 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 var connectionString = builder.Configuration.GetConnectionString("Courses");
 builder.Services.AddDbContext<CourseDbContext>(options =>
     options.UseSqlServer(connectionString, x => x.UseNetTopologySuite()));
+
+builder.Services.Configure<CacheOptions>(
+    builder.Configuration.GetSection(CacheOptions.Name));
+
+var cacheOptions = new CacheOptions();
+builder.Configuration.GetSection(CacheOptions.Name).Bind(cacheOptions);
 
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
@@ -82,6 +93,68 @@ builder.Services.AddHttpClient(ApiClientNames.Postcode, client =>
 {
     client.BaseAddress = new Uri("https://api.postcodes.io/");
 });
+
+switch (cacheOptions?.Type)
+{
+    case "Memory":
+        builder.Services.AddMemoryCache();
+        builder.Services.AddFusionCache()
+            .WithSerializer(
+                new FusionCacheSystemTextJsonSerializer()
+            )
+            .WithDefaultEntryOptions(new FusionCacheEntryOptions()
+            {
+                Duration = cacheOptions?.Duration ?? TimeSpan.FromMinutes(5),
+                SkipBackplaneNotifications = true
+            });
+        break;
+    case "Redis":
+        var cacheConnectionString = builder.Configuration.GetConnectionString("Cache");
+        if (string.IsNullOrEmpty(cacheConnectionString))
+        {
+            Console.WriteLine("ConnectionString Cache missing in configuration.");
+            return;
+        }
+        
+        builder.Services.AddFusionCache()
+            .WithDistributedCache(_ =>
+            {
+                var options = new RedisCacheOptions { Configuration = cacheConnectionString };
+                return new RedisCache(options);
+            })
+            .WithStackExchangeRedisBackplane(x => x.Configuration = cacheConnectionString )
+            .WithSerializer(
+                new FusionCacheSystemTextJsonSerializer()
+            )
+            .WithDefaultEntryOptions(new FusionCacheEntryOptions()
+            {
+                Duration = cacheOptions?.Duration ?? TimeSpan.FromHours(1),
+                DistributedCacheDuration = cacheOptions?.L2Duration ?? TimeSpan.FromDays(3)
+            });
+        break;
+    default:
+        builder.Services.AddFusionCache()
+            .WithoutDistributedCache()
+            .WithoutBackplane()
+            .WithSerializer(
+                new FusionCacheSystemTextJsonSerializer()
+            )
+            .WithDefaultEntryOptions(new FusionCacheEntryOptions()
+            {
+                Duration = TimeSpan.Zero
+            });
+        break;
+}
+
+builder.Services.AddOpenTelemetry()
+    // SETUP TRACES
+    .WithTracing(tracing => tracing
+            .AddFusionCacheInstrumentation()
+    )
+    // SETUP METRICS
+    .WithMetrics(metrics => metrics
+            .AddFusionCacheInstrumentation()
+    );
 
 var app = builder.Build();
 
