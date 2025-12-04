@@ -10,6 +10,7 @@ using feat.common.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
+using ZiggyCreatures.Caching.Fusion;
 using Location = feat.common.Models.Location;
 
 namespace feat.api.Services;
@@ -19,7 +20,8 @@ public class SearchService(
     IApiClient apiClient,
     SearchClient aiSearchClient,
     EmbeddingClient embeddingClient,
-    CourseDbContext dbContext)
+    CourseDbContext dbContext,
+    IFusionCache cache)
     : ISearchService
 {
     private readonly AzureOptions _azureOptions = options.CurrentValue;
@@ -39,7 +41,10 @@ public class SearchService(
             .Where(ei => searchResults.Select(sr => sr.InstanceId).Contains(ei.Id))
             .Include(ei => ei.Location)
             .Include(ei => ei.Entry)
-            .AsNoTracking()
+            .Include(ei => ei.Entry.Provider)
+            .Include(ei => ei.Entry.Provider.ProviderLocations)
+            .ThenInclude(pl => pl.Location)
+            .AsSplitQuery()
             .Select(ei => new Course
             {
                 Id = ei.Entry.Id,
@@ -55,8 +60,15 @@ public class SearchService(
                         Longitude = ei.Location.GeoLocation.X,
                         Latitude = ei.Location.GeoLocation.Y
                     }
-                    : null,
-                LocationName = GetLocationName(ei.Location)
+                    : ei.Entry.Provider.ProviderLocations.Any()
+                      && ei.Entry.Provider.ProviderLocations.Any() ?
+                        new GeoLocation()
+                        {
+                            Longitude = ei.Entry.Provider.ProviderLocations.First().Location.GeoLocation.X,
+                            Latitude = ei.Entry.Provider.ProviderLocations.First().Location.GeoLocation.Y
+                        }
+                : null,
+                LocationName = GetLocationName(ei.Location ?? ei.Entry.Provider.ProviderLocations.FirstOrDefault().Location)
             })
             .ToListAsync();
         
@@ -192,9 +204,15 @@ public class SearchService(
                 }
             };
         }
-        
-        var embedding = await embeddingClient.GenerateEmbeddingAsync(request.Query);
-        var vector = embedding.Value.ToFloats();
+
+        var embedding = cache.GetOrSet<ReadOnlyMemory<float>>(
+            $"query:{request.Query.ToLowerInvariant()}",
+            entry =>
+            {
+                var result = embeddingClient.GenerateEmbedding(request.Query.ToLowerInvariant(), cancellationToken: entry);
+                return result.Value.ToFloats();
+            }
+        );
         
         var filterExpression = BuildFilterExpression(request, userLocation);
         
@@ -225,7 +243,7 @@ public class SearchService(
         {
             Queries =
             {
-                new VectorizedQuery(vector)
+                new VectorizedQuery(embedding)
                 {
                     KNearestNeighborsCount = _azureOptions.Knn,
                     Fields = { "TitleVector", "LearningAimTitleVector", "DescriptionVector", "SectorVector" },
@@ -236,8 +254,14 @@ public class SearchService(
 
         return searchOptions;
     }
-    
+
     private async Task<GeoLocation?> GetGeoLocationAsync(string location)
+    {
+        return await cache.GetOrSetAsync<GeoLocation?>(
+            $"location:{location}",
+            async entry => await GetGeoLocationFromApiAsync(location));
+    }
+    private async Task<GeoLocation?> GetGeoLocationFromApiAsync(string location)
     {
         const string postcodePattern = @"^[a-z]{1,2}\d[a-z\d]?\s*\d[a-z]{2}$";
         var isPostcode = Regex.IsMatch(location, postcodePattern, RegexOptions.IgnoreCase);

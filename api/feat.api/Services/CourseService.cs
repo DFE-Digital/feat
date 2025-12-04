@@ -13,7 +13,7 @@ public class CourseService(CourseDbContext dbContext, IFusionCache cache) : ICou
     public async Task<CourseDetailsResponse?> GetCourseByInstanceIdAsync(Guid instanceId)
     {
         return await cache.GetOrSetAsync<CourseDetailsResponse?>(
-            $"{instanceId}",
+            $"instance:{instanceId}",
             async entry => await GetCourseFromDatabase(instanceId));
     }
     
@@ -30,9 +30,10 @@ public class CourseService(CourseDbContext dbContext, IFusionCache cache) : ICou
             .ThenInclude(employer => employer.EmployerLocations)
             .ThenInclude(employerLocation => employerLocation.Location)
             .Include(instance => instance.Entry.UniversityCourses)
-            .Include(instance => instance.Entry.EntryInstances).ThenInclude(entryInstance => entryInstance.Location)
+            .Include(instance => instance.Entry.EntryInstances)
+            .ThenInclude(entryInstance => entryInstance.Location)
             .AsSplitQuery()
-            .FirstOrDefaultAsync(e => e.Id == instanceId);
+            .SingleOrDefaultAsync(e => e.Id == instanceId);
 
         if (entryInstance == null)
         {
