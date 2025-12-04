@@ -13,4 +13,5 @@ public static class PageName
     public const string DetailsApprenticeship = "DetailsApprenticeship";
     public const string DetailsUniversityDegree = "DetailsUniversityDegree";
     public const string NoResultsSearch = "NoResultsSearch";
+    public const string Ai = "Ai";
 }
