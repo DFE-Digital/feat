@@ -8,6 +8,7 @@ public static class ModelExtensions
     {
         return new Location
         {
+            Name = l.Name,
             Address1 = l.Address1,
             Address2 = l.Address2,
             Address3 = l.Address3,

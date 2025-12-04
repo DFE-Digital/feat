@@ -2,6 +2,8 @@ namespace feat.api.Models;
 
 public class Location : IEquatable<Location>
 {
+    public string? Name { get; set; }
+    
     public string? Address1 { get; set; }
     
     public string? Address2 { get; set; }

@@ -12,6 +12,8 @@ public class CourseDetailsCourse : CourseDetailsBase
     
     public List<Location>? ProviderAddresses { get; set; }
     
+    public List<Location>? CourseAddresses { get; set; }
+    
     public string? ProviderUrl { get; set; }
     
     public List<StartDate>? StartDates { get; set; }
