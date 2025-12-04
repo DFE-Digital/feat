@@ -35,48 +35,50 @@ public class SearchService(
 
         var (searchResults, facets, totalCount) = await AiSearchAsync(request, userLocation);
         
-        var courses = await dbContext.Entries
-            .AsNoTracking()
-            .Where(e => searchResults
-                .Select(sr => sr.Id)
-                .Contains(e.Id))
-            .Select(e => new Course
-            {
-                Id = e.Id,
-                Title = e.Title,
-                Provider = e.Provider.Name,
-                CourseType = e.CourseType,
-                Requirements = e.EntryRequirements,
-                Overview = e.Description
-            })
-            .ToDictionaryAsync(e => e.Id);
-        
-        var locationNames = await dbContext.EntryInstances
+        var courses = await dbContext.EntryInstances
+            .Where(ei => searchResults.Select(sr => sr.InstanceId).Contains(ei.Id))
             .Include(ei => ei.Location)
+            .Include(ei => ei.Entry)
             .AsNoTracking()
-            .Where(ei => searchResults
-                .Select(sr => sr.InstanceId)
-                .Contains(ei.Id))
-            .ToDictionaryAsync(ei => ei.Id, ei => GetLocationName(ei.Location));
-
-        var detailedCourses = searchResults
-            .Where(sr => courses.ContainsKey(sr.Id))
-            .Select(sr =>
+            .Select(ei => new Course
             {
-                var course = courses[sr.Id];
-                course.Score = sr.RerankerScore;
-                
-                var locationName = locationNames[sr.InstanceId];
-                course.SetLocation(sr.Location, locationName, userLocation);
+                Id = ei.Entry.Id,
+                InstanceId = ei.Id,
+                Title = ei.Entry.Title,
+                Provider = ei.Entry.Provider.Name,
+                CourseType = ei.Entry.CourseType,
+                Requirements = ei.Entry.EntryRequirements,
+                Overview = ei.Entry.Description,
+                Location = ei.Location != null && ei.Location.GeoLocation != null
+                    ? new GeoLocation
+                    {
+                        Longitude = ei.Location.GeoLocation.X,
+                        Latitude = ei.Location.GeoLocation.Y
+                    }
+                    : null,
+                LocationName = GetLocationName(ei.Location)
+            })
+            .ToListAsync();
+        
+        var courseDictionary = courses.ToDictionary(c => c.InstanceId);
+        
+        foreach (var result in searchResults)
+        {
+            var course = courseDictionary[result.InstanceId];
+            
+            course.Score = result.RerankerScore;
+            course.CalculateDistance(userLocation);
+        }
 
-                return course;
-            }).ToList();
-
-        RemoveDuplicateCourses(detailedCourses);
+        RemoveDuplicateCourses(courses);
+        
+        courses = courses
+            .OrderBy(c => searchResults.FindIndex(sr => sr.InstanceId == c.InstanceId))
+            .ToList();
 
         return new SearchResponse
         {
-            Courses = detailedCourses,
+            Courses = courses,
             Facets = facets,
             Page = request.Page,
             PageSize = request.PageSize,

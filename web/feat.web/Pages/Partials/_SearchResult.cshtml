@@ -45,11 +45,11 @@
         <dd class="govuk-summary-list__value">
           @if (Model.Distance == null)
           {
-            @Model.Location
+            @Model.LocationName
           }
           else
           {
-            @(Model.Location + ", " + Model.DistanceDisplay)
+            @(Model.LocationName + ", " + Model.DistanceDisplay)
           }
         </dd>
       </div>
@@ -88,3 +88,13 @@
     </dl>
   </div>
 </div>
+
+<style>
+  .govuk-summary-card__title-wrapper {
+    align-items: center;
+  }
+  
+  .govuk-summary-card__action {
+    white-space: nowrap;
+  }
+</style>

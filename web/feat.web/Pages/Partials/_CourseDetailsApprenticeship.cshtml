@@ -1,6 +1,4 @@
-@using feat.web.Utils
 @model feat.web.Models.ViewModels.CourseDetailsApprenticeship
-
 
 <div class="govuk-width-container local_top_spacing">
   <main class="govuk-main-wrapper" id="main-content">
@@ -23,22 +21,20 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Level</dt>
                 <dd class="govuk-summary-list__value">
-                  @Model.Level
+                  @Model.LevelDisplay
                 </dd>
               </div>
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Entry requirements</dt>
                 <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrEmpty(Model.EntryRequirements) ? SharedStrings.NotProvided : Model.EntryRequirements)
+                  @Model.EntryRequirements
                 </dd>
               </div>
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Wage</dt>
-                <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrEmpty(Model.Wage) ? "Competitive" : Model.Wage)
-                </dd>
+                <dd class="govuk-summary-list__value">@Model.Wage</dd>
               </div>
 
               <div class="govuk-summary-list__row">
@@ -83,9 +79,10 @@
                   @if (!string.IsNullOrEmpty(Model.EmployerAddress?.MapLocationUrl))
                   {
                     <a class="govuk-link" href="@Model.EmployerAddress?.MapLocationUrl">View on a map
-                      <span class="govuk-visually-hidden">@(Model.EmployerName + "(" + Model.EmployerAddress?.Display + ")")</span>
+                      <span class="govuk-visually-hidden">@Model.EmployerAddress?.Display</span>
                     </a>
                   }
+                  
                 </dd>
               </div>
 
@@ -114,12 +111,13 @@
                 <dd class="govuk-summary-list__value">@Model.DeliveryModeDisplay</dd>
               </div>
 
-              <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Start date</dt>
-                <dd class="govuk-summary-list__value">
-                  @(Model.StartDate?.Display ?? SharedStrings.NotProvided)
-                </dd>
-              </div>
+              @if (!string.IsNullOrEmpty(@Model.StartDate?.Display))
+              {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Start date</dt>
+                  <dd class="govuk-summary-list__value">@Model.StartDate?.Display</dd>
+                </div>
+              }
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Duration</dt>
@@ -133,10 +131,8 @@
             </dl>
           </div>
         </div>
-        @if (!string.IsNullOrEmpty(Model.CourseUrl))
-        {
-          <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to Apprenticeship opportunity</govuk-button-link>
-        }
+
+        <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to Apprenticeship opportunity</govuk-button-link>
         <p>The information we show you about a course comes from the provider. If you want to know more about a course visit their website. You can also email or call them if you have any questions or want to discuss your options.</p>
       </div>
 
