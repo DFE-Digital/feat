@@ -58,7 +58,7 @@ resource "azurerm_linux_web_app" "feat-api" {
   }
 
   connection_string {
-    name  = "Redis"
+    name  = "Cache"
     type  = "RedisCache"
     value = "${azurerm_managed_redis.feat_redis_enterprise.hostname}:${azurerm_managed_redis.feat_redis_enterprise.default_database[0].port}"
   }
