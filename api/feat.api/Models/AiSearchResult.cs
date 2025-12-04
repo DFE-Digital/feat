@@ -6,7 +6,5 @@ public class AiSearchResult
     
     public required Guid InstanceId { get; set; }
     
-    public required GeoLocation? Location { get; set; }
-    
     public double? RerankerScore { get; set; }
 }

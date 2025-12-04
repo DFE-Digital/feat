@@ -60,24 +60,37 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             HttpContext.Session.Set("Search", Search);
             
             var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
-            if (!searchResponse.Courses.Any())
-            {
-                return RedirectToPage(PageName.NoResultsSearch);
-            }
-
-            TotalCourseCount = searchResponse.TotalCount;
-            Courses = searchResponse.Courses.ToList();
             
-            AllFacets = searchResponse.Facets.ToViewModels();
+            Courses = searchResponse.Courses.ToList();
+            TotalCourseCount = searchResponse.TotalCount;
+            CurrentPage = searchResponse.Page;
+            PageSize = searchResponse.PageSize;
+            TotalPages = (int)Math.Ceiling(searchResponse.TotalCount / (double)searchResponse.PageSize);
+            
+            var searchResponseFacets = searchResponse.Facets.ToViewModels();
+            var sessionFacets = HttpContext.Session.Get<List<Models.ViewModels.Facet>>("AllFacets");
+            
+            if (searchResponseFacets.Count != 0)
+            {
+                AllFacets = searchResponseFacets;
+                
+            }
+            else if (sessionFacets != null)
+            {
+                AllFacets = sessionFacets;
+            }
             
             if (Search.Facets.Count == 0) // Initial search
             {
+                if (Courses.Count == 0)
+                {
+                    return RedirectToPage(PageName.NoResultsSearch);
+                }
+                
                 SelectQualificationLevels();
-
                 Search.Facets = AllFacets;
             }
             
-            var sessionFacets = HttpContext.Session.Get<List<Models.ViewModels.Facet>>("AllFacets");
             if (sessionFacets != null)
             {
                 foreach (var facet in AllFacets)
@@ -87,11 +100,11 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
                     {
                         foreach (var value in facet.Values)
                         {
-                            var sessionVal = sessionFacet.Values.FirstOrDefault(v => v.Name == value.Name);
+                            var sessionValue = sessionFacet.Values.FirstOrDefault(v => v.Name == value.Name);
                             
-                            if (sessionVal != null)
+                            if (sessionValue != null)
                             {
-                                value.Selected = sessionVal.Selected;
+                                value.Selected = sessionValue.Selected;
                             }
                         }
                     }
@@ -102,10 +115,6 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
             Search.Facets = AllFacets;
             
             SelectedTravelDistance = Search.Distance;
-
-            CurrentPage = searchResponse.Page;
-            PageSize = searchResponse.PageSize;
-            TotalPages = (int)Math.Ceiling(searchResponse.TotalCount / (double)searchResponse.PageSize);
         }
         catch (Exception e)
         {

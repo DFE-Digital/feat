@@ -124,13 +124,6 @@ public class SearchService(
             {
                 Id = Guid.Parse(searchResult.Document.Id),
                 InstanceId = Guid.Parse(searchResult.Document.InstanceId),
-                Location = searchResult.Document.Location != null
-                    ? new GeoLocation
-                        {
-                            Latitude = searchResult.Document.Location.Latitude,
-                            Longitude = searchResult.Document.Location.Longitude
-                        }
-                    : null,
                 RerankerScore = searchResult.SemanticSearch?.RerankerScore
             });
         }
