@@ -28,7 +28,7 @@ public class Search
         { QualificationLevel.None, [0] },
         { QualificationLevel.OneAndTwo, [1, 2] },
         { QualificationLevel.Three, [3] },
-        { QualificationLevel.FourToSeven, [4, 5, 6, 7] }
+        { QualificationLevel.FourToEight, [4, 5, 6, 7, 8] }
     };
     
     private bool _pageIsChanging = false;

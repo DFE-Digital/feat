@@ -31,7 +31,7 @@
                     <govuk-checkboxes-item id="qualificationLevel[@i]"
                                            value="@(qualificationLevel.ToString("G"))"
                                            checked="@(isTrue)">
-                        @qualificationLevel.GetDisplayName();
+                        @qualificationLevel.GetDisplayName()
                     </govuk-checkboxes-item>
                     i++;
                 }
