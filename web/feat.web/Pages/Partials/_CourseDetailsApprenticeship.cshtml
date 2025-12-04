@@ -1,3 +1,4 @@
+@using feat.web.Utils
 @model feat.web.Models.ViewModels.CourseDetailsApprenticeship
 
 <div class="govuk-width-container local_top_spacing">
@@ -21,20 +22,22 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Level</dt>
                 <dd class="govuk-summary-list__value">
-                  @Model.Level
+                  @Model.LevelDisplay
                 </dd>
               </div>
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Entry requirements</dt>
                 <dd class="govuk-summary-list__value">
-                  @Model.EntryRequirements
+                  @(string.IsNullOrEmpty(Model.EntryRequirements) ? SharedStrings.NotProvided : Model.EntryRequirements)
                 </dd>
               </div>
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Wage</dt>
-                <dd class="govuk-summary-list__value">@Model.Wage</dd>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrEmpty(Model.Wage) ? "Competitive" : Model.Wage)
+                </dd>
               </div>
 
               <div class="govuk-summary-list__row">
@@ -113,7 +116,9 @@
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Start date</dt>
-                <dd class="govuk-summary-list__value">@Model.StartDate?.Display</dd>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrEmpty(@Model.StartDate?.Display) ? SharedStrings.NotProvided : Model.StartDate?.Display)
+                </dd>
               </div>
 
               <div class="govuk-summary-list__row">

@@ -1,3 +1,4 @@
+@using feat.web.Utils
 @model feat.web.Models.ViewModels.CourseDetailsCourse
 
 <div class="govuk-width-container local_top_spacing" >
@@ -20,13 +21,13 @@
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Level</dt>
-                <dd class="govuk-summary-list__value">@Model.Level</dd>
+                <dd class="govuk-summary-list__value">@Model.LevelDisplay</dd>
               </div>
               
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Entry requirements</dt>
                 <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrEmpty(Model.EntryRequirements) ? "We do not have any information on entry requirements. Contact the provider to find out more." : Model.EntryRequirements)
+                  @(string.IsNullOrEmpty(Model.EntryRequirements) ? SharedStrings.NotProvided : Model.EntryRequirements)
                 </dd>
               </div>
               
@@ -38,7 +39,7 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Course overview</dt>
                 <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrEmpty(Model.Description) ? "Contact the provider to find out more." : Model.Description)
+                  @(string.IsNullOrEmpty(Model.Description) ? "You need to visit the provider website for information about this course." : Model.Description)
                 </dd>
               </div>
             </dl>
@@ -95,6 +96,12 @@
                 <div class="govuk-details__text">
                   @foreach (var location in Model.ProviderAddresses!)
                   {
+                    var loca = location.Display;
+                    if (loca == "")
+                    {
+                      var s = string.Empty;
+                    }
+
                     if (!isFirst)
                     {
                       <p>@($"{location.Display} - ") 
@@ -122,23 +129,25 @@
                 <dt class="govuk-summary-list__key">Delivery method</dt>
                 <dd class="govuk-summary-list__value">@Model.DeliveryModeDisplay</dd>
               </div>
-              @if (Model.StartDates?.Count > 1)
+              @if (Model.StartDates?.Count(s => !string.IsNullOrEmpty(s.Display))> 1)
               {
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start dates</dt>
                   <dd class="govuk-summary-list__value">
-                    @foreach (var startDate in Model.StartDates)
+                    @foreach (var startDate in Model.StartDates.Where(s => !string.IsNullOrEmpty(s.Display)))
                     {
                       <p>@startDate.Display</p>
                     }
                   </dd>
                 </div>
               }
-              else
+              else if (!string.IsNullOrEmpty(@Model.StartDates?.FirstOrDefault()?.Display))
               {
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start date</dt>
-                  <dd class="govuk-summary-list__value">@Model.StartDates?.FirstOrDefault()?.Display</dd>
+                  <dd class="govuk-summary-list__value">
+                    @(Model.StartDates?.FirstOrDefault()?.Display ?? SharedStrings.NotProvided)
+                  </dd>
                 </div>
               }
 

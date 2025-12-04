@@ -1,3 +1,4 @@
+@using feat.web.Utils
 @model feat.web.Models.ViewModels.CourseDetailsUniversity
 
 <div class="govuk-width-container local_top_spacing">
@@ -23,12 +24,14 @@
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Level</dt>
-                <dd class="govuk-summary-list__value">@Model.Level</dd>
+                <dd class="govuk-summary-list__value">@Model.LevelDisplay</dd>
               </div>
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Entry requirements</dt>
-                <dd class="govuk-summary-list__value">@Model.EntryRequirements</dd>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrEmpty(Model.EntryRequirements) ? SharedStrings.NotProvided : Model.EntryRequirements)
+                </dd>
               </div>
 
               <div class="govuk-summary-list__row">
@@ -132,23 +135,25 @@
                 <dt class="govuk-summary-list__key">Delivery method</dt>
                 <dd class="govuk-summary-list__value">@Model.DeliveryModeDisplay</dd>
               </div>
-              @if (Model.StartDates?.Count > 1)
+              @if (Model.StartDates?.Count(s => !string.IsNullOrEmpty(s.Display))> 1)
               {
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start dates</dt>
                   <dd class="govuk-summary-list__value">
-                    @foreach (var startDate in Model.StartDates)
+                    @foreach (var startDate in Model.StartDates.Where(s => !string.IsNullOrEmpty(s.Display)))
                     {
                       <p>@startDate.Display</p>
                     }
                   </dd>
                 </div>
               }
-              else
+              else if (!string.IsNullOrEmpty(@Model.StartDates?.FirstOrDefault()?.Display))
               {
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start date</dt>
-                  <dd class="govuk-summary-list__value">@Model.StartDates?.FirstOrDefault()?.Display</dd>
+                  <dd class="govuk-summary-list__value">
+                    @(Model.StartDates?.FirstOrDefault()?.Display ?? SharedStrings.NotProvided)
+                  </dd>
                 </div>
               }
               
