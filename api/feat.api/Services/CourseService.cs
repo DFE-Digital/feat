@@ -1,125 +1,120 @@
 using feat.api.Models;
 using feat.api.Data;
+using feat.api.Extensions;
 using feat.common.Models.Enums;
 using Microsoft.EntityFrameworkCore;
+using ZiggyCreatures.Caching.Fusion;
 using Location = feat.api.Models.Location;
 
 namespace feat.api.Services;
 
-public class CourseService(CourseDbContext dbContext) : ICourseService
+public class CourseService(CourseDbContext dbContext, IFusionCache cache) : ICourseService
 {
-    public async Task<CourseDetailsResponse?> GetCourseByIdAsync(Guid courseId)
+    public async Task<CourseDetailsResponse?> GetCourseByInstanceIdAsync(Guid instanceId)
     {
-        var entry = await dbContext.Entries
-            .AsNoTracking()
-            .Include(e => e.Provider)
+        return await cache.GetOrSetAsync<CourseDetailsResponse?>(
+            $"instance:{instanceId}",
+            async entry => await GetCourseFromDatabase(instanceId));
+    }
+    
+    private async Task<CourseDetailsResponse?> GetCourseFromDatabase(Guid instanceId)
+    {
+        var entryInstance = await dbContext.EntryInstances
+            .Include(instance => instance.Entry.EntryCosts)
+            .Include(instance => instance.Entry.Provider)
             .ThenInclude(provider => provider.ProviderLocations)
             .ThenInclude(providerLocation => providerLocation.Location)
-            .Include(e => e.EntryCosts)
-            .Include(e => e.EntryInstances)
-            .Include(e => e.Vacancies).ThenInclude(vacancy => vacancy.Employer)
+            .Include(instance => instance.Location)
+            .Include(instance => instance.Entry.Vacancies)
+            .ThenInclude(vacancy => vacancy.Employer)
             .ThenInclude(employer => employer.EmployerLocations)
-            .ThenInclude(employerLocation => employerLocation.Location).Include(entry => entry.UniversityCourses)
-            .FirstOrDefaultAsync(e => e.Id == courseId);
+            .ThenInclude(employerLocation => employerLocation.Location)
+            .Include(instance => instance.Entry.UniversityCourses)
+            .Include(instance => instance.Entry.EntryInstances)
+            .ThenInclude(entryInstance => entryInstance.Location)
+            .AsSplitQuery()
+            .SingleOrDefaultAsync(e => e.Id == instanceId);
 
-        if (entry == null)
+        if (entryInstance == null)
         {
             return null;
         }
 
         var courseDetails = new CourseDetailsResponse
         {
-            Id = entry.Id,
-            Title = entry.Title,
-            EntryType = entry.Type,
-            CourseType = entry.CourseType,
-            Level = entry.Level,
-            EntryRequirements = entry.EntryRequirements,
-            Description = entry.Description,
-            DeliveryMode = entry.EntryInstances.First().StudyMode,
-            Duration = entry.EntryInstances.First().Duration,
-            HoursType = entry.AttendancePattern,
-            StartDates = entry.EntryInstances.Select(e => e.StartDate),
-            WhatYouWillLearn = entry.WhatYouWillLearn
+            Id = entryInstance.Id,
+            Title = entryInstance.Entry.Title,
+            EntryType = entryInstance.Entry.Type,
+            CourseType = entryInstance.Entry.CourseType,
+            Level = entryInstance.Entry.Level,
+            EntryRequirements = entryInstance.Entry.EntryRequirements,
+            Description = entryInstance.Entry.Description,
+            DeliveryMode = entryInstance.StudyMode,
+            Duration = entryInstance.Duration,
+            HoursType = entryInstance.Entry.AttendancePattern,
+            StartDates = entryInstance.Entry.EntryInstances.Select(e => e.StartDate).Distinct(),
+            WhatYouWillLearn = entryInstance.Entry.WhatYouWillLearn,
+            ProviderName = entryInstance.Entry.Provider.Name,
+            ProviderAddresses = entryInstance.Entry.Provider.ProviderLocations
+                .Select(el => el.Location.ToLocation()).Distinct().ToList(),
+            ProviderUrl = entryInstance.Entry.Provider.ProviderLocations
+                .Select(pl => pl.Location)
+                .Select(l => l.Url)
+                .FirstOrDefault(u => !string.IsNullOrEmpty(u)),
+            CourseUrl = entryInstance.Entry.Url,
+            AlternativeCourses = entryInstance.Entry.EntryInstances.Where(ei => ei.Id != entryInstance.Id)
+                .Select(ei => ei.Id)
         };
+        
+        // Get our course addresses - always have the first address set to the one from the current instance
+        var addresses = new List<Location>();
 
-        switch (entry.Type)
+        // Add our instance location if we have one
+        if (entryInstance.Location != null)
+        {
+            addresses.Add(entryInstance.Location.ToLocation());
+        }
+
+        // Add other course instance locations if we have them
+        addresses.AddRange(
+            entryInstance.Entry.EntryInstances
+                .Where(ei => ei.Id != entryInstance.Id && ei.Location != null)
+                .Select(ei => ei.Location).Distinct()
+                .Select(l => (l ?? throw new ArgumentNullException(nameof(l))).ToLocation())
+        );
+        
+        // If we have no course addresses still, add the provider's first address
+        if (addresses.Count == 0 && courseDetails.ProviderAddresses.Any())
+        {
+            addresses.Add(courseDetails.ProviderAddresses.First());
+        }
+
+        courseDetails.CourseAddresses = addresses.Distinct();
+
+        switch (entryInstance.Entry.Type)
         {
             case EntryType.Apprenticeship:
-                var vacancy = entry.Vacancies.First();
+                var vacancy = entryInstance.Entry.Vacancies.First();
                 var employer = vacancy.Employer;
                 courseDetails.Wage = vacancy.Wage;
-                courseDetails.TrainingProvider = entry.Provider.Name;
+                courseDetails.TrainingProvider = entryInstance.Entry.Provider.Name;
                 courseDetails.EmployerUrl = employer.Url;
                 courseDetails.EmployerName = employer.Name;
                 courseDetails.EmployerAddresses = employer.EmployerLocations
-                    .Select(el => el.Location)
-                    .Select(l => new Location
-                    {
-                        Address1 = l.Address1,
-                        Address2 = l.Address2,
-                        Address3 = l.Address3,
-                        Address4 = l.Address4,
-                        Town = l.Town,
-                        County = l.County,
-                        Postcode = l.Postcode,
-                        GeoLocation = l.GeoLocation != null ? new GeoLocation {
-                            Latitude = l.GeoLocation.Y,
-                            Longitude = l.GeoLocation.X
-                        } : null
-                    }).ToList();
-                courseDetails.CourseUrl = !string.IsNullOrEmpty(entry.Url) ? entry.Url : vacancy.Url;
+                    .Select(el => el.Location.ToLocation()).Distinct().ToList();
                 courseDetails.EmployerDescription = null; // We don't have this
-                courseDetails.PositionAvailable = entry.AimOrAltTitle; // We don't have this
+                courseDetails.PositionAvailable = null; // We don't have this
                 break;
+            
             case EntryType.Course:
-                courseDetails.Costs = entry.EntryCosts.Select(ec => (decimal?)ec.Value);
-                courseDetails.CourseUrl = entry.Url;
-                courseDetails.ProviderName = entry.Provider.Name;
-                courseDetails.ProviderAddresses = entry.Provider.ProviderLocations
-                    .Select(el => el.Location)
-                    .Select(l => new Location
-                    {
-                        Address1 = l.Address1,
-                        Address2 = l.Address2,
-                        Address3 = l.Address3,
-                        Address4 = l.Address4,
-                        Town = l.Town,
-                        County = l.County,
-                        Postcode = l.Postcode,
-                        GeoLocation = l.GeoLocation != null ? new GeoLocation {
-                            Latitude = l.GeoLocation.Y,
-                            Longitude = l.GeoLocation.X
-                        } : null
-                    }).ToList();
-                // TODO: Set these
-                courseDetails.ProviderUrl = null; // Need to get this from Location.Url
+                courseDetails.Costs = entryInstance.Entry.EntryCosts.Select(ec => (decimal?)ec.Value);
                 break;
+            
             case EntryType.UniversityCourse:
-                courseDetails.Costs = entry.EntryCosts.Select(ec => (decimal?)ec.Value);
-                courseDetails.CourseUrl = entry.Url;
-                courseDetails.ProviderName = entry.Provider.Name;
-                courseDetails.ProviderAddresses = entry.Provider.ProviderLocations
-                    .Select(el => el.Location)
-                    .Select(l => new Location
-                    {
-                        Address1 = l.Address1,
-                        Address2 = l.Address2,
-                        Address3 = l.Address3,
-                        Address4 = l.Address4,
-                        Town = l.Town,
-                        County = l.County,
-                        Postcode = l.Postcode,
-                        GeoLocation = l.GeoLocation != null ? new GeoLocation {
-                            Latitude = l.GeoLocation.Y,
-                            Longitude = l.GeoLocation.X
-                        } : null
-                    }).ToList();
-                // TODO: Set these
-                courseDetails.ProviderUrl = null; // Need to get this from Location.Url
-                courseDetails.TuitionFee = null; // Can just be Costs.First()
-                courseDetails.University = null;
-                courseDetails.CampusName = null;
+                courseDetails.Costs = entryInstance.Entry.EntryCosts.Select(ec => (decimal?)ec.Value);
+                courseDetails.TuitionFee = courseDetails.Costs.FirstOrDefault();
+                courseDetails.University = courseDetails.ProviderName;
+                courseDetails.CampusName = entryInstance.Location?.Name;
                 courseDetails.AwardingOrganisation = null;
                 break;
         }

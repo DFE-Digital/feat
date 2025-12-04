@@ -69,21 +69,21 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Provider location</dt>
                 <dd class="govuk-summary-list__value">
-                  @Model.ProviderAddresses?.FirstOrDefault()?.Display
+                  @Model.CourseAddresses?.FirstOrDefault()?.Display
                 </dd>
                 <dd class="govuk-summary-list__actions">
-                  @if (!string.IsNullOrEmpty(Model.ProviderAddresses?.FirstOrDefault()?.MapLocationUrl))
+                  @if (!string.IsNullOrEmpty(Model.CourseAddresses?.FirstOrDefault()?.MapLocationUrl))
                   {
-                    <a class="govuk-link" href="@Model.ProviderAddresses?.FirstOrDefault()?.MapLocationUrl">View on a map
-                      <span class="govuk-visually-hidden">@(Model.ProviderName + "(" + Model.ProviderAddresses?.FirstOrDefault()?.Display + ")")</span>
+                    <a class="govuk-link" href="@Model.CourseAddresses?.FirstOrDefault()?.MapLocationUrl">View on a map
+                      <span class="govuk-visually-hidden">@(Model.ProviderName + "(" + Model.CourseAddresses?.FirstOrDefault()?.Display + ")")</span>
                     </a>
                   }
                 </dd>
               </div>
             </dl>
-            @if (Model.ProviderAddresses?.Count > 1)
+            @if (Model.CourseAddresses?.Count > 1)
             {
-              var addressesCount = Model.ProviderAddresses?.Count;
+              var addressesCount = Model.CourseAddresses?.Count;
               var isFirst = true;
 
               <details class="govuk-details govuk-!-margin-top-2 govuk-!-margin-bottom-0" data-module="govuk-details">
@@ -94,7 +94,7 @@
                   }
                 </summary>
                 <div class="govuk-details__text">
-                  @foreach (var location in Model.ProviderAddresses!)
+                  @foreach (var location in Model.CourseAddresses!)
                   {
                     if (!isFirst)
                     {

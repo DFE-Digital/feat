@@ -54,7 +54,7 @@ public static class DtoMapper
 
         model.Cost = response.Costs.FirstOrDefault();
         model.ProviderName = response.ProviderName;
-        model.ProviderAddresses = response.ProviderAddresses.ToLocationViewModels();
+        model.CourseAddresses = response.CourseAddresses.ToLocationViewModels();
         model.ProviderUrl = response.ProviderUrl;
         model.StartDates = response.StartDates
             .Where(d => d.HasValue)
@@ -91,7 +91,7 @@ public static class DtoMapper
         model.AwardingOrganisation = response.AwardingOrganisation;
         model.University = response.University;
         model.CampusName = response.CampusName;
-        model.CampusAddresses = response.ProviderAddresses.ToLocationViewModels();
+        model.CampusAddresses = response.CourseAddresses.ToLocationViewModels();
         model.UniversityUrl = response.ProviderUrl;
         model.StartDates = response.StartDates
             .Where(d => d.HasValue)
@@ -105,6 +105,7 @@ public static class DtoMapper
     {
         return locations.Select(l => new Models.ViewModels.Location
         {
+            Name = l.Name,
             Address1 = l.Address1,
             Address2 = l.Address2,
             Address3 = l.Address3,

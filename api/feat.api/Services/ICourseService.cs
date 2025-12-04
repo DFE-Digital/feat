@@ -4,5 +4,5 @@ namespace feat.api.Services;
 
 public interface ICourseService
 {
-    Task<CourseDetailsResponse?> GetCourseByIdAsync(Guid courseId);
+    Task<CourseDetailsResponse?> GetCourseByInstanceIdAsync(Guid instanceId);
 }

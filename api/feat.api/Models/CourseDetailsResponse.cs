@@ -59,4 +59,8 @@ public class CourseDetailsResponse
     public string? CampusName { get; set; }
     
     public string? CourseUrl { get; set; }
+    
+    public IEnumerable<Location> CourseAddresses { get; set; } = [];
+    
+    public IEnumerable<Guid> AlternativeCourses { get; set; } = [];
 }

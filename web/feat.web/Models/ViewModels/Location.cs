@@ -2,6 +2,8 @@ namespace feat.web.Models.ViewModels;
 
 public class Location
 {
+    public string? Name { private get; init; }
+    
     public string? Address1 { private get; init; }
     
     public string? Address2 { private get; init; }
@@ -26,13 +28,14 @@ public class Location
         {
             var parts = new[]
             {
+                Name,
                 Address1,
                 Address2,
                 Address3,
                 Address4,
                 Town,
                 County,
-                Postcode
+                Postcode?.ToUpperInvariant()
             };
 
             return string.Join(", ", parts.Where(p => !string.IsNullOrWhiteSpace(p)));
@@ -48,7 +51,7 @@ public class Location
         {
             return string.Empty;
         }
-        return PostcodeUrl + Postcode?.Replace(" ", string.Empty);
+        return PostcodeUrl + Postcode?.ToUpperInvariant().Replace(" ", string.Empty);
     }
     
     private string GeoLocationUrl()

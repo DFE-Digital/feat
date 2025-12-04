@@ -86,11 +86,8 @@ services.Configure<CacheOptions>(config.GetSection(CacheOptions.Name));
 switch (cacheOptions?.Type)
 {
     case "Memory":
-        services.AddDistributedMemoryCache();
-        services.AddFusionCacheMemoryBackplane();
+        services.AddMemoryCache();
         services.AddFusionCache()
-            .WithRegisteredDistributedCache()
-            .WithRegisteredBackplane()
             .WithSerializer(
                 new FusionCacheSystemTextJsonSerializer()
             )
