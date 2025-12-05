@@ -11,8 +11,6 @@ public class CoursesController(ICourseService courseService) : ControllerBase
     [HttpGet("{instanceId:guid}")]
     public async Task<ActionResult<CourseDetailsResponse>> GetCourseByInstanceId(Guid instanceId)
     {
-        
-        
         var course = await courseService.GetCourseByInstanceIdAsync(instanceId);
 
         if (course == null)

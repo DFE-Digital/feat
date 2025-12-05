@@ -247,6 +247,7 @@ public class SearchService(
             $"location:{location}",
             async entry => await GetGeoLocationFromApiAsync(location));
     }
+    
     private async Task<GeoLocation?> GetGeoLocationFromApiAsync(string location)
     {
         const string postcodePattern = @"^[a-z]{1,2}\d[a-z\d]?\s*\d[a-z]{2}$";

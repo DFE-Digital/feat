@@ -125,10 +125,12 @@ public static class DtoMapper
             .GetTypes()
             .FirstOrDefault(t => t.IsEnum && t.Name == facet.Name);
         
+        var facetDisplayName = Regex.Replace(enumType!.Name, "(\\B[A-Z])", " $1");
+        
         var mappedFacet = new Models.ViewModels.Facet
         {
             Name = enumType.Name,
-            DisplayName = Regex.Replace(enumType.Name, "(\\B[A-Z])", " $1"),
+            DisplayName = char.ToUpper(facetDisplayName[0]) + facetDisplayName[1..].ToLower(),
             Index = GetFacetIndex(enumType.Name)
         };
         
