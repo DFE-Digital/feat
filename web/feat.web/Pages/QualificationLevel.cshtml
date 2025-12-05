@@ -14,7 +14,7 @@
 
 <form method="post">
     
-    <govuk-checkboxes for="SelectedQualificationOptions">
+    <govuk-checkboxes name="SelectedQualificationOptions" for="SelectedQualificationOptions">
         <govuk-checkboxes-fieldset>
             <govuk-checkboxes-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--m">
                 Qualification level
@@ -23,17 +23,15 @@
                 Select all that apply.
             </govuk-checkboxes-hint>
             @{
-                int i = 0;
                 foreach (var qualificationLevel in Enum.GetValues<QualificationLevel>())
                 {
                     var isTrue = Model.SelectedQualificationOptions.Contains(qualificationLevel);
 
-                    <govuk-checkboxes-item id="qualificationLevel[@i]"
+                    <govuk-checkboxes-item
                                            value="@(qualificationLevel.ToString("G"))"
                                            checked="@(isTrue)">
                         @qualificationLevel.GetDisplayName()
                     </govuk-checkboxes-item>
-                    i++;
                 }
             }
 
