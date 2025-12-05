@@ -9,9 +9,9 @@ public class CourseModel(ISearchService searchService) : PageModel
 {
     public CourseDetailsBase? Course { get; private set; }
 
-    public async Task<IActionResult> OnGet(Guid id)
+    public async Task<IActionResult> OnGet(Guid instanceId)
     {
-        Course = await searchService.GetCourseDetails(id.ToString());
+        Course = await searchService.GetCourseDetails(instanceId.ToString());
 
         if (Course == null)
         {

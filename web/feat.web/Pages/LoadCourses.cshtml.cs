@@ -34,92 +34,85 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
     
     public async Task<IActionResult> OnGetAsync(string orderBy, int pageNumber = 1) 
     {
-        try
+        pageNumber = pageNumber < 1 ? 1 : pageNumber;
+        
+        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+        
+        if (!Search.Updated)
         {
-            pageNumber = pageNumber < 1 ? 1 : pageNumber;
-            
-            Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-            
-            if (!Search.Updated)
-            {
-                return RedirectToPage(PageName.Index);
-            }
-            
-            Search.CurrentPage = pageNumber;
-            Search.TotalPages = TotalPages;
-            Search.PageSize = PageSize;
+            return RedirectToPage(PageName.Index);
+        }
+        
+        Search.CurrentPage = pageNumber;
+        Search.TotalPages = TotalPages;
+        Search.PageSize = PageSize;
 
-            if (!string.IsNullOrEmpty(orderBy))
+        if (!string.IsNullOrEmpty(orderBy))
+        {
+            Search.OrderBy = orderBy.Equals("distance", StringComparison.InvariantCultureIgnoreCase) 
+                ? OrderBy.Distance 
+                : OrderBy.Relevance;
+        }
+        
+        Search.SetPage(PageName.LoadCourses);
+        HttpContext.Session.Set("Search", Search);
+        
+        var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
+        
+        Courses = searchResponse.Courses.ToList();
+        TotalCourseCount = searchResponse.TotalCount;
+        CurrentPage = searchResponse.Page;
+        PageSize = searchResponse.PageSize;
+        TotalPages = (int)Math.Ceiling(searchResponse.TotalCount / (double)searchResponse.PageSize);
+        
+        var searchResponseFacets = searchResponse.Facets.ToViewModels();
+        var sessionFacets = HttpContext.Session.Get<List<Models.ViewModels.Facet>>("AllFacets");
+        
+        if (searchResponseFacets.Count != 0)
+        {
+            AllFacets = searchResponseFacets;
+            
+        }
+        else if (sessionFacets != null)
+        {
+            AllFacets = sessionFacets;
+        }
+        
+        if (Search.Facets.Count == 0) // Initial search
+        {
+            if (Courses.Count == 0)
             {
-                Search.OrderBy = orderBy.Equals("distance", StringComparison.InvariantCultureIgnoreCase) 
-                    ? OrderBy.Distance 
-                    : OrderBy.Relevance;
+                return RedirectToPage(PageName.NoResultsSearch);
             }
             
-            Search.SetPage(PageName.LoadCourses);
-            HttpContext.Session.Set("Search", Search);
-            
-            var searchResponse = await searchService.Search(Search, HttpContext.Session.Id);
-            
-            Courses = searchResponse.Courses.ToList();
-            TotalCourseCount = searchResponse.TotalCount;
-            CurrentPage = searchResponse.Page;
-            PageSize = searchResponse.PageSize;
-            TotalPages = (int)Math.Ceiling(searchResponse.TotalCount / (double)searchResponse.PageSize);
-            
-            var searchResponseFacets = searchResponse.Facets.ToViewModels();
-            var sessionFacets = HttpContext.Session.Get<List<Models.ViewModels.Facet>>("AllFacets");
-            
-            if (searchResponseFacets.Count != 0)
+            SelectQualificationLevels();
+            Search.Facets = AllFacets;
+        }
+        
+        if (sessionFacets != null)
+        {
+            foreach (var facet in AllFacets)
             {
-                AllFacets = searchResponseFacets;
-                
-            }
-            else if (sessionFacets != null)
-            {
-                AllFacets = sessionFacets;
-            }
-            
-            if (Search.Facets.Count == 0) // Initial search
-            {
-                if (Courses.Count == 0)
+                var sessionFacet = sessionFacets.FirstOrDefault(f => f.Name == facet.Name);
+                if (sessionFacet != null)
                 {
-                    return RedirectToPage(PageName.NoResultsSearch);
-                }
-                
-                SelectQualificationLevels();
-                Search.Facets = AllFacets;
-            }
-            
-            if (sessionFacets != null)
-            {
-                foreach (var facet in AllFacets)
-                {
-                    var sessionFacet = sessionFacets.FirstOrDefault(f => f.Name == facet.Name);
-                    if (sessionFacet != null)
+                    foreach (var value in facet.Values)
                     {
-                        foreach (var value in facet.Values)
+                        var sessionValue = sessionFacet.Values.FirstOrDefault(v => v.Name == value.Name);
+                        
+                        if (sessionValue != null)
                         {
-                            var sessionValue = sessionFacet.Values.FirstOrDefault(v => v.Name == value.Name);
-                            
-                            if (sessionValue != null)
-                            {
-                                value.Selected = sessionValue.Selected;
-                            }
+                            value.Selected = sessionValue.Selected;
                         }
                     }
                 }
             }
-            
-            HttpContext.Session.Set("AllFacets", AllFacets);
-            Search.Facets = AllFacets;
-            
-            SelectedTravelDistance = Search.Distance;
         }
-        catch (Exception e)
-        {
-            logger.LogError(e.Message);
-        }
+        
+        HttpContext.Session.Set("AllFacets", AllFacets);
+        Search.Facets = AllFacets;
+        
+        SelectedTravelDistance = Search.Distance;
 
         return Page();
     }

@@ -6,21 +6,12 @@
 
 @{
   ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-
-  string searchResultText = "Showing courses";
-  try
-  {
-    var totalResults = Model.TotalCourseCount;
-    var pluralText = (totalResults == 1 ? String.Empty : "s");
-    string locationText = string.IsNullOrEmpty(Model.Search.Location)?"near your area": " near <b>" + Model.Search.Location + "</b>";
-    string interestText = Model.Search.Interests.Count > 0 ? $" for <b>{string.Join(", ", Model.Search.Interests)}</b>" : string.Empty;
-    
-    searchResultText = $"Showing {totalResults} course{pluralText} {locationText} {interestText}";
-  }
-  catch (Exception e)
-  {
-    // ignored
-  }
+  
+  var totalResults = Model.TotalCourseCount;
+  var pluralText = (totalResults == 1 ? String.Empty : "s");
+  var locationText = string.IsNullOrEmpty(Model.Search.Location)?"near your area": " near <b>" + Model.Search.Location + "</b>";
+  var interestText = Model.Search.Interests.Count > 0 ? $" for <b>{string.Join(", ", Model.Search.Interests)}</b>" : string.Empty;
+  var searchResultText = $"Showing {totalResults} course{pluralText} {locationText} {interestText}";
 }
 
 <div class="govuk-width-container">
