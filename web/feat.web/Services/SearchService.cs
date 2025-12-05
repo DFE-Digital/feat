@@ -16,15 +16,15 @@ public class SearchService(
     {
         var request = search.ToSearchRequest();
         request.SessionId = sessionId;
-        
+    
         var endpoint = new Uri(new Uri(options.Value.ApiBaseUrl), "api/search").ToString();
-        
+    
         return await apiClient.PostAsync<SearchResponse>(ApiClientNames.Feat, endpoint, request);
     }
     
-    public async Task<CourseDetailsBase?> GetCourseDetails(string courseId)
+    public async Task<CourseDetailsBase?> GetCourseDetails(string instanceId)
     {
-        var endpoint = new Uri(new Uri(options.Value.ApiBaseUrl), $"api/courses/{courseId}").ToString();
+        var endpoint = new Uri(new Uri(options.Value.ApiBaseUrl), $"api/courses/{instanceId}").ToString();
         var response = await apiClient.GetAsync<CourseDetailsResponse>(ApiClientNames.Feat, endpoint);
 
         return response.EntryType switch

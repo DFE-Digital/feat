@@ -36,13 +36,15 @@ builder.Services.AddGovUkFrontend(options =>
     options.Rebrand = true;
     options.FrontendPackageHostingOptions = FrontendPackageHostingOptions.None;
 });
+
 builder.Services.AddRazorPages().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.WriteIndented = true;
-    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-    options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-});
+    {
+        options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 builder.Services.AddDirectoryBrowser();
 
 builder.Services.AddScoped<IApiClient, ApiClient>();
@@ -79,10 +81,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseExceptionHandler("/Errors/500");
+app.UseStatusCodePagesWithReExecute("/Errors/{0}");
 
 app.UseHttpsRedirection();
 app.UseRouting();
