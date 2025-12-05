@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using NUnit.Framework;
 using OpenAI.Embeddings;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace feat.api.tests.Services;
 
@@ -17,13 +18,15 @@ public class SearchServiceTests(
     SearchClient searchClient,
     EmbeddingClient embeddingClient,
     CourseDbContext dbContext,
-    SearchService searchService)
+    SearchService searchService,
+    IFusionCache cache)
 {
     private IOptionsMonitor<AzureOptions> _azureOptions = azureOptions;
     private IApiClient _apiClient = apiClient;
     private SearchClient _searchClient = searchClient;
     private EmbeddingClient _embeddingClient = embeddingClient;
     private CourseDbContext _dbContext = dbContext;
+    private IFusionCache _cache = cache;
     
     private SearchService _searchService = searchService;
 
@@ -35,13 +38,15 @@ public class SearchServiceTests(
         _searchClient = Substitute.For<SearchClient>();
         _embeddingClient = Substitute.For<EmbeddingClient>();
         _dbContext = Substitute.For<CourseDbContext>();
+        _cache = Substitute.For<IFusionCache>();
         
         _searchService = new SearchService(
             _azureOptions,
             _apiClient,
             _searchClient,
             _embeddingClient,
-            _dbContext
+            _dbContext,
+            _cache
         );
     }
 }

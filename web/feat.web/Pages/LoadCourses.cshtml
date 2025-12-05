@@ -76,7 +76,9 @@
                             <div class="govuk-summary-list__row">
                               <div class="govuk-form-group">
                                 <govuk-select for="SelectedTravelDistance">
-                                  <govuk-select-label><br/>Travel Distance</govuk-select-label>
+                                  <govuk-select-label class="govuk-!-margin-top-4 govuk-!-font-weight-bold">
+                                    Travel distance
+                                  </govuk-select-label>
                                   @foreach (var option in Enum.GetValues<Distance>())
                                   {
                                     <govuk-select-item 
@@ -99,7 +101,7 @@
                                           <govuk-checkboxes-fieldset-legend 
                                               is-page-heading="true" 
                                               class="govuk-fieldset__legend--s">
-                                              <br />@facet.DisplayName
+                                              @facet.DisplayName
                                           </govuk-checkboxes-fieldset-legend>
 
                                           @for (var valueIndex = 0; valueIndex < orderedFacetValues.Count; valueIndex++)
@@ -141,8 +143,7 @@
                           facetIndex++;
                         }
                       }
-                      <br>
-                      <button class="govuk-button" type="submit">Apply filters</button>
+                      <button class="govuk-button govuk-!-margin-top-4" type="submit">Apply filters</button>
                       <p class="govuk-body">
                         <a class="govuk-link" asp-page-handler="ClearFilters">Clear all filters</a>
                       </p>
@@ -311,5 +312,9 @@
         display: inline-block;
       }
     }
-    
+
+    .govuk-summary-list__row:not(:first-child) > fieldset.govuk-fieldset {
+      margin-top: 20px;
+    }
+
 </style>
