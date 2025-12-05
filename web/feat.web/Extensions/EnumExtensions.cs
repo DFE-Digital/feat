@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using feat.web.Utils;
 
 namespace feat.web.Extensions;
 
@@ -13,7 +14,7 @@ public static class EnumExtensions
 
         if (member == null)
         {
-            return value.ToString();
+            return SharedStrings.NotProvided;
         }
 
         if (member.GetCustomAttribute<DisplayAttribute>() is { } displayAttribute)

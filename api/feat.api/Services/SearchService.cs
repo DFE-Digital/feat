@@ -3,6 +3,7 @@ using Azure.Search.Documents;
 using Azure.Search.Documents.Models;
 using feat.api.Data;
 using feat.api.Enums;
+using feat.api.Extensions;
 using feat.api.Models;
 using feat.api.Models.External;
 using feat.common;
@@ -54,21 +55,13 @@ public class SearchService(
                 CourseType = ei.Entry.CourseType,
                 Requirements = ei.Entry.EntryRequirements,
                 Overview = ei.Entry.Description,
-                Location = ei.Location != null && ei.Location.GeoLocation != null
-                    ? new GeoLocation
-                    {
-                        Longitude = ei.Location.GeoLocation.X,
-                        Latitude = ei.Location.GeoLocation.Y
-                    }
-                    : ei.Entry.Provider.ProviderLocations.Any()
-                      && ei.Entry.Provider.ProviderLocations.Any() ?
-                        new GeoLocation()
-                        {
-                            Longitude = ei.Entry.Provider.ProviderLocations.First().Location.GeoLocation.X,
-                            Latitude = ei.Entry.Provider.ProviderLocations.First().Location.GeoLocation.Y
-                        }
-                : null,
-                LocationName = GetLocationName(ei.Location ?? ei.Entry.Provider.ProviderLocations.FirstOrDefault().Location)
+                Location = ei.Location != null ? ei.Location.ToLocation().GeoLocation :
+                        ei.Entry.Provider.ProviderLocations.FirstOrDefault() != null ?
+                ei.Entry.Provider.ProviderLocations.First().Location.ToLocation().GeoLocation : null,
+                LocationName =
+                    ei.Location != null ? GetLocationName(ei.Location) :
+                        ei.Entry.Provider.ProviderLocations.FirstOrDefault() != null ?
+                            GetLocationName(ei.Entry.Provider.ProviderLocations.First().Location) : null
             })
             .ToListAsync();
         
