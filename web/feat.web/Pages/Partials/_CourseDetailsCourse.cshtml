@@ -169,26 +169,18 @@
         }
         <p>The details we show you comes from the provider. There may be extra information on their website. You can also email or call them if you have any questions or want to discuss your options. </p>
       </div>
-      
-      <div class="govuk-grid-column-one-third local_top_border" >
+      <div class="govuk-grid-column-one-third">
         <div class="x-govuk-related-navigation">
           <nav class="x-govuk-related-navigation__nav-section" aria-labelledby="related-navigation-related-content">
-
             <h2 class="x-govuk-related-navigation__main-heading" id="related-navigation-related-content">Related links</h2>
-            
             <ul class="x-govuk-related-navigation__link-list">
               <li class="x-govuk-related-navigation__link">
                 <a class="govuk-link x-govuk-related-navigation__section-link" 
                    href="https://nationalcareers.service.gov.uk/explore-careers">Explore jobs and careers you could do after this course</a>
               </li>
-              @*if (!string.IsNullOrEmpty(Model.CourseTypeDisplay))
-              {
-                <li class="x-govuk-related-navigation__link">
-                  <a asp-page="#" class="govuk-link x-govuk-related-navigation__section-link">@($"More information about {Model.CourseTypeDisplay}")</a>
-                </li>
-              }*@
               <li class="x-govuk-related-navigation__link">
-                <a asp-page="TrainingOptionsPages/TrainingOptions" class="govuk-link x-govuk-related-navigation__section-link">@($"More information about training options")</a>
+                <a class="govuk-link x-govuk-related-navigation__section-link"
+                   asp-page="TrainingOptionsPages/TrainingOptions">More information about training options</a>
               </li>
             </ul>
           </nav>
