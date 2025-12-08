@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -11,13 +12,13 @@
       <PackageReference Include="Azure.Search.Documents" Version="11.8.0-beta.1" />
       <PackageReference Include="CsvHelper" Version="33.1.0" />
       <PackageReference Include="Microsoft.Azure.Core.Spatial" Version="1.2.0-beta.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.11" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="9.0.11" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.11">
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="10.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.11" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
       <PackageReference Include="UnDotNet.HtmlToText" Version="1.1.0" />
     </ItemGroup>
 
