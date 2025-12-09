@@ -52,13 +52,24 @@ variable "openai_key" {
 }
 
 # Azure Search Service Configuration variables
-variable "sku" {
-  description = "The pricing tier of the search service you want to create (for example, basic or standard)."
+variable "ai_search_sku" {
+  description = "The SKU which should be used for this Search Service. Possible values include basic, free, standard, standard2, standard3, storage_optimized_l1 and storage_optimized_l2"
   default     = "standard"
   type        = string
   validation {
-    condition     = contains(["free", "basic", "standard", "standard2", "standard3", "storage_optimized_l1", "storage_optimized_l2"], var.sku)
+    condition     = contains(["free", "basic", "standard", "standard2", "standard3", "storage_optimized_l1", "storage_optimized_l2"], var.ai_search_sku)
     error_message = "The sku must be one of the following values: free, basic, standard, standard2, standard3, storage_optimized_l1, storage_optimized_l2."
+  }
+}
+
+variable "ai_search_semantic_sku"
+{
+  description = "Specifies the Semantic Search SKU which should be used for this Search Service. Possible values include free and standard"
+  default     = "standard"
+  type        = string
+  validation {
+    condition     = contains(["free", "standard"], var.ai_search_semantic_sku)
+    error_message = "The sku must be one of the following values: free, standard."
   }
 }
 
