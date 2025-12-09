@@ -63,7 +63,7 @@ resource "azurerm_linux_web_app" "feat-api" {
   connection_string {
     name  = "Cache"
     type  = "RedisCache"
-    value = "${azurerm_managed_redis.feat_redis_enterprise.hostname}:${azurerm_managed_redis.feat_redis_enterprise.default_database[0].port}"
+    value = "${azurerm_managed_redis.feat_redis_enterprise.hostname}:${azurerm_managed_redis.feat_redis_enterprise.default_database[0].port},ssl=true,password=${azurerm_managed_redis.feat_redis_enterprise.default_database[0].primary_access_key}"
   }
 
   https_only = true
