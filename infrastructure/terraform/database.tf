@@ -23,10 +23,10 @@ resource "azurerm_mssql_server" "feat_mssql_server" {
 resource "azurerm_mssql_database" "feat_mssql_db" {
   name      = "${var.prefix}-coursedb"
   server_id = azurerm_mssql_server.feat_mssql_server.id
-  sku_name  = "GP_S_Gen5_1"
+  sku_name  = "GP_S_Gen5_2"
 
   auto_pause_delay_in_minutes = 120
-  max_size_gb                 = 8
+  max_size_gb                 = 32
   min_capacity                = 0.5
 
   tags = {
