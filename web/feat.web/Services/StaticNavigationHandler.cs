@@ -44,7 +44,7 @@ public class StaticNavigationHandler(IHttpContextAccessor httpContextAccessor)
 
             var currentPageName = httpContext.Request.Path.ToString().Split('/')?.LastOrDefault();
             
-            if (!string.IsNullOrEmpty(currentPageName) && refererLink.EndsWith(currentPageName)) //.Contains(currentPageName))
+            if (!string.IsNullOrEmpty(currentPageName) && refererLink.EndsWith(currentPageName)) 
             {
                 return (staticPageHistory[^1], string.Empty);
             }
@@ -108,7 +108,8 @@ public class StaticNavigationHandler(IHttpContextAccessor httpContextAccessor)
 
         if (navigatingBack)
         {
-            history.RemoveRange(history.Count - 2, 2);
+            var index = history.FindIndex(x => pageName != null && x.EndsWith(pageName));
+            history.RemoveRange(index, history.Count - index);
             var navigatingBackUrl = history[^1];
 
             SaveBackHistory(history);
