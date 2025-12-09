@@ -13,24 +13,27 @@ public class CheckAnswersModel (ILogger<CheckAnswersModel> logger): PageModel
     
     public IActionResult OnGet()
     {
-        logger.LogInformation("OnGet called");
-        
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-        if (!Search.Updated)
-            return RedirectToPage("Index");
-
-        Search.SetPage(PageName.CheckAnswers);
-        Search.ResetHistory(PageName.CheckAnswers);
-        HttpContext.Session.Set("Search", Search);
         
+        if (!Search.Updated)
+        {
+            return RedirectToPage("Index");
+        }
+
         HttpContext.Session.Remove("AllFacets");
         Search.Facets.Clear();
         
+        Search.SetPage(PageName.CheckAnswers);
+        Search.ResetHistory(PageName.CheckAnswers);
+        
+        HttpContext.Session.Set("Search", Search);
+
         if (Search.Interests.Count == 0 && (Search.Distance is null or < Distance.Two) && 
             Search.QualificationLevels.Count == 0 && Search.VisitedCheckAnswers)
         {
             return RedirectToPage(PageName.Location);
         }
+        
         return Page();
     }
 

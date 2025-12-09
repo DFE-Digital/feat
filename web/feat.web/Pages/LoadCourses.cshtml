@@ -8,9 +8,9 @@
   ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
   
   var totalResults = Model.TotalCourseCount;
-  var pluralText = (totalResults == 1 ? String.Empty : "s");
-  var locationText = string.IsNullOrEmpty(Model.Search.Location)?"near your area": " near <b>" + Model.Search.Location + "</b>";
-  var interestText = Model.Search.Interests.Count > 0 ? $" for <b>{string.Join(", ", Model.Search.Interests)}</b>" : string.Empty;
+  var pluralText = totalResults == 1 ? string.Empty : "s";
+  var locationText = string.IsNullOrEmpty(Model.Search.Location) ? string.Empty : "near <b>" + Model.Search.Location + "</b>";
+  var interestText = Model.Search.Interests.Count > 0 ? $"for <b>{string.Join(", ", Model.Search.Interests)}</b>" : string.Empty;
   var searchResultText = $"Showing {totalResults} course{pluralText} {locationText} {interestText}";
 }
 
