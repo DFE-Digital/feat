@@ -26,7 +26,7 @@ resource "azurerm_mssql_database" "feat_mssql_db" {
   sku_name  = "GP_S_Gen5_1"
 
   auto_pause_delay_in_minutes = 120
-  max_size_gb                 = 2
+  max_size_gb                 = 8
   min_capacity                = 0.5
 
   tags = {
