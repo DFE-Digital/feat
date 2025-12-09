@@ -3,7 +3,9 @@
 @model feat.web.Pages.LinkPages.AccessibilityStatement
 @{
   ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-  ViewBag.ShowJSBack = true;
+  ViewBag.ShowStaticBack = true;
+
+  ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
 
 <div class="govuk-grid-row">
