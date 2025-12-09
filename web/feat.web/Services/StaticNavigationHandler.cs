@@ -6,7 +6,7 @@ namespace feat.web.Services;
 // Handles back-button navigation outside of the Search-Journey flow.
 public class StaticNavigationHandler(IHttpContextAccessor httpContextAccessor)
 {
-    private const string BackPageSessionKey = "StaticNavigationBackPage23";
+    private const string BackPageSessionKey = "StaticNavigationBackPage2311";
 
     public void Initialise()
     {
@@ -16,7 +16,7 @@ public class StaticNavigationHandler(IHttpContextAccessor httpContextAccessor)
     public string GetRefererUrl()
     {
         var values = AddToPageHistory();
-        return GetPreviousPage(values.pageName, values.referingUrl);
+        return GetPreviousPage(values.referingUrl, values.pageName);
     }
 
     private (string? referingUrl, string? pageName) AddToPageHistory()
@@ -32,22 +32,31 @@ public class StaticNavigationHandler(IHttpContextAccessor httpContextAccessor)
         if (httpContext != null &&
             httpContext.Request.Headers!.TryGetValue("Referer", out var value))
         {
-            var referer = value.ToString();
+            var refererLink = value.ToString();
+            
             var staticPageHistory = GetBackLinkHistory();
 
             // Prevent duplicate consecutive entries
-            if (staticPageHistory.Count != 0 && (staticPageHistory[staticPageHistory.Count - 1] == referer))
-                return new ValueTuple<string?, string?>();
-            
-            if (!staticPageHistory.Contains(referer))
+            if (staticPageHistory.Count != 0 && (staticPageHistory[staticPageHistory.Count - 1] == refererLink))
             {
-                staticPageHistory.Add(referer);
+                return (refererLink, string.Empty); 
             }
-            SaveBackHistory(staticPageHistory);
-            
+
             var currentPageName = httpContext.Request.Path.ToString().Split('/')?.LastOrDefault();
             
-            return (referer, currentPageName);
+            if (!string.IsNullOrEmpty(currentPageName) && refererLink.EndsWith(currentPageName)) //.Contains(currentPageName))
+            {
+                return (staticPageHistory[^1], string.Empty);
+            }
+            
+            if (!staticPageHistory.Contains(refererLink))
+            {
+                staticPageHistory.Add(refererLink);
+            }
+            
+            SaveBackHistory(staticPageHistory);
+            
+            return (refererLink, currentPageName);
         }
         return (null, null);
     }
@@ -72,9 +81,20 @@ public class StaticNavigationHandler(IHttpContextAccessor httpContextAccessor)
         session?.SetString(BackPageSessionKey, JsonSerializer.Serialize(staticHistory));
     }
 
-    private string GetPreviousPage(string? pageName, string? referUrl)
+    private string GetPreviousPage(string? referUrl, string? pageName)
     {
+        if (pageName == null || referUrl == null)
+        {
+            return string.Empty;
+        }
+
+        if (!string.IsNullOrEmpty(referUrl) && string.IsNullOrEmpty(pageName))
+        {
+            return referUrl;
+        }
+
         var history = GetBackLinkHistory();
+
         var navigatingBack = false;
 
         foreach (var item in history)
@@ -89,21 +109,21 @@ public class StaticNavigationHandler(IHttpContextAccessor httpContextAccessor)
         if (navigatingBack)
         {
             history.RemoveRange(history.Count - 2, 2);
-            var navigatingBackUrl = history[history.Count - 1];
+            var navigatingBackUrl = history[^1];
 
             SaveBackHistory(history);
-            
+
             return navigatingBackUrl;
         }
 
-        string? previousPage = history.Count > 1 ? history[history.Count - 1] : history.FirstOrDefault();
+        var previousPage = history.Count > 1 ? history[^1] : history.FirstOrDefault();
 
         if (previousPage == null && !string.IsNullOrEmpty(referUrl))
         {
-            return referUrl; 
+            return referUrl;
         }
-        
+
         return previousPage ?? string.Empty;
     }
-    
+
 }
