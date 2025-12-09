@@ -50,6 +50,7 @@ resource "azurerm_linux_web_app" "feat-api" {
     Azure__AiSearchIndex                  = "latest"
     Azure__AiSearchIndexScoringProfile    = ""
     Azure__AiSearchIndexScoringParameters = ""
+    Azure__OpenAIKey                      = var.openai_key
     Cache__Type                           = "Redis"
   }
 

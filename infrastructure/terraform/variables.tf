@@ -44,6 +44,13 @@ variable "sql_admin_password" {
   default     = null
 }
 
+variable "openai_key" {
+  type        = string
+  description = "The OpenAI Key used for text embeddings."
+  sensitive   = true
+  default     = null
+}
+
 # Azure Search Service Configuration variables
 variable "sku" {
   description = "The pricing tier of the search service you want to create (for example, basic or standard)."
