@@ -74,16 +74,9 @@
     {
         <govuk-back-link href="@ViewBag.BackPageUrl">Back </govuk-back-link>
     }
-    else if(ViewBag.ShowStaticBack is not null && ViewBag.ShowStaticBack == true)
+    else if (!string.IsNullOrEmpty(ViewBag.StaticBackPageUrl))
     {
-        if (ViewBag.StaticBackPageUrl is not null)
-        {
-            <govuk-back-link href="@ViewBag.StaticBackPageUrl">Back </govuk-back-link>
-        }
-        else
-        {
-            <govuk-back-link href="javascript:history.back()">Back </govuk-back-link>
-        }
+        <govuk-back-link href="@ViewBag.StaticBackPageUrl">Back </govuk-back-link>
     }
 }
 

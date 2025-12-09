@@ -5,7 +5,8 @@
 @model TrainingOptionsPages.TrainingOptionsModel
 @{
     ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-    ViewBag.ShowStaticBack = true;
+     
+    ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
 
 <div class="govuk-grid-row">

@@ -12,7 +12,7 @@ public class StaticNavigationHandler(IHttpContextAccessor httpContextAccessor)
     {
         SaveBackHistory([]);
     }
-
+    
     public string GetRefererUrl()
     {
         var values = AddToPageHistory();
