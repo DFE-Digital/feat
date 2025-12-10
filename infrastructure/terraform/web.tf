@@ -46,7 +46,7 @@ resource "azurerm_linux_web_app" "feat-api" {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
     Azure__OpenAiEndpoint                 = "https://pp-api.education.gov.uk"
     Azure__AiSearchUrl                    = "https://${azurerm_search_service.feat_search_service.name}.search.windows.net"
-    Azure__AISearchKey                    = azurerm_search_service.feat_search_service.primary_key
+    Azure__AISearchKey                    = azurerm_search_service.feat_search_service.query_keys[0].key
     Azure__AiSearchIndex                  = "latest"
     Azure__AiSearchIndexScoringProfile    = ""
     Azure__AiSearchIndexScoringParameters = ""
