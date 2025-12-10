@@ -71,6 +71,8 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddScoped<StaticNavigationHandler>();
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(8081);

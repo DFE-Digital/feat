@@ -60,7 +60,12 @@
                             </span>
                         </p>
                     </div>
-                    <a href="javascript:history.back()" class="govuk-back-link" style="margin-bottom: 30px;">Back</a>
+                    @{
+                        if (!string.IsNullOrEmpty(ViewBag.StaticBackPageUrl))
+                        {
+                            <govuk-back-link href="@ViewBag.StaticBackPageUrl" style="margin-bottom: 30px;">Back </govuk-back-link>
+                        }
+                    }
                     <h2 class="govuk-heading-l" style="margin-bottom: 10px;">@(ViewBag.CourseTitle ?? string.Empty)</h2>
                 </div>
             </div>

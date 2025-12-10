@@ -17,7 +17,7 @@
 <form method="post">
     <govuk-radios for="AgeGroup">
         <govuk-radios-fieldset>
-            <govuk-radios-fieldset-legend class="govuk-heading-m">How old are you?</govuk-radios-fieldset-legend>
+            <govuk-radios-fieldset-legend class="govuk-heading-m">How old are you? (optional)</govuk-radios-fieldset-legend>
             @foreach (var option in Enum.GetValues<AgeGroup>())
             {
                 <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>

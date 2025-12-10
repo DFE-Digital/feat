@@ -3,7 +3,8 @@
 @model feat.web.Pages.TrainingOptionsPages.AboutTLevelsModel
 @{
     ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-    ViewBag.ShowJSBack = true;
+     
+    ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
 
 <div class="govuk-width-container">
