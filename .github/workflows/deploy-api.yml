@@ -24,8 +24,6 @@ jobs:
       ACR_LOGIN_SERVER: ${{ vars.ACR_NAME }}.azurecr.io
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
-      OPENAI_KEY: ${{ secrets.AZURE_OPENAI_APIKEY }}
-      AISEARCH_KEY: ${{ secrets.AZURE_AISEARCH_APIKEY }}
       RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
       API_NAME: ${{ vars.ENV_PREFIX }}-app-api
     environment: ${{ github.event.inputs.environment }}
@@ -59,19 +57,9 @@ jobs:
           push: true
           tags: ${{ env.ACR_LOGIN_SERVER }}/feat-api:${{ github.sha }}
 
-      - name: Configure App Settings
-        run: |
-          az webapp config appsettings set \
-            --name "$API_NAME" \
-            --resource-group "$RESOURCE_GROUP" \
-            --settings \
-              Azure__OpenAiKey="$OPENAI_KEY" \
-              Azure__AiSearchKey="$AISEARCH_KEY" \
-              ASPNETCORE_ENVIRONMENT="${{ github.event.inputs.environment }}"
-
       - name: Update API App Service
         run: |
           az webapp config container set \
             --name "$API_NAME" \
             --resource-group "$RESOURCE_GROUP" \
-            --docker-custom-image-name "$ACR_LOGIN_SERVER/feat-api:${{ github.sha }}"
+            --container-image-name "$ACR_LOGIN_SERVER/feat-api:${{ github.sha }}"

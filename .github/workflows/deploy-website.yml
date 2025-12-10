@@ -57,17 +57,9 @@ jobs:
           push: true
           tags: ${{ env.ACR_LOGIN_SERVER }}/feat-web:${{ github.sha }}
 
-      - name: Configure App Settings
-        run: |
-          az webapp config appsettings set \
-            --name "$WEBSITE_NAME" \
-            --resource-group "$RESOURCE_GROUP" \
-            --settings \
-              ASPNETCORE_ENVIRONMENT="${{ github.event.inputs.environment }}"
-
       - name: Update Website App Service
         run: |
           az webapp config container set \
             --name "$WEBSITE_NAME" \
             --resource-group "$RESOURCE_GROUP" \
-            --docker-custom-image-name "$ACR_LOGIN_SERVER/feat-web:${{ github.sha }}"
+            --container-image-name "$ACR_LOGIN_SERVER/feat-web:${{ github.sha }}"
