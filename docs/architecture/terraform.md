@@ -48,14 +48,16 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_ai_search_semantic_sku"></a> [ai\_search\_semantic\_sku](#input\_ai\_search\_semantic\_sku) | Specifies the Semantic Search SKU which should be used for this Search Service. Possible values include free and standard | `string` | `"standard"` | no |
+| <a name="input_ai_search_sku"></a> [ai\_search\_sku](#input\_ai\_search\_sku) | The SKU which should be used for this Search Service. Possible values include basic, free, standard, standard2, standard3, storage\_optimized\_l1 and storage\_optimized\_l2 | `string` | `"standard"` | no |
 | <a name="input_api_image_name"></a> [api\_image\_name](#input\_api\_image\_name) | The repository name and tag for the API container. | `string` | n/a | yes |
 | <a name="input_env"></a> [env](#input\_env) | Environment (dev, test, prod) | `string` | n/a | yes |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | `"uksouth"` | no |
+| <a name="input_openai_key"></a> [openai\_key](#input\_openai\_key) | The OpenAI Key used for text embeddings. | `string` | `null` | no |
 | <a name="input_partition_count"></a> [partition\_count](#input\_partition\_count) | Partitions allow for scaling of document count as well as faster indexing by sharding your index over multiple search units. | `number` | `1` | no |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix for resource names | `string` | `"s265"` | no |
 | <a name="input_product"></a> [product](#input\_product) | Name of the project | `string` | `"Find Education and Training"` | no |
 | <a name="input_replica_count"></a> [replica\_count](#input\_replica\_count) | Replicas distribute search workloads across the service. You need at least two replicas to support high availability of query workloads (not applicable to the free tier). | `number` | `1` | no |
-| <a name="input_sku"></a> [sku](#input\_sku) | The pricing tier of the search service you want to create (for example, basic or standard). | `string` | `"standard"` | no |
 | <a name="input_sql_admin_password"></a> [sql\_admin\_password](#input\_sql\_admin\_password) | The administrator password of the SQL logical server. | `string` | `null` | no |
 | <a name="input_sql_admin_username"></a> [sql\_admin\_username](#input\_sql\_admin\_username) | The administrator username of the SQL logical server. | `string` | `"azureadmin"` | no |
 | <a name="input_website_image_name"></a> [website\_image\_name](#input\_website\_image\_name) | The repository name and tag for the website container. | `string` | n/a | yes |
