@@ -15,21 +15,34 @@ public class Cookies(StaticNavigationHandler staticNavigation) : PageModel
     
     public string? RefererUrl { get; private set; } = "";
     
-    public void OnGet()
+    public IActionResult OnGet()
     {
         RefererUrl = staticNavigation.GetRefererUrl();
         
+        AnalyticsCookie = Request.Cookies[nameof(AnalyticsCookie)];
+        MarketingCookie = Request.Cookies[nameof(MarketingCookie)];
         
-        var analyticsCookieValue = Request.Cookies["analytics-cookies"];
-        var matketingCookieValue = Request.Cookies["marketing-cookies"];
+        return Page();
+    }
+
+    public IActionResult OnPost()
+    {
+        if (AnalyticsCookie != null)
+        {
+            Response.Cookies.Append(nameof(AnalyticsCookie), AnalyticsCookie, new CookieOptions
+            {
+                Expires= DateTime.Now.AddDays(1)
+            });
+        }
+
+        if (MarketingCookie != null)
+        {
+            Response.Cookies.Append(nameof(MarketingCookie), MarketingCookie, new CookieOptions
+            {
+                Expires = DateTime.Now.AddDays(1)
+            });
+        }
         
-        if (analyticsCookieValue != null)
-        {
-            AnalyticsCookie = analyticsCookieValue;
-        }
-        if (matketingCookieValue != null)
-        {
-            MarketingCookie = matketingCookieValue;
-        }
+        return RedirectToPage();
     }
 }
