@@ -432,9 +432,17 @@ public class FaaIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
         
+        // Reset locations
+        await dbContext.EntryInstances.Where(ei => ei.SourceSystem == SourceSystem.FAA)
+            .UpdateFromQueryAsync(ei => new EntryInstance() { Reference = ei.Reference, LocationId = null }, 
+                cancellationToken: cancellationToken);
+
+        // Remove employer locations
+        await dbContext.BulkDeleteAsync(dbContext.EmployerLocations, cancellationToken);
+        
+        
         // LOCATION
         Console.WriteLine("Generating locations...");
-        
         var locations = apprenticeships
             .SelectMany(a => a.Addresses)
             .GroupBy(a => new
@@ -464,20 +472,15 @@ public class FaaIngestionHandler(
                 };
             }).ToList();
 
-        await dbContext.BulkSynchronizeAsync(locations, options =>
+        await dbContext.BulkMergeAsync(locations, options =>
         {
             options.IgnoreOnSynchronizeUpdateExpression = l => new
             {
                 l.Id,
                 l.Created
             };
-            options.ColumnPrimaryKeyExpression = l => new
-            {
-                l.Postcode,
-                l.Address1,
-                l.Address4
-            };
-            options.AllowDuplicateKeys = true;
+            options.ColumnPrimaryKeyExpression = l => l.SourceReference;
+            options.AllowDuplicateKeys = false;
             options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
             options.UseRowsAffected = true;
             options.ResultInfo = resultInfo;
@@ -485,12 +488,12 @@ public class FaaIngestionHandler(
 
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
-        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        // Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
         
         var locationLookup = new Dictionary<(string?, string?, string?), Guid>();
 
-        foreach (var location in dbContext.Set<Location>())
+        foreach (var location in dbContext.Locations.Where(l => l.SourceSystem == SourceSystem))
         {
             var key = (
                 location.Postcode?.ToLower().Trim(),
@@ -606,9 +609,22 @@ public class FaaIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
-
+        resultInfo = new ResultInfo();
+        
+        Console.WriteLine("Cleaning up unused locations...");
+        await dbContext.Locations
+            .Where(l => 
+                l.SourceSystem == SourceSystem 
+                && l.EntryInstances.Count == 0
+                && l.ProviderLocations.Count == 0
+                && l.EmployerLocations.Count == 0
+            )
+            .ExecuteDeleteAsync(cancellationToken);
         
         await transaction.CommitAsync(cancellationToken);
+        
+        
+        
         Console.WriteLine($"{Name} table sync complete.");
 
         return true;
