@@ -62,8 +62,7 @@ variable "ai_search_sku" {
   }
 }
 
-variable "ai_search_semantic_sku"
-{
+variable "ai_search_semantic_sku" {
   description = "Specifies the Semantic Search SKU which should be used for this Search Service. Possible values include free and standard"
   default     = "standard"
   type        = string
