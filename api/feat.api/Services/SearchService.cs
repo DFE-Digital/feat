@@ -143,7 +143,7 @@ public class SearchService(
         return (results, facets, totalCount);
     }
 
-    private async Task<SearchOptions> BuildSearchOptions(SearchRequest request, GeoLocation? userLocation)
+    private Task<SearchOptions> BuildSearchOptions(SearchRequest request, GeoLocation? userLocation)
     {
         SearchOptions searchOptions;
 
@@ -191,7 +191,7 @@ public class SearchService(
             };
         }
 
-        var embedding = cache.GetOrSet<ReadOnlyMemory<float>>(
+        var embedding = cache.GetOrSet(
             $"query:{request.Query.ToLowerInvariant()}",
             entry =>
             {
@@ -208,14 +208,14 @@ public class SearchService(
                 $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') asc"
             );
             
-            searchOptions.QueryType = SearchQueryType.Full;
+            searchOptions.QueryType = SearchQueryType.Simple;
         }
         else
         {
             searchOptions.QueryType = SearchQueryType.Semantic;
             searchOptions.SemanticSearch = new SemanticSearchOptions
             {
-                SemanticConfigurationName = "semantic-title-description",
+                SemanticConfigurationName = "semantic-title-description"
             };
         }
         
@@ -238,7 +238,7 @@ public class SearchService(
             },
         };
 
-        return searchOptions;
+        return Task.FromResult(searchOptions);
     }
 
     private async Task<GeoLocation?> GetGeoLocationAsync(string location)
@@ -303,7 +303,7 @@ public class SearchService(
             var radius = RadiusInKilometers(request.Radius);
             
             filters.Add(
-                $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius}"
+                $"(geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius} or Location eq null)"
             );
         }
         
@@ -313,12 +313,13 @@ public class SearchService(
 
         void AddFacet(string field, IEnumerable<string>? values)
         {
-            if (values == null || !values.Any())
+            var valueList = (values ?? []).ToList();
+            if (valueList.Count == 0)
             {
                 return;
             }
             
-            var ors = values.Select(v => $"{field} eq '{v.Replace("'", "''")}'");
+            var ors = valueList.Select(v => $"{field} eq '{v.Replace("'", "''")}'");
             filters.Add("(" + string.Join(" or ", ors) + ")");
         }
     }
