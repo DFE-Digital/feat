@@ -558,7 +558,7 @@ public class FacIngestionHandler(
     {
         var resultInfo = new ResultInfo();
         var auditEntries = new List<AuditEntry>();
-        bool skip = true;
+        bool skip = false;
         
         Console.WriteLine($"Starting sync of {Name} data");
 
