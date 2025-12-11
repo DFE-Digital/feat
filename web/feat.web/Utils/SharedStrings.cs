@@ -9,14 +9,14 @@ public static class SharedStrings
     public const string SelectQualificationLevel = "Select a qualification level.";
     
     // Site Title
-    public const string SiteTitle_ExploreYourOptions_GOVUK = "Explore your options after school or college - GOV.UK";
+    public const string SiteTitle = "Explore your options after school or college - GOV.UK";
     
     public const string NoTravelDistanceAdded = "No travel distance added";
     public const string NoLocationAdded = "No location added";
     public const string NoInterestAdded = "No interests added";
     public const string NoAgeAdded = "No age added";
 
-    
-    public const string NotProvided = "Not provided";
-    
+    // Pull this from the common library
+    public const string NotProvided = common.SharedStrings.NotProvided;
+
 }
