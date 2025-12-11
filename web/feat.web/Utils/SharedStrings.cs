@@ -16,7 +16,7 @@ public static class SharedStrings
     public const string NoInterestAdded = "No interests added";
     public const string NoAgeAdded = "No age added";
 
-    
-    public const string NotProvided = "Not provided";
-    
+    // Pull this from the common library
+    public const string NotProvided = common.SharedStrings.NotProvided;
+
 }
