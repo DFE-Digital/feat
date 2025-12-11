@@ -1,25 +1,5 @@
+@using feat.common.Extensions
 @model feat.web.Models.ViewModels.SearchResult
-
-@functions {
-  static string? TruncateString(string? fullString, out string remainder, int cutoff = 300)
-  {
-    remainder = string.Empty;
-    
-    if (string.IsNullOrWhiteSpace(fullString) || fullString.Length <= cutoff)
-    {
-      return fullString;
-    }
-
-    var cutPosition = fullString.LastIndexOf(' ', cutoff);
-    if (cutPosition == -1)
-    {
-      cutPosition = cutoff;
-    }
-
-    remainder = fullString[(cutPosition + 1)..];
-    return fullString[..cutPosition];
-  }
-}
 
 <div class="govuk-summary-card">
   <div class="govuk-summary-card__title-wrapper">
@@ -59,13 +39,13 @@
       </div>
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Requirements</dt>
-        <dd class="govuk-summary-list__value">@(string.IsNullOrEmpty(Model.Requirements) ? SharedStrings.NotProvided : Model.Requirements)</dd>
+        <dd class="govuk-summary-list__value">@Model.Requirements.ValueOrNotProvided()</dd>
       </div>
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Overview</dt>
         <dd class="govuk-summary-list__value">
           @{
-            var truncatedOverview = TruncateString(Model.Overview, out var remainderText);
+            var truncatedOverview = Model.Overview.TruncateString(out var remainderText);
             
             if (string.IsNullOrEmpty(remainderText))
             {
