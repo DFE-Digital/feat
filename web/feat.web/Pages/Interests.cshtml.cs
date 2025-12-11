@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using feat.web.Enums;
 using feat.web.Extensions;
 using feat.web.Models;
