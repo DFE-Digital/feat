@@ -18,5 +18,9 @@ public static class SharedStrings
 
     // Pull this from the common library
     public const string NotProvided = common.SharedStrings.NotProvided;
-
+    
+    // Cookie Names
+    public const string AnalyticsCookie = "AnalyticsCookie";
+    public const string MarketingCookie = "MarketingCookie";
+    
 }
