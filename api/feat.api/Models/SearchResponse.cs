@@ -11,6 +11,4 @@ public class SearchResponse
     public IEnumerable<Course> Courses { get; set; } = [];
     
     public IEnumerable<Facet> Facets { get; set; } = [];
-    
-    public string? Error { get; set; }
 }
