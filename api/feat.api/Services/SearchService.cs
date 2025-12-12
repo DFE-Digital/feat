@@ -27,8 +27,11 @@ public class SearchService(
 {
     private readonly AzureOptions _azureOptions = options.CurrentValue;
 
-    public async Task<SearchResponse?> SearchAsync(SearchRequest request)
+    public async Task<(ValidationResult validation, SearchResponse? response)>
+        SearchAsync(SearchRequest request)
     {
+        var validation = new ValidationResult();
+
         GeoLocation? userLocation = null;
 
         if (!string.IsNullOrWhiteSpace(request.Location))
@@ -37,15 +40,19 @@ public class SearchService(
 
             if (!locationResult.IsValid)
             {
-                return new SearchResponse
-                {
-                    Error = locationResult.ErrorMessage
-                };
+                validation.AddError("location", locationResult.ErrorMessage!);
             }
-
-            userLocation = locationResult.Location;
+            else
+            {
+                userLocation = locationResult.Location;
+            }
         }
         
+        if (!validation.IsValid)
+        {
+            return (validation, null);
+        }
+
         var (searchResults, facets, totalCount) = await AiSearchAsync(request, userLocation);
         
         var courses = await dbContext.EntryInstances
@@ -91,7 +98,7 @@ public class SearchService(
             .OrderBy(c => searchResults.FindIndex(sr => sr.InstanceId == c.InstanceId))
             .ToList();
 
-        return new SearchResponse
+        var response = new SearchResponse
         {
             Courses = courses,
             Facets = facets,
@@ -99,6 +106,8 @@ public class SearchService(
             PageSize = request.PageSize,
             TotalCount = totalCount
         };
+        
+        return (validation, response);
     }
     
     public async Task<GeoLocationResponse> GetGeoLocationAsync(string location)
@@ -261,55 +270,48 @@ public class SearchService(
     
     private async Task<GeoLocationResponse> ResolveLocationAsync(string location)
     {
-        try
+        const string postcodePattern = @"^[a-z]{1,2}\d[a-z\d]?\s*\d[a-z]{2}$";
+        var isPostcode = Regex.IsMatch(location, postcodePattern, RegexOptions.IgnoreCase);
+
+        if (isPostcode)
         {
-            const string postcodePattern = @"^[a-z]{1,2}\d[a-z\d]?\s*\d[a-z]{2}$";
-            var isPostcode = Regex.IsMatch(location, postcodePattern, RegexOptions.IgnoreCase);
+            var postcode = await dbContext.Postcodes.FirstOrDefaultAsync(p =>
+                    p.Postcode.ToLower().Replace(" ", "") == location.ToLower().Replace(" ", "")
+                );
 
-            if (isPostcode)
+            if (postcode is { Latitude: not null, Longitude: not null })
             {
-                var postcode = await dbContext.Postcodes.FirstOrDefaultAsync(p =>
-                        p.Postcode.ToLower().Replace(" ", "") == location.ToLower().Replace(" ", "")
-                    );
-
-                if (postcode is { Latitude: not null, Longitude: not null })
-                {
-                    return new GeoLocationResponse(
-                        new GeoLocation
-                        {
-                            Latitude = postcode.Latitude.Value,
-                            Longitude = postcode.Longitude.Value
-                        },
-                        true
-                    );
-                }
-
-                return new GeoLocationResponse(null, false, "Postcode not found.");
-            }
-
-            var response = await apiClient
-                .GetAsync<PlaceResult>(ApiClientNames.Postcode, $"places/?q={location}&limit=1");
-
-            if (response.Result?.Count > 0)
-            {
-                var place = response.Result[0];
-
                 return new GeoLocationResponse(
                     new GeoLocation
                     {
-                        Latitude = place.Latitude.GetValueOrDefault(),
-                        Longitude = place.Longitude.GetValueOrDefault()
+                        Latitude = postcode.Latitude.Value,
+                        Longitude = postcode.Longitude.Value
                     },
                     true
                 );
             }
 
-            return new GeoLocationResponse(null, false, "Location not found.");
+            return new GeoLocationResponse(null, false, "Postcode not found.");
         }
-        catch (HttpRequestException)
+
+        var response = await apiClient
+            .GetAsync<PlaceResult>(ApiClientNames.Postcode, $"places/?q={location}&limit=1");
+
+        if (response.Result?.Count > 0)
         {
-            return new GeoLocationResponse(null, false, "Location not found.");
+            var place = response.Result[0];
+
+            return new GeoLocationResponse(
+                new GeoLocation
+                {
+                    Latitude = place.Latitude.GetValueOrDefault(),
+                    Longitude = place.Longitude.GetValueOrDefault()
+                },
+                true
+            );
         }
+
+        return new GeoLocationResponse(null, false, "Location not found.");
     }
     
     private static string? BuildFilterExpression(SearchRequest request, GeoLocation? userLocation)

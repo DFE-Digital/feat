@@ -11,22 +11,22 @@ public class SearchController(ISearchService searchService) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<SearchResponse>> Search([FromBody] SearchRequest request)
     {
-        var result = await searchService.SearchAsync(request);
+        var (validation, response) = await searchService.SearchAsync(request);
 
-        if (result?.Error != null)
+        if (!validation.IsValid)
         {
-            return ValidationProblem(
-                title: "Invalid location",
-                detail: result.Error,
-                statusCode: StatusCodes.Status400BadRequest
-            );
+            return ValidationProblem(new ValidationProblemDetails(validation.Errors)
+            {
+                Title = "One or more validation errors occurred.",
+                Status = StatusCodes.Status400BadRequest
+            });
         }
 
-        if (result == null)
+        if (response == null)
         {
             return NotFound();
         }
 
-        return Ok(result);
+        return Ok(response);
     }
 }
