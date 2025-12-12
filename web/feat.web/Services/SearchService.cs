@@ -27,7 +27,7 @@ public class SearchService(
         var endpoint = new Uri(new Uri(options.Value.ApiBaseUrl), $"api/courses/{instanceId}").ToString();
         var response = await apiClient.GetAsync<CourseDetailsResponse>(ApiClientNames.Feat, endpoint);
 
-        return response.EntryType switch
+        return response?.EntryType switch
         {
             EntryType.Course => response.ToCourseViewModel(),
             EntryType.Apprenticeship => response.ToApprenticeshipViewModel(),

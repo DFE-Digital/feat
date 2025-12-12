@@ -22,11 +22,6 @@ public class SearchController(ISearchService searchService) : ControllerBase
             });
         }
 
-        if (response == null)
-        {
-            return NotFound();
-        }
-
         return Ok(response);
     }
 }
