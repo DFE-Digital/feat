@@ -220,7 +220,7 @@ public class DiscoverUniIngestionHandler(
         // Get our latest aim levels file
         var aimData = files.Where(blob =>
                 blob.Name.StartsWith("KISAIM", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (aimData != null && Aims != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of aim level data...");
@@ -254,7 +254,7 @@ public class DiscoverUniIngestionHandler(
         // Get our latest HECOS sectors file
         var hecosData = files.Where(blob =>
                 blob.Name.StartsWith("HECOS", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (hecosData != null && HECOS != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of HECOS sector data...");
@@ -285,7 +285,7 @@ public class DiscoverUniIngestionHandler(
         // Get our latest locations file
         var locationData = files.Where(blob =>
                 blob.Name.StartsWith("LOCATION", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (locationData != null && Locations != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of location data...");
@@ -316,7 +316,7 @@ public class DiscoverUniIngestionHandler(
         // Get our latest institutions file
         var institutionData = files.Where(blob =>
                 blob.Name.StartsWith("INSTITUTION", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (institutionData != null && Providers != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of institution data...");
@@ -348,7 +348,7 @@ public class DiscoverUniIngestionHandler(
         // Get our latest courses file
         var courseData = files.Where(blob =>
                 blob.Name.StartsWith("KISCOURSE", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (courseData != null && Courses != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of course data...");
@@ -379,7 +379,7 @@ public class DiscoverUniIngestionHandler(
         // Get our latest course locations file
         var courseLocationData = files.Where(blob =>
                 blob.Name.StartsWith("COURSELOCATION", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (courseLocationData != null && Courses != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of course location data...");

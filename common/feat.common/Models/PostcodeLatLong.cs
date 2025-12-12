@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace feat.common.Models;
 
-[Table("postcodelatlng")]
+[Table("PostcodeLatLong")]
 public class PostcodeLatLong
 {
     [Key]
@@ -14,4 +14,8 @@ public class PostcodeLatLong
     
     public double? Longitude { get; set; }
     
+    public DateTime? Expired { get; set; }
+    
+    [NotMapped]
+    public bool Valid => !Expired.HasValue ||  Expired.Value <= DateTime.Today;
 }
