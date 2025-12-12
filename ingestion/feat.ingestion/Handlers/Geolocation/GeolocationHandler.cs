@@ -45,7 +45,7 @@ public class GeolocationHandler(
         // Get our latest postcode Data file
         var postcodeData = files.Where(blob =>
                 blob.Name.StartsWith("postcode_", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
 
         if (postcodeData != null)
         {
@@ -71,7 +71,7 @@ public class GeolocationHandler(
         // Get our latest postcode Data file
         var locationData = files.Where(blob =>
                 blob.Name.StartsWith("england_", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
 
         if (locationData != null)
         {
