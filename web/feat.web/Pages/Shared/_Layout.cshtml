@@ -1,4 +1,5 @@
 ﻿@using feat.web.Utils
+@using Microsoft.AspNetCore.Http.Features
 @{
     // ReSharper disable once Razor.LayoutNotResolved
     Layout = "_GovUkPageTemplate";
@@ -32,22 +33,42 @@
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src=https://www.googletagmanager.com/ns.html?id=GTM-KX9ZWC6X height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <!--
-    <govuk-cookie-banner aria-label="Cookies on Find Education and Training">
-        <govuk-cookie-banner-message>
-            <govuk-cookie-banner-message-heading>Cookies on Find Education and Training</govuk-cookie-banner-message-heading>
-            <govuk-cookie-banner-message-content>
-                <p class="govuk-body">We use some essential cookies to make this service work.</p>
-                <p class="govuk-body">We’d also like to use analytics cookies so we can understand how you use the service and make improvements.</p>
-            </govuk-cookie-banner-message-content>
-            <govuk-cookie-banner-message-actions>
-                <govuk-cookie-banner-message-action text="Accept analytics cookies" type="button"/>
-                <govuk-cookie-banner-message-action text="Reject analytics cookies" type="button"/>
-                <govuk-cookie-banner-message-action-link text="View cookies" href="#"/>
-            </govuk-cookie-banner-message-actions>
-        </govuk-cookie-banner-message>
-    </govuk-cookie-banner>
-    -->
+    
+    @{
+        var hasAnalyticsCookie = Context.Request.Cookies[SharedStrings.AnalyticsCookie];
+        var hasMarketingCookie = Context.Request.Cookies[SharedStrings.MarketingCookie];
+        var hasCookieConsent = !string.IsNullOrEmpty(hasAnalyticsCookie) || !string.IsNullOrEmpty(hasMarketingCookie);
+        var showBanner = !hasCookieConsent;
+        ViewBag.ShowCookieBanner =  showBanner;
+    }
+    
+    @if (ViewBag.ShowCookieBanner)
+    {
+        <div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Cookies on Find Education and Training" id="cookieConsent">
+            <div class="govuk-cookie-banner__message govuk-width-container">
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds">
+                        <h2 class="govuk-cookie-banner__heading govuk-heading-m">
+                            Cookies on Find Education and Training
+                        </h2>
+                        <div class="govuk-cookie-banner__content">
+                            <p class="govuk-body">We use some essential cookies to make this service work.</p>
+                            <p class="govuk-body">We’d also like to use analytics cookies so we can understand how you use the service and make improvements.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="govuk-button-group">
+                    <button type="button" class="govuk-button" data-module="govuk-button" onclick="acceptCookies(true);">
+                        Accept analytics cookies
+                    </button>
+                    <button type="button" class="govuk-button" data-module="govuk-button" onclick="acceptCookies(false);">
+                        Reject analytics cookies
+                    </button>
+                    <a class="govuk-link" asp-page="/linkpages/cookies">View cookies</a>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 
@@ -186,5 +207,28 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    
+    @if (ViewBag.ShowCookieBanner)
+    {
+        <script>
+            function acceptCookies(args) {
+                document.getElementById("cookieConsent").style.display = "none";
+                if (args === true) {
+                    createCookie("AnalyticsCookie", "yes");
+                    createCookie("MarketingCookie", "yes");
+                } else {
+                    createCookie("AnalyticsCookie", "no");
+                    createCookie("MarketingCookie", "no");
+                }
+            }
+            function createCookie(cookiname, cookivalue) {
+                let date = new Date();
+                date.setFullYear(date.getFullYear() + 1);
+                let expires = "expires=" + date.toGMTString();
+                document.cookie =
+                    cookiname + "=" + cookivalue + ";" + expires + ";path=/;Secure";
+            }
+        </script>
+    }
 }
 @* ReSharper restore Razor.SectionNotResolved *@

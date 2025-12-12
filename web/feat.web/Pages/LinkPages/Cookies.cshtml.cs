@@ -1,4 +1,5 @@
 using feat.web.Services;
+using feat.web.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -18,8 +19,8 @@ public class Cookies(StaticNavigationHandler staticNavigation) : PageModel
     {
         RefererUrl = staticNavigation.GetRefererUrl();
         
-        AnalyticsCookie = Request.Cookies[nameof(AnalyticsCookie)];
-        MarketingCookie = Request.Cookies[nameof(MarketingCookie)];
+        AnalyticsCookie = Request.Cookies[SharedStrings.AnalyticsCookie];
+        MarketingCookie = Request.Cookies[SharedStrings.MarketingCookie];
         
         return Page();
     }
@@ -28,17 +29,17 @@ public class Cookies(StaticNavigationHandler staticNavigation) : PageModel
     {
         if (AnalyticsCookie != null)
         {
-            Response.Cookies.Append(nameof(AnalyticsCookie), AnalyticsCookie, new CookieOptions
+            Response.Cookies.Append(SharedStrings.AnalyticsCookie, AnalyticsCookie, new CookieOptions
             {
-                Expires= DateTime.Now.AddDays(1)
+                Expires= DateTime.Now.AddYears(1)
             });
         }
 
         if (MarketingCookie != null)
         {
-            Response.Cookies.Append(nameof(MarketingCookie), MarketingCookie, new CookieOptions
+            Response.Cookies.Append(SharedStrings.MarketingCookie, MarketingCookie, new CookieOptions
             {
-                Expires = DateTime.Now.AddDays(1)
+                Expires = DateTime.Now.AddYears(1)
             });
         }
         
