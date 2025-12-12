@@ -30,28 +30,14 @@ public class SearchControllerTests
             Query = "art",
             Location = "Manchester",
         };
+        var validationResult = new ValidationResult();
         var searchResponse = new SearchResponse();
-        _searchService.SearchAsync(searchRequest).Returns(searchResponse);
+        _searchService.SearchAsync(searchRequest).Returns((validationResult, searchResponse));
         
         var result = await _searchController.Search(searchRequest);
         
         Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
         var okResult = result.Result as OkObjectResult;
         Assert.That(okResult?.Value, Is.EqualTo(searchResponse));
-    }
-
-    [Test]
-    public async Task WhenSearchReturnsNull_ShouldReturnNotFoundResult()
-    {
-        var searchRequest = new SearchRequest
-        {
-            Query = "farmer",
-            Location = "London",
-        };
-        _searchService.SearchAsync(searchRequest).Returns((SearchResponse)null);
-        
-        var result = await _searchController.Search(searchRequest);
-        
-        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
     }
 }

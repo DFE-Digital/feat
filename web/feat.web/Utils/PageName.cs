@@ -9,9 +9,6 @@ public static class PageName
     public const string Age = "Age";
     public const string CheckAnswers = "CheckAnswers";
     public const string LoadCourses = "LoadCourses"; 
-    public const string DetailsCourse = "DetailsCourse";
-    public const string DetailsApprenticeship = "DetailsApprenticeship";
-    public const string DetailsUniversityDegree = "DetailsUniversityDegree";
     public const string NoResultsSearch = "NoResultsSearch";
     public const string Ai = "Ai";
 }

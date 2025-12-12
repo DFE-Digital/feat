@@ -2,7 +2,7 @@ namespace feat.common;
 
 public interface IApiClient
 {
-    Task<T> GetAsync<T>(
+    Task<T?> GetAsync<T>(
         string clientName,
         string url,
         CancellationToken cancellationToken = default);
