@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.IO.Compression;
 using Azure.Storage.Blobs;
 using CsvHelper;
 using feat.common.Models;
@@ -44,7 +45,7 @@ public class GeolocationHandler(
 
         // Get our latest postcode Data file
         var postcodeData = files.Where(blob =>
-                blob.Name.StartsWith("postcode_", StringComparison.InvariantCultureIgnoreCase))
+                blob.Name.StartsWith("ONSPD_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
 
         if (postcodeData != null)
@@ -52,23 +53,41 @@ public class GeolocationHandler(
             Console.WriteLine("Starting import of postcode data");
             var blobClient = containerClient.GetBlobClient(postcodeData.Name);
             Console.WriteLine("Fetching file");
-            using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
-            Console.WriteLine("Setting up CSV reader");
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<PostcodeLatLongMap>();
-            Console.WriteLine("Reading data...");
-            var records = csv.GetRecords<PostcodeLatLong>().ToList();
+            var stream = await blobClient.OpenReadAsync(cancellationToken: cancellationToken);
+            await using var archive = new ZipArchive(stream, ZipArchiveMode.Read);
 
+            List<PostcodeLatLong> postcodes = [];
+            
+            foreach (var postcodeFile in archive.Entries
+                         .Where(e => e.FullName.StartsWith("Data/multi_csv") 
+                                     && e.Name.EndsWith(".csv")))
+            {
+                using var reader = new StreamReader(await postcodeFile.OpenAsync(cancellationToken));
+                Console.WriteLine($"Setting up CSV reader for {postcodeFile.Name}");
+                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                csv.Context.RegisterClassMap<PostcodeMap>();
+                Console.WriteLine("Reading data...");
+                var records = csv.GetRecordsAsync<Postcode>(cancellationToken);
+                
+                postcodes.AddRange(records
+                    .Where(p => p.CountryCode != null && p.CountryCode.StartsWith('E'))
+                    .Select(p => new PostcodeLatLong()
+                    {
+                        Postcode = p.Code,
+                        Latitude = p.Latitude,
+                        Longitude = p.Longitude,
+                        Expired = p.Expired
+                    }).ToBlockingEnumerable(cancellationToken: cancellationToken));
+            }
 
-            Console.WriteLine($"Preparing {records.Count} records to DB...");
-            await dbContext.BulkSynchronizeAsync(records, options => { options.UseTableLock = true; },
+            Console.WriteLine($"Preparing {postcodes.Count} records to DB...");
+            await dbContext.BulkSynchronizeAsync(postcodes, options => { options.UseTableLock = true; },
                 cancellationToken);
-
 
             Console.WriteLine("Done");
         }
 
-        // Get our latest postcode Data file
+        // Get our latest Location Data file
         var locationData = files.Where(blob =>
                 blob.Name.StartsWith("england_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
@@ -125,7 +144,7 @@ public class GeolocationHandler(
 
         await foreach (var blob in files)
         {
-            if (blob.Name.StartsWith("postcode_", StringComparison.InvariantCultureIgnoreCase))
+            if (blob.Name.StartsWith("ONSPD_", StringComparison.InvariantCultureIgnoreCase))
             {
                 foundPostcodes = true;
             }
