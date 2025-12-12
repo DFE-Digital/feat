@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace feat.common.Models;
 
-[Table("PostcodeLatLong")]
-public class PostcodeLatLong
+[Table("LocationLatLong")]
+public class LocationLatLong
 {
     [Key]
-    [StringLength(8)]
-    public required string Postcode { get; set; } 
+    [StringLength(100)]
+    public required string Name { get; set; } 
     
     public double? Latitude { get; set; }
     

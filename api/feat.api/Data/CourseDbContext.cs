@@ -40,5 +40,8 @@ public class CourseDbContext(DbContextOptions<CourseDbContext> options) : DbCont
 
     public DbSet<Vacancy> Vacancies { get; set; }
     
-    public DbSet<PostcodeLatLong> Postcodes { get; set; }
+    public DbSet<PostcodeLatLong> LookupPostcodes { get; set; }
+    
+    public DbSet<LocationLatLong> LookupLocations { get; set; }
+    
 }

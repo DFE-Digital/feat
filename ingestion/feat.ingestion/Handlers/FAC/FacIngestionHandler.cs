@@ -139,39 +139,6 @@ public class FacIngestionHandler(
         // Let's stream our data in
         var files = containerClient.GetBlobsAsync(cancellationToken: cancellationToken)
             .ToBlockingEnumerable(cancellationToken).ToArray();
-
-        // Get our latest postcode Data file
-        var postcodeData = files.Where(blob =>
-                blob.Name.StartsWith("ukpostcodes", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
-        if (postcodeData != null && Postcodes != ProcessMode.Skip)
-        {
-            Console.WriteLine("Starting import of postcode data");
-            var blobClient = containerClient.GetBlobClient(postcodeData.Name);
-            Console.WriteLine("Fetching file");
-            using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
-            Console.WriteLine("Setting up CSV reader");
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<PostcodeLatLongMap>();
-            Console.WriteLine("Reading data...");
-            var records = csv.GetRecords<PostcodeLatLong>().ToList();
-
-            if (
-                Postcodes == ProcessMode.Force
-                || dbContext.Postcodes.Count() != records.Count
-            )
-            {
-                Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
-                {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
-                }, cancellationToken);
-            }
-
-            Console.WriteLine("Done");
-        }
         
         // Get our latest AIM Data file
         var aimData = files.Where(blob =>
@@ -575,7 +542,7 @@ public class FacIngestionHandler(
         Console.WriteLine("Generating locations...");
         var locations =
             from v in dbContext.FAC_Venues
-            join p in dbContext.Postcodes
+            join p in dbContext.LookupPostcodes
                 on v.Postcode equals p.Postcode into postcodes
             from p in postcodes.DefaultIfEmpty()
             where v.VenueStatus == VenueStatus.Live

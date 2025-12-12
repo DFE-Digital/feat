@@ -255,7 +255,7 @@ public class SearchService(
         
         if (isPostcode)
         {
-            var postcode = dbContext.Postcodes.FirstOrDefault(p =>
+            var postcode = dbContext.LookupPostcodes.FirstOrDefault(p =>
                 p.Postcode.ToLower().Replace(" ", "") == location.ToLower().Replace(" ", "")
             );
 
