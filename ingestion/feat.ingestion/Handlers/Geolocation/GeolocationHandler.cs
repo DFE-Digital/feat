@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.IO.Compression;
+using System.Security.Cryptography;
 using Azure.Storage.Blobs;
 using CsvHelper;
 using feat.common.Models;
@@ -9,6 +10,7 @@ using feat.ingestion.Data;
 using feat.ingestion.Enums;
 using feat.ingestion.Models.FAC;
 using feat.ingestion.Models.Geolocation;
+using feat.ingestion.Models.Geolocation.Converters;
 
 namespace feat.ingestion.Handlers.Geolocation;
 
@@ -74,6 +76,7 @@ public class GeolocationHandler(
                     .Select(p => new PostcodeLatLong()
                     {
                         Postcode = p.Code,
+                        CleanPostcode = p.Code.Replace(" ", ""),
                         Latitude = p.Latitude,
                         Longitude = p.Longitude,
                         Expired = p.Expired
@@ -86,32 +89,65 @@ public class GeolocationHandler(
 
             Console.WriteLine("Done");
         }
-
-        // Get our latest Location Data file
-        var locationData = files.Where(blob =>
-                blob.Name.StartsWith("england_", StringComparison.InvariantCultureIgnoreCase))
+        
+        // Get our latest postcode Data file
+        var onsLocationData = files.Where(blob =>
+                blob.Name.StartsWith("OPNAME_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
 
-        if (locationData != null)
+        if (onsLocationData != null)
         {
-            Console.WriteLine("Starting import of location data");
-            var blobClient = containerClient.GetBlobClient(locationData.Name);
+            Console.WriteLine("Starting import of ONS Name data");
+            var blobClient = containerClient.GetBlobClient(onsLocationData.Name);
             Console.WriteLine("Fetching file");
-            using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
-            Console.WriteLine("Setting up CSV reader");
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<LocationLatLongMap>();
-            Console.WriteLine("Reading data...");
-            var records = csv.GetRecords<LocationLatLong>().ToList();
+            var stream = await blobClient.OpenReadAsync(cancellationToken: cancellationToken);
+            await using var archive = new ZipArchive(stream, ZipArchiveMode.Read);
 
+            List<LocationLatLong> locations = [];
+            
+            foreach (var locationFile in archive.Entries
+                         .Where(e => e.FullName.StartsWith("Data") 
+                                     && e.Name.EndsWith(".csv")))
+            {
+                using var reader = new StreamReader(await locationFile.OpenAsync(cancellationToken));
+                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                csv.Context.RegisterClassMap<OpenNameMap>();
+                var records = csv.GetRecordsAsync<OpenName>(cancellationToken);
 
-            Console.WriteLine($"Preparing {records.Count} records to DB...");
-            await dbContext.BulkSynchronizeAsync(records, options => { options.UseTableLock = true; },
+                locations.AddRange(records
+                    .Where(r => r is
+                    {
+                        Country: "England", 
+                        Type: "populatedPlace",
+                        LocalType: "City" or "Town" or "Village" or "Hamlet"
+                    })
+                    .Select(r => new LocationLatLong()
+                    {
+                        Name = (r.Name2Lang != null && r.Name2Lang.Equals("eng",
+                                                        StringComparison.InvariantCultureIgnoreCase)
+                                                    && r.Name2 != null
+                            ? r.Name2
+                            : r.Name1) + (!string.IsNullOrEmpty(r.County) ? $" ({r.County})" : ""),
+                        CleanName = r.Name2Lang != null && r.Name2Lang.Equals("eng",
+                                                            StringComparison.InvariantCultureIgnoreCase)
+                                                        && r.Name2 != null
+                            ? r.Name2.Replace("'", "").Replace("-", " ")
+                            : r.Name1.Replace("'", "").Replace("-", " "),
+                        County = r.County,
+                        Latitude = EastingsNorthingsLatLong.ToLatLong(r.X, r.Y).Latitude,
+                        Longitude = EastingsNorthingsLatLong.ToLatLong(r.X, r.Y).Longitude
+                    }).ToBlockingEnumerable(cancellationToken: cancellationToken));
+            }
+
+            locations = locations.DistinctBy(l => new { l.Name, l.County }).ToList();
+
+            Console.WriteLine($"Preparing {locations.Count} records to DB...");
+            await dbContext.BulkSynchronizeAsync(locations, options => { options.UseTableLock = true; },
                 cancellationToken);
-
 
             Console.WriteLine("Done");
         }
+        
 
         return true;
 
@@ -135,39 +171,7 @@ public class GeolocationHandler(
             Console.WriteLine($"Unable create the {Name} Azure Storage Container");
             return false;
         }
-
-        // Now check we have some files
-        var files = containerClient.GetBlobsAsync(cancellationToken: cancellationToken);
-
-        var foundPostcodes = false;
-        var foundLocations = false;
-
-        await foreach (var blob in files)
-        {
-            if (blob.Name.StartsWith("ONSPD_", StringComparison.InvariantCultureIgnoreCase))
-            {
-                foundPostcodes = true;
-            }
-
-            if (blob.Name.StartsWith("england_", StringComparison.InvariantCultureIgnoreCase))
-            {
-                foundLocations = true;
-            }
-            
-        }
-
-        if (!foundPostcodes)
-        {
-            Console.WriteLine("Unable to find postcodes data file");
-            return false;
-        }
-
-        if (!foundLocations)
-        {
-            Console.WriteLine("Unable to find locations data file");
-            return false;
-        }
-
+        
         // Otherwise, we're returning true
         return true;
     }

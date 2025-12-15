@@ -8,4 +8,6 @@ public interface ISearchService
         SearchAsync(SearchRequest request);
 
     Task<GeoLocationResponse> GetGeoLocationAsync(string location);
+    
+    Task<AutoCompleteLocation[]> GetAutoCompleteLocationsAsync(string location);
 }

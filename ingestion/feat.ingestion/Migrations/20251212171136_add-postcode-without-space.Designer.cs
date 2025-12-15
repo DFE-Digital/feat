@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251212171136_add-postcode-without-space")]
+    partial class addpostcodewithoutspace
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -410,15 +413,6 @@ namespace feat.ingestion.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("CleanName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("County")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<double?>("Latitude")
                         .HasColumnType("float");
 
@@ -426,8 +420,6 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Name");
-
-                    b.HasIndex("CleanName");
 
                     b.ToTable("LocationLatLong");
                 });
@@ -438,10 +430,6 @@ namespace feat.ingestion.Migrations
                         .HasMaxLength(8)
                         .HasColumnType("nvarchar(8)");
 
-                    b.Property<string>("CleanPostcode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime?>("Expired")
                         .HasColumnType("datetime2");
 
@@ -451,9 +439,13 @@ namespace feat.ingestion.Migrations
                     b.Property<double?>("Longitude")
                         .HasColumnType("float");
 
+                    b.Property<string>("PostcodeNoSpace")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Postcode");
 
-                    b.HasIndex("CleanPostcode", "Expired");
+                    b.HasIndex("PostcodeNoSpace", "Expired");
 
                     b.ToTable("PostcodeLatLong");
                 });
