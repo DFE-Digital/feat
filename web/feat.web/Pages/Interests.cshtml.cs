@@ -72,7 +72,7 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
             
             if (string.IsNullOrWhiteSpace(UserInterest1))
             {
-                ModelState.AddModelError("UserInterest1", "Please enter an interest");
+                ModelState.AddModelError("UserInterest1", SharedStrings.EnterAnInterest);
             }
         }
 

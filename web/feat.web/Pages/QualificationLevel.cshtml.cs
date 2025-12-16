@@ -11,7 +11,6 @@ namespace feat.web.Pages;
 public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) : PageModel
 {
     [BindProperty]
-    [Required(ErrorMessage = "Please select the level of qualification you are looking for")]
     public List<QualificationLevel> SelectedQualificationOptions { get; set; } = [];
     
     public required Search Search { get; set; }
@@ -33,59 +32,53 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
     {
         logger.LogInformation("Qualification OnPost {SelectedQualificationOptions}", SelectedQualificationOptions);
 
-        try
-        {
-            Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-            
-            if (SelectedQualificationOptions?.Count == 0)
-            {
-                ModelState.AddModelError("SelectedQualificationOptions", SharedStrings.SelectQualificationLevel);
-            }
-            
-            if (!ModelState.IsValid) 
-                return Page();
-            
-            Search.QualificationLevels?.Clear();
-            if (SelectedQualificationOptions is { Count: > 0 })
-            {
-                foreach (var qualificationOption in SelectedQualificationOptions)
-                {
-                    if (Search.QualificationLevels != null && 
-                        !Search.QualificationLevels.Contains(qualificationOption))
-                    {
-                        Search.QualificationLevels.Add(qualificationOption);
-                    }
-                }
-            }
-            else
-            {
-                Search.QualificationLevels = new List<QualificationLevel>(Enum.GetValues<QualificationLevel>());
-            }
-            Search.Updated = true;
-            HttpContext.Session.Set("Search", Search);
+        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
-            if ((SelectedQualificationOptions.Contains(Enums.QualificationLevel.None) || 
-                 SelectedQualificationOptions.Contains(Enums.QualificationLevel.OneAndTwo)))
-            {
-                if (Search.AgeGroup.HasValue && Search.VisitedCheckAnswers)
-                {
-                    return RedirectToPage(PageName.CheckAnswers);
-                }
-                return RedirectToPage(PageName.Age);
-            }
-            else if (Search.AgeGroup.HasValue && Search.VisitedCheckAnswers)
-            {
-                Search.AgeGroup = null;
-                HttpContext.Session.Set("Search", Search);
-            }
-            
-            return RedirectToPage(PageName.CheckAnswers);
-        }
-        catch (Exception e)
+        if (SelectedQualificationOptions?.Count == 0)
         {
-            logger.LogError(e.Message);
+            ModelState.AddModelError("SelectedQualificationOptions", SharedStrings.SelectQualificationLevel);
         }
-        return Page();
+
+        if (!ModelState.IsValid)
+            return Page();
+
+        Search.QualificationLevels?.Clear();
+        if (SelectedQualificationOptions is { Count: > 0 })
+        {
+            foreach (var qualificationOption in SelectedQualificationOptions)
+            {
+                if (Search.QualificationLevels != null &&
+                    !Search.QualificationLevels.Contains(qualificationOption))
+                {
+                    Search.QualificationLevels.Add(qualificationOption);
+                }
+            }
+        }
+        else
+        {
+            Search.QualificationLevels = new List<QualificationLevel>(Enum.GetValues<QualificationLevel>());
+        }
+
+        Search.Updated = true;
+        HttpContext.Session.Set("Search", Search);
+
+        if ((SelectedQualificationOptions.Contains(Enums.QualificationLevel.None) ||
+             SelectedQualificationOptions.Contains(Enums.QualificationLevel.OneAndTwo)))
+        {
+            if (Search.AgeGroup.HasValue && Search.VisitedCheckAnswers)
+            {
+                return RedirectToPage(PageName.CheckAnswers);
+            }
+
+            return RedirectToPage(PageName.Age);
+        }
+        else if (Search.AgeGroup.HasValue && Search.VisitedCheckAnswers)
+        {
+            Search.AgeGroup = null;
+            HttpContext.Session.Set("Search", Search);
+        }
+
+        return RedirectToPage(PageName.CheckAnswers);
     }
-    
+
 }
