@@ -1,4 +1,5 @@
 @using feat.common.Extensions
+@using feat.web.Utils;
 @model feat.web.Models.ViewModels.CourseDetailsCourse
 
 <div class="govuk-width-container local_top_spacing" >
@@ -69,7 +70,7 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Provider location</dt>
                 <dd class="govuk-summary-list__value">
-                  @Model.CourseAddresses?.FirstOrDefault()?.Display
+                  @(!string.IsNullOrWhiteSpace(Model.CourseAddresses?.FirstOrDefault()?.Display) ? Model.CourseAddresses?.FirstOrDefault()?.Display : SharedStrings.NotProvided)
                 </dd>
                 <dd class="govuk-summary-list__actions">
                   @if (!string.IsNullOrEmpty(Model.CourseAddresses?.FirstOrDefault()?.MapLocationUrl))
