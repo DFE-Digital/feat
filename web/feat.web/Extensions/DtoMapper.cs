@@ -69,7 +69,7 @@ public static class DtoMapper
         var model = MapCourseDetailsBase<CourseDetailsApprenticeship>(response);
 
         model.Wage = response.Wage;
-        model.PositionAvailable = response.PositionAvailable;
+        model.PositionsAvailable = response.PositionsAvailable;
         model.EmployerName = response.EmployerName;
         model.EmployerAddress = response.EmployerAddresses.ToLocationViewModels().FirstOrDefault();
         model.EmployerUrl = response.EmployerUrl;

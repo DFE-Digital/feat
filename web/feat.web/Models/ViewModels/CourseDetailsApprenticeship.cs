@@ -4,7 +4,7 @@ public class CourseDetailsApprenticeship : CourseDetailsBase
 {
     public string? Wage { get; set; }
     
-    public string? PositionAvailable { get; set; }
+    public short? PositionsAvailable { get; set; }
     
     public string? EmployerName { get; set; }
     

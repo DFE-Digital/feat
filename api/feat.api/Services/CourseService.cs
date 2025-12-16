@@ -14,7 +14,7 @@ public class CourseService(CourseDbContext dbContext, IFusionCache cache) : ICou
     {
         return await cache.GetOrSetAsync<CourseDetailsResponse?>(
             $"instance:{instanceId}",
-            async entry => await GetCourseFromDatabase(instanceId));
+            async _ => await GetCourseFromDatabase(instanceId));
     }
     
     private async Task<CourseDetailsResponse?> GetCourseFromDatabase(Guid instanceId)
@@ -102,8 +102,8 @@ public class CourseService(CourseDbContext dbContext, IFusionCache cache) : ICou
                 courseDetails.EmployerName = employer.Name;
                 courseDetails.EmployerAddresses = employer.EmployerLocations
                     .Select(el => el.Location.ToLocation()).Distinct().ToList();
-                courseDetails.EmployerDescription = null; // We don't have this
-                courseDetails.PositionAvailable = null; // We don't have this
+                courseDetails.PositionsAvailable = vacancy.Positions;
+                courseDetails.EmployerDescription = null;
                 break;
             
             case EntryType.Course:
