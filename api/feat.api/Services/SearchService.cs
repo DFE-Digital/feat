@@ -120,7 +120,7 @@ public class SearchService(
 
     public async Task<AutoCompleteLocation[]> GetAutoCompleteLocationsAsync(string location)
     {
-        if (string.IsNullOrEmpty(location) || location.Length < 2)
+        if (string.IsNullOrEmpty(location) || location.Length < 3)
             return [];
 
         var searchTerm = location.Trim();

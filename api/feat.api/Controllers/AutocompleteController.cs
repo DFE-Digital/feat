@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using feat.api.Models;
 using feat.api.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -10,7 +11,10 @@ namespace feat.api.Controllers;
 public class AutocompleteController(ISearchService searchService) : ControllerBase
 {
     [HttpGet("{query}")]
-    public async Task<ActionResult<AutoCompleteLocation[]>> Query(string query)
+    public async Task<ActionResult<AutoCompleteLocation[]>> Query(
+        [MaxLength(100)]
+        [MinLength(3)]
+        string query)
     {
         var locations = await searchService.GetAutoCompleteLocationsAsync(query);
 
