@@ -41,12 +41,16 @@
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Awarding organisation</dt>
-                <dd class="govuk-summary-list__value">@Model.AwardingOrganisation</dd>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrWhiteSpace(Model.AwardingOrganisation) ? Model.University: Model.AwardingOrganisation)
+                </dd>
               </div>
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Course description</dt>
-                <dd class="govuk-summary-list__value">@Model.Description</dd>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrWhiteSpace(Model.Description)? "You will need to visit the institution’s website for information about this course." : Model.Description)
+                </dd>
               </div>
             </dl>
           </div>
