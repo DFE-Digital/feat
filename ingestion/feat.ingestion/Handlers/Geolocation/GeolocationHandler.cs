@@ -128,11 +128,11 @@ public class GeolocationHandler(
                                                     && r.Name2 != null
                             ? r.Name2
                             : r.Name1) + (!string.IsNullOrEmpty(r.County) ? $" ({r.County})" : ""),
-                        CleanName = r.Name2Lang != null && r.Name2Lang.Equals("eng",
+                        CleanName = (r.Name2Lang != null && r.Name2Lang.Equals("eng",
                                                             StringComparison.InvariantCultureIgnoreCase)
                                                         && r.Name2 != null
                             ? r.Name2.Replace("'", "").Replace("-", " ")
-                            : r.Name1.Replace("'", "").Replace("-", " "),
+                            : r.Name1.Replace("'", "").Replace("-", " ")) + (!string.IsNullOrEmpty(r.County) ? $" {r.County}" : ""),
                         County = r.County,
                         Latitude = EastingsNorthingsLatLong.ToLatLong(r.X, r.Y).Latitude,
                         Longitude = EastingsNorthingsLatLong.ToLatLong(r.X, r.Y).Longitude
