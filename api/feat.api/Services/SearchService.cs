@@ -128,6 +128,7 @@ public class SearchService(
         
         var fromLocations =
             dbContext.LookupLocations
+                .AsNoTracking()
                 .Where(l =>
                     (EF.Functions.Like(l.Name, $"{searchTerm}%") || EF.Functions.Like(l.Name, $"%{searchTerm}%")) &&
                     l.Latitude != null && l.Longitude != null)
@@ -146,6 +147,7 @@ public class SearchService(
         
         var fromPostcodes =
             dbContext.LookupPostcodes
+                .AsNoTracking()
                 .Where(p =>
                     p.CleanPostcode.StartsWith(searchTerm.Replace(" ", "")) &&
                     (p.Expired == null || p.Expired > DateTime.Today) &&
