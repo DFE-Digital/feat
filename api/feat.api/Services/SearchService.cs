@@ -117,7 +117,95 @@ public class SearchService(
             async _ => await ResolveLocationAsync(location)
         );
     }
-    
+
+    public async Task<AutoCompleteLocation[]> GetAutoCompleteLocationsAsync(string location)
+    {
+        if (string.IsNullOrWhiteSpace(location) || location.Length < 3)
+            return [];
+
+        var searchTerm = location.Trim();
+        searchTerm = searchTerm.Replace("'", "%");
+        
+        var fromLocations =
+            dbContext.LookupLocations
+                .AsNoTracking()
+                .Where(l =>
+                    (EF.Functions.Like(l.CleanName, $"{searchTerm}%") || EF.Functions.Like(l.CleanName, $"%{searchTerm}%")) &&
+                    l.Latitude != null && l.Longitude != null)
+                .Select(l => new
+                {
+                    Text = l.Name,
+                    l.Latitude,
+                    l.Longitude,
+                    Rank = l.Name == searchTerm
+                        ? 1
+                        : EF.Functions.Like(l.CleanName, $"{searchTerm}%") ? 2 : 3
+                })
+                .OrderBy(x => x.Rank)
+                .ThenBy(x => x.Text)
+                .Take(5);
+        
+        var fromPostcodes =
+            dbContext.LookupPostcodes
+                .AsNoTracking()
+                .Where(p =>
+                    p.CleanPostcode.StartsWith(searchTerm.Replace(" ", "")) &&
+                    (p.Expired == null || p.Expired > DateTime.Today) &&
+                    p.Latitude != null && p.Longitude != null)
+                .Select(p => new
+                {
+                    Text = p.Postcode,
+                    p.Latitude,
+                    p.Longitude,
+                    Rank = p.CleanPostcode == searchTerm.Replace(" ", "")
+                        ? 0
+                        : (EF.Functions.Like(p.CleanPostcode, $"{searchTerm.Replace(" ", "")}%")) ? 1 : 2
+                })
+                .OrderBy(x => x.Rank)
+                .ThenBy(x => x.Text)
+                .Take(5);
+
+        var query =
+            fromLocations
+                .Concat(fromPostcodes)
+                .GroupBy(x => new { x.Text, x.Latitude, x.Longitude })
+                .Select(g => new
+                {
+                    g.Key.Text,
+                    g.Key.Latitude,
+                    g.Key.Longitude,
+                    Rank = g.Min(x => x.Rank)
+                })
+                .OrderBy(x => x.Rank)
+                .ThenBy(x => x.Text)
+                .Take(5);
+
+        var results = await query.ToListAsync();
+
+        if (results.Any(x => x.Rank == 0))
+        {
+            var firstResult = results.First(x => x.Rank == 0);
+            return
+            [
+                new AutoCompleteLocation()
+                {
+                    Name = firstResult.Text,
+                    Latitude = firstResult.Latitude.Value,
+                    Longitude = firstResult.Longitude.Value
+                }
+            ];
+        }
+        else
+        {
+            return results.OrderBy(x => x.Rank).ThenBy(x => x.Text).Select(x => new AutoCompleteLocation()
+            {
+                Name = x.Text,
+                Latitude = x.Latitude.Value,
+                Longitude = x.Longitude.Value
+            }).ToArray();
+        }
+    }
+
     private static void RemoveDuplicateCourses(List<Course> courses)
     {
         if (courses.Count == 0)

@@ -1,14 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace feat.common.Models;
 
 [Table("PostcodeLatLong")]
+[Index(nameof(CleanPostcode), nameof(Expired))]
 public class PostcodeLatLong
 {
     [Key]
     [StringLength(8)]
-    public required string Postcode { get; set; } 
+    public required string Postcode { get; set; }
+    
+    [StringLength(8)]
+    public required string CleanPostcode { get; set; }
     
     public double? Latitude { get; set; }
     

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251215140452_add-county-and-clean-name")]
+    partial class addcountyandcleanname
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -440,8 +443,7 @@ namespace feat.ingestion.Migrations
 
                     b.Property<string>("CleanPostcode")
                         .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("Expired")
                         .HasColumnType("datetime2");
