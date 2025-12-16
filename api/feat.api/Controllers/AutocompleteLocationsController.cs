@@ -8,10 +8,11 @@ namespace feat.api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AutocompleteController(ISearchService searchService) : ControllerBase
+public class AutocompleteLocationsController(ISearchService searchService) : ControllerBase
 {
-    [HttpGet("{query}")]
+    [HttpGet)]
     public async Task<ActionResult<AutoCompleteLocation[]>> Query(
+        [FromQuery]
         [MaxLength(100)]
         [MinLength(3)]
         string query)
