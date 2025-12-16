@@ -130,7 +130,7 @@ public class SearchService(
             dbContext.LookupLocations
                 .AsNoTracking()
                 .Where(l =>
-                    (EF.Functions.Like(l.Name, $"{searchTerm}%") || EF.Functions.Like(l.Name, $"%{searchTerm}%")) &&
+                    (EF.Functions.Like(l.CleanName, $"{searchTerm}%") || EF.Functions.Like(l.CleanName, $"%{searchTerm}%")) &&
                     l.Latitude != null && l.Longitude != null)
                 .Select(l => new
                 {
@@ -139,7 +139,7 @@ public class SearchService(
                     l.Longitude,
                     Rank = l.Name == searchTerm
                         ? 1
-                        : EF.Functions.Like(l.Name, $"{searchTerm}%") ? 2 : 3
+                        : EF.Functions.Like(l.CleanName, $"{searchTerm}%") ? 2 : 3
                 })
                 .OrderBy(x => x.Rank)
                 .ThenBy(x => x.Text)
