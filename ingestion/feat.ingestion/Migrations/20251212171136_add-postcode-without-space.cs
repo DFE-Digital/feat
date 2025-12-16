@@ -13,7 +13,7 @@ namespace feat.ingestion.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "PostcodeNoSpace",
                 table: "PostcodeLatLong",
-                type: "nvarchar(450)",
+                type: "nvarchar(8)",
                 nullable: false,
                 defaultValue: "");
 
