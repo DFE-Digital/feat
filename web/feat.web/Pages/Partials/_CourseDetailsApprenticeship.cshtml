@@ -43,7 +43,9 @@
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Position available</dt>
-                <dd class="govuk-summary-list__value">@(Model.PositionAvailable)</dd>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrWhiteSpace(Model.PositionAvailable) ? "1" : Model.PositionAvailable)
+                </dd>
               </div>
 
               <div class="govuk-summary-list__row">
