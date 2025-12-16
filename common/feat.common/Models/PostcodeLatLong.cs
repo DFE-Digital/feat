@@ -13,6 +13,7 @@ public class PostcodeLatLong
     [StringLength(8)]
     public required string Postcode { get; set; }
     
+    [StringLength(8)]
     public required string CleanPostcode { get; set; }
     
     public double? Latitude { get; set; }
