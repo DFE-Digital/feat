@@ -32,28 +32,17 @@ public class AgeModel(ILogger<AgeModel> logger) : PageModel
     public IActionResult OnPost()
     {
         logger.LogInformation("OnPost called");
-        
-        try
-        {
-            Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-            if (!ModelState.IsValid)
-                return Page();
 
-            if (AgeGroup.HasValue)
-                Search.AgeGroup = AgeGroup.Value;
-            
-            logger.LogInformation("Age OnPost {AgeGroup}", AgeGroup);
-            
-            Search.Updated = true;
-            HttpContext.Session.Set("Search", Search);
+        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+        if (!ModelState.IsValid)
+            return Page();
 
-            return RedirectToPage(PageName.CheckAnswers);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e.Message);
-            Console.WriteLine(e);
-            throw;
-        }
+        if (AgeGroup.HasValue)
+            Search.AgeGroup = AgeGroup.Value;
+
+        Search.Updated = true;
+        HttpContext.Session.Set("Search", Search);
+
+        return RedirectToPage(PageName.CheckAnswers);
     }
 }
