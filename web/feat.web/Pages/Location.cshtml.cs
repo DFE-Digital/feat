@@ -9,7 +9,7 @@ using feat.web.Utils;
 
 namespace feat.web.Pages;
 
-public class LocationModel(ISearchService searchService, ILogger<LocationModel> logger) : PageModel
+public class LocationModel(ILogger<LocationModel> logger) : PageModel
 {
 
     [BindProperty]
@@ -21,7 +21,7 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
     
     public required Search Search { get; set; }
     
-    public async Task<IActionResult> OnGetAsync()
+    public IActionResult OnGet()
     {
         logger.LogInformation("OnGet");
         
