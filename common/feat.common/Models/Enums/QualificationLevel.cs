@@ -30,6 +30,6 @@ public enum QualificationLevel
     [Description("Level 7 (like masters degree)")]
     Level7 = 7,
     
-    [Description("Level 8 (like PhD)")]
+    [Description("Level 8 (like a PhD)")]
     Level8 = 8
 }
