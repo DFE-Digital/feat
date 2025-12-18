@@ -35,8 +35,6 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
         logger.LogInformation("OnGet");
         
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-        if (!Search.Updated)
-            return RedirectToPage(PageName.Index); 
         
         // If you've come here from LoadCourses page then start to 'new Search'
         if (Search.History.Contains(PageName.LoadCourses))
@@ -50,7 +48,6 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
         if (Search.Distance.HasValue)
             Distance = Search.Distance;
         
-        Search.Updated = true;
         Search.SetPage(PageName.Location);
         HttpContext.Session.Set("Search", Search);
         
