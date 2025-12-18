@@ -365,7 +365,7 @@ public class SearchService(
         {
             var postcode = await dbContext.LookupPostcodes.FirstOrDefaultAsync(p =>
                     p.Postcode.ToLower().Replace(" ", "") == location.ToLower().Replace(" ", "")
-                    && p.Valid
+                    && (p.Expired == null || p.Expired > DateTime.Today)
                 );
 
             if (postcode is { Latitude: not null, Longitude: not null })
