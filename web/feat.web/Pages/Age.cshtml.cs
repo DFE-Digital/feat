@@ -20,6 +20,11 @@ public class AgeModel(ILogger<AgeModel> logger) : PageModel
         
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
+        if (!Search.Updated)
+        {
+            return RedirectToPage("Index");
+        }
+        
         if (Search.AgeGroup.HasValue)
             AgeGroup = Search.AgeGroup;
 
