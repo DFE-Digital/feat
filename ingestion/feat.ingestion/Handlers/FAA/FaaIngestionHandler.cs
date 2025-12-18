@@ -433,7 +433,7 @@ public class FaaIngestionHandler(
         resultInfo = new ResultInfo();
         
         // Reset locations
-        await dbContext.EntryInstances.Where(ei => ei.SourceSystem == SourceSystem.FAA)
+        await dbContext.EntryInstances.Where(ei => ei.SourceSystem == SourceSystem)
             .UpdateFromQueryAsync(ei => new EntryInstance() { Reference = ei.Reference, LocationId = null }, 
                 cancellationToken: cancellationToken);
 
@@ -470,9 +470,9 @@ public class FaaIngestionHandler(
                     SourceSystem = SourceSystem,
                     SourceReference = $"{a.First().Id}"
                 };
-            }).ToList();
+            }).DistinctBy(x => x.SourceReference).ToList();
 
-        await dbContext.BulkMergeAsync(locations, options =>
+        await dbContext.BulkSynchronizeAsync(locations, options =>
         {
             options.IgnoreOnSynchronizeUpdateExpression = l => new
             {
