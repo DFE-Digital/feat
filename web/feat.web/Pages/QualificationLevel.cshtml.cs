@@ -19,6 +19,11 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         
+        if (!Search.Updated)
+        {
+            return RedirectToPage("Index");
+        }
+        
         if (Search.QualificationLevels.Count != 0)
             SelectedQualificationOptions = Search.QualificationLevels;
         
