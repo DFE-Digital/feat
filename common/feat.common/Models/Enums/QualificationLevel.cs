@@ -18,7 +18,7 @@ public enum QualificationLevel
     [Description("Level 3 (like A levels)")]
     Level3 = 3,
     
-    [Description("Level 4 (like high national certificate)")]
+    [Description("Level 4 (like higher national certificate)")]
     Level4 = 4,
     
     [Description("Level 5 (like diplomas)")]
