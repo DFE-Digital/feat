@@ -6,6 +6,7 @@ using feat.web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using feat.web.Utils;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace feat.web.Pages;
 
@@ -13,13 +14,21 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
 {
 
     [BindProperty]
-    [MaxLength(100, ErrorMessage = SharedStrings.LessThan100Char)]
     public string? Location { get; set; }
     
     [BindProperty]
     public Distance? Distance { get; set; }
     
     public required Search Search { get; set; }
+
+    public async Task<JsonResult> OnGetAutoCompleteAsync([FromQuery] string query, CancellationToken cancellationToken = default)
+    {
+        logger.LogInformation("OnGetAutoComplete");
+        
+        var locations = await searchService.GetAutoCompleteLocations(query, cancellationToken);
+        return new JsonResult(locations);
+        
+    }
     
     public IActionResult OnGet()
     {
@@ -48,13 +57,21 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
         return Page();
     }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPost(CancellationToken cancellationToken = default)
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
-        // TODO validate entered location is real or entered post-code is real.
-        
-        var distanceValue = Distance.HasValue? Distance.Value : new Distance();
+        var distanceValue = Distance ?? new Distance();
+
+        if (!string.IsNullOrEmpty(Location))
+        {
+            // Try to fetch the location from the search service and, if we have no results, show an error
+            var locationValid = await searchService.IsLocationValid(Location, cancellationToken);
+            if (!locationValid)
+            {
+                ModelState.AddModelError("Location", SharedStrings.LocationNotFound);
+            }
+        }
         
         if (!string.IsNullOrEmpty(Location) && distanceValue == 0)
         {

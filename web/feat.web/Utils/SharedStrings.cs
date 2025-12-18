@@ -8,6 +8,7 @@ public static class SharedStrings
     public const string EnterCityOrPostcode = "Enter a town, city or postcode to use the distance filter";
     public const string SelectQualificationLevel = "Select a qualification level";
     public const string EnterAnInterest = "Enter an interest";
+    public const string LocationNotFound = "Enter a valid town, city or postcode";
     
     // Site Title
     public const string SiteTitle = "Explore your options after school or college - GOV.UK";
@@ -23,5 +24,4 @@ public static class SharedStrings
     // Cookie Names
     public const string AnalyticsCookie = "AnalyticsCookie";
     public const string MarketingCookie = "MarketingCookie";
-    
 }

@@ -35,4 +35,22 @@ public class SearchService(
             _ => null
         };
     }
+
+    public async Task<AutoCompleteLocation[]> GetAutoCompleteLocations(string query, CancellationToken cancellationToken = default)
+    {
+        var endpoint = new Uri(new Uri(options.Value.ApiBaseUrl), $"api/autocompletelocations?query={query}").ToString();
+        
+        var response = await apiClient.GetAsync<AutoCompleteLocation[]>(ApiClientNames.Feat, endpoint, cancellationToken);
+
+        return response ?? [];
+    }
+    
+    public async Task<bool> IsLocationValid(string query, CancellationToken cancellationToken = default)
+    {
+        var endpoint = new Uri(new Uri(options.Value.ApiBaseUrl), $"api/autocompletelocations?query={query}").ToString();
+        
+        var response = await apiClient.PostAsync<bool>(ApiClientNames.Feat, endpoint, "", cancellationToken);
+
+        return response;
+    }
 }

@@ -124,7 +124,7 @@ public class SearchService(
             return [];
 
         var searchTerm = location.Trim();
-        searchTerm = searchTerm.Replace("'", "%");
+        searchTerm = searchTerm.Replace("'", "").Replace("(", "").Replace(")", "").Replace("-", " ");
         
         var fromLocations =
             dbContext.LookupLocations
@@ -365,7 +365,7 @@ public class SearchService(
         {
             var postcode = await dbContext.LookupPostcodes.FirstOrDefaultAsync(p =>
                     p.Postcode.ToLower().Replace(" ", "") == location.ToLower().Replace(" ", "")
-                    && p.Valid
+                    && (p.Expired == null || p.Expired > DateTime.Today)
                 );
 
             if (postcode is { Latitude: not null, Longitude: not null })
@@ -383,18 +383,16 @@ public class SearchService(
             return new GeoLocationResponse(null, false, "Postcode not found.");
         }
 
-        var response = await apiClient
-            .GetAsync<PlaceResult>(ApiClientNames.Postcode, $"places/?q={location}&limit=1");
+        var locationLatLong = await dbContext.LookupLocations.FirstOrDefaultAsync(l =>
+            l.Name == location);
 
-        if (response.Result?.Count > 0)
+        if (locationLatLong is { Latitude: not null, Longitude: not null })
         {
-            var place = response.Result[0];
-
             return new GeoLocationResponse(
                 new GeoLocation
                 {
-                    Latitude = place.Latitude.GetValueOrDefault(),
-                    Longitude = place.Longitude.GetValueOrDefault()
+                    Latitude = locationLatLong.Latitude.Value,
+                    Longitude = locationLatLong.Longitude.Value
                 },
                 true
             );

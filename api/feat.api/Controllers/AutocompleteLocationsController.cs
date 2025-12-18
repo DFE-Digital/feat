@@ -13,12 +13,22 @@ public class AutocompleteLocationsController(ISearchService searchService) : Con
     [HttpGet]
     public async Task<ActionResult<AutoCompleteLocation[]>> Query(
         [FromQuery]
-        [MaxLength(100)]
         [MinLength(3)]
         string query)
     {
         var locations = await searchService.GetAutoCompleteLocationsAsync(query);
 
         return Ok(locations);
+    }
+    
+    [HttpPost]
+    public async Task<ActionResult<bool>> Valid(
+        [FromQuery]
+        [MinLength(3)]
+        string query)
+    {
+        var location = await searchService.GetGeoLocationAsync(query);
+
+        return location is { IsValid: true };
     }
 }
