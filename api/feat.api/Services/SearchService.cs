@@ -383,18 +383,16 @@ public class SearchService(
             return new GeoLocationResponse(null, false, "Postcode not found.");
         }
 
-        var response = await apiClient
-            .GetAsync<PlaceResult>(ApiClientNames.Postcode, $"places/?q={location}&limit=1");
+        var locationLatLong = await dbContext.LookupLocations.FirstOrDefaultAsync(l =>
+            l.Name == location);
 
-        if (response.Result?.Count > 0)
+        if (locationLatLong is { Latitude: not null, Longitude: not null })
         {
-            var place = response.Result[0];
-
             return new GeoLocationResponse(
                 new GeoLocation
                 {
-                    Latitude = place.Latitude.GetValueOrDefault(),
-                    Longitude = place.Longitude.GetValueOrDefault()
+                    Latitude = locationLatLong.Latitude.Value,
+                    Longitude = locationLatLong.Longitude.Value
                 },
                 true
             );
