@@ -124,7 +124,7 @@ public class SearchService(
             return [];
 
         var searchTerm = location.Trim();
-        searchTerm = searchTerm.Replace("'", "%");
+        searchTerm = searchTerm.Replace("'", "").Replace("(", "").Replace(")", "").Replace("-", "");
         
         var fromLocations =
             dbContext.LookupLocations
