@@ -45,7 +45,8 @@
             source: suggest,
             minLength: 3,
             showNoOptionsFound: true,
-            autoselect: true
+            autoselect: true,
+            inputClasses: ['@(locationError ? "govuk-input govuk-input--error" : "govuk-input")'],
         });
     </script>
 }
