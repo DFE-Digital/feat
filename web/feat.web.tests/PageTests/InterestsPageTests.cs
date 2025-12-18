@@ -51,7 +51,7 @@ public class InterestsPageTests
         var search = new Search
         {
             Updated = true, 
-            Location = "Nottingham", 
+            Location = "Sheffield", 
             Distance = Distance.Ten, 
             Interests = new List<string> { "Maths", "Fermat's last theorem" }
         };
@@ -71,8 +71,8 @@ public class InterestsPageTests
 
     [Theory]
     [InlineData(null, Distance.Ten)]
-    [InlineData("Nottingham", null)]
-    [InlineData("Nottingham", Distance.ThirtyPlus)]
+    [InlineData("Sheffield", null)]
+    [InlineData("Sheffield", Distance.ThirtyPlus)]
     public void OnGet_Sets_FirstOptionMandatory_When_LocationOrDistance_Require_FirstOption(string? location, Distance? distance)
     {
         var search = new Search { Updated = true, Location = location, Distance = distance };
@@ -90,7 +90,7 @@ public class InterestsPageTests
     [Fact]
     public void OnPost_Returns_Page_When_FirstOptionMandatory_And_UserInterest1_Empty()
     {
-        var search = new Search { Location = "Nottingham", Distance = Distance.ThirtyPlus }; // forces FirstOptionMandatory
+        var search = new Search { Location = "Sheffield", Distance = Distance.ThirtyPlus }; // forces FirstOptionMandatory
         var session = new TestSession();
         session.Set("Search", Encoding.UTF8.GetBytes(JsonSerializer.Serialize(search)));
 

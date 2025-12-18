@@ -48,7 +48,7 @@ public class LocationPageTests
 	[Fact]
 	public void OnGet_Populates_Properties_From_Session_And_Returns_Page()
 	{
-		var search = new Search { Updated = true, Location = "Nottingham", Distance = Distance.Ten };
+		var search = new Search { Updated = true, Location = "Sheffield", Distance = Distance.Ten };
 		var session = new TestSession();
 		session.Set("Search", Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(search)));
 
@@ -57,7 +57,7 @@ public class LocationPageTests
 		var result = model.OnGet();
 
 		Assert.IsType<PageResult>(result);
-		Assert.Equal("Nottingham", model.Location);
+		Assert.Equal("Sheffield", model.Location);
 		Assert.Equal(Distance.Ten, model.Distance);
 	}
 
@@ -67,7 +67,7 @@ public class LocationPageTests
 		var session = new TestSession();
 		var model = CreateModel(session);
 
-		model.Location = "Nottingham"; // distance not set
+		model.Location = "Sheffield"; // distance not set
 
 		var result = model.OnPost();
 
@@ -99,7 +99,7 @@ public class LocationPageTests
 		session.Set("Search", Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(search)));
 
 		var model = CreateModel(session);
-		model.Location = "Nottingham";
+		model.Location = "Sheffield";
 		model.Distance = Distance.Ten;
 
 		var result = model.OnPost();
@@ -116,7 +116,7 @@ public class LocationPageTests
 		session.Set("Search", Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(search)));
 
 		var model = CreateModel(session);
-		model.Location = "Nottingham";
+		model.Location = "Sheffield";
 		model.Distance = Distance.Ten;
 
 		var result = model.OnPost();
@@ -133,7 +133,7 @@ public class LocationPageTests
 		session.Set("Search", Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(search)));
 
 		var model = CreateModel(session);
-		model.Location = "Nottingham";
+		model.Location = "Sheffield";
 		model.Distance = Distance.ThirtyPlus;
 
 		var result = model.OnPost();
@@ -150,7 +150,7 @@ public class LocationPageTests
 		session.Set("Search", Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(search)));
 
 		var model = CreateModel(session);
-		model.Location = "Nottingham";
+		model.Location = "Sheffield";
 		model.Distance = Distance.Fifteen; 
 
 		var result = model.OnPost();
@@ -167,7 +167,7 @@ public class LocationPageTests
 		session.Set("Search", Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(search)));
 
 		var model = CreateModel(session);
-		model.Location = "Nottingham";
+		model.Location = "Sheffield";
 		model.Distance = null;
 
 		var result = model.OnPost();
