@@ -5,33 +5,98 @@
 @{
     ViewBag.Title = SharedStrings.SiteTitle;
     ViewBag.BackPageUrl = Url.Page(Model.Search.BackPage);
+
+    var locationModelState = ModelState["Location"];
+    var locationError = false;
+    string[] locationErrors = [];
+    if (locationModelState != null)
+    {
+        locationError = locationModelState.Errors.Count > 0;
+        locationErrors = locationModelState.Errors.Select(e => e.ErrorMessage).ToArray();
+    }
+    
 }
 
+@section Head 
+{
+    <link rel="stylesheet" href="~/css/accessible-autocomplete.min.css"/>
+}
+
+@section Scripts
+{
+    <script type="text/javascript" src="~/js/accessible-autocomplete.min.js"></script>
+    <script type="text/javascript">
+        let results = [];
+        async function suggest(query, populateResults) {
+            const response = await fetch('/Location?handler=AutoComplete&query=' + query)
+            .then(res => res.json())
+            .then(data => {
+                results = data;
+                return populateResults(data.map(l => l.name))
+            })
+            .catch(err => console.error("Unable to search", err));
+        }
+
+        accessibleAutocomplete({
+            element: document.querySelector('#location-container'),
+            id: 'Location',
+            name: 'Location',
+            defaultValue: '@Model.Location',
+            source: suggest,
+            minLength: 3,
+            showNoOptionsFound: true,
+            autoselect: true
+        });
+    </script>
+}
+
+@if (!ModelState.IsValid)
+{
+    <govuk-error-summary>
+        @foreach (var modelState in ModelState)
+        {
+            foreach (var stateError in modelState.Value.Errors)
+            {
+                <govuk-error-summary-item href="#@modelState.Key">
+                    @stateError.ErrorMessage
+                </govuk-error-summary-item>
+                
+            }
+        }
+    </govuk-error-summary>
+}
 <h1 class="govuk-heading-l">Where do you want to study?</h1>
 <p>You can search anywhere in England.</p>
 <p>Some courses are only available to people living in the local area. This can apply even if it is online training. It is more common for short courses or those aiming to help you find employment. Check with the provider if you are unsure.</p>
 
 <form method="post">
-    
-    <govuk-input for="Location" input-class="govuk-input--width-20" spellcheck="false" autocomplete="true">
-        <govuk-input-label class="govuk-label--m">Enter a town, city or postcode (optional)</govuk-input-label>
-    </govuk-input>
+    <div class="govuk-form-group@(locationError ? " govuk-form-group--error" : "")">
+        <label for="Location" class="govuk-label govuk-label--m">Enter a town, city or postcode (optional)</label>
+        @if (locationError)
+        {
+            @foreach (var error in locationErrors)
+            {
+                <govuk-error-message>@error</govuk-error-message>
+            }
+        }
+        <div id="location-container" class="govuk-input--width-30"></div>
+    </div>
     
     <govuk-radios for="Distance">
-            <govuk-radios-fieldset>
-                <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
-                    How far are you able to travel? (optional)
-                </govuk-radios-fieldset-legend>
-                @foreach (var option in Enum.GetValues<Distance>())
+        <govuk-radios-fieldset>
+            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--m">
+                How far are you able to travel? (optional)
+            </govuk-radios-fieldset-legend>
+            @foreach (var option in Enum.GetValues<Distance>())
+            {
+                if (option > 0)
                 {
-                    if (option > 0)
-                    {
-                        <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
-                    }
+                    <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
                 }
-            </govuk-radios-fieldset>
-        </govuk-radios>
-    
+            }
+        </govuk-radios-fieldset>
+    </govuk-radios>
+
     <div class="govuk-button-group">
         <govuk-button type="submit">Continue</govuk-button>
     </div>
