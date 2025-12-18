@@ -14,16 +14,16 @@ public class NoResultsSearchModel(ILogger<NoResultsSearchModel> logger) : PageMo
     {
         logger.LogInformation("OnGet called");
 
-        try
+        Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
+        
+        if (!Search.Updated)
         {
-            Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-            Search.SetPage(PageName.NoResultsSearch);
-            HttpContext.Session.Set("Search", Search);
+            return RedirectToPage(PageName.Index);
         }
-        catch (Exception e)
-        {
-            logger.LogError(e.Message);
-        }
+        
+        Search.SetPage(PageName.NoResultsSearch);
+        HttpContext.Session.Set("Search", Search);
+        
         return Page();
     }
     
