@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace feat.web.Pages;
 
-public class LocationModel(ISearchService searchService, ILogger<LocationModel> logger) : PageModel
+public class LocationModel(ILogger<LocationModel> logger) : PageModel
 {
 
     [BindProperty]
