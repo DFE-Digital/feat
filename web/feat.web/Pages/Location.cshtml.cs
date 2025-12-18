@@ -13,7 +13,6 @@ public class LocationModel(ISearchService searchService, ILogger<LocationModel> 
 {
 
     [BindProperty]
-    [MaxLength(100, ErrorMessage = SharedStrings.LessThan100Char)]
     public string? Location { get; set; }
     
     [BindProperty]
