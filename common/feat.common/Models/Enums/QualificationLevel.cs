@@ -18,7 +18,7 @@ public enum QualificationLevel
     [Description("Level 3 (like A levels)")]
     Level3 = 3,
     
-    [Description("Level 4 (like high national certificate)")]
+    [Description("Level 4 (like higher national certificate)")]
     Level4 = 4,
     
     [Description("Level 5 (like diplomas)")]
@@ -30,6 +30,6 @@ public enum QualificationLevel
     [Description("Level 7 (like masters degree)")]
     Level7 = 7,
     
-    [Description("Level 8 (like doctorate)")]
+    [Description("Level 8 (like a PhD)")]
     Level8 = 8
 }
