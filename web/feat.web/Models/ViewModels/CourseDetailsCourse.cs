@@ -14,7 +14,9 @@ public class CourseDetailsCourse : CourseDetailsBase
     
     public List<Location>? CourseAddresses { get; set; }
     
-    public string? ProviderUrl { get; set; }
+    public string? ProviderUrl { private get; set; }
+    
+    public string? ProviderUrlAbsolute => NormalizeUrl(ProviderUrl);
     
     public List<StartDate>? StartDates { get; set; }
 }

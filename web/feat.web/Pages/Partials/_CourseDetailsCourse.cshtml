@@ -58,9 +58,9 @@
                 <dt class="govuk-summary-list__key">Provider</dt>
                 <dd class="govuk-summary-list__value">@Model.ProviderName</dd>
                 <dd class="govuk-summary-list__actions">
-                  @if (!string.IsNullOrEmpty(Model.ProviderUrl))
+                  @if (!string.IsNullOrEmpty(Model.ProviderUrlAbsolute))
                   {
-                    <a class="govuk-link" href="@(Model.ProviderUrl)">View website
+                    <a class="govuk-link" href="@(Model.ProviderUrlAbsolute)">View website
                       <span class="govuk-visually-hidden">@(Model.ProviderName + "(" + Model.ProviderAddresses?.FirstOrDefault()?.Display + ")")</span>
                     </a>
                   }
@@ -129,7 +129,9 @@
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start dates</dt>
                   <dd class="govuk-summary-list__value">
-                    @foreach (var startDate in Model.StartDates.Where(s => !string.IsNullOrEmpty(s.Display)))
+                    @foreach (var startDate in Model.StartDates
+                                .Where(sd => !string.IsNullOrEmpty(sd.Display))
+                                .OrderBy(sd => sd.Date))
                     {
                       <p>@startDate.Display</p>
                     }
@@ -141,7 +143,7 @@
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start date</dt>
                   <dd class="govuk-summary-list__value">
-                    @(Model.StartDates?.FirstOrDefault()?.Display.ValueOrNotProvided())
+                    @(Model.StartDates?.FirstOrDefault()?.Display ?? SharedStrings.NotProvided)
                   </dd>
                 </div>
               }
@@ -160,13 +162,13 @@
           </div>
         </div>
 
-        @if (!string.IsNullOrEmpty(Model.CourseUrl))
+        @if (!string.IsNullOrEmpty(Model.CourseUrlAbsolute))
         {
-          <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to course</govuk-button-link>
+          <govuk-button-link href="@(Model.CourseUrlAbsolute)" is-start-button="false">Go to course</govuk-button-link>
         }
-        else if(!string.IsNullOrEmpty(Model.ProviderUrl))
+        else if(!string.IsNullOrEmpty(Model.ProviderUrlAbsolute))
         {
-          <govuk-button-link href="@(Model.ProviderUrl)" is-start-button="false">Go to course provider</govuk-button-link>
+          <govuk-button-link href="@(Model.ProviderUrlAbsolute)" is-start-button="false">Go to course provider</govuk-button-link>
         }
         <p>The details we show you comes from the provider. There may be extra information on their website. You can also email or call them if you have any questions or want to discuss your options. </p>
       </div>
