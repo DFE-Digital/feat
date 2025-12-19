@@ -41,64 +41,67 @@ public static class DtoMapper
             EntryRequirements = response.EntryRequirements,
             Description = response.Description,
             WhatYouWillLearn = response.WhatYouWillLearn,
-            DeliveryMode = (DeliveryMode?)response.DeliveryMode,
+            DeliveryMode = response.DeliveryMode.ToDeliveryMode(),
             Duration = response.Duration,
             Hours = response.HoursType,
             CourseUrl = response.CourseUrl
         };
     }
     
-    public static CourseDetailsCourse ToCourseViewModel(this CourseDetailsResponse response)
+    extension(CourseDetailsResponse response)
     {
-        var model = MapCourseDetailsBase<CourseDetailsCourse>(response);
+        public CourseDetailsCourse ToCourseViewModel()
+        {
+            var model = MapCourseDetailsBase<CourseDetailsCourse>(response);
 
-        model.Cost = response.Costs.FirstOrDefault();
-        model.ProviderName = response.ProviderName;
-        model.CourseAddresses = response.CourseAddresses.ToLocationViewModels();
-        model.ProviderUrl = response.ProviderUrl;
-        model.StartDates = response.StartDates
-            .Where(d => d.HasValue)
-            .Select(d => new StartDate(d!.Value))
-            .ToList();
+            model.Cost = response.Costs.FirstOrDefault();
+            model.ProviderName = response.ProviderName;
+            model.CourseAddresses = response.CourseAddresses.ToLocationViewModels();
+            model.ProviderUrl = response.ProviderUrl;
+            model.StartDates = response.StartDates
+                .Where(d => d.HasValue)
+                .Select(d => new StartDate(d!.Value))
+                .ToList();
 
-        return model;
-    }
-    
-    public static CourseDetailsApprenticeship ToApprenticeshipViewModel(this CourseDetailsResponse response)
-    {
-        var model = MapCourseDetailsBase<CourseDetailsApprenticeship>(response);
+            return model;
+        }
 
-        model.Wage = response.Wage;
-        model.PositionsAvailable = response.PositionsAvailable;
-        model.EmployerName = response.EmployerName;
-        model.EmployerAddress = response.EmployerAddresses.ToLocationViewModels().FirstOrDefault();
-        model.EmployerUrl = response.EmployerUrl;
-        model.EmployerDescription = response.EmployerDescription;
-        model.TrainingProvider = response.TrainingProvider;
-        model.StartDate = response.StartDates
-            .Where(d => d.HasValue)
-            .Select(d => new StartDate(d!.Value))
-            .FirstOrDefault();
+        public CourseDetailsApprenticeship ToApprenticeshipViewModel()
+        {
+            var model = MapCourseDetailsBase<CourseDetailsApprenticeship>(response);
 
-        return model;
-    }
-    
-    public static CourseDetailsUniversity ToUniversityViewModel(this CourseDetailsResponse response)
-    {
-        var model = MapCourseDetailsBase<CourseDetailsUniversity>(response);
+            model.Wage = response.Wage;
+            model.PositionsAvailable = response.PositionsAvailable;
+            model.EmployerName = response.EmployerName;
+            model.EmployerAddress = response.EmployerAddresses.ToLocationViewModels().FirstOrDefault();
+            model.EmployerUrl = response.EmployerUrl;
+            model.EmployerDescription = response.EmployerDescription;
+            model.TrainingProvider = response.TrainingProvider;
+            model.StartDate = response.StartDates
+                .Where(d => d.HasValue)
+                .Select(d => new StartDate(d!.Value))
+                .FirstOrDefault();
 
-        model.TuitionFee = response.TuitionFee;
-        model.AwardingOrganisation = response.AwardingOrganisation;
-        model.University = response.University;
-        model.CampusName = response.CampusName;
-        model.CampusAddresses = response.CourseAddresses.ToLocationViewModels();
-        model.UniversityUrl = response.ProviderUrl;
-        model.StartDates = response.StartDates
-            .Where(d => d.HasValue)
-            .Select(d => new StartDate(d!.Value))
-            .ToList();
+            return model;
+        }
 
-        return model;
+        public CourseDetailsUniversity ToUniversityViewModel()
+        {
+            var model = MapCourseDetailsBase<CourseDetailsUniversity>(response);
+
+            model.TuitionFee = response.TuitionFee;
+            model.AwardingOrganisation = response.AwardingOrganisation;
+            model.University = response.University;
+            model.CampusName = response.CampusName;
+            model.CampusAddresses = response.CourseAddresses.ToLocationViewModels();
+            model.UniversityUrl = response.ProviderUrl;
+            model.StartDates = response.StartDates
+                .Where(d => d.HasValue)
+                .Select(d => new StartDate(d!.Value))
+                .ToList();
+
+            return model;
+        }
     }
 
     private static List<Models.ViewModels.Location> ToLocationViewModels(this IEnumerable<Models.Location> locations)
@@ -158,6 +161,18 @@ public static class DtoMapper
             nameof(CourseHours) => 3,
             nameof(StudyTime) => 4,
             _ => 5
+        };
+    }
+    
+    public static DeliveryMode? ToDeliveryMode(this LearningMethod? learningMethod)
+    {
+        return learningMethod switch
+        {
+            LearningMethod.Online => DeliveryMode.Online,
+            LearningMethod.ClassroomBased => DeliveryMode.ClassroomBased,
+            LearningMethod.Hybrid => DeliveryMode.BlendedLearning,
+            LearningMethod.Workbased => DeliveryMode.WorkBased,
+            _ => null
         };
     }
 }
