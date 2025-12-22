@@ -32,9 +32,9 @@ public class AgePageTests
     }
 
     [Fact]
-    public void OnGet_Populates_AgeGroup_From_Session_And_Returns_Page()
+    public void OnGet_AgeGroup_In_Session_And_Returns_Page()
     {
-        var search = new Search { AgeGroup = AgeGroup.TwentyToTwentyFour };
+        var search = new Search { AgeGroup = AgeGroup.TwentyToTwentyFour, Updated = true };
         var session = new TestSession();
         session.Set("Search", Encoding.UTF8.GetBytes(JsonSerializer.Serialize(search)));
 
@@ -47,9 +47,12 @@ public class AgePageTests
     }
 
     [Fact]
-    public void OnGet_Returns_Page_When_No_Age_In_Session()
+    public void OnGet_No_AgeGroup_In_Session_Returns_Page()
     {
+        var search = new Search { Updated = true };
         var session = new TestSession();
+        session.Set("Search", Encoding.UTF8.GetBytes(JsonSerializer.Serialize(search)));
+
         var model = CreateModel(session);
 
         var result = model.OnGet();
@@ -59,7 +62,7 @@ public class AgePageTests
     }
 
     [Fact]
-    public void OnPost_Returns_Page_When_ModelState_Invalid()
+    public void OnPost_ModelState_Invalid_Returns_Page()
     {
         var search = new Search();
         var session = new TestSession();
@@ -71,10 +74,11 @@ public class AgePageTests
         var result = model.OnPost();
 
         Assert.IsType<PageResult>(result);
+        Assert.False(model.ModelState.IsValid);
     }
 
     [Fact]
-    public void OnPost_Saves_AgeGroup_And_Redirects_To_CheckAnswers_When_AgeSet()
+    public void OnPost_Save_AgeGroup_And_Redirects_To_CheckAnswers()
     {
         var search = new Search();
         var session = new TestSession();
@@ -96,7 +100,7 @@ public class AgePageTests
     }
 
     [Fact]
-    public void OnPost_Sets_Updated_And_Redirects_CheckAnswers_When_Age_NotSet()
+    public void OnPost_AgeGroup_NotSet_Redirects_To_CheckAnswers()
     {
         var search = new Search();
         var session = new TestSession();

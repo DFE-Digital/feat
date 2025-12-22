@@ -37,7 +37,7 @@ public class QualificationLevelPageTests
 		var search = new Search { QualificationLevels = new List<QualificationLevel>
 		{
 			QualificationLevel.FourToEight, QualificationLevel.OneAndTwo
-		} };
+		}, Updated = true };
 		var session = new TestSession();
 		session.Set("Search", Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(search)));
 
@@ -51,7 +51,7 @@ public class QualificationLevelPageTests
 	}
 
 	[Fact]
-	public void OnPost_Returns_Page_When_No_Qualification_Selection()
+	public void OnPost_When_No_Qualification_Selection_Returns_Page()
 	{
 		var search = new Search();
 		var session = new TestSession();
@@ -68,7 +68,7 @@ public class QualificationLevelPageTests
 	}
 
 	[Fact]
-	public void OnPost_Redirects_To_Age_When_Selects_QualificationNone_And_Not_VisitedCheckAnswers()
+	public void OnPost_Selects_Qualification_Is_None_And_Not_VisitedCheckAnswers_Redirects_To_AgePage()
 	{
 		var search = new Search { VisitedCheckAnswers = false };
 		var session = new TestSession();
@@ -90,7 +90,7 @@ public class QualificationLevelPageTests
 	}
 
 	[Fact]
-	public void OnPost_Redirects_To_CheckAnswers_When_Selects_None_And_VisitedCheckAnswers_And_AgeGroupSet()
+	public void OnPost_VisitedCheckAnswers_True_Selects_Qualification_None_And_AgeGroupSet_Redirects_To_CheckAnswers()
 	{
 		var search = new Search { VisitedCheckAnswers = true, AgeGroup = AgeGroup.Eighteen }; 
 		var session = new TestSession();
@@ -106,11 +106,11 @@ public class QualificationLevelPageTests
 	}
 
 	[Fact]
-	public void OnPost_Clears_AgeGroup_And_Redirects_CheckAnswers_When_Selects_Other_And_VisitedCheckAnswers_True()
+	public void OnPost_VisitedCheckAnswers_True_When_Selects_Other_Then_Redirects_To_CheckAnswers_And_Clears_AgeGroup()
 	{
 		var search = new Search { VisitedCheckAnswers = true, AgeGroup = AgeGroup.Eighteen };
 		var session = new TestSession();
-		session.Set("Search", Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(search)));
+		session.Set("Search", Encoding.UTF8.GetBytes(JsonSerializer.Serialize(search)));
 
 		var model = CreateModel(session);
 		model.SelectedQualificationOptions = new List<QualificationLevel> { QualificationLevel.FourToEight };

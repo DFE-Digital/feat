@@ -32,7 +32,7 @@ public class InterestsPageTests
     }
 
     [Fact]
-    public void OnGet_Redirects_To_Index_When_Search_Not_Updated()
+    public void OnGet_Search_Not_Updated_Redirects_To_IndexPage()
     {
         var session = new TestSession();
         session.Set("Search", Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new Search { Updated = false })));
@@ -46,7 +46,7 @@ public class InterestsPageTests
     }
 
     [Fact]
-    public void OnGet_Populates_Fields_From_Session_And_Returns_Page()
+    public void OnGet_Populates_Interests_From_Session_And_Returns_Page()
     {
         var search = new Search
         {
@@ -73,6 +73,7 @@ public class InterestsPageTests
     [InlineData(null, Distance.Ten)]
     [InlineData("Sheffield", null)]
     [InlineData("Sheffield", Distance.ThirtyPlus)]
+    [InlineData(null, null)]
     public void OnGet_Sets_FirstOptionMandatory_When_LocationOrDistance_Require_FirstOption(string? location, Distance? distance)
     {
         var search = new Search { Updated = true, Location = location, Distance = distance };
@@ -88,7 +89,7 @@ public class InterestsPageTests
     }
 
     [Fact]
-    public void OnPost_Returns_Page_When_FirstOptionMandatory_And_UserInterest1_Empty()
+    public void OnPost_FirstOptionMandatory_And_UserInterest1_IsEmpty_Returns_Page()
     {
         var search = new Search { Location = "Sheffield", Distance = Distance.ThirtyPlus }; // forces FirstOptionMandatory
         var session = new TestSession();
@@ -109,7 +110,7 @@ public class InterestsPageTests
     }
 
     [Fact]
-    public void OnPost_Saves_Interests_And_Redirects_To_QualificationLevel_When_VisitedCheckAnswers_False()
+    public void OnPost_Save_Interests_When_VisitedCheckAnswers_Is_False_Redirect_To_QualificationLevel()
     {
         var search = new Search { VisitedCheckAnswers = false };
         var session = new TestSession();
@@ -135,7 +136,7 @@ public class InterestsPageTests
     }
 
     [Fact]
-    public void OnPost_Redirects_To_CheckAnswers_When_VisitedCheckAnswers_True()
+    public void OnPost_VisitedCheckAnswers_Is_True_Redirect_To_CheckAnswers()
     {
         var search = new Search { VisitedCheckAnswers = true };
         var session = new TestSession();

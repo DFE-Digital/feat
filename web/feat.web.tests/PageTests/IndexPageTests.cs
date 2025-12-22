@@ -38,7 +38,7 @@ public class IndexPageTests
     }
 
     [Fact]
-    public void OnGet_Sets_Search_In_Session_And_Sets_PageHistory()
+    public void OnGet_Create_Session_And_Set_IndexPage_In_PageHistory_Returns_Page()
     {
         //arrange
         var session = new TestSession();
