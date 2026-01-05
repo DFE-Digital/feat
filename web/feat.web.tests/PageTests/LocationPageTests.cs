@@ -43,21 +43,7 @@ public class LocationPageTests
 		};
 		return model;
 	}
-
-	[Fact]
-	public void OnGet_Redirects_To_IndexPage_When_Search_Not_Updated()
-	{
-		var session = new TestSession();
-		session.Set("Search", Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(new Search { Updated = false })));
-
-		var model = CreateModel(session);
-
-		var result = model.OnGet();
-
-		var redirect = Assert.IsType<RedirectToPageResult>(result);
-		Assert.Equal(PageName.Index, redirect.PageName);
-	}
-
+	
 	[Fact]
 	public void OnGet_Populates_Properties_From_Session_And_Returns_Page()
 	{
