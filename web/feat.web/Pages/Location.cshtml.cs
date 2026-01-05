@@ -48,7 +48,6 @@ public class LocationModel(ILogger<LocationModel> logger, ISearchService searchS
         if (Search.Distance.HasValue)
             Distance = Search.Distance;
         
-        Search.Updated = true;
         Search.SetPage(PageName.Location);
         HttpContext.Session.Set("Search", Search);
         
