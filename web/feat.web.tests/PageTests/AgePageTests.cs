@@ -34,7 +34,7 @@ public class AgePageTests
     [Fact]
     public void OnGet_Populates_AgeGroup_From_Session_And_Returns_Page()
     {
-        var search = new Search { AgeGroup = AgeGroup.TwentyToTwentyFour };
+        var search = new Search { Location = "Sheffield", Updated = true, AgeGroup = AgeGroup.TwentyToTwentyFour };
         var session = new TestSession();
         session.Set("Search", Encoding.UTF8.GetBytes(JsonSerializer.Serialize(search)));
 
@@ -47,14 +47,14 @@ public class AgePageTests
     }
 
     [Fact]
-    public void OnGet_Returns_Page_When_No_Age_In_Session()
+    public void OnGet_Returns_Redirect_When_No_Age_In_Session()
     {
         var session = new TestSession();
         var model = CreateModel(session);
 
         var result = model.OnGet();
 
-        Assert.IsType<PageResult>(result);
+        Assert.IsType<RedirectToPageResult>(result);
         Assert.Null(model.AgeGroup);
     }
 

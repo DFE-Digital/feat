@@ -34,7 +34,7 @@ public class QualificationLevelPageTests
 	[Fact]
 	public void OnGet_Populates_SelectedQualificationOptions_From_Session_And_Returns_Page()
 	{
-		var search = new Search { QualificationLevels = new List<QualificationLevel>
+		var search = new Search { Updated = true, QualificationLevels = new List<QualificationLevel>
 		{
 			QualificationLevel.FourToEight, QualificationLevel.OneAndTwo
 		} };
