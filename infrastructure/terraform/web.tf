@@ -103,6 +103,8 @@ resource "azurerm_linux_web_app" "feat-website" {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
     ASPNETCORE_ENVIRONMENT              = var.env == "Dev" ? "Development" : var.env
     Search__ApiBaseUrl                  = "https://${azurerm_linux_web_app.feat-api.default_hostname}"
+    Analytics__GoogleTagManager         = var.google_tag_manager
+    Analytics__Clarity                  = var.clarity
   }
 
   https_only = true

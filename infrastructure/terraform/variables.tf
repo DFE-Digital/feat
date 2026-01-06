@@ -91,3 +91,15 @@ variable "partition_count" {
     error_message = "The partition_count must be one of the following values: 1, 2, 3, 4, 6, 12."
   }
 }
+
+variable "google_tag_manager" {
+  type        = string
+  description = "The Google Tag Manager (GTM) Id"
+  default     = ""
+}
+
+variable "clarity" {
+  type        = string
+  description = "The Microsoft Clarity Id"
+  default     = ""
+}

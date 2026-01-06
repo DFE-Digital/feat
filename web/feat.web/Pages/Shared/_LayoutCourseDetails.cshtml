@@ -1,9 +1,16 @@
-﻿@using feat.web.Utils
+﻿@using feat.web.Configuration
+@using feat.web.Utils
+@using Microsoft.Extensions.Options
+
+@inject IOptions<AnalyticsOptions> AnalyticsOptions
+
 @{
     // ReSharper disable once Razor.LayoutNotResolved
     Layout = "_GovUkPageTemplate";
     ViewBag.AssetPath = "/assets";
     ViewBag.CompiledContentPath = "/assets";
+
+    var analyticsOptions = AnalyticsOptions.Value;
 }
 @* ReSharper disable Razor.SectionNotResolved *@
 @section Head {
@@ -12,7 +19,7 @@
         var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
         j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
         f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-KX9ZWC6X');</script>
+    })(window,document,'script','dataLayer','@analyticsOptions.GoogleTagManager');</script>
     <!-- End Google Tag Manager -->
     
     <script type="text/javascript">
@@ -20,19 +27,64 @@
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "t7kid1y3ng");
+    })(window, document, "clarity", "script", "@analyticsOptions.Clarity");
     </script>
     
     <link rel="stylesheet" href="~/css/application.css" />
     <link rel="stylesheet" href="~/css/moj-frontend.min.css" />
-    <link rel="stylesheet" href="~/css/accessible-autocomplete.min.css" />
+    
+    <style>
+        .dfe-page-grey {
+            padding-top: 40px;
+            padding-bottom: 30px;
+            background-color: #EAF5FF;
+        }
+    </style>
 }
 
 
+@await RenderSectionAsync("Head", required: false)
+
 @section BodyStart {
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src=https://www.googletagmanager.com/ns.html?id=GTM-KX9ZWC6X height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=@analyticsOptions.GoogleTagManager" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
+    
+    @{
+        var hasAnalyticsCookie = Context.Request.Cookies[SharedStrings.AnalyticsCookie];
+        var hasMarketingCookie = Context.Request.Cookies[SharedStrings.MarketingCookie];
+        var hasCookieConsent = !string.IsNullOrEmpty(hasAnalyticsCookie) || !string.IsNullOrEmpty(hasMarketingCookie);
+        var showBanner = !hasCookieConsent;
+        ViewBag.ShowCookieBanner =  showBanner;
+    }
+    
+    @if (ViewBag.ShowCookieBanner)
+    {
+        <div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Cookies on Find Education and Training" id="cookieConsent">
+            <div class="govuk-cookie-banner__message govuk-width-container">
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds">
+                        <h2 class="govuk-cookie-banner__heading govuk-heading-m">
+                            Cookies on Find Education and Training
+                        </h2>
+                        <div class="govuk-cookie-banner__content">
+                            <p class="govuk-body">We use some essential cookies to make this service work.</p>
+                            <p class="govuk-body">We’d also like to use analytics cookies so we can understand how you use the service and make improvements.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="govuk-button-group">
+                    <button type="button" class="govuk-button" data-module="govuk-button" onclick="acceptCookies(true);">
+                        Accept analytics cookies
+                    </button>
+                    <button type="button" class="govuk-button" data-module="govuk-button" onclick="acceptCookies(false);">
+                        Reject analytics cookies
+                    </button>
+                    <a class="govuk-link" asp-page="/linkpages/cookies">View cookies</a>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 
@@ -73,10 +125,7 @@
     </section>
 }
 
-@section BeforeContent {
-}
-
-@RenderSection("BeforeContent", required: false)
+@await RenderSectionAsync("BeforeContent", required: false)
 
 @RenderBody()
 
@@ -174,13 +223,6 @@
 }
 
 @section BodyEnd {
-    <style>
-        .dfe-page-grey {
-            padding-top: 40px;
-            padding-bottom: 30px;
-            background-color: #EAF5FF;
-        }
-    </style>
     @Html.GovUkFrontendScriptImports()
     <script src="js/dfefrontend-2.0.0.min.js" type="module"></script>
     <script src="js/moj-frontend.min.js" type="module"></script>
