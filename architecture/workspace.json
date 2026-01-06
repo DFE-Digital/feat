@@ -1,0 +1,790 @@
+{
+    "configuration": {},
+    "description": "Find Education and Training - Hosting internal AI Search",
+    "documentation": {},
+    "id": 2,
+    "lastModifiedAgent": "structurizr-onpremises/dsl-editor/dd273879-ec98-42a1-90bc-7fa67a9995b9",
+    "lastModifiedDate": "2025-10-16T15:34:49Z",
+    "lastModifiedUser": "stuart",
+    "model": {
+        "deploymentNodes": [
+            {
+                "children": [
+                    {
+                        "children": [
+                            {
+                                "environment": "Service",
+                                "id": "20",
+                                "infrastructureNodes": [
+                                    {
+                                        "description": "Automatically distributes and secures incoming application traffic",
+                                        "environment": "Service",
+                                        "id": "21",
+                                        "name": "Shared DfE WAF",
+                                        "properties": {
+                                            "structurizr.dsl.identifier": "gateway"
+                                        },
+                                        "relationships": [
+                                            {
+                                                "description": "Fowards requests to",
+                                                "destinationId": "34",
+                                                "id": "35",
+                                                "sourceId": "21",
+                                                "tags": "Relationship",
+                                                "technology": "HTTPS"
+                                            },
+                                            {
+                                                "description": "Provides secured access",
+                                                "destinationId": "36",
+                                                "id": "44",
+                                                "sourceId": "21",
+                                                "tags": "Relationship"
+                                            }
+                                        ],
+                                        "tags": "Element,Infrastructure Node,Microsoft Azure - Firewalls",
+                                        "technology": "Azure Front Door and Firewalls"
+                                    },
+                                    {
+                                        "description": "Remote SSH for connecting to the virtual network",
+                                        "environment": "Service",
+                                        "id": "22",
+                                        "name": "Bastion",
+                                        "properties": {
+                                            "structurizr.dsl.identifier": "bastion"
+                                        },
+                                        "relationships": [
+                                            {
+                                                "description": "Allows secured access to",
+                                                "destinationId": "25",
+                                                "id": "26",
+                                                "sourceId": "22",
+                                                "tags": "Relationship"
+                                            }
+                                        ],
+                                        "tags": "Element,Infrastructure Node,Microsoft Azure - Bastions"
+                                    }
+                                ],
+                                "instances": "1",
+                                "name": "Public Internet",
+                                "properties": {
+                                    "structurizr.dsl.identifier": "internet"
+                                },
+                                "tags": "Element,Deployment Node,Microsoft Azure - Entra Internet Access"
+                            },
+                            {
+                                "containerInstances": [
+                                    {
+                                        "containerId": "14",
+                                        "deploymentGroups": [
+                                            "Default"
+                                        ],
+                                        "environment": "Service",
+                                        "id": "24",
+                                        "instanceId": 1,
+                                        "properties": {
+                                            "structurizr.dsl.identifier": "openaiinstance"
+                                        },
+                                        "tags": "Container Instance"
+                                    }
+                                ],
+                                "environment": "Service",
+                                "id": "23",
+                                "instances": "1",
+                                "name": "DfE AI Centre for Excellence",
+                                "properties": {
+                                    "structurizr.dsl.identifier": "dfe"
+                                },
+                                "tags": "Element,Deployment Node,Microsoft Azure - Virtual Networks"
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "children": [
+                                            {
+                                                "containerInstances": [
+                                                    {
+                                                        "containerId": "2",
+                                                        "deploymentGroups": [
+                                                            "Default"
+                                                        ],
+                                                        "environment": "Service",
+                                                        "id": "34",
+                                                        "instanceId": 1,
+                                                        "properties": {
+                                                            "structurizr.dsl.identifier": "webapplicationinstance"
+                                                        },
+                                                        "relationships": [
+                                                            {
+                                                                "destinationId": "37",
+                                                                "id": "40",
+                                                                "linkedRelationshipId": "4",
+                                                                "sourceId": "34"
+                                                            }
+                                                        ],
+                                                        "tags": "Container Instance"
+                                                    }
+                                                ],
+                                                "environment": "Service",
+                                                "id": "33",
+                                                "instances": "1",
+                                                "name": "Web - Azure Container App",
+                                                "properties": {
+                                                    "structurizr.dsl.identifier": "webappservice"
+                                                },
+                                                "tags": "Element,Deployment Node,Microsoft Azure - Container Instances"
+                                            },
+                                            {
+                                                "containerInstances": [
+                                                    {
+                                                        "containerId": "3",
+                                                        "deploymentGroups": [
+                                                            "Default"
+                                                        ],
+                                                        "environment": "Service",
+                                                        "id": "37",
+                                                        "instanceId": 1,
+                                                        "properties": {
+                                                            "structurizr.dsl.identifier": "apiinstance"
+                                                        },
+                                                        "relationships": [
+                                                            {
+                                                                "description": "Queries",
+                                                                "destinationId": "24",
+                                                                "id": "38",
+                                                                "linkedRelationshipId": "15",
+                                                                "sourceId": "37",
+                                                                "technology": "HTTPS"
+                                                            },
+                                                            {
+                                                                "description": "Queries",
+                                                                "destinationId": "27",
+                                                                "id": "39",
+                                                                "linkedRelationshipId": "8",
+                                                                "sourceId": "37",
+                                                                "technology": "HTTPS"
+                                                            },
+                                                            {
+                                                                "description": "Saves semantic results and geolocation lookups",
+                                                                "destinationId": "28",
+                                                                "id": "41",
+                                                                "sourceId": "37",
+                                                                "tags": "Relationship"
+                                                            }
+                                                        ],
+                                                        "tags": "Container Instance"
+                                                    }
+                                                ],
+                                                "environment": "Service",
+                                                "id": "36",
+                                                "instances": "1",
+                                                "name": "API - Azure Container App",
+                                                "properties": {
+                                                    "structurizr.dsl.identifier": "apiappservice"
+                                                },
+                                                "tags": "Element,Deployment Node,Microsoft Azure - Container Instances"
+                                            }
+                                        ],
+                                        "environment": "Service",
+                                        "id": "32",
+                                        "instances": "1",
+                                        "name": "Auto-Scaling Web Container",
+                                        "properties": {
+                                            "structurizr.dsl.identifier": "webcontainer"
+                                        },
+                                        "tags": "Element,Deployment Node,Microsoft Azure - Container Apps Environments"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "containerInstances": [
+                                                    {
+                                                        "containerId": "5",
+                                                        "deploymentGroups": [
+                                                            "Default"
+                                                        ],
+                                                        "environment": "Service",
+                                                        "id": "47",
+                                                        "instanceId": 1,
+                                                        "properties": {
+                                                            "structurizr.dsl.identifier": "ingestioninstance"
+                                                        },
+                                                        "relationships": [
+                                                            {
+                                                                "description": "Queries",
+                                                                "destinationId": "24",
+                                                                "id": "48",
+                                                                "linkedRelationshipId": "17",
+                                                                "sourceId": "47",
+                                                                "technology": "HTTPS"
+                                                            },
+                                                            {
+                                                                "description": "Writes to",
+                                                                "destinationId": "27",
+                                                                "id": "49",
+                                                                "linkedRelationshipId": "12",
+                                                                "sourceId": "47",
+                                                                "technology": "HTTPS"
+                                                            },
+                                                            {
+                                                                "description": "Saves semantic results and geolocation lookups",
+                                                                "destinationId": "28",
+                                                                "id": "50",
+                                                                "sourceId": "47",
+                                                                "tags": "Relationship"
+                                                            },
+                                                            {
+                                                                "description": "Saves additional information for display",
+                                                                "destinationId": "30",
+                                                                "id": "52",
+                                                                "sourceId": "47",
+                                                                "tags": "Relationship"
+                                                            }
+                                                        ],
+                                                        "tags": "Container Instance"
+                                                    }
+                                                ],
+                                                "environment": "Service",
+                                                "id": "46",
+                                                "instances": "1",
+                                                "name": "Ingestion - Azure Container Job",
+                                                "properties": {
+                                                    "structurizr.dsl.identifier": "ingestionappservice"
+                                                },
+                                                "tags": "Element,Deployment Node,Microsoft Azure - Worker Container App"
+                                            }
+                                        ],
+                                        "environment": "Service",
+                                        "id": "45",
+                                        "instances": "1",
+                                        "name": "Auto-Scaling Ingestion Container",
+                                        "properties": {
+                                            "structurizr.dsl.identifier": "igestioncontainer"
+                                        },
+                                        "tags": "Element,Deployment Node,Microsoft Azure - Container Apps Environments"
+                                    }
+                                ],
+                                "containerInstances": [
+                                    {
+                                        "containerId": "7",
+                                        "deploymentGroups": [
+                                            "Default"
+                                        ],
+                                        "environment": "Service",
+                                        "id": "27",
+                                        "instanceId": 1,
+                                        "properties": {
+                                            "structurizr.dsl.identifier": "aisearchinstance"
+                                        },
+                                        "tags": "Container Instance"
+                                    }
+                                ],
+                                "environment": "Service",
+                                "id": "25",
+                                "infrastructureNodes": [
+                                    {
+                                        "description": "Azure Cache - Redis",
+                                        "environment": "Service",
+                                        "id": "28",
+                                        "name": "Distributed Cache",
+                                        "properties": {
+                                            "structurizr.dsl.identifier": "cache"
+                                        },
+                                        "relationships": [
+                                            {
+                                                "description": "Backing store",
+                                                "destinationId": "30",
+                                                "id": "31",
+                                                "sourceId": "28",
+                                                "tags": "Relationship"
+                                            },
+                                            {
+                                                "description": "Fetches semantic results and geolocation lookups",
+                                                "destinationId": "37",
+                                                "id": "42",
+                                                "sourceId": "28",
+                                                "tags": "Relationship"
+                                            },
+                                            {
+                                                "description": "Fetches semantic results and geolocation lookups",
+                                                "destinationId": "47",
+                                                "id": "51",
+                                                "sourceId": "28",
+                                                "tags": "Relationship"
+                                            }
+                                        ],
+                                        "tags": "Element,Infrastructure Node,Microsoft Azure - Cache Redis"
+                                    },
+                                    {
+                                        "description": "Staging location for CSV file imports and data storage",
+                                        "environment": "Service",
+                                        "id": "29",
+                                        "name": "Azure Blob Storage",
+                                        "properties": {
+                                            "structurizr.dsl.identifier": "staging"
+                                        },
+                                        "relationships": [
+                                            {
+                                                "description": "Loads data from",
+                                                "destinationId": "47",
+                                                "id": "53",
+                                                "sourceId": "29",
+                                                "tags": "Relationship"
+                                            }
+                                        ],
+                                        "tags": "Element,Infrastructure Node,Microsoft Azure - Storage Accounts"
+                                    },
+                                    {
+                                        "description": "Data store for information to be surfaced to users that isn't required to be searchable",
+                                        "environment": "Service",
+                                        "id": "30",
+                                        "name": "Relational DB",
+                                        "properties": {
+                                            "structurizr.dsl.identifier": "db"
+                                        },
+                                        "relationships": [
+                                            {
+                                                "description": "Fetches additional information for display",
+                                                "destinationId": "37",
+                                                "id": "43",
+                                                "sourceId": "30",
+                                                "tags": "Relationship"
+                                            }
+                                        ],
+                                        "tags": "Element,Infrastructure Node,Microsoft Azure - SQL Server"
+                                    }
+                                ],
+                                "instances": "1",
+                                "name": "FEAT Vnet",
+                                "properties": {
+                                    "structurizr.dsl.identifier": "vnet"
+                                },
+                                "tags": "Element,Deployment Node,Microsoft Azure - Virtual Networks"
+                            }
+                        ],
+                        "environment": "Service",
+                        "id": "19",
+                        "instances": "1",
+                        "name": "West Europe",
+                        "properties": {
+                            "structurizr.dsl.identifier": "3096e830-b2d5-4c10-9527-15309b18da39"
+                        },
+                        "tags": "Element,Deployment Node,Microsoft Azure - Region Management"
+                    }
+                ],
+                "environment": "Service",
+                "id": "18",
+                "instances": "1",
+                "name": "Microsoft Azure",
+                "properties": {
+                    "structurizr.dsl.identifier": "053d47a6-15b0-45a0-99eb-f8b9f038e8c2"
+                },
+                "tags": "Element,Deployment Node,Microsoft Azure - Azure A"
+            }
+        ],
+        "properties": {
+            "structurizr.groupSeparator": "/"
+        },
+        "softwareSystems": [
+            {
+                "containers": [
+                    {
+                        "description": "Proof of concept site to demonstrate a front-end for finding information",
+                        "documentation": {},
+                        "id": "2",
+                        "name": "FEAT Website",
+                        "properties": {
+                            "structurizr.dsl.identifier": "webapp"
+                        },
+                        "relationships": [
+                            {
+                                "destinationId": "3",
+                                "id": "4",
+                                "sourceId": "2",
+                                "tags": "Relationship"
+                            }
+                        ],
+                        "tags": "Element,Container,Microsoft Azure - Website Staging",
+                        "technology": "dotnet 9.0"
+                    },
+                    {
+                        "description": "FEAT API that interrogates Azure AI Search",
+                        "documentation": {},
+                        "id": "3",
+                        "name": "FEAT API Service",
+                        "properties": {
+                            "structurizr.dsl.identifier": "api"
+                        },
+                        "relationships": [
+                            {
+                                "description": "Queries",
+                                "destinationId": "7",
+                                "id": "8",
+                                "sourceId": "3",
+                                "tags": "Relationship",
+                                "technology": "HTTPS"
+                            },
+                            {
+                                "description": "Queries",
+                                "destinationId": "6",
+                                "id": "9",
+                                "linkedRelationshipId": "8",
+                                "sourceId": "3",
+                                "technology": "HTTPS"
+                            },
+                            {
+                                "description": "Queries",
+                                "destinationId": "14",
+                                "id": "15",
+                                "sourceId": "3",
+                                "tags": "Relationship",
+                                "technology": "HTTPS"
+                            }
+                        ],
+                        "tags": "Element,Container,Microsoft Azure - API Management Services",
+                        "technology": "dotnet 9.0"
+                    },
+                    {
+                        "documentation": {},
+                        "id": "5",
+                        "name": "FEAT Ingestion Job",
+                        "properties": {
+                            "structurizr.dsl.identifier": "ingestion"
+                        },
+                        "relationships": [
+                            {
+                                "description": "Writes to",
+                                "destinationId": "7",
+                                "id": "12",
+                                "sourceId": "5",
+                                "tags": "Relationship",
+                                "technology": "HTTPS"
+                            },
+                            {
+                                "description": "Writes to",
+                                "destinationId": "6",
+                                "id": "13",
+                                "linkedRelationshipId": "12",
+                                "sourceId": "5",
+                                "technology": "HTTPS"
+                            },
+                            {
+                                "description": "Queries",
+                                "destinationId": "14",
+                                "id": "17",
+                                "sourceId": "5",
+                                "tags": "Relationship",
+                                "technology": "HTTPS"
+                            }
+                        ],
+                        "tags": "Element,Container,Microsoft Azure - Data Shares",
+                        "technology": "dotnet 9.0"
+                    }
+                ],
+                "description": "Serverless container platform",
+                "documentation": {},
+                "group": "DfE",
+                "id": "1",
+                "location": "Unspecified",
+                "name": "Find Education and Training",
+                "properties": {
+                    "structurizr.dsl.identifier": "findasystem"
+                },
+                "relationships": [
+                    {
+                        "description": "Queries",
+                        "destinationId": "7",
+                        "id": "10",
+                        "linkedRelationshipId": "8",
+                        "sourceId": "1",
+                        "technology": "HTTPS"
+                    },
+                    {
+                        "description": "Queries",
+                        "destinationId": "6",
+                        "id": "11",
+                        "linkedRelationshipId": "8",
+                        "sourceId": "1",
+                        "technology": "HTTPS"
+                    },
+                    {
+                        "description": "Queries",
+                        "destinationId": "14",
+                        "id": "16",
+                        "linkedRelationshipId": "15",
+                        "sourceId": "1",
+                        "technology": "HTTPS"
+                    }
+                ],
+                "tags": "Element,Software System,Microsoft Azure - Container Apps Environments"
+            },
+            {
+                "containers": [
+                    {
+                        "description": "Vector search database",
+                        "documentation": {},
+                        "id": "7",
+                        "name": "Microsoft AI Search",
+                        "properties": {
+                            "structurizr.dsl.identifier": "aisearch"
+                        },
+                        "tags": "Element,Container,Microsoft Azure - Cognitive Search",
+                        "technology": "Microsoft AI"
+                    },
+                    {
+                        "description": "Embeddings generator",
+                        "documentation": {},
+                        "id": "14",
+                        "name": "OpenAI LLM",
+                        "properties": {
+                            "structurizr.dsl.identifier": "openai"
+                        },
+                        "tags": "Element,Container,Microsoft Azure - Azure OpenAI",
+                        "technology": "Microsoft AI"
+                    }
+                ],
+                "documentation": {},
+                "group": "Azure AI",
+                "id": "6",
+                "location": "Unspecified",
+                "name": "Microsoft AI Services",
+                "properties": {
+                    "structurizr.dsl.identifier": "ai"
+                },
+                "tags": "Element,Software System,Microsoft Azure - Cognitive Services"
+            }
+        ]
+    },
+    "name": "FEATv1",
+    "properties": {
+        "structurizr.dsl": "d29ya3NwYWNlICJGRUFUdjEiICJGaW5kIEVkdWNhdGlvbiBhbmQgVHJhaW5pbmcgLSBIb3N0aW5nIGludGVybmFsIEFJIFNlYXJjaCIgewoKICAgIG1vZGVsIHsKICAgICAgICBwcm9wZXJ0aWVzIHsKICAgICAgICAgICAgInN0cnVjdHVyaXpyLmdyb3VwU2VwYXJhdG9yIiAiLyIKICAgICAgICB9CgogICAgICAgIGdyb3VwICJEZkUiIHsKCiAgICAgICAgICAgIGZpbmRBU3lzdGVtID0gc29mdHdhcmVTeXN0ZW0gIkZpbmQgRWR1Y2F0aW9uIGFuZCBUcmFpbmluZyIgewogICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlNlcnZlcmxlc3MgY29udGFpbmVyIHBsYXRmb3JtIgogICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQ29udGFpbmVyIEFwcHMgRW52aXJvbm1lbnRzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgIHdlYmFwcCA9IGNvbnRhaW5lciAiRkVBVCBXZWJzaXRlIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlByb29mIG9mIGNvbmNlcHQgc2l0ZSB0byBkZW1vbnN0cmF0ZSBhIGZyb250LWVuZCBmb3IgZmluZGluZyBpbmZvcm1hdGlvbiIKICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJkb3RuZXQgOS4wIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIFdlYnNpdGUgU3RhZ2luZyIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGFwaSA9IGNvbnRhaW5lciAiRkVBVCBBUEkgU2VydmljZSIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJGRUFUIEFQSSB0aGF0IGludGVycm9nYXRlcyBBenVyZSBBSSBTZWFyY2giCiAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiZG90bmV0IDkuMCIKICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBBUEkgTWFuYWdlbWVudCBTZXJ2aWNlcyIKICAgICAgICAgICAgICAgICAgICB3ZWJhcHAgLT4gdGhpcwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgaW5nZXN0aW9uID0gY29udGFpbmVyICJGRUFUIEluZ2VzdGlvbiBKb2IiIHsKICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJkb3RuZXQgOS4wIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIERhdGEgU2hhcmVzIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgCiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgCiAgICAgICAgCiAgICAgICAgZ3JvdXAgIkF6dXJlIEFJIiB7CiAgICAgICAgICAgIGFpID0gc29mdHdhcmVTeXN0ZW0gIk1pY3Jvc29mdCBBSSBTZXJ2aWNlcyIgewogICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQ29nbml0aXZlIFNlcnZpY2VzIgogICAgICAgICAgICAgICAgYWlTZWFyY2ggPSBjb250YWluZXIgIk1pY3Jvc29mdCBBSSBTZWFyY2giIHsKICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJNaWNyb3NvZnQgQUkiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQ29nbml0aXZlIFNlYXJjaCIKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiVmVjdG9yIHNlYXJjaCBkYXRhYmFzZSIKICAgICAgICAgICAgICAgICAgICBhcGkgLT4gdGhpcyAiUXVlcmllcyIgIkhUVFBTIgogICAgICAgICAgICAgICAgICAgIGluZ2VzdGlvbiAtPiB0aGlzICJXcml0ZXMgdG8iICJIVFRQUyIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgb3BlbkFJID0gY29udGFpbmVyICJPcGVuQUkgTExNIiB7CiAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiTWljcm9zb2Z0IEFJIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEF6dXJlIE9wZW5BSSIKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiRW1iZWRkaW5ncyBnZW5lcmF0b3IiCiAgICAgICAgICAgICAgICAgICAgYXBpIC0+IHRoaXMgIlF1ZXJpZXMiICJIVFRQUyIKICAgICAgICAgICAgICAgICAgICBpbmdlc3Rpb24gLT4gdGhpcyAiUXVlcmllcyIgIkhUVFBTIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIAogICAgICAgIHNlcnZpY2UgPSBkZXBsb3ltZW50RW52aXJvbm1lbnQgIlNlcnZpY2UiIHsKCiAgICAgICAgICAgIGRlcGxveW1lbnROb2RlICJNaWNyb3NvZnQgQXp1cmUiIHsKICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEF6dXJlIEEiCgogICAgICAgICAgICAgICAgZGVwbG95bWVudE5vZGUgIldlc3QgRXVyb3BlIiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gUmVnaW9uIE1hbmFnZW1lbnQiCiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgaW50ZXJuZXQgPSBkZXBsb3ltZW50Tm9kZSAiUHVibGljIEludGVybmV0IiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEVudHJhIEludGVybmV0IEFjY2VzcyIKICAgICAgICAgICAgICAgICAgICAgICAgZ2F0ZXdheSA9IGluZnJhc3RydWN0dXJlTm9kZSAiU2hhcmVkIERmRSBXQUYiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIkF6dXJlIEZyb250IERvb3IgYW5kIEZpcmV3YWxscyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJBdXRvbWF0aWNhbGx5IGRpc3RyaWJ1dGVzIGFuZCBzZWN1cmVzIGluY29taW5nIGFwcGxpY2F0aW9uIHRyYWZmaWMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBGaXJld2FsbHMiCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGJhc3Rpb24gPSBpbmZyYXN0cnVjdHVyZU5vZGUgIkJhc3Rpb24iIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJSZW1vdGUgU1NIIGZvciBjb25uZWN0aW5nIHRvIHRoZSB2aXJ0dWFsIG5ldHdvcmsiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBCYXN0aW9ucyIKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICBkZmUgPSBkZXBsb3ltZW50Tm9kZSAiRGZFIEFJIENlbnRyZSBmb3IgRXhjZWxsZW5jZSIgewogICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBWaXJ0dWFsIE5ldHdvcmtzIgogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIG9wZW5BSUluc3RhbmNlID0gY29udGFpbmVySW5zdGFuY2Ugb3BlbkFJIHsKCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgICAgIHZuZXQgPSBkZXBsb3ltZW50Tm9kZSAiRkVBVCBWbmV0IiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIFZpcnR1YWwgTmV0d29ya3MiCiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICBiYXN0aW9uIC0+IHRoaXMgIkFsbG93cyBzZWN1cmVkIGFjY2VzcyB0byIKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICBhaVNlYXJjaEluc3RhbmNlID0gY29udGFpbmVySW5zdGFuY2UgYWlTZWFyY2ggewogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGNhY2hlID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJEaXN0cmlidXRlZCBDYWNoZSIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkF6dXJlIENhY2hlIC0gUmVkaXMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBDYWNoZSBSZWRpcyIKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICBzdGFnaW5nID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJBenVyZSBCbG9iIFN0b3JhZ2UiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJTdGFnaW5nIGxvY2F0aW9uIGZvciBDU1YgZmlsZSBpbXBvcnRzIGFuZCBkYXRhIHN0b3JhZ2UiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBTdG9yYWdlIEFjY291bnRzIgogICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgZGIgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIlJlbGF0aW9uYWwgREIiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJEYXRhIHN0b3JlIGZvciBpbmZvcm1hdGlvbiB0byBiZSBzdXJmYWNlZCB0byB1c2VycyB0aGF0IGlzbid0IHJlcXVpcmVkIHRvIGJlIHNlYXJjaGFibGUiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBTUUwgU2VydmVyIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgY2FjaGUgLT4gdGhpcyAiQmFja2luZyBzdG9yZSIKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIHdlYkNvbnRhaW5lciA9IGRlcGxveW1lbnROb2RlICJBdXRvLVNjYWxpbmcgV2ViIENvbnRhaW5lciIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQ29udGFpbmVyIEFwcHMgRW52aXJvbm1lbnRzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB3ZWJBcHBTZXJ2aWNlID0gZGVwbG95bWVudE5vZGUgIldlYiAtIEF6dXJlIENvbnRhaW5lciBBcHAiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBDb250YWluZXIgSW5zdGFuY2VzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHdlYkFwcGxpY2F0aW9uSW5zdGFuY2UgPSBjb250YWluZXJJbnN0YW5jZSB3ZWJhcHAgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBnYXRld2F5IC0+IHRoaXMgIkZvd2FyZHMgcmVxdWVzdHMgdG8iICJIVFRQUyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFwaUFwcFNlcnZpY2UgPSBkZXBsb3ltZW50Tm9kZSAiQVBJIC0gQXp1cmUgQ29udGFpbmVyIEFwcCIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIENvbnRhaW5lciBJbnN0YW5jZXMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYXBpSW5zdGFuY2UgPSBjb250YWluZXJJbnN0YW5jZSBhcGkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGNhY2hlICJTYXZlcyBzZW1hbnRpYyByZXN1bHRzIGFuZCBnZW9sb2NhdGlvbiBsb29rdXBzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjYWNoZSAtPiB0aGlzICJGZXRjaGVzIHNlbWFudGljIHJlc3VsdHMgYW5kIGdlb2xvY2F0aW9uIGxvb2t1cHMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRiIC0+IHRoaXMgIkZldGNoZXMgYWRkaXRpb25hbCBpbmZvcm1hdGlvbiBmb3IgZGlzcGxheSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ2F0ZXdheSAtPiB0aGlzICJQcm92aWRlcyBzZWN1cmVkIGFjY2VzcyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGlnZXN0aW9uQ29udGFpbmVyID0gZGVwbG95bWVudE5vZGUgIkF1dG8tU2NhbGluZyBJbmdlc3Rpb24gQ29udGFpbmVyIiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBDb250YWluZXIgQXBwcyBFbnZpcm9ubWVudHMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGluZ2VzdGlvbkFwcFNlcnZpY2UgPSBkZXBsb3ltZW50Tm9kZSAiSW5nZXN0aW9uIC0gQXp1cmUgQ29udGFpbmVyIEpvYiIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIFdvcmtlciBDb250YWluZXIgQXBwIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGluZ2VzdGlvbkluc3RhbmNlID0gY29udGFpbmVySW5zdGFuY2UgaW5nZXN0aW9uIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiBjYWNoZSAiU2F2ZXMgc2VtYW50aWMgcmVzdWx0cyBhbmQgZ2VvbG9jYXRpb24gbG9va3VwcyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2FjaGUgLT4gdGhpcyAiRmV0Y2hlcyBzZW1hbnRpYyByZXN1bHRzIGFuZCBnZW9sb2NhdGlvbiBsb29rdXBzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGRiICJTYXZlcyBhZGRpdGlvbmFsIGluZm9ybWF0aW9uIGZvciBkaXNwbGF5IgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdGFnaW5nIC0+IHRoaXMgIkxvYWRzIGRhdGEgZnJvbSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgCgogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIC8qIAogICAgICAgICAgICAgICAgICAgICAgICBkYXRhZmFjdG9yeSAtPiBzdGFnaW5nICJFeHBvcnRzIGRhdGEgdG8iIAogICAgICAgICAgICAgICAgICAgICAgICAqLwogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIAoKICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIAoKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgICAgICAKICAgICAgICB9CiAgICAgICAgCiAgICB9CgogICAgdmlld3MgewogICAgICAgIAogICAgICAgIGRlcGxveW1lbnQgKiBTZXJ2aWNlIHsKICAgICAgICAgICAgdGl0bGUgIlNlcnZpY2UgVmlldyIKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgfQogICAgICAgIAogICAgICAgIHRoZW1lcyBodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vc3RydWN0dXJpenIvdGhlbWVzL3JlZnMvaGVhZHMvbWFzdGVyL21pY3Jvc29mdC1henVyZS0yMDI0LjA3LjE1L2ljb25zLmpzb24KICAgICAgICAvLyB0aGVtZXMgaHR0cHM6Ly9zdGF0aWMuc3RydWN0dXJpenIuY29tL3RoZW1lcy9taWNyb3NvZnQtYXp1cmUtMjAyMy4wMS4yNC90aGVtZS5qc29uCiAgICB9Cgp9"
+    },
+    "views": {
+        "configuration": {
+            "branding": {},
+            "lastSavedView": "Deployment-001",
+            "metadataSymbols": "SquareBrackets",
+            "styles": {},
+            "terminology": {},
+            "themes": [
+                "https://raw.githubusercontent.com/structurizr/themes/refs/heads/master/microsoft-azure-2024.07.15/icons.json"
+            ]
+        },
+        "deploymentViews": [
+            {
+                "dimensions": {
+                    "height": 2730,
+                    "width": 3275
+                },
+                "elements": [
+                    {
+                        "id": "18",
+                        "x": 1925,
+                        "y": 1925
+                    },
+                    {
+                        "id": "19",
+                        "x": 1925,
+                        "y": 1925
+                    },
+                    {
+                        "id": "20",
+                        "x": 1750,
+                        "y": 1750
+                    },
+                    {
+                        "id": "21",
+                        "x": 1960,
+                        "y": 225
+                    },
+                    {
+                        "id": "22",
+                        "x": 265,
+                        "y": 230
+                    },
+                    {
+                        "id": "23",
+                        "x": 1750,
+                        "y": 1750
+                    },
+                    {
+                        "id": "24",
+                        "x": 2540,
+                        "y": 1740
+                    },
+                    {
+                        "id": "25",
+                        "x": 1750,
+                        "y": 1750
+                    },
+                    {
+                        "id": "27",
+                        "x": 1975,
+                        "y": 1215
+                    },
+                    {
+                        "id": "28",
+                        "x": 290,
+                        "y": 1765
+                    },
+                    {
+                        "id": "29",
+                        "x": 1995,
+                        "y": 2210
+                    },
+                    {
+                        "id": "30",
+                        "x": 285,
+                        "y": 820
+                    },
+                    {
+                        "id": "32",
+                        "x": 350,
+                        "y": 350
+                    },
+                    {
+                        "id": "33",
+                        "x": 1925,
+                        "y": 1925
+                    },
+                    {
+                        "id": "34",
+                        "x": 1190,
+                        "y": 740
+                    },
+                    {
+                        "id": "36",
+                        "x": 1925,
+                        "y": 1925
+                    },
+                    {
+                        "id": "37",
+                        "x": 1190,
+                        "y": 1242
+                    },
+                    {
+                        "id": "45",
+                        "x": 1925,
+                        "y": 1925
+                    },
+                    {
+                        "id": "46",
+                        "x": 1925,
+                        "y": 1925
+                    },
+                    {
+                        "id": "47",
+                        "x": 1190,
+                        "y": 1825
+                    }
+                ],
+                "environment": "Service",
+                "generatedKey": true,
+                "key": "Deployment-001",
+                "order": 1,
+                "relationships": [
+                    {
+                        "id": "26",
+                        "vertices": [
+                            {
+                                "x": 1050,
+                                "y": 375
+                            }
+                        ]
+                    },
+                    {
+                        "id": "31"
+                    },
+                    {
+                        "id": "35",
+                        "vertices": [
+                            {
+                                "x": 1910,
+                                "y": 375
+                            }
+                        ]
+                    },
+                    {
+                        "id": "38"
+                    },
+                    {
+                        "id": "39"
+                    },
+                    {
+                        "id": "40"
+                    },
+                    {
+                        "id": "41"
+                    },
+                    {
+                        "id": "42",
+                        "vertices": [
+                            {
+                                "x": 635,
+                                "y": 1465
+                            }
+                        ]
+                    },
+                    {
+                        "id": "43",
+                        "vertices": [
+                            {
+                                "x": 975,
+                                "y": 1125
+                            }
+                        ]
+                    },
+                    {
+                        "id": "44",
+                        "vertices": [
+                            {
+                                "x": 1800,
+                                "y": 1175
+                            }
+                        ]
+                    },
+                    {
+                        "id": "48"
+                    },
+                    {
+                        "id": "49"
+                    },
+                    {
+                        "id": "50",
+                        "vertices": [
+                            {
+                                "x": 965,
+                                "y": 1830
+                            }
+                        ]
+                    },
+                    {
+                        "id": "51",
+                        "vertices": [
+                            {
+                                "x": 950,
+                                "y": 2042
+                            }
+                        ]
+                    },
+                    {
+                        "id": "52",
+                        "vertices": [
+                            {
+                                "x": 1085,
+                                "y": 1680
+                            },
+                            {
+                                "x": 995,
+                                "y": 1280
+                            }
+                        ]
+                    },
+                    {
+                        "id": "53"
+                    }
+                ],
+                "title": "Service View"
+            }
+        ]
+    }
+}
