@@ -51,7 +51,9 @@ No modules.
 | <a name="input_ai_search_semantic_sku"></a> [ai\_search\_semantic\_sku](#input\_ai\_search\_semantic\_sku) | Specifies the Semantic Search SKU which should be used for this Search Service. Possible values include free and standard | `string` | `"standard"` | no |
 | <a name="input_ai_search_sku"></a> [ai\_search\_sku](#input\_ai\_search\_sku) | The SKU which should be used for this Search Service. Possible values include basic, free, standard, standard2, standard3, storage\_optimized\_l1 and storage\_optimized\_l2 | `string` | `"standard"` | no |
 | <a name="input_api_image_name"></a> [api\_image\_name](#input\_api\_image\_name) | The repository name and tag for the API container. | `string` | n/a | yes |
+| <a name="input_clarity"></a> [clarity](#input\_clarity) | The Microsoft Clarity Id | `string` | `""` | no |
 | <a name="input_env"></a> [env](#input\_env) | Environment (dev, test, prod) | `string` | n/a | yes |
+| <a name="input_google_tag_manager"></a> [google\_tag\_manager](#input\_google\_tag\_manager) | The Google Tag Manager (GTM) Id | `string` | `""` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | `"uksouth"` | no |
 | <a name="input_openai_key"></a> [openai\_key](#input\_openai\_key) | The OpenAI Key used for text embeddings. | `string` | `null` | no |
 | <a name="input_partition_count"></a> [partition\_count](#input\_partition\_count) | Partitions allow for scaling of document count as well as faster indexing by sharding your index over multiple search units. | `number` | `1` | no |
