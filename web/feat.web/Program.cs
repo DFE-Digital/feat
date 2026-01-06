@@ -22,7 +22,8 @@ if (builder.Environment.IsDevelopment() &&
 builder.Configuration.AddEnvironmentVariables();
 
 // Add configuration
-builder.Services.Configure<SearchOptions>(builder.Configuration.GetSection("Search"));
+builder.Services.Configure<SearchOptions>(builder.Configuration.GetSection(SearchOptions.Name));
+builder.Services.Configure<AnalyticsOptions>(builder.Configuration.GetSection(AnalyticsOptions.Name));
 
 // Add services to the container.
 builder.Services.Configure<RouteOptions>(option =>
@@ -72,11 +73,6 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddScoped<StaticNavigationHandler>();
-
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(8081);
-});
 
 var app = builder.Build();
 
