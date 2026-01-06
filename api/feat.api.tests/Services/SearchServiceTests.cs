@@ -1,8 +1,9 @@
 using Azure.Search.Documents;
 using feat.api.Data;
+using feat.api.Models;
 using feat.api.Services;
-using feat.common;
 using feat.common.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using NUnit.Framework;
@@ -12,41 +13,59 @@ using ZiggyCreatures.Caching.Fusion;
 namespace feat.api.tests.Services;
 
 [TestFixture]
-public class SearchServiceTests(
-    IOptionsMonitor<AzureOptions> azureOptions,
-    IApiClient apiClient,
-    SearchClient searchClient,
-    EmbeddingClient embeddingClient,
-    CourseDbContext dbContext,
-    SearchService searchService,
-    IFusionCache cache)
+public class SearchServiceTests
 {
-    private IOptionsMonitor<AzureOptions> _azureOptions = azureOptions;
-    private IApiClient _apiClient = apiClient;
-    private SearchClient _searchClient = searchClient;
-    private EmbeddingClient _embeddingClient = embeddingClient;
-    private CourseDbContext _dbContext = dbContext;
-    private IFusionCache _cache = cache;
-    
-    private SearchService _searchService = searchService;
+    private SearchService _service;
+    private IFusionCache _cache;
 
     [SetUp]
     public void Setup()
     {
-        _azureOptions = Substitute.For<IOptionsMonitor<AzureOptions>>();
-        _apiClient = Substitute.For<IApiClient>();
-        _searchClient = Substitute.For<SearchClient>();
-        _embeddingClient = Substitute.For<EmbeddingClient>();
-        _dbContext = Substitute.For<CourseDbContext>();
-        _cache = Substitute.For<IFusionCache>();
+        var options = new DbContextOptionsBuilder<CourseDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
         
-        _searchService = new SearchService(
-            _azureOptions,
-            _apiClient,
-            _searchClient,
-            _embeddingClient,
-            _dbContext,
+        var dbContext = new CourseDbContext(options);
+
+        var azureOptions = Substitute.For<IOptionsMonitor<AzureOptions>>();
+        _cache = Substitute.For<IFusionCache>();
+
+        _service = new SearchService(
+            azureOptions,
+            Substitute.For<SearchClient>(),
+            Substitute.For<EmbeddingClient>(),
+            dbContext,
             _cache
         );
+    }
+
+    [Test]
+    public async Task SearchAsync_ReturnsValidationError_WhenLocationInvalid()
+    {
+        const string invalidLocation = "Nowhere";
+
+        var request = new SearchRequest
+        {
+            Query = "Art",
+            Location = invalidLocation
+        };
+
+        _cache.GetOrSetAsync(
+            Arg.Is<string>(k => k == $"location:{invalidLocation}"),
+            Arg.Any<Func<FusionCacheFactoryExecutionContext<GeoLocationResponse>, CancellationToken, Task<GeoLocationResponse>>>(),
+            Arg.Any<FusionCacheEntryOptions>(),
+            Arg.Any<CancellationToken>()
+        ).Returns(callInfo =>
+        {
+            var factory = callInfo.ArgAt<Func<FusionCacheFactoryExecutionContext<GeoLocationResponse>, CancellationToken, Task<GeoLocationResponse>>>(1);
+            var task = factory(null!, CancellationToken.None);
+            return new ValueTask<GeoLocationResponse>(task);
+        });
+
+        var (validation, response) = await _service.SearchAsync(request);
+
+        Assert.That(validation.IsValid, Is.False);
+        Assert.That(validation.Errors.ContainsKey("location"));
+        Assert.That(response, Is.Null);
     }
 }

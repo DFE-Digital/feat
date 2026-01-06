@@ -1,5 +1,7 @@
 using feat.api.Data;
+using feat.api.Models;
 using feat.api.Services;
+using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using NUnit.Framework;
 using ZiggyCreatures.Caching.Fusion;
@@ -7,22 +9,40 @@ using ZiggyCreatures.Caching.Fusion;
 namespace feat.api.tests.Services;
 
 [TestFixture]
-public class CourseServiceTests(
-    CourseDbContext dbContext,
-    CourseService courseService,
-    IFusionCache cache)
+public class CourseServiceTests
 {
-    private CourseDbContext _dbContext = dbContext;
-    private IFusionCache _cache = cache;
-    
-    private CourseService _courseService = courseService;
+    private CourseService _service;
+    private IFusionCache _cache;
 
     [SetUp]
     public void Setup()
     {
-        _dbContext = Substitute.For<CourseDbContext>();
+        var options = new DbContextOptionsBuilder<CourseDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+        
+        var dbContext = new CourseDbContext(options);
+        
         _cache = Substitute.For<IFusionCache>();
         
-        _courseService = new CourseService(_dbContext, _cache);
+        _service = new CourseService(
+            dbContext,
+            _cache);
+    }
+
+    [Test]
+    public async Task GetCourseByInstanceIdAsync_ReturnsCachedValue()
+    {
+        var instanceId = Guid.NewGuid();
+        var cachedResponse = new CourseDetailsResponse { Id = instanceId };
+
+        _cache.GetOrSetAsync<CourseDetailsResponse?>(
+            $"instance:{instanceId}",
+            Arg.Any<Func<FusionCacheFactoryExecutionContext<CourseDetailsResponse?>, CancellationToken, Task<CourseDetailsResponse?>>>()
+        ).Returns(new ValueTask<CourseDetailsResponse?>(cachedResponse));
+        
+        var result = await _service.GetCourseByInstanceIdAsync(instanceId);
+        
+        Assert.That(result, Is.EqualTo(cachedResponse));
     }
 }
