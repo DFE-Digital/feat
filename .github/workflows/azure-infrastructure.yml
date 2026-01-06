@@ -17,6 +17,7 @@ on:
         options:
           - Development
           - Test
+          - Beta
 
 jobs:
   terraform:
