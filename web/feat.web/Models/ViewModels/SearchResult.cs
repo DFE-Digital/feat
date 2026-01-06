@@ -1,3 +1,4 @@
+using feat.common;
 using feat.common.Models.Enums;
 using feat.web.Extensions;
 
@@ -26,7 +27,7 @@ public class SearchResult
     
     public CourseType? CourseType { private get; init; }
     
-    public string CourseTypeDisplay => CourseType?.GetDescription() ?? "Not available";
+    public string CourseTypeDisplay => CourseType?.GetDescription() ?? SharedStrings.NotProvided;
     
     public string? Requirements { get; init; }
     

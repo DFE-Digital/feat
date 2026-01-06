@@ -25,11 +25,11 @@
         <dd class="govuk-summary-list__value">
           @if (Model.Distance == null)
           {
-            @Model.LocationName
+            @Model.LocationName.ValueOrNotProvided()
           }
           else
           {
-            @(Model.LocationName + ", " + Model.DistanceDisplay)
+            @(Model.LocationName.ValueOrNotProvided() + ", " + Model.DistanceDisplay)
           }
         </dd>
       </div>
