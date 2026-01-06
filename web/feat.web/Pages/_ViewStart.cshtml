@@ -1,15 +1,5 @@
 ﻿@using feat.web.Models
 
 @{
-    var routeUrl = ViewContext.RouteData.Values["Page"]?.ToString();
-    var pages = new[] { "/Course" };
-    
-    if (routeUrl != null && pages.Contains(routeUrl)) 
-    {
-        Layout = "_LayoutCourseDetails";
-    }
-    else
-    {
-        Layout = "_Layout";
-    }
+    Layout = "_Layout";
 }
