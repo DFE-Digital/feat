@@ -5,8 +5,6 @@ using feat.api.Data;
 using feat.api.Enums;
 using feat.api.Extensions;
 using feat.api.Models;
-using feat.api.Models.External;
-using feat.common;
 using feat.common.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,7 +16,6 @@ namespace feat.api.Services;
 
 public class SearchService(
     IOptionsMonitor<AzureOptions> options,
-    IApiClient apiClient,
     SearchClient aiSearchClient,
     EmbeddingClient embeddingClient,
     CourseDbContext dbContext,
@@ -185,25 +182,27 @@ public class SearchService(
         if (results.Any(x => x.Rank == 0))
         {
             var firstResult = results.First(x => x.Rank == 0);
+            
             return
             [
-                new AutoCompleteLocation()
+                new AutoCompleteLocation
                 {
                     Name = firstResult.Text,
-                    Latitude = firstResult.Latitude.Value,
-                    Longitude = firstResult.Longitude.Value
+                    Latitude = firstResult.Latitude!.Value,
+                    Longitude = firstResult.Longitude!.Value
                 }
             ];
         }
-        else
+
+        return results
+            .OrderBy(x => x.Rank)
+            .ThenBy(x => x.Text)
+            .Select(x => new AutoCompleteLocation
         {
-            return results.OrderBy(x => x.Rank).ThenBy(x => x.Text).Select(x => new AutoCompleteLocation()
-            {
-                Name = x.Text,
-                Latitude = x.Latitude.Value,
-                Longitude = x.Longitude.Value
-            }).ToArray();
-        }
+            Name = x.Text,
+            Latitude = x.Latitude!.Value,
+            Longitude = x.Longitude!.Value
+        }).ToArray();
     }
 
     private static void RemoveDuplicateCourses(List<Course> courses)
