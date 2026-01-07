@@ -29,12 +29,12 @@ public class AutocompleteLocationsControllerTests
             .GetAutoCompleteLocationsAsync("Man")
             .Returns(locations);
 
-        var actionResult = await _controller.Query("Man");
+        var result = await _controller.Query("Man");
         
-        var result = actionResult.Result as ObjectResult;
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.StatusCode, Is.EqualTo(200));
-        Assert.That(result!.Value, Is.EqualTo(locations));
+        var okResult = result.Result as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        Assert.That(okResult!.StatusCode, Is.EqualTo(200));
+        Assert.That(okResult!.Value, Is.EqualTo(locations));
     }
 
     [Test]
@@ -44,8 +44,8 @@ public class AutocompleteLocationsControllerTests
             .GetGeoLocationAsync("M1 7AB")
             .Returns(new GeoLocationResponse(new GeoLocation(), true));
 
-        var actionResult = await _controller.Valid("M1 7AB");
+        var result = await _controller.Valid("M1 7AB");
         
-        Assert.That(actionResult.Value, Is.True);
+        Assert.That(result.Value, Is.True);
     }
 }

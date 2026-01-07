@@ -31,12 +31,12 @@ public class SearchControllerTests
             .SearchAsync(request)
             .Returns((new ValidationResult(), response));
         
-        var actionResult = await _controller.Search(request);
+        var result = await _controller.Search(request);
         
-        var result = actionResult.Result as ObjectResult;
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.StatusCode, Is.EqualTo(200));
-        Assert.That(result!.Value, Is.EqualTo(response));
+        var okResult = result.Result as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        Assert.That(okResult!.StatusCode, Is.EqualTo(200));
+        Assert.That(okResult!.Value, Is.EqualTo(response));
     }
 
     [Test]
@@ -51,10 +51,10 @@ public class SearchControllerTests
             .SearchAsync(request)
             .Returns((validation, null));
 
-        var actionResult = await _controller.Search(request);
+        var result = await _controller.Search(request);
         
-        var result = actionResult.Result as ObjectResult;
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.StatusCode, Is.EqualTo(400));
+        var badRequestResult = result.Result as BadRequestObjectResult;
+        Assert.That(badRequestResult, Is.Not.Null);
+        Assert.That(badRequestResult!.StatusCode, Is.EqualTo(400));
     }
 }

@@ -3,6 +3,7 @@ using feat.api.Data;
 using feat.api.Models;
 using feat.api.Services;
 using feat.common.Configuration;
+using feat.common.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -15,8 +16,9 @@ namespace feat.api.tests.Services;
 [TestFixture]
 public class SearchServiceTests
 {
-    private SearchService _service;
+    private CourseDbContext _dbContext;
     private IFusionCache _cache;
+    private SearchService _service;
 
     [SetUp]
     public void Setup()
@@ -25,16 +27,14 @@ public class SearchServiceTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         
-        var dbContext = new CourseDbContext(options);
-
-        var azureOptions = Substitute.For<IOptionsMonitor<AzureOptions>>();
+        _dbContext = new CourseDbContext(options);
         _cache = Substitute.For<IFusionCache>();
-
+        
         _service = new SearchService(
-            azureOptions,
+            Substitute.For<IOptionsMonitor<AzureOptions>>(),
             Substitute.For<SearchClient>(),
             Substitute.For<EmbeddingClient>(),
-            dbContext,
+            _dbContext,
             _cache
         );
     }
@@ -67,5 +67,38 @@ public class SearchServiceTests
         Assert.That(validation.IsValid, Is.False);
         Assert.That(validation.Errors.ContainsKey("location"));
         Assert.That(response, Is.Null);
+    }
+    
+    [Test]
+    public async Task GetAutoCompleteLocationsAsync_PrioritizesExactMatch()
+    {
+        _dbContext.LookupLocations.AddRange(
+            new LocationLatLong
+            {
+                Name = "Manchester Piccadilly",
+                CleanName = "manchester piccadilly",
+                Latitude = 1.1d,
+                Longitude = 2.1d
+            },
+            new LocationLatLong
+            {
+                Name = "Manchester",
+                CleanName = "manchester",
+                Latitude = 1.0d,
+                Longitude = 2.0d
+            }
+        );
+        
+        await _dbContext.SaveChangesAsync();
+        
+        var results = await _service.GetAutoCompleteLocationsAsync("Manchester");
+        
+        Assert.That(results[0].Name, Is.EqualTo("Manchester"));
+    }
+    
+    [TearDown]
+    public void TearDown()
+    {
+        _dbContext.Dispose();
     }
 }

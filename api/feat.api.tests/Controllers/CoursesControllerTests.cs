@@ -34,12 +34,12 @@ public class CoursesControllerTests
             .GetCourseByInstanceIdAsync(instanceId)
             .Returns(response);
         
-        var actionResult = await _controller.GetCourseByInstanceId(instanceId);
+        var result = await _controller.GetCourseByInstanceId(instanceId);
         
-        var result = actionResult.Result as ObjectResult;
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.StatusCode, Is.EqualTo(200));
-        Assert.That(result!.Value, Is.EqualTo(response));
+        var okResult = result.Result as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        Assert.That(okResult!.StatusCode, Is.EqualTo(200));
+        Assert.That(okResult!.Value, Is.EqualTo(response));
     }
 
     [Test]
@@ -51,10 +51,9 @@ public class CoursesControllerTests
             .GetCourseByInstanceIdAsync(instanceId)
             .Returns((CourseDetailsResponse?)null);
         
-        var actionResult = await _controller.GetCourseByInstanceId(instanceId);
+        var result = await _controller.GetCourseByInstanceId(instanceId);
         
-        var result = actionResult.Result;
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!, Is.TypeOf<NotFoundResult>());
+        Assert.That(result.Result, Is.Not.Null);
+        Assert.That(result.Result!, Is.TypeOf<NotFoundResult>());
     }
 }
