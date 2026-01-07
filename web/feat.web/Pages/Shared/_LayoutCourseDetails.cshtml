@@ -7,9 +7,6 @@
 @{
     // ReSharper disable once Razor.LayoutNotResolved
     Layout = "_GovUkPageTemplate";
-    ViewBag.AssetPath = "/assets";
-    ViewBag.CompiledContentPath = "/assets";
-
     var analyticsOptions = AnalyticsOptions.Value;
 }
 @* ReSharper disable Razor.SectionNotResolved *@
@@ -223,9 +220,9 @@
 }
 
 @section BodyEnd {
-    @Html.GovUkFrontendScriptImports()
-    <script src="js/dfefrontend-2.0.0.min.js" type="module"></script>
-    <script src="js/moj-frontend.min.js" type="module"></script>
+    <script src="~/js/govuk-frontend.min.js" type="module"></script>
+    <script src="~/js/dfefrontend-2.0.0.min.js" type="module"></script>
+    <script src="~/js/moj-frontend.min.js" type="module"></script>
     <script type="module">
         import * as MOJFrontend from '/js/moj-frontend.min.js'
         MOJFrontend.initAll()

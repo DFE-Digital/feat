@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace feat.web.Pages.LinkPages;
 
+[IgnoreAntiforgeryToken]
 public class Cookies(StaticNavigationHandler staticNavigation) : PageModel
 {
     [BindProperty] 
