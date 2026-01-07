@@ -20,11 +20,6 @@ using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(8080);
-});
-
 builder.Services.Configure<AzureOptions>(
     builder.Configuration.GetSection(AzureOptions.Name));
 
