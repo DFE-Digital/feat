@@ -229,5 +229,28 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    
+    @if (ViewBag.ShowCookieBanner)
+    {
+        <script>
+            function acceptCookies(args) {
+                document.getElementById("cookieConsent").style.display = "none";
+                if (args === true) {
+                    createCookie("AnalyticsCookie", "yes");
+                    createCookie("MarketingCookie", "yes");
+                } else {
+                    createCookie("AnalyticsCookie", "no");
+                    createCookie("MarketingCookie", "no");
+                }
+            }
+            function createCookie(cookiname, cookivalue) {
+                let date = new Date();
+                date.setFullYear(date.getFullYear() + 1);
+                let expires = "expires=" + date.toGMTString();
+                document.cookie =
+                    cookiname + "=" + cookivalue + ";" + expires + ";path=/;Secure";
+            }
+        </script>
+    }
 }
 @* ReSharper restore Razor.SectionNotResolved *@
