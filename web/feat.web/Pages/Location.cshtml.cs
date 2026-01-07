@@ -24,10 +24,14 @@ public class LocationModel(ILogger<LocationModel> logger, ISearchService searchS
     public async Task<JsonResult> OnGetAutoCompleteAsync([FromQuery] string query, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("OnGetAutoComplete");
+        AutoCompleteLocation[] locations = [];
         
-        var locations = await searchService.GetAutoCompleteLocations(query, cancellationToken);
+        if (query.Length > 2)
+        {
+            locations = await searchService.GetAutoCompleteLocations(query, cancellationToken);
+        }
+
         return new JsonResult(locations);
-        
     }
     
     public IActionResult OnGet()
@@ -60,7 +64,7 @@ public class LocationModel(ILogger<LocationModel> logger, ISearchService searchS
 
         var distanceValue = Distance ?? new Distance();
 
-        if (!string.IsNullOrEmpty(Location))
+        if (!string.IsNullOrEmpty(Location) && Location.Length > 2)
         {
             // Try to fetch the location from the search service and, if we have no results, show an error
             var locationValid = await searchService.IsLocationValid(Location, cancellationToken);
@@ -68,6 +72,11 @@ public class LocationModel(ILogger<LocationModel> logger, ISearchService searchS
             {
                 ModelState.AddModelError("Location", SharedStrings.LocationNotFound);
             }
+        }
+        
+        if (!string.IsNullOrEmpty(Location) && Location.Length <= 2)
+        {
+            ModelState.AddModelError("Location", SharedStrings.LocationNotFound);
         }
         
         if (!string.IsNullOrEmpty(Location) && distanceValue == 0)
