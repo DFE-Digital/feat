@@ -45,6 +45,7 @@ resource "azurerm_linux_web_app" "feat-api" {
   app_settings = {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE   = "false"
     ASPNETCORE_ENVIRONMENT                = var.env == "Dev" ? "Development" : var.env
+    ASPNETCORE_URLS                       = "http://[::]:8080"
     Azure__OpenAiEndpoint                 = "https://pp-api.education.gov.uk"
     Azure__AiSearchUrl                    = "https://${azurerm_search_service.feat_search_service.name}.search.windows.net"
     Azure__AISearchKey                    = azurerm_search_service.feat_search_service.query_keys[0].key
@@ -102,6 +103,7 @@ resource "azurerm_linux_web_app" "feat-website" {
   app_settings = {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
     ASPNETCORE_ENVIRONMENT              = var.env == "Dev" ? "Development" : var.env
+    ASPNETCORE_URLS                     = "http://[::]:8081"
     Search__ApiBaseUrl                  = "https://${azurerm_linux_web_app.feat-api.default_hostname}"
     Analytics__GoogleTagManager         = var.google_tag_manager
     Analytics__Clarity                  = var.clarity
