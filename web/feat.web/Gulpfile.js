@@ -11,7 +11,10 @@ let paths = {
     src: 'AssetSrc/',
     dist: 'wwwroot/'
 }
-
+task('govuk-js', function() {
+    return src('node_modules/govuk-frontend/dist/govuk/govuk-frontend.min.js')
+        .pipe(dest(paths.dist + 'js'));
+});
 task('govuk-assets', function() {
     return src('node_modules/govuk-frontend/dist/govuk/assets/**/*')
         .pipe(dest(paths.dist + 'assets'));
@@ -69,6 +72,7 @@ task("images", function() {
 })
 
 task("dev", series(
+    "govuk-js",
     "govuk-assets",
     "dfe-js",
     "dfe-assets",
