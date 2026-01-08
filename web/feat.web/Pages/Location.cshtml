@@ -28,13 +28,17 @@
     <script type="text/javascript">
         let results = [];
         async function suggest(query, populateResults) {
+            populateResults(["Searching, please wait..."]);
             const response = await fetch('/Location?handler=AutoComplete&query=' + query)
             .then(res => res.json())
             .then(data => {
                 results = data;
                 return populateResults(data.map(l => l.name))
             })
-            .catch(err => console.error("Unable to search", err));
+            .catch(err => {
+                console.error("Unable to search", err)
+                return populateResults([]);
+            });
         }
 
         accessibleAutocomplete({
@@ -48,6 +52,9 @@
             autoselect: true,
             inputClasses: ['@(locationError ? "govuk-input govuk-input--error" : "govuk-input")'],
         });
+        
+        document.querySelector('#Location').setAttribute('aria-describedby', '@(locationError ? "Location-hint Location-error" : "Location-hint")');
+        
     </script>
 }
 
@@ -77,9 +84,10 @@
         {
             @foreach (var error in locationErrors)
             {
-                <govuk-error-message>@error</govuk-error-message>
+                <govuk-error-message id="Location-error">@error</govuk-error-message>
             }
         }
+        <div id="Location-hint" class="govuk-hint">Search for a town or postcode from a list of English places using a minimum 3 of characters using the following autocomplete.</div>
         <div id="location-container" class="govuk-input--width-30"></div>
     </div>
     
