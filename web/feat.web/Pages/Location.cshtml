@@ -3,7 +3,7 @@
 @using feat.web.Utils
 @model LocationModel
 @{
-    ViewBag.Title = SharedStrings.SiteTitle;
+    ViewBag.PageTitle = "Where do you want to study?";
     ViewBag.BackPageUrl = Url.Page(Model.Search.BackPage);
 
     var locationModelState = ModelState["Location"];
@@ -66,7 +66,7 @@
         }
     </govuk-error-summary>
 }
-<h1 class="govuk-heading-l">Where do you want to study?</h1>
+<h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
 <p>You can search anywhere in England.</p>
 <p>Some courses are only available to people living in the local area. This can apply even if it is online training. It is more common for short courses or those aiming to help you find employment. Check with the provider if you are unsure.</p>
 
