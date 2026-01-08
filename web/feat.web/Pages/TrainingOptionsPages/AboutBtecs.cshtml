@@ -2,7 +2,7 @@
 @using feat.web.Utils
 @model feat.web.Pages.TrainingOptionsPages.AboutBtecsModel
 @{
-  ViewBag.Title = SharedStrings.SiteTitle;
+  ViewBag.PageTitle = "About BTECs";
    
   ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
@@ -11,7 +11,7 @@
   <div class="govuk-grid-row">
     
     <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-l">About BTECs</h1>
+      <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
       <p class="govuk-body">
         BTECs are vocational qualifications that focus on practical, hands-on learning. They can prepare you for work, an apprenticeship or further study, including university.
       </p>

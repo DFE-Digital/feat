@@ -2,7 +2,7 @@
 @using feat.web.Utils
 @model feat.web.Pages.LinkPages.Privacy
 @{
-  ViewBag.Title = SharedStrings.SiteTitle;
+  ViewBag.PageTitle = "Privacy notice: how we use your data";
    
   ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
@@ -10,7 +10,7 @@
 <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
   
-        <h1 class="govuk-heading-l">Privacy notice: how we use your data</h1>
+        <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
   
         <p class="govuk-body">Last updated: November 2025</p>
   

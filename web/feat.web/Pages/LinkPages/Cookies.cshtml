@@ -2,7 +2,7 @@
 @using feat.web.Utils
 @model feat.web.Pages.LinkPages.Cookies
 @{
-    ViewBag.Title = SharedStrings.SiteTitle;
+    ViewBag.PageTitle = "Cookies on the Find education and training website";
     ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
 
@@ -21,7 +21,7 @@
       </div>
     }
     
-    <h1 class="govuk-heading-l">Cookies on the Skills for Careers website</h1>
+    <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
     
     <p class="govuk-body">
       Cookies are files saved on your phone, tablet or computer when you visit a website.

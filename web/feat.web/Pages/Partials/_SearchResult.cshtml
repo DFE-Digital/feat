@@ -6,9 +6,9 @@
     <h2 class="govuk-summary-card__title">@Model.CourseTitle</h2>
     <ul class="govuk-summary-card__actions">
       <li class="govuk-summary-card__action">
-        <a class="govuk-link" asp-page="/Course" asp-route-instanceid="@Model.InstanceId">
+        <a class="govuk-link" asp-page="/Course" asp-route-instanceid="@Model.InstanceId" id="course-@Model.InstanceId">
           View more details
-          @* <span class="govuk-visually-hidden">about @(Model.CourseTypeDisplay)</span> *@
+          <span class="govuk-visually-hidden">about @(Model.CourseTitle)</span>
         </a>
       </li>
     </ul>
@@ -55,9 +55,9 @@
             {
               <p>@truncatedOverview</p>
 
-              <details class="govuk-details govuk-!-margin-top-2" data-module="govuk-details">
+              <details class="govuk-details govuk-!-margin-top-2" data-module="govuk-details" id="details-@Model.InstanceId">
                 <summary class="govuk-details__summary">
-                  <span class="govuk-details__summary-text">Read more of the course overview</span>
+                  <span class="govuk-details__summary-text">Read more of the course overview <span class="govuk-visually-hidden">about @(Model.CourseTitle)</span></span>
                 </summary>
                 <div class="govuk-details__text">@remainderText</div>
               </details>

@@ -3,7 +3,7 @@
 @model feat.web.Pages.AiModel
 
 @{
-    ViewBag.Title = SharedStrings.SiteTitle;
+    ViewBag.PageTitle = "How we use AI";
      
     ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
@@ -12,7 +12,7 @@
 <div class="govuk-grid-row">
 
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">How we use AI</h1>
+        <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
 
         <p>This search uses AI to make it easier for you to find options that match your interests.</p>
         <p>Using AI allows us to show you things related to your search terms and not rely on matching words exactly. For example if you search for "coding" it will also show you courses about "software development" or "programming" because they are similar.</p>

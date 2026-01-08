@@ -4,11 +4,11 @@
 @using feat.web.Utils
 @model feat.web.Pages.CheckAnswersModel
 @{
-    ViewBag.Title = SharedStrings.SiteTitle; 
+    ViewBag.PageTitle = "Check your answers"; 
     ViewBag.BackPageUrl = Url.Page(Model.Search.BackPage);
 }
 
-<h1 class="govuk-heading-l">Check your answers</h1>
+<h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
 
 <dl class="govuk-summary-list">
     

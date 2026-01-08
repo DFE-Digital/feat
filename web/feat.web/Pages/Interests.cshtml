@@ -2,45 +2,46 @@
 @using feat.web.Utils
 @model InterestsModel
 @{
-    ViewBag.Title = SharedStrings.SiteTitle;
+    ViewBag.PageTitle = "What courses, subjects, jobs, or careers are you interested in?";
     ViewBag.BackPageUrl = Url.Page(Model.Search.BackPage);
 }
 
-<h1 class="govuk-heading-l">What courses, subjects, jobs, or careers are you interested in?</h1>
-<p class="govuk-body">Be as specific or broad as you like. You can try searching for academic subjects, practical skills, or just start from an idea of what you'd like to do.</p>
-<p>For example:</p>
-<ul class="govuk-list govuk-list--bullet">
-    <li>maths</li>
-    <li>bricklaying</li>
-    <li>working with animals</li>
-</ul>
-<p>If you skip this question, the search results will be everything in your chosen location.</p>
+<form method="post">
 
-<!-- Interests-->
-<form method="post" >
-    
-    <fieldset class="govuk-fieldset moj-add-another__item">
+    <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend" style="margin-bottom: 0;">
+            <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
+        </legend>
+        <p class="govuk-body">Be as specific or broad as you like. You can try searching for academic subjects, practical skills, or just start from an idea of what you'd like to do.</p>
+        <p>For example:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>maths</li>
+            <li>bricklaying</li>
+            <li>working with animals</li>
+        </ul>
+        <p>If you skip this question, the search results will be everything in your chosen location.</p>
+
         <div class="govuk-form-group">
-            
+
             <govuk-input input-class="govuk-input--width-20" spellcheck="true" for="UserInterest1"
                          value="@(Model.UserInterest1)">
                 <govuk-input-label class="govuk-heading-m">
-                    Interest 1 @(Model.FirstOptionMandatory ? string.Empty : "(optional)" )
+                    Interest 1 @(Model.FirstOptionMandatory ? string.Empty : "(optional)")
                 </govuk-input-label>
             </govuk-input>
-            <govuk-input input-class="govuk-input--width-20" spellcheck="true" for="UserInterest2"  
+            <govuk-input input-class="govuk-input--width-20" spellcheck="true" for="UserInterest2"
                          value="@(Model.UserInterest2)">
                 <govuk-input-label class="govuk-heading-m">
                     Interest 2 (optional)
                 </govuk-input-label>
             </govuk-input>
-            <govuk-input input-class="govuk-input--width-20" spellcheck="true" for="UserInterest3"  
+            <govuk-input input-class="govuk-input--width-20" spellcheck="true" for="UserInterest3"
                          value="@(Model.UserInterest3)">
                 <govuk-input-label class="govuk-heading-m">
                     Interest 3 (optional)
                 </govuk-input-label>
             </govuk-input>
-            
+
         </div>
     </fieldset>
     <div class="govuk-button-group">

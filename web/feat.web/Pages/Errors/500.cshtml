@@ -1,13 +1,14 @@
 @page
 @{
     ViewBag.ShowStaticBack = true;
+    ViewBag.PageTitle = "Sorry, there is a problem with the service";
 }
 
 <div class="govuk-width-container">
     <div class="govuk-grid-row">
 
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-l">Sorry, there is a problem with the service</h1>
+            <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
             <p class="govuk-body">Try again later.</p>
         </div>
       

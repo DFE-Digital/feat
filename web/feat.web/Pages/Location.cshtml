@@ -3,7 +3,7 @@
 @using feat.web.Utils
 @model LocationModel
 @{
-    ViewBag.Title = SharedStrings.SiteTitle;
+    ViewBag.PageTitle = "Where do you want to study?";
     ViewBag.BackPageUrl = Url.Page(Model.Search.BackPage);
 
     var locationModelState = ModelState["Location"];
@@ -28,13 +28,17 @@
     <script type="text/javascript">
         let results = [];
         async function suggest(query, populateResults) {
+            populateResults(["Searching, please wait..."]);
             const response = await fetch('/Location?handler=AutoComplete&query=' + query)
             .then(res => res.json())
             .then(data => {
                 results = data;
                 return populateResults(data.map(l => l.name))
             })
-            .catch(err => console.error("Unable to search", err));
+            .catch(err => {
+                console.error("Unable to search", err)
+                return populateResults([]);
+            });
         }
 
         accessibleAutocomplete({
@@ -48,6 +52,9 @@
             autoselect: true,
             inputClasses: ['@(locationError ? "govuk-input govuk-input--error" : "govuk-input")'],
         });
+        
+        document.querySelector('#Location').setAttribute('aria-describedby', '@(locationError ? "Location-hint Location-error" : "Location-hint")');
+        
     </script>
 }
 
@@ -66,7 +73,7 @@
         }
     </govuk-error-summary>
 }
-<h1 class="govuk-heading-l">Where do you want to study?</h1>
+<h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
 <p>You can search anywhere in England.</p>
 <p>Some courses are only available to people living in the local area. This can apply even if it is online training. It is more common for short courses or those aiming to help you find employment. Check with the provider if you are unsure.</p>
 
@@ -77,9 +84,10 @@
         {
             @foreach (var error in locationErrors)
             {
-                <govuk-error-message>@error</govuk-error-message>
+                <govuk-error-message id="Location-error">@error</govuk-error-message>
             }
         }
+        <div id="Location-hint" class="govuk-hint">Search for a town or postcode from a list of English places using a minimum 3 of characters using the following autocomplete.</div>
         <div id="location-container" class="govuk-input--width-30"></div>
     </div>
     

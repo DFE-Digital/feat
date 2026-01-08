@@ -2,7 +2,7 @@
 @using feat.web.Utils
 @model feat.web.Pages.TrainingOptionsPages.AboutApprenticeshipsModel
 @{
-    ViewBag.Title = SharedStrings.SiteTitle;
+    ViewBag.PageTitle = "About Apprenticeships";
     
     ViewBag.StaticBackPageUrl = Model.RefererUrl; 
 }
@@ -11,7 +11,7 @@
     <div class="govuk-grid-row">
 
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-l">About Apprenticeships</h1>
+            <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
             <h2 class="govuk-heading-m">Types of apprenticeships</h2>
             <p>There are over 700 types of apprenticeships in different areas of work.</p>
 

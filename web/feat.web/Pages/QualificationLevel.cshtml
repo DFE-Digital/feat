@@ -3,11 +3,11 @@
 @using feat.web.Utils
 @model QualificationLevelModel
 @{
-    ViewBag.Title = SharedStrings.SiteTitle; 
+    ViewBag.PageTitle = "What qualification level are you looking for?"; 
     ViewBag.BackPageUrl = Url.Page(Model.Search.BackPage);
 }
 
-<h1 class="govuk-heading-l">What qualification level are you looking for?</h1>
+<h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
 <p>Most qualifications have a difficulty level. The higher the level, the more difficult. Some qualifications like Apprenticeships or vocational qualifications can be studied at different levels.</p>
 <p><a class="govuk-link" href="https://www.gov.uk/what-different-qualification-levels-mean/list-of-qualification-levels" >What qualification levels mean</a></p>
 
@@ -15,7 +15,7 @@
     
     <govuk-checkboxes name="SelectedQualificationOptions" for="SelectedQualificationOptions">
         <govuk-checkboxes-fieldset>
-            <govuk-checkboxes-fieldset-legend is-page-heading="true" class="govuk-fieldset__legend--m">
+            <govuk-checkboxes-fieldset-legend is-page-heading="false" class="govuk-fieldset__legend--m">
                 Qualification level
             </govuk-checkboxes-fieldset-legend>
             <govuk-checkboxes-hint>
