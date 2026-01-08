@@ -11,7 +11,7 @@ public static class SharedStrings
     public const string LocationNotFound = "Enter a valid town, city or postcode";
     
     // Site Title
-    public const string SiteTitle = "Explore your options after school or college - GOV.UK";
+    public const string SiteTitle = "Find education and training - Department for Education";
     
     public const string NoTravelDistanceAdded = "No travel distance added";
     public const string NoLocationAdded = "No location added";
