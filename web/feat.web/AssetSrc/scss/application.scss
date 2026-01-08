@@ -181,3 +181,8 @@ $govuk-font-family: 'Inter', sans-serif; // Override govuk font
 .x-govuk-related-navigation__section-link--other {
   font-weight: normal;
 }
+
+.govuk-pagination__item--current
+{
+  color: #ffffff;
+}
