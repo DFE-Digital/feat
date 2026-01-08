@@ -9,8 +9,8 @@
   
   var totalResults = Model.TotalCourseCount;
   var pluralText = totalResults == 1 ? string.Empty : "s";
-  var locationText = string.IsNullOrEmpty(Model.Search.Location) ? string.Empty : "near <b>" + Model.Search.Location + "</b>";
-  var interestText = Model.Search.Interests.Count > 0 ? $"for <b>{string.Join(", ", Model.Search.Interests)}</b>" : string.Empty;
+  var locationText = string.IsNullOrEmpty(Model.Search.Location) ? string.Empty : "near <strong>" + Model.Search.Location + "</strong>";
+  var interestText = Model.Search.Interests.Count > 0 ? $"for <strong>{string.Join(", ", Model.Search.Interests)}</strong>" : string.Empty;
   var searchResultText = $"Showing {totalResults} course{pluralText} {locationText} {interestText}";
 }
 
