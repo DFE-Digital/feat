@@ -172,13 +172,15 @@
                 {
                   if (Model.Search.OrderBy == OrderBy.Distance)
                   {
-                    <span aria-current="true">Distance | </span>
+                    <span aria-current="true">Distance</span>
+                    <span> | </span> 
                     <a asp-page="@PageName.LoadCourses" asp-route-orderBy="relevance">Relevance</a>
                   }
                   else
                   {
                     <a asp-page="@PageName.LoadCourses" asp-route-orderBy="distance">Distance</a>
-                    <span aria-current="true">| Relevance</span>
+                    <span> | </span> 
+                    <span aria-current="true">Relevance</span>
                   }
                 }
               }
