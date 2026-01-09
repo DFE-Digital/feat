@@ -62,9 +62,9 @@ public class QualificationLevelPageTests
 
 		var result = model.OnPost();
 
-		Assert.IsType<PageResult>(result);
-		Assert.False(model.ModelState.IsValid);
-		Assert.True(model.ModelState.ContainsKey("SelectedQualificationOptions"));
+		var redirect = Assert.IsType<RedirectToPageResult>(result);
+		Assert.Null(redirect.PageName);
+		Assert.Equal(SharedStrings.SelectQualificationLevel, model.ValidationError);
 	}
 
 	[Fact]
