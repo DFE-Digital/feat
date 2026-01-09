@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using feat.web.Enums;
 using feat.web.Extensions;
 using feat.web.Models;
@@ -10,44 +10,63 @@ namespace feat.web.Pages;
 
 public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) : PageModel
 {
+    public required Search Search { get; set; }
+    
     [BindProperty]
     public List<QualificationLevel> SelectedQualificationOptions { get; set; } = [];
     
-    public required Search Search { get; set; }
+    [TempData]
+    public string? SelectedQualificationsJson { get; set; }
+    
+    [TempData]
+    public string? ValidationError { get; set; }
     
     public IActionResult OnGet()
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-        
+
         if (!Search.Updated)
         {
             return RedirectToPage("Index");
         }
-        
-        if (Search.QualificationLevels.Count != 0)
+
+        if (!string.IsNullOrEmpty(SelectedQualificationsJson))
+        {
+            SelectedQualificationOptions =
+                JsonSerializer.Deserialize<List<QualificationLevel>>(SelectedQualificationsJson) ?? [];
+        }
+        else if (Search.QualificationLevels.Count != 0)
+        {
             SelectedQualificationOptions = Search.QualificationLevels;
-        
-        Search.SetPage(PageName.QualificationLevel); 
+        }
+
+        if (!string.IsNullOrEmpty(ValidationError))
+        {
+            ModelState.AddModelError(nameof(SelectedQualificationOptions), ValidationError);
+        }
+
+        Search.SetPage(PageName.QualificationLevel);
         HttpContext.Session.Set("Search", Search);
-        
+
         return Page();
     }
 
     public IActionResult OnPost()
     {
-        logger.LogInformation("Qualification OnPost {SelectedQualificationOptions}", SelectedQualificationOptions);
+        logger.LogInformation("Selected Qualification Levels {@Levels}", SelectedQualificationOptions);
 
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
-        if (SelectedQualificationOptions?.Count == 0)
+        if (SelectedQualificationOptions.Count == 0)
         {
-            ModelState.AddModelError("SelectedQualificationOptions", SharedStrings.SelectQualificationLevel);
+            ValidationError = SharedStrings.SelectQualificationLevel;
+            SelectedQualificationsJson = JsonSerializer.Serialize(SelectedQualificationOptions);
+
+            return RedirectToPage();
         }
 
-        if (!ModelState.IsValid)
-            return Page();
-
-        Search.QualificationLevels?.Clear();
+        Search.QualificationLevels.Clear();
+        
         if (SelectedQualificationOptions is { Count: > 0 })
         {
             foreach (var qualificationOption in SelectedQualificationOptions)
@@ -67,17 +86,15 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
         Search.Updated = true;
         HttpContext.Session.Set("Search", Search);
 
-        if ((SelectedQualificationOptions.Contains(Enums.QualificationLevel.None) ||
-             SelectedQualificationOptions.Contains(Enums.QualificationLevel.OneAndTwo)))
+        if (SelectedQualificationOptions.Contains(QualificationLevel.None) ||
+             SelectedQualificationOptions.Contains(QualificationLevel.OneAndTwo))
         {
-            if (Search.AgeGroup.HasValue && Search.VisitedCheckAnswers)
-            {
-                return RedirectToPage(PageName.CheckAnswers);
-            }
-
-            return RedirectToPage(PageName.Age);
+            return RedirectToPage(Search is { AgeGroup: not null, VisitedCheckAnswers: true }
+                ? PageName.CheckAnswers
+                : PageName.Age);
         }
-        else if (Search.AgeGroup.HasValue && Search.VisitedCheckAnswers)
+
+        if (Search is { AgeGroup: not null, VisitedCheckAnswers: true })
         {
             Search.AgeGroup = null;
             HttpContext.Session.Set("Search", Search);
@@ -85,5 +102,4 @@ public class QualificationLevelModel (ILogger<QualificationLevelModel> logger) :
 
         return RedirectToPage(PageName.CheckAnswers);
     }
-
 }
