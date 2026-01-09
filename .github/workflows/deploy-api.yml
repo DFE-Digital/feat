@@ -33,6 +33,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Run API Tests
+        run: |
+          dotnet restore
+          dotnet build --configuration Release --no-restore
+          dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx"
+
       - name: Azure Login
         uses: azure/login@v2
         with:
