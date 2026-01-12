@@ -24,10 +24,10 @@ jobs:
       - name: 'Checkout source'
         uses: actions/checkout@v4
       
-      - name: 'Running ZAP scan against front end https://${{ var.ENV_PREFIX }}-app-web.azurewebsites.net'
+      - name: 'Running ZAP scan against front end https://${{ vars.ENV_PREFIX }}-app-web.azurewebsites.net'
         uses: zaproxy/action-full-scan@v0.13.0
         with:
-          target: 'https://${{ var.ENV_PREFIX }}-app-web.azurewebsites.net'
+          target: 'https://${{ vars.ENV_PREFIX }}-app-web.azurewebsites.net'
           allow_issue_writing: 'false'
       
       - name: Add web report
@@ -36,10 +36,10 @@ jobs:
           git add docs/scans/Web-Security-Scan-Report.md
         continue-on-error: true
         
-      - name: 'Running ZAP scan against API https://${{ env.ENV_PREFIX }}-app-api.azurewebsites.net'
+      - name: 'Running ZAP scan against API https://${{ vars.ENV_PREFIX }}-app-api.azurewebsites.net'
         uses: zaproxy/action-full-scan@v0.13.0
         with:
-          target: 'https://${{ env.ENV_PREFIX }}-app-api.azurewebsites.net'
+          target: 'https://${{ vars.ENV_PREFIX }}-app-api.azurewebsites.net'
           allow_issue_writing: 'false'
 
       - name: Add API report
