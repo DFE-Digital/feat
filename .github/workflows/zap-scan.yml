@@ -24,10 +24,10 @@ jobs:
       - name: 'Checkout source'
         uses: actions/checkout@v4
       
-      - name: 'Running ZAP scan against front end https://${{ env.ENV_PREFIX }}-app-web.azurewebsites.net'
+      - name: 'Running ZAP scan against front end https://${{ var.ENV_PREFIX }}-app-web.azurewebsites.net'
         uses: zaproxy/action-full-scan@v0.13.0
         with:
-          target: 'https://${{ env.ENV_PREFIX }}-app-web.azurewebsites.net'
+          target: 'https://${{ var.ENV_PREFIX }}-app-web.azurewebsites.net'
           allow_issue_writing: 'false'
       
       - name: Add web report
