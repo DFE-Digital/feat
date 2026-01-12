@@ -31,7 +31,7 @@ jobs:
           allow_issue_writing: 'false'
       
       - name: Add web report
-        if: ${{ github.event.inputs.environment == "Beta" }}
+        if: ${{ github.event.inputs.environment == 'Beta' }}
         run: |
           mv report_md.md docs/scans/Web-Security-Scan-Report.md
           git add docs/scans/Web-Security-Scan-Report.md
@@ -56,7 +56,7 @@ jobs:
           allow_issue_writing: 'false'
     
       - name: Add API report
-        if: ${{ github.event.inputs.environment == "Beta" }}
+        if: ${{ github.event.inputs.environment == 'Beta' }}
         run: |
           mv report_md.md docs/scans/API-Security-Scan-Report.md
           git add docs/scans/API-Security-Scan-Report.md
