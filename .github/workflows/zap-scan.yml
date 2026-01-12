@@ -50,8 +50,8 @@ jobs:
       - name: 'Checkout source'
         uses: actions/checkout@v4
         
-      - name: 'Running ZAP scan against API https://${{ vars.ENV_PREFIX }}-app-api.azurewebsites.net'
-        uses: zaproxy/action-full-scan@v0.13.0
+      - name: 'Running ZAP API scan against API https://${{ vars.ENV_PREFIX }}-app-api.azurewebsites.net'
+        uses: zaproxy/action-api-scan@v0.10.0
         with:
           target: 'https://${{ vars.ENV_PREFIX }}-app-api.azurewebsites.net'
           allow_issue_writing: 'false'
