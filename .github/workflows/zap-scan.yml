@@ -13,7 +13,6 @@ on:
           - 'Test'
           - 'Beta'
 
-environment: ${{ github.event.inputs.environment }}
 run-name: Running ZAP scan against ${{ github.event.inputs.environment }}
 jobs:
   zap_scan:
