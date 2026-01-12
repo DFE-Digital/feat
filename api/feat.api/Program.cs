@@ -14,7 +14,6 @@ using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
-using OwaspHeaders.Core.Extensions;
 using Scalar.AspNetCore;
 using ZiggyCreatures.Caching.Fusion;
 using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
@@ -153,11 +152,13 @@ builder.Services.AddOpenTelemetry()
     );
 
 var app = builder.Build();
+var policyCollection = new HeaderPolicyCollection()
+    .AddDefaultApiSecurityHeaders();
+app.UseSecurityHeaders(policyCollection);
+
 app.MapOpenApi();
 app.MapScalarApiReference();
 app.MapControllers();
-
-app.UseSecureHeadersMiddleware();
 app.UseHttpsRedirection();
 
 app.Run();

@@ -25,7 +25,7 @@
 @section Scripts
 {
     <script type="text/javascript" src="~/js/accessible-autocomplete.min.js"></script>
-    <script type="text/javascript">
+    <script asp-add-nonce type="text/javascript">
         let results = [];
         async function suggest(query, populateResults) {
             populateResults(["Searching, please wait..."]);

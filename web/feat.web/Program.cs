@@ -4,9 +4,13 @@ using feat.web.Configuration;
 using feat.web.Services;
 using GovUk.Frontend.AspNetCore;
 using Microsoft.Extensions.Options;
-using OwaspHeaders.Core.Extensions;
+using NetEscapades.AspNetCore.SecurityHeaders;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.AddServerHeader = false;
+});
 
 // Add layered configuration
 builder.Configuration
@@ -37,6 +41,7 @@ builder.Services.AddGovUkFrontend(options =>
 {
     options.Rebrand = true;
     options.FrontendPackageHostingOptions = FrontendPackageHostingOptions.None;
+    options.GetCspNonceForRequest = context => context.GetNonce();
 });
 
 builder.Services.AddRazorPages().AddJsonOptions(options =>
@@ -77,8 +82,40 @@ builder.Services.AddScoped<StaticNavigationHandler>();
 
 var app = builder.Build();
 
+var policyCollection = new HeaderPolicyCollection()
+    .AddDefaultSecurityHeaders()
+    .AddContentSecurityPolicyReportOnly(csp =>
+    {
+        csp.AddBlockAllMixedContent();
+        csp.AddUpgradeInsecureRequests();
+        csp.AddDefaultSrc()
+            .Self();
+        csp.AddScriptSrc()
+            .Self()
+            .WithNonce()
+            .From("*.googletagmanager.com")
+            .From("*.google-analytics.com")
+            .From("c.bing.com")
+            .From("*.clarity.ms");
+        csp.AddStyleSrc()
+            .Self()
+            .WithNonce()
+            .From("rsms.me");
+        csp.AddFontSrc()
+            .Self()
+            .From("res-1.cdn.office.net")
+            .From("rsms.me");
+        csp.AddConnectSrc()
+            .Self()
+            .From("*.googletagmanager.com")
+            .From("*.google-analytics.com")
+            .From("*.analytics.google.com")
+            .From("c.bing.com")
+            .From("*.clarity.ms");
+    });
+    
+app.UseSecurityHeaders(policyCollection);
 
-app.UseSecureHeadersMiddleware();
 app.UseExceptionHandler("/Errors/500");
 app.UseStatusCodePagesWithReExecute("/Errors/{0}");
 
