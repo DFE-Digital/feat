@@ -27,7 +27,7 @@ jobs:
       - name: 'Running ZAP scan against front end https://${{ vars.ENV_PREFIX }}-app-web.azurewebsites.net'
         uses: zaproxy/action-full-scan@v0.13.0
         with:
-          target: 'https://${{ vars.ENV_PREFIX }}-app-web.azurewebsites.net'
+          target: 'https://${{ vars.ENV_PREFIX }}-app-web.azurewebsites.net/openapi/v1.json'
           allow_issue_writing: 'false'
           artifact_name: 'web_zap_scan'
       
