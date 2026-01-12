@@ -40,7 +40,6 @@ jobs:
           git commit -m "Generated web zap scan report"
           git push
         continue-on-error: true
-
   zap_scan_api:
     name: 'Run Zap Scan against API'
     runs-on: ubuntu-latest
