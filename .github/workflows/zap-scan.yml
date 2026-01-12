@@ -29,6 +29,7 @@ jobs:
         with:
           target: 'https://${{ vars.ENV_PREFIX }}-app-web.azurewebsites.net'
           allow_issue_writing: 'false'
+          artifact_name: 'web_zap_scan'
       
       - name: Add web report
         if: ${{ github.event.inputs.environment == 'Beta' }}
@@ -54,7 +55,8 @@ jobs:
         with:
           target: 'https://${{ vars.ENV_PREFIX }}-app-api.azurewebsites.net'
           allow_issue_writing: 'false'
-    
+          artifact_name: 'api_zap_scan'
+
       - name: Add API report
         if: ${{ github.event.inputs.environment == 'Beta' }}
         run: |
