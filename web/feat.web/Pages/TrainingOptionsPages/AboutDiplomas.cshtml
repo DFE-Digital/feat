@@ -2,15 +2,16 @@
 @using feat.web.Utils
 @model feat.web.Pages.TrainingOptionsPages.AboutDiplomasModel
 @{
-    ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-    ViewBag.ShowJSBack = true;
+    ViewBag.PageTitle = "About diplomas";
+     
+    ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
 
 <div class="govuk-width-container">
     <div class="govuk-grid-row">
 
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-l">About diplomas</h1>
+            <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
 
             <p class="govuk-body">
                 Diplomas are work-related qualifications that help you gain knowledge and skills for a specific job, industry or subject. You can take a diploma at different levels, depending on your experience and career goals.

@@ -27,12 +27,30 @@ public class SearchService(
         var endpoint = new Uri(new Uri(options.Value.ApiBaseUrl), $"api/courses/{instanceId}").ToString();
         var response = await apiClient.GetAsync<CourseDetailsResponse>(ApiClientNames.Feat, endpoint);
 
-        return response.EntryType switch
+        return response?.EntryType switch
         {
             EntryType.Course => response.ToCourseViewModel(),
             EntryType.Apprenticeship => response.ToApprenticeshipViewModel(),
             EntryType.UniversityCourse => response.ToUniversityViewModel(),
             _ => null
         };
+    }
+
+    public async Task<AutoCompleteLocation[]> GetAutoCompleteLocations(string query, CancellationToken cancellationToken = default)
+    {
+        var endpoint = new Uri(new Uri(options.Value.ApiBaseUrl), $"api/autocompletelocations?query={query}").ToString();
+        
+        var response = await apiClient.GetAsync<AutoCompleteLocation[]>(ApiClientNames.Feat, endpoint, cancellationToken);
+
+        return response ?? [];
+    }
+    
+    public async Task<bool> IsLocationValid(string query, CancellationToken cancellationToken = default)
+    {
+        var endpoint = new Uri(new Uri(options.Value.ApiBaseUrl), $"api/autocompletelocations?query={query}").ToString();
+        
+        var response = await apiClient.PostAsync<bool>(ApiClientNames.Feat, endpoint, "", cancellationToken);
+
+        return response;
     }
 }

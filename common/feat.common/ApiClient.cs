@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 
 namespace feat.common;
@@ -11,7 +12,7 @@ public class ApiClient : IApiClient
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<T> GetAsync<T>(
+    public async Task<T?> GetAsync<T>(
         string clientName,
         string url,
         CancellationToken cancellationToken = default)
@@ -19,7 +20,12 @@ public class ApiClient : IApiClient
         var client = _httpClientFactory.CreateClient(clientName);
 
         var response = await client.GetAsync(url, cancellationToken);
-
+        
+        if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            return default;
+        }
+        
         if (!response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync(cancellationToken);

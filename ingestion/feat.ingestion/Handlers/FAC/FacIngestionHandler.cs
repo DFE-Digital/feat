@@ -139,44 +139,11 @@ public class FacIngestionHandler(
         // Let's stream our data in
         var files = containerClient.GetBlobsAsync(cancellationToken: cancellationToken)
             .ToBlockingEnumerable(cancellationToken).ToArray();
-
-        // Get our latest postcode Data file
-        var postcodeData = files.Where(blob =>
-                blob.Name.StartsWith("ukpostcodes", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
-        if (postcodeData != null && Postcodes != ProcessMode.Skip)
-        {
-            Console.WriteLine("Starting import of postcode data");
-            var blobClient = containerClient.GetBlobClient(postcodeData.Name);
-            Console.WriteLine("Fetching file");
-            using var reader = new StreamReader(await blobClient.OpenReadAsync(cancellationToken: cancellationToken));
-            Console.WriteLine("Setting up CSV reader");
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<PostcodeLatLongMap>();
-            Console.WriteLine("Reading data...");
-            var records = csv.GetRecords<PostcodeLatLong>().ToList();
-
-            if (
-                Postcodes == ProcessMode.Force
-                || dbContext.Postcodes.Count() != records.Count
-            )
-            {
-                Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
-                {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
-                }, cancellationToken);
-            }
-
-            Console.WriteLine("Done");
-        }
         
         // Get our latest AIM Data file
         var aimData = files.Where(blob =>
                 blob.Name.StartsWith("LearningDelivery_", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (aimData != null && Aim != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of AIM Data");
@@ -209,7 +176,7 @@ public class FacIngestionHandler(
         // Get our latest Approved Qualification data
         var approvedQualificationData = files.Where(blob =>
                 blob.Name.StartsWith("ApprovedQualifications_", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (approvedQualificationData != null && ApprovedQualifications != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of Approved Qualification Data");
@@ -242,7 +209,7 @@ public class FacIngestionHandler(
         // Get our latest courses file
         var courseData = files.Where(blob =>
                 blob.Name.StartsWith("Courses_", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (courseData != null && Courses != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of Course Data");
@@ -284,7 +251,7 @@ public class FacIngestionHandler(
         // Get our latest course runs file
         var courseRunData = files.Where(blob =>
                 blob.Name.StartsWith("CourseRuns_", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (courseRunData != null && Courses != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of Course Run Data");
@@ -326,7 +293,7 @@ public class FacIngestionHandler(
         // Get our latest T Levels file
         var tLevelData = files.Where(blob =>
                 blob.Name.StartsWith("TLevels_", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (tLevelData != null && TLevels != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of T-Level Data");
@@ -367,7 +334,7 @@ public class FacIngestionHandler(
         // Get our latest T Level Definitions file
         var tLevelDefinitionData = files.Where(blob =>
                 blob.Name.StartsWith("TLevelDefinitions_", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (tLevelDefinitionData != null && TLevels != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of T-Level Definition Data");
@@ -402,7 +369,7 @@ public class FacIngestionHandler(
         // Get our latest T Level Locations file
         var tLevelLocationData = files.Where(blob =>
                 blob.Name.StartsWith("TLevelLocations_", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (tLevelLocationData != null && TLevels != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of T-Level Location Data");
@@ -437,7 +404,7 @@ public class FacIngestionHandler(
         // Get our latest Providers file
         var providerData = files.Where(blob =>
                 blob.Name.StartsWith("Providers_", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (providerData != null && Providers != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of Provider Data");
@@ -474,7 +441,7 @@ public class FacIngestionHandler(
         // Get our latest all courses file
         var allCoursesData = files.Where(blob =>
                 blob.Name.StartsWith("AllCoursesReport_", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (allCoursesData != null && AllCourses != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of All Course Report Data");
@@ -513,7 +480,7 @@ public class FacIngestionHandler(
         // Get our latest venue file
         var venueData = files.Where(blob =>
                 blob.Name.StartsWith("Venues_", StringComparison.InvariantCultureIgnoreCase))
-            .OrderByDescending(b => b.Properties.CreatedOn).LastOrDefault();
+            .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
         if (venueData != null && Venues != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of Venue Data");
@@ -558,7 +525,7 @@ public class FacIngestionHandler(
     {
         var resultInfo = new ResultInfo();
         var auditEntries = new List<AuditEntry>();
-        bool skip = true;
+        bool skip = false;
         
         Console.WriteLine($"Starting sync of {Name} data");
 
@@ -575,7 +542,7 @@ public class FacIngestionHandler(
         Console.WriteLine("Generating locations...");
         var locations =
             from v in dbContext.FAC_Venues
-            join p in dbContext.Postcodes
+            join p in dbContext.LookupPostcodes
                 on v.Postcode equals p.Postcode into postcodes
             from p in postcodes.DefaultIfEmpty()
             where v.VenueStatus == VenueStatus.Live

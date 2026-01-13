@@ -2,15 +2,16 @@
 @using feat.web.Utils
 @model feat.web.Pages.TrainingOptionsPages.AboutALevelsModel
 @{
-    ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-    ViewBag.ShowJSBack = true;
+    ViewBag.PageTitle = "About A levels";
+     
+    ViewBag.StaticBackPageUrl = Model.RefererUrl; 
 }
 
 <div class="govuk-width-container">
     <div class="govuk-grid-row">
 
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-l"> About A levels</h1>
+            <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
             <h2 class="govuk-heading-m"> Subjects you can take</h2>
             <p>There are more than 40 different A level subjects to choose from.</p>
         

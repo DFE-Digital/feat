@@ -2,8 +2,9 @@
 @using feat.web.Utils
 @model feat.web.Pages.TrainingOptionsPages.AboutDegreesModel
 @{
-  ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-  ViewBag.ShowJSBack = true;
+  ViewBag.PageTitle = "About degrees";
+   
+  ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
 
 
@@ -11,7 +12,7 @@
     <div class="govuk-grid-row">
 
       <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">About degrees</h1>
+        <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
 
         <p class="govuk-body">
           A degree is a higher education qualification that usually takes 3 or more years to complete if you study full time.
@@ -58,7 +59,7 @@
 
         <p class="govuk-body">
           You’ll get a level 6 qualification when you complete a bachelor's degree.
-          <a class="govuk-link" href="https://www.gov.uk/what-different-qualification-levels-mean/list-of-qualification-levels" target="_blank" rel="noopener noreferrer">
+          <a class="govuk-link" href="https://www.gov.uk/what-different-qualification-levels-mean/list-of-qualification-levels" rel="noopener noreferrer">
             Find out what qualification levels mean
           </a>.
         </p>

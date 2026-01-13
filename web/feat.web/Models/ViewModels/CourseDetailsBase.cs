@@ -43,9 +43,30 @@ public abstract class CourseDetailsBase
 
     public string HoursDisplay => Hours?.GetDescription() ?? NotProvidedString;
     
-    public string? CourseUrl { get; init; }
+    public string? CourseUrl { private get; init; }
+    
+    public string? CourseUrlAbsolute => NormalizeUrl(CourseUrl);
 
     protected static string NotProvidedString => SharedStrings.NotProvided;
+    
+    protected static string? NormalizeUrl(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return null;
+        }
+
+        input = input.Trim();
+
+        if (Uri.TryCreate(input, UriKind.Absolute, out var absolute))
+        {
+            return absolute.ToString();
+        }
+
+        return Uri.TryCreate($"https://{input}", UriKind.Absolute, out var https)
+            ? https.ToString()
+            : null;
+    }
     
     private static string FormatDuration(TimeSpan? duration)
     {
@@ -54,10 +75,8 @@ public abstract class CourseDetailsBase
             return NotProvidedString;
         }
         
-        var totalDays = duration.Value.TotalDays;
         var totalMonths = (int)duration.Value.TotalMonths();
         var totalYears = (int)duration.Value.TotalYears();
-        var totalHours = (int)duration.Value.TotalHours;
         var remainingMonths = (int)duration.Value.TotalMonths() % 12;
         var remainingDays = (int)duration.Value.TotalDays % 30;
         var remainingHours = (int)duration.Value.TotalHours % 24;

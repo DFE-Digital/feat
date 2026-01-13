@@ -2,15 +2,16 @@
 @using feat.web.Utils
 @model feat.web.Pages.TrainingOptionsPages.AboutBtecsModel
 @{
-  ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-  ViewBag.ShowJSBack = true;
+  ViewBag.PageTitle = "About BTECs";
+   
+  ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
 
 <div class="govuk-width-container">
   <div class="govuk-grid-row">
     
     <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-l">About BTECs</h1>
+      <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
       <p class="govuk-body">
         BTECs are vocational qualifications that focus on practical, hands-on learning. They can prepare you for work, an apprenticeship or further study, including university.
       </p>
@@ -66,7 +67,7 @@
 
       <p class="govuk-body">
         You’ll get a recognised qualification at the end of your BTEC. The level depends on the course you take.
-        <a class="govuk-link" href="https://www.gov.uk/what-different-qualification-levels-mean/list-of-qualification-levels" target="_blank" rel="noopener noreferrer">
+        <a class="govuk-link" href="https://www.gov.uk/what-different-qualification-levels-mean/list-of-qualification-levels" rel="noopener noreferrer">
           Find out what qualification levels mean
         </a>.
       </p>

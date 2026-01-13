@@ -11,47 +11,50 @@ namespace feat.api.tests.Controllers;
 public class SearchControllerTests
 {
     private ISearchService _searchService;
-    
-    private SearchController _searchController;
+    private SearchController _controller;
 
     [SetUp]
     public void Setup()
     {
         _searchService = Substitute.For<ISearchService>();
-        
-        _searchController = new SearchController(_searchService);
+        _controller = new SearchController(_searchService);
     }
 
     [Test]
-    public async Task WhenSearchReturnsResults_ShouldReturnOkResult()
+    public async Task Search_ReturnsOk_WhenValidationPasses()
     {
-        var searchRequest = new SearchRequest
-        {
-            Query = "art",
-            Location = "Manchester",
-        };
-        var searchResponse = new SearchResponse();
-        _searchService.SearchAsync(searchRequest).Returns(searchResponse);
+        var request = new SearchRequest { Query = "Art" };
         
-        var result = await _searchController.Search(searchRequest);
+        var response = new SearchResponse();
         
-        Assert.That(result.Result, Is.InstanceOf<OkObjectResult>());
+        _searchService
+            .SearchAsync(request)
+            .Returns((new ValidationResult(), response));
+        
+        var result = await _controller.Search(request);
+        
         var okResult = result.Result as OkObjectResult;
-        Assert.That(okResult?.Value, Is.EqualTo(searchResponse));
+        Assert.That(okResult, Is.Not.Null);
+        Assert.That(okResult!.StatusCode, Is.EqualTo(200));
+        Assert.That(okResult!.Value, Is.EqualTo(response));
     }
 
     [Test]
-    public async Task WhenSearchReturnsNull_ShouldReturnNotFoundResult()
+    public async Task Search_ReturnsBadRequest_WhenValidationFails()
     {
-        var searchRequest = new SearchRequest
-        {
-            Query = "farmer",
-            Location = "London",
-        };
-        _searchService.SearchAsync(searchRequest).Returns((SearchResponse)null);
+        var request = new SearchRequest { Query = "" };
         
-        var result = await _searchController.Search(searchRequest);
+        var validation = new ValidationResult();
+        validation.AddError("Query", "Required field");
         
-        Assert.That(result.Result, Is.InstanceOf<NotFoundResult>());
+        _searchService
+            .SearchAsync(request)
+            .Returns((validation, null));
+
+        var result = await _controller.Search(request);
+        
+        var badRequestResult = result.Result as BadRequestObjectResult;
+        Assert.That(badRequestResult, Is.Not.Null);
+        Assert.That(badRequestResult!.StatusCode, Is.EqualTo(400));
     }
 }

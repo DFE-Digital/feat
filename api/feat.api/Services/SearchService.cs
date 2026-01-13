@@ -5,8 +5,6 @@ using feat.api.Data;
 using feat.api.Enums;
 using feat.api.Extensions;
 using feat.api.Models;
-using feat.api.Models.External;
-using feat.common;
 using feat.common.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -18,7 +16,6 @@ namespace feat.api.Services;
 
 public class SearchService(
     IOptionsMonitor<AzureOptions> options,
-    IApiClient apiClient,
     SearchClient aiSearchClient,
     EmbeddingClient embeddingClient,
     CourseDbContext dbContext,
@@ -27,13 +24,30 @@ public class SearchService(
 {
     private readonly AzureOptions _azureOptions = options.CurrentValue;
 
-    public async Task<SearchResponse?> SearchAsync(SearchRequest request)
+    public async Task<(ValidationResult validation, SearchResponse? response)>
+        SearchAsync(SearchRequest request)
     {
+        var validation = new ValidationResult();
+
         GeoLocation? userLocation = null;
 
-        if (request.Location != null)
+        if (!string.IsNullOrWhiteSpace(request.Location))
         {
-            userLocation = await GetGeoLocationAsync(request.Location);
+            var locationResult = await GetGeoLocationAsync(request.Location!);
+
+            if (!locationResult.IsValid)
+            {
+                validation.AddError("location", locationResult.ErrorMessage!);
+            }
+            else
+            {
+                userLocation = locationResult.Location;
+            }
+        }
+        
+        if (!validation.IsValid)
+        {
+            return (validation, null);
         }
 
         var (searchResults, facets, totalCount) = await AiSearchAsync(request, userLocation);
@@ -81,7 +95,7 @@ public class SearchService(
             .OrderBy(c => searchResults.FindIndex(sr => sr.InstanceId == c.InstanceId))
             .ToList();
 
-        return new SearchResponse
+        var response = new SearchResponse
         {
             Courses = courses,
             Facets = facets,
@@ -89,8 +103,108 @@ public class SearchService(
             PageSize = request.PageSize,
             TotalCount = totalCount
         };
+        
+        return (validation, response);
     }
     
+    public async Task<GeoLocationResponse> GetGeoLocationAsync(string location)
+    {
+        return await cache.GetOrSetAsync(
+            $"location:{location}",
+            async _ => await ResolveLocationAsync(location)
+        );
+    }
+
+    public async Task<AutoCompleteLocation[]> GetAutoCompleteLocationsAsync(string location)
+    {
+        if (string.IsNullOrWhiteSpace(location) || location.Length < 3)
+            return [];
+
+        var searchTerm = location.Trim();
+        searchTerm = searchTerm.Replace("'", "").Replace("(", "").Replace(")", "").Replace("-", " ");
+        
+        var fromLocations =
+            dbContext.LookupLocations
+                .AsNoTracking()
+                .Where(l =>
+                    (EF.Functions.Like(l.CleanName, $"{searchTerm}%") || EF.Functions.Like(l.CleanName, $"%{searchTerm}%")) &&
+                    l.Latitude != null && l.Longitude != null)
+                .Select(l => new
+                {
+                    Text = l.Name,
+                    l.Latitude,
+                    l.Longitude,
+                    Rank = l.Name == searchTerm
+                        ? 1
+                        : EF.Functions.Like(l.CleanName, $"{searchTerm}%") ? 2 : 3
+                })
+                .OrderBy(x => x.Rank)
+                .ThenBy(x => x.Text)
+                .Take(5);
+        
+        var fromPostcodes =
+            dbContext.LookupPostcodes
+                .AsNoTracking()
+                .Where(p =>
+                    p.CleanPostcode.StartsWith(searchTerm.Replace(" ", "")) &&
+                    (p.Expired == null || p.Expired > DateTime.Today) &&
+                    p.Latitude != null && p.Longitude != null)
+                .Select(p => new
+                {
+                    Text = p.Postcode,
+                    p.Latitude,
+                    p.Longitude,
+                    Rank = p.CleanPostcode == searchTerm.Replace(" ", "")
+                        ? 0
+                        : (EF.Functions.Like(p.CleanPostcode, $"{searchTerm.Replace(" ", "")}%")) ? 1 : 2
+                })
+                .OrderBy(x => x.Rank)
+                .ThenBy(x => x.Text)
+                .Take(5);
+
+        var query =
+            fromLocations
+                .Concat(fromPostcodes)
+                .GroupBy(x => new { x.Text, x.Latitude, x.Longitude })
+                .Select(g => new
+                {
+                    g.Key.Text,
+                    g.Key.Latitude,
+                    g.Key.Longitude,
+                    Rank = g.Min(x => x.Rank)
+                })
+                .OrderBy(x => x.Rank)
+                .ThenBy(x => x.Text)
+                .Take(5);
+
+        var results = await query.ToListAsync();
+
+        if (results.Any(x => x.Rank == 0))
+        {
+            var firstResult = results.First(x => x.Rank == 0);
+            
+            return
+            [
+                new AutoCompleteLocation
+                {
+                    Name = firstResult.Text,
+                    Latitude = firstResult.Latitude!.Value,
+                    Longitude = firstResult.Longitude!.Value
+                }
+            ];
+        }
+
+        return results
+            .OrderBy(x => x.Rank)
+            .ThenBy(x => x.Text)
+            .Select(x => new AutoCompleteLocation
+        {
+            Name = x.Text,
+            Latitude = x.Latitude!.Value,
+            Longitude = x.Longitude!.Value
+        }).ToArray();
+    }
+
     private static void RemoveDuplicateCourses(List<Course> courses)
     {
         if (courses.Count == 0)
@@ -143,7 +257,7 @@ public class SearchService(
         return (results, facets, totalCount);
     }
 
-    private async Task<SearchOptions> BuildSearchOptions(SearchRequest request, GeoLocation? userLocation)
+    private Task<SearchOptions> BuildSearchOptions(SearchRequest request, GeoLocation? userLocation)
     {
         SearchOptions searchOptions;
 
@@ -191,7 +305,7 @@ public class SearchService(
             };
         }
 
-        var embedding = cache.GetOrSet<ReadOnlyMemory<float>>(
+        var embedding = cache.GetOrSet(
             $"query:{request.Query.ToLowerInvariant()}",
             entry =>
             {
@@ -208,14 +322,14 @@ public class SearchService(
                 $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') asc"
             );
             
-            searchOptions.QueryType = SearchQueryType.Full;
+            searchOptions.QueryType = SearchQueryType.Simple;
         }
         else
         {
             searchOptions.QueryType = SearchQueryType.Semantic;
             searchOptions.SemanticSearch = new SemanticSearchOptions
             {
-                SemanticConfigurationName = "semantic-title-description",
+                SemanticConfigurationName = "semantic-title-description"
             };
         }
         
@@ -238,54 +352,52 @@ public class SearchService(
             },
         };
 
-        return searchOptions;
-    }
-
-    private async Task<GeoLocation?> GetGeoLocationAsync(string location)
-    {
-        return await cache.GetOrSetAsync<GeoLocation?>(
-            $"location:{location}",
-            async entry => await GetGeoLocationFromApiAsync(location));
+        return Task.FromResult(searchOptions);
     }
     
-    private async Task<GeoLocation?> GetGeoLocationFromApiAsync(string location)
+    private async Task<GeoLocationResponse> ResolveLocationAsync(string location)
     {
         const string postcodePattern = @"^[a-z]{1,2}\d[a-z\d]?\s*\d[a-z]{2}$";
         var isPostcode = Regex.IsMatch(location, postcodePattern, RegexOptions.IgnoreCase);
-        
+
         if (isPostcode)
         {
-            var postcode = dbContext.Postcodes.FirstOrDefault(p =>
-                p.Postcode.ToLower().Replace(" ", "") == location.ToLower().Replace(" ", "")
-            );
+            var postcode = await dbContext.LookupPostcodes.FirstOrDefaultAsync(p =>
+                    p.Postcode.ToLower().Replace(" ", "") == location.ToLower().Replace(" ", "")
+                    && (p.Expired == null || p.Expired > DateTime.Today)
+                );
 
             if (postcode is { Latitude: not null, Longitude: not null })
             {
-                return new GeoLocation
-                {
-                    Latitude = postcode.Latitude.Value,
-                    Longitude = postcode.Longitude.Value
-                };
+                return new GeoLocationResponse(
+                    new GeoLocation
+                    {
+                        Latitude = postcode.Latitude.Value,
+                        Longitude = postcode.Longitude.Value
+                    },
+                    true
+                );
             }
-        }
-        else
-        {
-            var response = await apiClient
-                .GetAsync<PlaceResult>(ApiClientNames.Postcode, $"places/?q={location}&limit=1");
-            
-            if (response.Result?.Count > 0)
-            {
-                var place = response.Result[0];
-                
-                return new GeoLocation
-                {
-                    Latitude = place.Latitude.GetValueOrDefault(),
-                    Longitude = place.Longitude.GetValueOrDefault()
-                };
-            }
+
+            return new GeoLocationResponse(null, false, "Postcode not found.");
         }
 
-        return null;
+        var locationLatLong = await dbContext.LookupLocations.FirstOrDefaultAsync(l =>
+            l.Name == location);
+
+        if (locationLatLong is { Latitude: not null, Longitude: not null })
+        {
+            return new GeoLocationResponse(
+                new GeoLocation
+                {
+                    Latitude = locationLatLong.Latitude.Value,
+                    Longitude = locationLatLong.Longitude.Value
+                },
+                true
+            );
+        }
+
+        return new GeoLocationResponse(null, false, "Location not found.");
     }
     
     private static string? BuildFilterExpression(SearchRequest request, GeoLocation? userLocation)
@@ -303,7 +415,7 @@ public class SearchService(
             var radius = RadiusInKilometers(request.Radius);
             
             filters.Add(
-                $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius}"
+                $"(geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius} or Location eq null)"
             );
         }
         
@@ -313,12 +425,13 @@ public class SearchService(
 
         void AddFacet(string field, IEnumerable<string>? values)
         {
-            if (values == null || !values.Any())
+            var valueList = (values ?? []).ToList();
+            if (valueList.Count == 0)
             {
                 return;
             }
             
-            var ors = values.Select(v => $"{field} eq '{v.Replace("'", "''")}'");
+            var ors = valueList.Select(v => $"{field} eq '{v.Replace("'", "''")}'");
             filters.Add("(" + string.Join(" or ", ors) + ")");
         }
     }

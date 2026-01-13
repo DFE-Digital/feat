@@ -44,14 +44,31 @@ variable "sql_admin_password" {
   default     = null
 }
 
+variable "openai_key" {
+  type        = string
+  description = "The OpenAI Key used for text embeddings."
+  sensitive   = true
+  default     = null
+}
+
 # Azure Search Service Configuration variables
-variable "sku" {
-  description = "The pricing tier of the search service you want to create (for example, basic or standard)."
+variable "ai_search_sku" {
+  description = "The SKU which should be used for this Search Service. Possible values include basic, free, standard, standard2, standard3, storage_optimized_l1 and storage_optimized_l2"
   default     = "standard"
   type        = string
   validation {
-    condition     = contains(["free", "basic", "standard", "standard2", "standard3", "storage_optimized_l1", "storage_optimized_l2"], var.sku)
+    condition     = contains(["free", "basic", "standard", "standard2", "standard3", "storage_optimized_l1", "storage_optimized_l2"], var.ai_search_sku)
     error_message = "The sku must be one of the following values: free, basic, standard, standard2, standard3, storage_optimized_l1, storage_optimized_l2."
+  }
+}
+
+variable "ai_search_semantic_sku" {
+  description = "Specifies the Semantic Search SKU which should be used for this Search Service. Possible values include free and standard"
+  default     = "standard"
+  type        = string
+  validation {
+    condition     = contains(["free", "standard"], var.ai_search_semantic_sku)
+    error_message = "The sku must be one of the following values: free, standard."
   }
 }
 
@@ -73,4 +90,16 @@ variable "partition_count" {
     condition     = contains([1, 2, 3, 4, 6, 12], var.partition_count)
     error_message = "The partition_count must be one of the following values: 1, 2, 3, 4, 6, 12."
   }
+}
+
+variable "google_tag_manager" {
+  type        = string
+  description = "The Google Tag Manager (GTM) Id"
+  default     = ""
+}
+
+variable "clarity" {
+  type        = string
+  description = "The Microsoft Clarity Id"
+  default     = ""
 }

@@ -2,14 +2,14 @@
 @model feat.web.Pages.IndexModel
 @using feat.web.Utils
 @{
-    ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
+    ViewBag.PageTitle = "Find education and training opportunities";
 }
 
 <!-- Index Page content goes here -->
 <div class="govuk-width-container">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h2 class="govuk-heading-l">Find education and training opportunities</h2>
+            <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
             <p>Whether you're already in education or training, or coming back after a break, we can help you work out what to do next.</p>
             
             <govuk-button-link asp-page="@PageName.Location" is-start-button="false">Start now</govuk-button-link>

@@ -31,13 +31,15 @@ Two environment configurations are provided:
     - ARM_SUBSCRIPTION_ID
     - TF_VAR_sql_admin_username
     - TF_VAR_sql_admin_password
+    - TF_VAR_openai_key
 
 ## How CI/CD installs and sets it up
 The GitHub Actions workflow:
 - Logs into Azure using the service principal from repository secrets.
 - Exposes environment variables for Terraform:
     - ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID (Azure auth)
-    - TF_VAR_sql_admin_username, TF_VAR_sql_admin_password (Terraform variables)
+    - TF_VAR_sql_admin_username, TF_VAR_sql_admin_password (Terraform variables to set the SQL admin users)
+    - TF_VAR_openai_key (Terraform variable to set the OpenAI key to use for the DfE OpenAI instance)
 - Selects the target environment via workflow input (Development or Test) and runs:
     - terraform init
     - terraform plan -var-file=<environment>.tfvars
@@ -92,6 +94,7 @@ az login az account set --subscription "<your-subscription-id>"
 ```bash
 export ARM_CLIENT_ID="" export ARM_CLIENT_SECRET=" " export ARM_TENANT_ID=" " export ARM_SUBSCRIPTION_ID=" "
 export TF_VAR_sql_admin_username="feat-admin" export TF_VAR_sql_admin_password="<strong-password>"
+export TF_VAR_openai_key="<openai-key>"
 ```
 
 3) Move to the Terraform directory:

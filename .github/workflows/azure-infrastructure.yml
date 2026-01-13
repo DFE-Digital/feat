@@ -17,6 +17,7 @@ on:
         options:
           - Development
           - Test
+          - Beta
 
 jobs:
   terraform:
@@ -29,6 +30,7 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       TF_VAR_sql_admin_username: ${{ secrets.SQL_ADMIN_USERNAME }}
       TF_VAR_sql_admin_password: ${{ secrets.SQL_ADMIN_PASSWORD }}
+      TF_VAR_openai_key: ${{ secrets.AZURE_OPENAI_APIKEY }}
       ENVIRONMENT: ${{ github.event.inputs.environment }}
     environment: ${{ github.event.inputs.environment }}
     defaults:

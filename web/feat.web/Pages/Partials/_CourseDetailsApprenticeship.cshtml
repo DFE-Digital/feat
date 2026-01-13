@@ -1,3 +1,4 @@
+@using feat.common.Extensions
 @using feat.web.Utils
 @model feat.web.Models.ViewModels.CourseDetailsApprenticeship
 
@@ -29,27 +30,27 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Entry requirements</dt>
                 <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrEmpty(Model.EntryRequirements) ? SharedStrings.NotProvided : Model.EntryRequirements)
+                  @Model.EntryRequirements.ValueOrNotProvided()
                 </dd>
               </div>
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Wage</dt>
                 <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrEmpty(Model.Wage) ? "Competitive" : Model.Wage)
+                  @(string.IsNullOrWhiteSpace(Model.Wage) ? "Competitive" : Model.Wage)
                 </dd>
               </div>
 
               <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Position available</dt>
-                <dd class="govuk-summary-list__value">
-                  @Model.PositionAvailable
-                </dd>
+                <dt class="govuk-summary-list__key">Positions available</dt>
+                <dd class="govuk-summary-list__value">@(Model.PositionsAvailable > 0 ? Model.PositionsAvailable : 1)</dd>
               </div>
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Course description</dt>
-                <dd class="govuk-summary-list__value">@Model.Description</dd>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrWhiteSpace(Model.Description) ? "You will need to visit the employer’s website for information about this course" : Model.Description))
+                </dd>
               </div>
             </dl>
           </div>
@@ -64,7 +65,7 @@
             <dl class="govuk-summary-list">
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Employer</dt>
-                <dd class="govuk-summary-list__value">@Model.EmployerName</dd>
+                <dd class="govuk-summary-list__value">@Model.EmployerName.ValueOrNotProvided()</dd>
                 <dd class="govuk-summary-list__actions">
                   @if (!string.IsNullOrEmpty(Model.EmployerUrl))
                   {
@@ -91,7 +92,9 @@
 
               <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
                 <dt class="govuk-summary-list__key">About this employer</dt>
-                <dd class="govuk-summary-list__value">@Model.EmployerDescription</dd>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrWhiteSpace(Model.EmployerDescription) ? SharedStrings.NotProvided : Model.EmployerDescription)
+                </dd>
               </div>
 
               <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
@@ -117,7 +120,7 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Start date</dt>
                 <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrEmpty(@Model.StartDate?.Display) ? SharedStrings.NotProvided : Model.StartDate?.Display)
+                  @(Model.StartDate?.Display ?? SharedStrings.NotProvided)
                 </dd>
               </div>
 
@@ -134,9 +137,9 @@
           </div>
         </div>
 
-        @if(!string.IsNullOrEmpty(Model.CourseUrl))
+        @if(!string.IsNullOrEmpty(Model.CourseUrlAbsolute))
         {
-          <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to Apprenticeship opportunity</govuk-button-link>
+          <govuk-button-link href="@(Model.CourseUrlAbsolute)" is-start-button="false">Go to Apprenticeship opportunity</govuk-button-link>
         }
         <p>The information we show you about a course comes from the provider. If you want to know more about a course visit their website. You can also email or call them if you have any questions or want to discuss your options.</p>
       </div>
@@ -161,7 +164,7 @@
   </main>
 </div>
 
-<style>
+<style asp-add-nonce>
   .local_top_border{
     border-top: 2px solid #1d70b8;
     display: block;

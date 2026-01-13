@@ -1,17 +1,16 @@
 @page
-@using feat.web.Enums
-@using feat.web.Models
 @using feat.web.Utils
 @model TrainingOptionsPages.TrainingOptionsModel
 @{
-    ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-    ViewBag.ShowJSBack = true;
+    ViewBag.PageTitle = "Different training options";
+     
+    ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
 
 <div class="govuk-grid-row">
 
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">Different training options</h1>
+        <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
 
         <h2 class="govuk-heading-m">A Levels</h2>
         <p>A levels are subject-based qualifications usually assessed by exams. You usually choose 3 subjects to study but you can take more or fewer.</p>

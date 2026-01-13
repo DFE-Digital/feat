@@ -5,12 +5,12 @@
 @model feat.web.Pages.LoadCoursesModel
 
 @{
-  ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
+  ViewBag.PageTitle = "Your search results";
   
   var totalResults = Model.TotalCourseCount;
   var pluralText = totalResults == 1 ? string.Empty : "s";
-  var locationText = string.IsNullOrEmpty(Model.Search.Location) ? string.Empty : "near <b>" + Model.Search.Location + "</b>";
-  var interestText = Model.Search.Interests.Count > 0 ? $"for <b>{string.Join(", ", Model.Search.Interests)}</b>" : string.Empty;
+  var locationText = string.IsNullOrEmpty(Model.Search.Location) ? string.Empty : "near <strong>" + Model.Search.Location + "</strong>";
+  var interestText = Model.Search.Interests.Count > 0 ? $"for <strong>{string.Join(", ", Model.Search.Interests)}</strong>" : string.Empty;
   var searchResultText = $"Showing {totalResults} course{pluralText} {locationText} {interestText}";
 }
 
@@ -19,7 +19,7 @@
     <div class="govuk-grid-row">
       <!--Header section -->
       <div class="govuk-grid-column-full">
-        <h1 class="govuk-heading-l">Your search results</h1>
+        <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
         <p class="govuk-body-l">@Html.Raw(searchResultText)</p>
         <p><a asp-page="@PageName.Location">Search again</a></p>
         <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
@@ -50,7 +50,7 @@
                   </div>
 
                   <div class="govuk-summary-card__content">
-                    <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list">
                       @if (Model.AllFacets is { Count: > 0 })
                       {
                         var facetIndex = 0;
@@ -84,13 +84,13 @@
                           }
                           
                           <div class="govuk-summary-list__row">
-                              <fieldset class="govuk-fieldset">
+                              <div class="govuk-form-group">
                                   <input type="hidden" name="AllFacets[@facetIndex].Name" value="@facet.Name" />
 
                                   <govuk-checkboxes name="facet-@facetIndex">
-                                      <govuk-checkboxes-fieldset>
+                                      <govuk-checkboxes-fieldset class="govuk-checkboxes--small">
                                           <govuk-checkboxes-fieldset-legend 
-                                              is-page-heading="true" 
+                                              is-page-heading="false" 
                                               class="govuk-fieldset__legend--s">
                                               @facet.DisplayName
                                           </govuk-checkboxes-fieldset-legend>
@@ -125,10 +125,10 @@
                                   @if (orderedFacetValues.Exists(v => v.Selected))
                                   {
                                     <p class="govuk-body">
-                                      <a class="govuk-link" asp-page-handler="ClearFacet" asp-route-facetname="@facet.Name">Clear filter</a>
+                                      <a class="govuk-link" asp-page-handler="ClearFacet" asp-route-facetname="@facet.Name" id="clear-facet-@facet.Name">Clear filter<span class="govuk-visually-hidden"> for @facet.DisplayName</span></a>
                                     </p>
                                   }
-                              </fieldset>
+                              </div>
                           </div>
 
                           facetIndex++;
@@ -138,7 +138,7 @@
                       <p class="govuk-body">
                         <a class="govuk-link" asp-page-handler="ClearFilters">Clear all filters</a>
                       </p>
-                    </dl>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -172,13 +172,15 @@
                 {
                   if (Model.Search.OrderBy == OrderBy.Distance)
                   {
-                    <span aria-current="true">Distance | </span>
+                    <span aria-current="true">Distance</span>
+                    <span> | </span> 
                     <a asp-page="@PageName.LoadCourses" asp-route-orderBy="relevance">Relevance</a>
                   }
                   else
                   {
                     <a asp-page="@PageName.LoadCourses" asp-route-orderBy="distance">Distance</a>
-                    <span aria-current="true">| Relevance</span>
+                    <span> | </span> 
+                    <span aria-current="true">Relevance</span>
                   }
                 }
               }
@@ -198,8 +200,8 @@
                 {
                   <div class="govuk-pagination__prev">
                     <a class="govuk-link govuk-pagination__link"
-                       asp-page="LoadCourses" asp-route-pageNumber="@(Model.PreviousPage)"
-                       aria-label="Previous">
+                       asp-route-pageNumber="@(Model.PreviousPage)"
+                       aria-label="Previous Page, Page @(Model.PreviousPage)">
                       <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg"
                            height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
                         <path d="m6.5938-0.0088125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
@@ -215,16 +217,17 @@
                     {
                       <li class="govuk-pagination__item govuk-pagination__item--current">
                         <a class="govuk-link govuk-pagination__link"
-                           aria-label="@($"Page {pageNumber}")" aria-current="page">
+                           asp-route-pageNumber="@pageNumber"
+                           aria-label="@($"Current Page, Page {pageNumber}")" aria-current="page">
                           @pageNumber
-                        </a><span></span>
+                        </a>
                       </li>
                     }
                     else
                     {
                       <li class="govuk-pagination__item">
                         <a class="govuk-link govuk-pagination__link"
-                           asp-page="" asp-route-pageNumber="@pageNumber"
+                           asp-route-pageNumber="@pageNumber"
                            aria-label="@($"Page {pageNumber}")">
                           @pageNumber
                         </a>
@@ -237,8 +240,8 @@
                 {
                   <div class="govuk-pagination__next">
                     <a class="govuk-link govuk-pagination__link"
-                       asp-page="LoadCourses" asp-route-pageNumber="@Model.NextPage"
-                       rel="next">
+                       asp-route-pageNumber="@Model.NextPage"
+                       aria-label="Next Page, Page @(Model.NextPage)">
                       <span class="govuk-pagination__link-title">Next<span class="govuk-visually-hidden"> page</span></span>
                       <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg"
                            height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
@@ -260,7 +263,7 @@
   <script src="~/js/filter-toggle.js"></script>
 }
 
-<style>
+<style asp-add-nonce>
     /* Mobile filter toggle button - hidden by default */
     .mobile-filter-toggle {
         display: none;
@@ -303,9 +306,14 @@
         display: inline-block;
       }
     }
-
-    .govuk-summary-list__row:not(:first-child) > fieldset.govuk-fieldset {
+    
+    #filterSection > div > div.govuk-summary-card__content > div > div > div > p
+    {
       margin-top: 20px;
     }
-
+    
+    #filterSection div.govuk-summary-list__row:not(:first-child) div.govuk-form-group {
+      margin-top: 20px;
+    }
+    
 </style>

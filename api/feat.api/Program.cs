@@ -20,11 +20,6 @@ using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(8080);
-});
-
 builder.Services.Configure<AzureOptions>(
     builder.Configuration.GetSection(AzureOptions.Name));
 
@@ -157,14 +152,13 @@ builder.Services.AddOpenTelemetry()
     );
 
 var app = builder.Build();
+var policyCollection = new HeaderPolicyCollection()
+    .AddDefaultApiSecurityHeaders();
+app.UseSecurityHeaders(policyCollection);
 
-if(app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
-
-app.UseHttpsRedirection();
+app.MapOpenApi();
+app.MapScalarApiReference();
 app.MapControllers();
+app.UseHttpsRedirection();
 
 app.Run();

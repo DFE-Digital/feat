@@ -11,7 +11,10 @@ let paths = {
     src: 'AssetSrc/',
     dist: 'wwwroot/'
 }
-
+task('govuk-js', function() {
+    return src('node_modules/govuk-frontend/dist/govuk/govuk-frontend.min.js')
+        .pipe(dest(paths.dist + 'js'));
+});
 task('govuk-assets', function() {
     return src('node_modules/govuk-frontend/dist/govuk/assets/**/*')
         .pipe(dest(paths.dist + 'assets'));
@@ -42,6 +45,16 @@ task('moj-css', function() {
         .pipe(dest(paths.dist + 'css'));
 });
 
+task('autocomplete-js', function() {
+    return src('node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.js', { sourcemaps: true })
+        .pipe(dest(paths.dist + 'js'));
+});
+
+task('autocomplete-css', function() {
+    return src('node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.css', { sourcemaps: true })
+        .pipe(dest(paths.dist + 'css'));
+});
+
 task("sass", function () {
     return src(paths.src + '/scss/*.scss')
         .pipe(sourcemaps.init())
@@ -59,12 +72,15 @@ task("images", function() {
 })
 
 task("dev", series(
+    "govuk-js",
     "govuk-assets",
     "dfe-js",
     "dfe-assets",
     "moj-js",
     "moj-assets",
     "moj-css",
+    "autocomplete-js",
+    "autocomplete-css",
     "images",
     "sass"     
 ));

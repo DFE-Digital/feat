@@ -4,5 +4,10 @@ namespace feat.api.Services;
 
 public interface ISearchService
 {
-    Task<SearchResponse?> SearchAsync(SearchRequest request);
+    Task<(ValidationResult validation, SearchResponse? response)>
+        SearchAsync(SearchRequest request);
+
+    Task<GeoLocationResponse> GetGeoLocationAsync(string location);
+    
+    Task<AutoCompleteLocation[]> GetAutoCompleteLocationsAsync(string location);
 }

@@ -1,4 +1,5 @@
-@using feat.web.Utils
+@using feat.common.Extensions
+@using feat.web.Utils;
 @model feat.web.Models.ViewModels.CourseDetailsCourse
 
 <div class="govuk-width-container local_top_spacing" >
@@ -27,7 +28,7 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Entry requirements</dt>
                 <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrEmpty(Model.EntryRequirements) ? SharedStrings.NotProvided : Model.EntryRequirements)
+                  @Model.EntryRequirements.ValueOrNotProvided()
                 </dd>
               </div>
               
@@ -39,7 +40,7 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Course overview</dt>
                 <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrEmpty(Model.Description) ? "You need to visit the provider website for information about this course." : Model.Description)
+                  @(string.IsNullOrWhiteSpace(Model.Description) ? "You need to visit the provider website for information about this course." : Model.Description)
                 </dd>
               </div>
             </dl>
@@ -55,11 +56,11 @@
             <dl class="govuk-summary-list">
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Provider</dt>
-                <dd class="govuk-summary-list__value">@Model.ProviderName</dd>
+                <dd class="govuk-summary-list__value">@Model.ProviderName.ValueOrNotProvided()</dd>
                 <dd class="govuk-summary-list__actions">
-                  @if (!string.IsNullOrEmpty(Model.ProviderUrl))
+                  @if (!string.IsNullOrEmpty(Model.ProviderUrlAbsolute))
                   {
-                    <a class="govuk-link" href="@(Model.ProviderUrl)">View website
+                    <a class="govuk-link" href="@(Model.ProviderUrlAbsolute)">View website
                       <span class="govuk-visually-hidden">@(Model.ProviderName + "(" + Model.ProviderAddresses?.FirstOrDefault()?.Display + ")")</span>
                     </a>
                   }
@@ -69,7 +70,7 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Provider location</dt>
                 <dd class="govuk-summary-list__value">
-                  @Model.CourseAddresses?.FirstOrDefault()?.Display
+                  @(!string.IsNullOrWhiteSpace(Model.CourseAddresses?.FirstOrDefault()?.Display) ? Model.CourseAddresses?.FirstOrDefault()?.Display : SharedStrings.NotProvided)
                 </dd>
                 <dd class="govuk-summary-list__actions">
                   @if (!string.IsNullOrEmpty(Model.CourseAddresses?.FirstOrDefault()?.MapLocationUrl))
@@ -128,10 +129,21 @@
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start dates</dt>
                   <dd class="govuk-summary-list__value">
-                    @foreach (var startDate in Model.StartDates.Where(s => !string.IsNullOrEmpty(s.Display)))
+                    @foreach (var startDate in Model.StartDates
+                                .Where(sd => !string.IsNullOrEmpty(sd.Display))
+                                .OrderBy(sd => sd.Date))
                     {
                       <p>@startDate.Display</p>
                     }
+                  </dd>
+                </div>
+              }
+              else if (!string.IsNullOrEmpty(Model.StartDates?.FirstOrDefault()?.Display))
+              {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Start date</dt>
+                  <dd class="govuk-summary-list__value">
+                    @Model.StartDates?.FirstOrDefault()?.Display
                   </dd>
                 </div>
               }
@@ -139,8 +151,7 @@
               {
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start date</dt>
-                  <dd class="govuk-summary-list__value">
-                    @(Model.StartDates?.FirstOrDefault()?.Display ?? SharedStrings.NotProvided)
+                  <dd class="govuk-summary-list__value">@SharedStrings.NotProvided
                   </dd>
                 </div>
               }
@@ -159,13 +170,13 @@
           </div>
         </div>
 
-        @if (!string.IsNullOrEmpty(Model.CourseUrl))
+        @if (!string.IsNullOrEmpty(Model.CourseUrlAbsolute))
         {
-          <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to course</govuk-button-link>
+          <govuk-button-link href="@(Model.CourseUrlAbsolute)" is-start-button="false">Go to course</govuk-button-link>
         }
-        else if(!string.IsNullOrEmpty(Model.ProviderUrl))
+        else if(!string.IsNullOrEmpty(Model.ProviderUrlAbsolute))
         {
-          <govuk-button-link href="@(Model.ProviderUrl)" is-start-button="false">Go to course provider</govuk-button-link>
+          <govuk-button-link href="@(Model.ProviderUrlAbsolute)" is-start-button="false">Go to course provider</govuk-button-link>
         }
         <p>The details we show you comes from the provider. There may be extra information on their website. You can also email or call them if you have any questions or want to discuss your options. </p>
       </div>
@@ -190,7 +201,7 @@
   </main>
 </div>
 
-<style>
+<style asp-add-nonce>
   .local_top_border{
     border-top: 2px solid #1d70b8;
     display: block;

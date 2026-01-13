@@ -1,0 +1,8 @@
+env                = "Beta"
+product            = "Find Education and Training"
+prefix             = "s265t01"
+location           = "uksouth"
+api_image_name     = "feat-api:latest"
+website_image_name = "feat-web:latest"
+google_tag_manager = "GTM-KX9ZWC6X"
+clarity            = "t7kid1y3ng"

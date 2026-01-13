@@ -2,15 +2,16 @@
 @using feat.web.Utils
 @model feat.web.Pages.TrainingOptionsPages.AboutTLevelsModel
 @{
-    ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-    ViewBag.ShowJSBack = true;
+    ViewBag.PageTitle = "About T levels";
+     
+    ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
 
 <div class="govuk-width-container">
     <div class="govuk-grid-row">
 
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-l"> About T levels</h1>
+            <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
             <h2 class="govuk-heading-m">Subjects you can take</h2>
 
             <p class="govuk-body">

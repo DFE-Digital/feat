@@ -48,7 +48,7 @@ public class CourseDetailsResponse
     
     public decimal? TuitionFee { get; set; }
     
-    public string? PositionAvailable { get; set; }
+    public short? PositionsAvailable { get; set; }
     
     public string? TrainingProvider { get; set; }
     

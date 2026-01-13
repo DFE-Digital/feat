@@ -2,29 +2,30 @@
 @using feat.web.Utils
 @model feat.web.Pages.LinkPages.Cookies
 @{
-    ViewBag.Title = SharedStrings.SiteTitle_ExploreYourOptions_GOVUK;
-    ViewBag.ShowJSBack = true;
+    ViewBag.PageTitle = "Cookies on the Find education and training website";
+    ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <div id="cookie-banner" class="govuk-notification-banner govuk-notification-banner--success" 
-         data-module="govuk-notification-banner" hidden>
-      <div class="govuk-notification-banner__header">
-        <h2 class="govuk-notification-banner__title">Success</h2>
+    @if (!string.IsNullOrEmpty(Model.AnalyticsCookie) && !string.IsNullOrEmpty(Model.MarketingCookie))
+    {
+      <div id="cookie-banner" class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" >
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title">Success</h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <p class="govuk-notification-banner__heading">You’ve saved your cookie settings.</p>
+        </div>
       </div>
-      <div class="govuk-notification-banner__content">
-        <p class="govuk-notification-banner__heading">You’ve saved your cookie settings.</p>
-      </div>
-    </div>
-
-    <h1 class="govuk-heading-l">Cookies on the Skills for Careers website</h1>
-
+    }
+    
+    <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
+    
     <p class="govuk-body">
       Cookies are files saved on your phone, tablet or computer when you visit a website.
     </p>
-
     <p class="govuk-body">
       We use cookies to make Find education and training work and collect information about how you use our service.
     </p>
@@ -73,7 +74,6 @@
     <p class="govuk-body">
       Some cookies may be be placed on your computer by third parties and partners we work with.
     </p>
-
     <p class="govuk-body">
       We use these cookies to:
     </p>
@@ -86,25 +86,21 @@
     <p class="govuk-body">
       Sometimes we’ll include content from other sites, such as YouTube, who may set their own cookies.
     </p>
-
     <p class="govuk-body">
       We might also share information about your use of our pages with our social media and advertising partners, such as Facebook. We do this to help improve the relevancy of advertising campaigns you receive from us.
     </p>
-
     <p class="govuk-body">
       If you decide to share a link to one of our pages, the service you share it on might set a cookie. We have no control over cookies set on other websites and you can turn them off but only through the website you’ve used.
     </p>
-
+    
     <h2 class="govuk-heading-m">Analytics cookies (optional)</h2>
 
     <p class="govuk-body">
       With your permission, we use Google Analytics to collect data about how you use this service. This information helps us to improve our service.
     </p>
-
     <p class="govuk-body">
       Google is not allowed to use or share our analytics data with anyone.
     </p>
-
     <p class="govuk-body">
       Google Analytics stores anonymised information about:
     </p>
@@ -149,7 +145,6 @@
     <p class="govuk-body">
       We use Microsoft Clarity to understand how you use the Find education and training website. This information helps us to improve the website.
     </p>
-
     <p class="govuk-body">
       Microsoft Clarity uses the following cookies:
     </p>
@@ -209,16 +204,14 @@
     <p class="govuk-body">
       Some cookies help us improve the adverts you receive from us by making them more relevant to you.
     </p>
-
     <p class="govuk-body">
       We also share information about your use of this service with our social media, advertising and analytics partner. They use the information to decide what type of adverts to create.
     </p>
 
     <h2 class="govuk-heading-m">Change your cookie settings</h2>
     <form id="cookie-form" method="post">
-      
       <div class="remember-radio" data-key="analytics-cookies">
-        <govuk-radios id-prefix="analytics-cookies" name="analytics-cookies">
+        <govuk-radios for="AnalyticsCookie"> 
           <govuk-radios-fieldset>
             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s">
               Do you want to accept analytics cookies?
@@ -234,7 +227,7 @@
       </div>
 
       <div class="remember-radio" data-key="marketing-cookies">
-        <govuk-radios id-prefix="marketing-cookies" name="marketing-cookies">
+        <govuk-radios for="MarketingCookie">
           <govuk-radios-fieldset>
             <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s">
               Do you want to accept marketing cookies?
@@ -250,83 +243,9 @@
       </div>
       
       <div class="govuk-button-group">
-        <govuk-button type="submit" id="save-cookie-btn">Save cookie settings</govuk-button>
+        <govuk-button type="submit" >Save cookie settings</govuk-button>
       </div>
-
     </form>
-        
 
   </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  // -------------------------------------------
-  // 🔵 Force page to the top after reload
-  // -------------------------------------------
-  if ('scrollRestoration' in history) {
-    history.scrollRestoration = 'manual';
-  }
-
-  // Elements
-  var banner = document.getElementById('cookie-banner');
-  var form   = document.getElementById('cookie-form');
-
-  // -------------------------------------------
-  // 🔵 Show banner after reload if flag is set
-  // -------------------------------------------
-  if (localStorage.getItem('showCookieBanner') === 'true') {
-    if (banner) banner.hidden = false;
-
-    // Remove flag so it's only shown once
-    localStorage.removeItem('showCookieBanner');
-
-    // Scroll to top AFTER the browser tries to restore position
-    setTimeout(function () {
-      window.scrollTo(0, 0);
-    }, 0);
-  }
-
-  // -------------------------------------------
-  // 🔵 Intercept form submit: save flag + reload
-  // -------------------------------------------
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      localStorage.setItem('showCookieBanner', 'true');
-
-      if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual';
-      }
-
-      location.reload();
-    });
-  }
-
-  // -------------------------------------------
-  // 🔵 Remember radio choices on reload
-  // -------------------------------------------
-  document.querySelectorAll('.remember-radio').forEach(function (group) {
-    var key = group.dataset.key;
-    var inputs = group.querySelectorAll('input[type="radio"]');
-
-    // Load saved value
-    var saved = localStorage.getItem('radio-' + key);
-    if (saved) {
-      inputs.forEach(function (input) {
-        if (input.value === saved) {
-          input.checked = true;
-        }
-      });
-    }
-
-    // Save on change
-    inputs.forEach(function (input) {
-      input.addEventListener('change', function () {
-        localStorage.setItem('radio-' + key, input.value);
-      });
-    });
-  });
-
-});
-</script>

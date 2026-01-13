@@ -6,7 +6,7 @@ namespace feat.web.Models;
 public class Search
 {
     public List<string> History { get; set; } = [];
-    public bool Updated { get; set; } = true;
+    public bool Updated { get; set; } = false;
     
     public string? Location { get; set; } 
     public Distance? Distance { get; set; }

@@ -68,7 +68,9 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
 
     public DbSet<Vacancy> Vacancies { get; set; }
     
-    public DbSet<PostcodeLatLong> Postcodes { get; set; }
+    public DbSet<PostcodeLatLong> LookupPostcodes { get; set; }
+    
+    public DbSet<LocationLatLong> LookupLocations { get; set; }
     
     public DbSet<AiSearchEntry> AiSearchEntries { get; set; }
     

@@ -1,11 +1,12 @@
 using feat.web.Services;
-using Microsoft.AspNetCore.Components.Routing;
+using feat.web.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace feat.web.Pages.LinkPages;
 
-public class Cookies : PageModel
+[IgnoreAntiforgeryToken]
+public class Cookies(StaticNavigationHandler staticNavigation) : PageModel
 {
     [BindProperty] 
     public string? AnalyticsCookie { get; set; }
@@ -13,18 +14,36 @@ public class Cookies : PageModel
     [BindProperty]
     public string? MarketingCookie { get; set; }
     
-    public void OnGet()
+    public string? RefererUrl { get; private set; } = "";
+    
+    public IActionResult OnGet()
     {
-        var analyticsCookieValue = Request.Cookies["analytics-cookies"];
-        var matketingCookieValue = Request.Cookies["marketing-cookies"];
+        RefererUrl = staticNavigation.GetRefererUrl();
         
-        if (analyticsCookieValue != null)
+        AnalyticsCookie = Request.Cookies[SharedStrings.AnalyticsCookie];
+        MarketingCookie = Request.Cookies[SharedStrings.MarketingCookie];
+        
+        return Page();
+    }
+
+    public IActionResult OnPost()
+    {
+        if (AnalyticsCookie != null)
         {
-            AnalyticsCookie = analyticsCookieValue;
+            Response.Cookies.Append(SharedStrings.AnalyticsCookie, AnalyticsCookie, new CookieOptions
+            {
+                Expires= DateTime.Now.AddYears(1)
+            });
         }
-        if (matketingCookieValue != null)
+
+        if (MarketingCookie != null)
         {
-            MarketingCookie = matketingCookieValue;
+            Response.Cookies.Append(SharedStrings.MarketingCookie, MarketingCookie, new CookieOptions
+            {
+                Expires = DateTime.Now.AddYears(1)
+            });
         }
+        
+        return RedirectToPage();
     }
 }

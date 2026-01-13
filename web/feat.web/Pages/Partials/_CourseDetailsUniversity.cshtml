@@ -1,3 +1,4 @@
+@using feat.common.Extensions
 @using feat.web.Utils
 @model feat.web.Models.ViewModels.CourseDetailsUniversity
 
@@ -30,7 +31,7 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Entry requirements</dt>
                 <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrEmpty(Model.EntryRequirements) ? SharedStrings.NotProvided : Model.EntryRequirements)
+                  @Model.EntryRequirements.ValueOrNotProvided()
                 </dd>
               </div>
 
@@ -41,12 +42,16 @@
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Awarding organisation</dt>
-                <dd class="govuk-summary-list__value">@Model.AwardingOrganisation</dd>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrWhiteSpace(Model.AwardingOrganisation) ? Model.University: Model.AwardingOrganisation)
+                </dd>
               </div>
 
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Course description</dt>
-                <dd class="govuk-summary-list__value">@Model.Description</dd>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrWhiteSpace(Model.Description)? "You will need to visit the institution’s website for information about this course." : Model.Description)
+                </dd>
               </div>
             </dl>
           </div>
@@ -140,10 +145,21 @@
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start dates</dt>
                   <dd class="govuk-summary-list__value">
-                    @foreach (var startDate in Model.StartDates.Where(s => !string.IsNullOrEmpty(s.Display)))
+                    @foreach (var startDate in Model.StartDates
+                                .Where(sd => !string.IsNullOrEmpty(sd.Display))
+                                .OrderBy(sd => sd.Date))
                     {
                       <p>@startDate.Display</p>
                     }
+                  </dd>
+                </div>
+              }
+              else if (!string.IsNullOrEmpty(Model.StartDates?.FirstOrDefault()?.Display))
+              {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Start date</dt>
+                  <dd class="govuk-summary-list__value">
+                    @Model.StartDates?.FirstOrDefault()?.Display
                   </dd>
                 </div>
               }
@@ -151,8 +167,7 @@
               {
                 <div class="govuk-summary-list__row">
                   <dt class="govuk-summary-list__key">Start date</dt>
-                  <dd class="govuk-summary-list__value">
-                    @(Model.StartDates?.FirstOrDefault()?.Display ?? SharedStrings.NotProvided)
+                  <dd class="govuk-summary-list__value">@SharedStrings.NotProvided
                   </dd>
                 </div>
               }
@@ -171,9 +186,9 @@
           </div>
         </div>
         
-        @if (!string.IsNullOrEmpty(Model.CourseUrl))
+        @if (!string.IsNullOrEmpty(Model.CourseUrlAbsolute))
         {
-          <govuk-button-link href="@(Model.CourseUrl)" is-start-button="false">Go to course</govuk-button-link>
+          <govuk-button-link href="@(Model.CourseUrlAbsolute)" is-start-button="false">Go to course</govuk-button-link>
         }
         <p>The information we show you about a course comes from the provider. If you want to know more about a course visit their website. You can also email or call them if you have any questions or want to discuss your options.</p>
       </div>
@@ -198,12 +213,7 @@
   </main>
 </div>
 
-<style>
-  .local_top_border{
-    border-top: 2px solid #1d70b8;
-    display: block;
-  }
-  
+<style asp-add-nonce>
   .local_top_spacing{
     margin-top: -40px;
   }
