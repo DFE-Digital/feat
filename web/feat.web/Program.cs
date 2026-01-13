@@ -114,6 +114,10 @@ var policyCollection = new HeaderPolicyCollection()
             .From("*.analytics.google.com")
             .From("c.bing.com")
             .From("*.clarity.ms");
+        csp.AddFrameAncestors()
+            .Self();
+        csp.AddFormAction()
+            .Self();
     });
     
 app.UseSecurityHeaders(policyCollection);
