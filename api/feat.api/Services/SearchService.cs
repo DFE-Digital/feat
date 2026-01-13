@@ -415,7 +415,7 @@ public class SearchService(
             var radius = RadiusInKilometers(request.Radius);
             
             filters.Add(
-                $"(geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius} or Location eq null)"
+                $"(geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius} or (Location eq null and (LearningMethod eq 'Online' or Source eq 'FAA')))"
             );
         }
         
