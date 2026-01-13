@@ -11,9 +11,9 @@ export class IndexPage {
 
     serviceNameLink = (): Locator =>
         this.page.locator('a.govuk-service-navigation__link', { hasText: 'Find education and training' });
-
+    
     mainHeading = (): Locator =>
-        this.page.locator('h2.govuk-heading-l', { hasText: 'Find education and training opportunities' });
+        this.page.getByRole('heading', { name: 'Find education and training opportunities' });
 
     introParagraph = (): Locator =>
         this.page.locator('main p').first();
