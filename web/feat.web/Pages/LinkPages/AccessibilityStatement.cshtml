@@ -3,7 +3,7 @@
 @model feat.web.Pages.LinkPages.AccessibilityStatement
 @{
   ViewBag.PageTitle = "Accessibility statement for the Find education and training service";
-  
+
   ViewBag.StaticBackPageUrl = Model.RefererUrl;
 }
 
@@ -12,8 +12,11 @@
 
     <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
 
+    <h2 class="govuk-heading-m">Accessibility Statement</h2>
+
     <p class="govuk-body">
-      This accessibility statement applies to the Find education and training service, which is run by the Department for Education (DfE).
+      This accessibility statement applies to the Find Education and Training service, which is run by Department for
+      Education.
     </p>
 
     <p class="govuk-body">
@@ -25,15 +28,18 @@
       <li>zoom in up to 200% without the text spilling off the screen</li>
       <li>navigate most of the website using just a keyboard</li>
       <li>navigate most of the website using speech recognition software</li>
-      <li>listen to most of the website using a screen reader (including the most recent versions of JAWS, NVDA and VoiceOver)</li>
+      <li>listen to most of the website using a screen reader (including the most recent versions of JAWS, NVDA and
+        VoiceOver)
+      </li>
     </ul>
 
     <p class="govuk-body">
-      We’ve also made the website text as simple as possible to understand.
+      We've also made the website text as simple as possible to understand.
     </p>
 
     <p class="govuk-body">
-      <a class="govuk-link" href="https://abilitynet.org.uk">AbilityNet</a> has advice on making your device easier to use if you have a disability.
+      <a class="govuk-link" href="https://abilitynet.org.uk">AbilityNet</a> has advice on making your device easier to
+      use if you have a disability.
     </p>
 
     <h2 class="govuk-heading-m">
@@ -41,7 +47,39 @@
     </h2>
 
     <p class="govuk-body">
-      This website was first tested on 19 December 2023 and was made fully accessible.
+      This website was first tested on 7 January 2026. We know some parts of the service are not fully accessible,
+      specifically:
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>The "Where do you want to study" question requires JavaScript switched on to work, without JavaScript enabled,
+        you will not be able to filter by location and should therefore skip the question. If you are blocked, you may
+        have to select "Over 30 miles" to continue.
+      </li>
+      <li>Some text on pages may not resize correctly if users are using methods other than zoom to increase the text
+        size on pages, which could cause some minor layout issues.
+      </li>
+    </ul>
+
+    <h2 class="govuk-heading-m">
+      Feedback and contact information
+    </h2>
+
+    <p class="govuk-body">
+      If you find any problems not listed on this page or think we're not meeting accessibility requirements, contact:
+      <a href="mailto:customer.experience@service.education.gov.uk" class="govuk-link">customer.experience@service.education.gov.uk</a>
+    </p>
+    <p class="govuk-body">
+      We'll consider your request and get back to you in 5 working days.
+    </p>
+
+    <h2 class="govuk-heading-m">
+      Reporting accessibility problems with this website
+    </h2>
+
+    <p class="govuk-body">
+      We're always looking to improve the accessibility of this website. If you find any problems not listed on this
+      page or think we're not meeting accessibility requirements, contact: <a
+        href="mailto:customer.experience@service.education.gov.uk" class="govuk-link">customer.experience@service.education.gov.uk</a>
     </p>
 
     <h2 class="govuk-heading-m">
@@ -49,40 +87,76 @@
     </h2>
 
     <p class="govuk-body">
-      The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ‘accessibility regulations’).
-    </p>
-
-    <p class="govuk-body">
-      If you’re not happy with how we respond to your complaint, contact the
-      <a class="govuk-link" href="https://www.eass.org.uk/">Equality Advisory and Support Service (EASS)</a>.
+      The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites
+      and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the 'accessibility regulations'). If you're not
+      happy with how we respond to your complaint, 
+      <a href="https://www.equalityadvisoryservice.com/" class="govuk-link">
+        contact the Equality Advisory and Support Service (EASS)
+      </a>.
     </p>
 
     <h2 class="govuk-heading-m">
-      Technical information about this website’s accessibility
+      Technical information about this website's accessibility
     </h2>
 
     <p class="govuk-body">
-      DfE is committed to making this website accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.
+      Department for Education is committed to making its website accessible, in accordance with the Public Sector
+      Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.
     </p>
 
-    <h3 class="govuk-heading-m">
+    <h2 class="govuk-heading-m">
       Compliance status
-    </h3>
-
-    <p class="govuk-body">
-      This website is fully compliant with the Web Content Accessibility Guidelines version 2.2 AA standard.
-    </p>
-
-    <h2 class="govuk-heading-m">
-      Preparation of this statement
     </h2>
 
     <p class="govuk-body">
-      This statement was prepared on 19 December 2023.
+      The website has been tested against the Web Content Accessibility Guidelines (WCAG) 2.2 AA standard.
+    </p>
+    <p class="govuk-body">
+      This website is partially compliant with the WCAG (Web Content Accessibility Guidelines) version 2.2 AA standard,
+      due to the following non-compliances and/or exemptions.
     </p>
 
+    <h2 class="govuk-heading-m">
+      Non-accessible content
+    </h2>
+
     <p class="govuk-body">
-      This website was last tested on 15 April 2025. The test was carried out by the Business Engagement and Accessibility Team at the Department for Education, and internally by the National Careers Service.
+      The content is not accessible for the following reasons:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>The "Where do you want to study" question requires JavaScript switched on to work, without JavaScript enabled,
+        you will not be able to filter by location and should therefore skip the question. If you are blocked, you may
+        have to select "Over 30 miles" to continue.
+      </li>
+      <li>Some text on pages may not resize correctly if users are using methods other than zoom to increase the text
+        size on pages, which could cause some minor layout issues.
+      </li>
+    </ul>
+
+    <h2 class="govuk-heading-m">
+      What we're doing to improve accessibility
+    </h2>
+
+    <p class="govuk-body">
+      We are investigating how to resolve the issues caused by the "Where do you want to study" question to make it work
+      without the need for JavaScript.
+    </p>
+    <p class="govuk-body">
+      We are investigating how we can ensure all text on the site correctly scales when using methods other than zoom to
+      increase text readability.
+    </p>
+    <p class="govuk-body">
+      We will implement improvements in a future update.
+    </p>
+    <h2 class="govuk-heading-m">
+      Preparation of this accessibility statement
+    </h2>
+    <p class="govuk-body">
+      This statement was prepared on 9th January 2026. It was last reviewed on 9th January 2026.
+    </p>
+    <p class="govuk-body">
+      This website was last tested on 7th January 2026 against the WCAG 2.2 AA standard.
     </p>
 
   </div>
