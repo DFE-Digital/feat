@@ -12,6 +12,7 @@
       <Content Include="..\..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+      <Content Remove="Pages\LinkPages\AccessibilityStatement.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -29,6 +30,10 @@
     <ItemGroup>
       <PackageReference Include="GovUk.Frontend.AspNetCore" Version="3.4.3" />
       <PackageReference Include="NetEscapades.AspNetCore.SecurityHeaders.TagHelpers" Version="1.3.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Pages\LinkPages\AccessibilityStatement.cshtml.cs" />
     </ItemGroup>
 
 </Project>
