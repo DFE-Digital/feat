@@ -6,27 +6,39 @@ import { InterestsPage } from '../pages/interestsPage';
 // Helper flows to reach Interests in the two states
 async function goToInterestsOptional(page: Page) {
     const index = new IndexPage(page);
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await index.startNow().click();
 
     const loc = new LocationPage(page);
-    await loc.locationInput().fill('Leeds');
-    await loc.distanceRadio('Up to 10 miles').check(); // ≤ 30 miles => optional
-    await loc.continueButton().click();
+    await expect(page).toHaveURL(/\/location/i);
 
+    await loc.enterLocationAndSelectFirst('Leeds');
+    
+    const tenMiles = loc.distanceRadio('Up to 10 miles');
+    await tenMiles.check({ force: true });
+    await expect(tenMiles).toBeChecked();
+
+    await loc.continueButton().click();
     await expect(page).toHaveURL(/\/interests$/i);
 }
 
 async function goToInterestsMandatory(page: Page) {
     const index = new IndexPage(page);
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await index.startNow().click();
 
     const loc = new LocationPage(page);
-    // No location or > 30 miles => mandatory
-    await loc.distanceRadio('Over 30 miles').check();
-    await loc.continueButton().click();
+    await expect(page).toHaveURL(/\/location/i);
 
+
+    // No location or > 30 miles => mandatory
+    await loc.enterLocationAndSelectFirst('Leeds');
+
+    const over30 = loc.distanceRadio('Over 30 miles');
+    await over30.check({ force: true });
+    await expect(over30).toBeChecked();
+    
+    await loc.continueButton().click();
     await expect(page).toHaveURL(/\/interests$/i);
 }
 
@@ -44,23 +56,24 @@ test.describe('FEAT – 3.0 Interests', () => {
         await expect(interests.infoLine()).toBeVisible();
     });
 
-    test('AC3/AC4: three inputs accept free text up to 100 chars', async ({ page }) => {
+    test('AC3/AC4: three inputs accept free text and do not truncate long values', async ({ page }) => {
         await goToInterestsOptional(page);
 
         const interests = new InterestsPage(page);
         const long = 'x'.repeat(120);
+        await expect(interests.heading()).toBeVisible();
 
         await interests.interestInput(1).fill('maths');
-        await interests.interestInput(2).fill('computer science');
+        await interests.interestInput(2).fill('ತಂತ್ರಜ್ಞಾನ and informática');
         await interests.interestInput(3).fill(long);
 
         const v1 = await interests.interestInput(1).inputValue();
         const v2 = await interests.interestInput(2).inputValue();
         const v3 = await interests.interestInput(3).inputValue();
 
-        expect(v1.length).toBeLessThanOrEqual(100);
-        expect(v2.length).toBeLessThanOrEqual(100);
-        expect(v3.length).toBeLessThanOrEqual(100);
+        expect(v1).toBe('maths');
+        expect(v2).toBe('ತಂತ್ರಜ್ಞಾನ and informática');
+        expect(v3).toBe(long);
     });
 
     test('AC6/AC8 (optional): can continue with all fields blank', async ({ page }) => {
@@ -83,9 +96,16 @@ test.describe('FEAT – 3.0 Interests', () => {
         await interests.continueButton().click();
 
         await expect(interests.errorSummary()).toBeVisible();
-        await expect(interests.errorSummary()).toContainText(/Please enter an interest/i);
+        await expect(interests.errorSummary()).toContainText(/Enter an interest/i);
         await expect(interests.interest1InlineError()).toBeVisible();
         await expect(page).toHaveURL(/\/interests$/i);
+
+        const errorLink = interests.errorSummary().getByRole('link', { name: 'Enter an interest' });
+        await expect(errorLink).toBeVisible();
+
+        // Click error summary link and Assert focus moved to Interest 1
+        await errorLink.click();
+        await expect(interests.interestInput(1)).toBeFocused();
 
         // Enter a value then proceed
         await interests.interestInput(1).fill('maths');

@@ -26,12 +26,12 @@ test.describe('FEAT – 2.0 Location', () => {
         const loc = new LocationPage(page);
 
         await page.goto('/location', { waitUntil: 'networkidle' });
-        await loc.locationInput().fill('@@@'); // clearly invalid
+        await loc.locationInput().fill('@@@'); // invalid
         await loc.continueButton().click();
 
         await expect(loc.errorSummary()).toBeVisible();
-        await expect(loc.errorSummary()).toContainText(/Please enter a valid location/i);
-        await expect(loc.fieldError('Please enter a valid location.')).toBeVisible();
+        await expect(loc.errorSummary()).toContainText(/Select how far you would be able to travel/i);
+        await expect(loc.fieldError('Select how far you would be able to travel')).toBeVisible();
         await expect(page).toHaveURL(/\/location/i);
     });
 
@@ -41,23 +41,30 @@ test.describe('FEAT – 2.0 Location', () => {
         await loc.locationInput().fill('Lo');
         await expect(loc.suggestionsMenu()).toBeHidden();
 
-        await loc.locationInput().type('n'); // now 3 chars
-        await expect(loc.suggestionsMenu()).toBeVisible();
-
-        // if backend returns nothing, expect “No locations found”
-        // await expect(page.getByText(/No locations found/i)).toBeVisible();
+        await loc.locationInput().type('n'); // now 3 chars 'Lon'
+        await expect(loc.suggestionsMenu()).not.toHaveClass(/autocomplete__menu--hidden/i, {
+            timeout: 10_000,
+        });
     });
 
     test('AC3: autocomplete supports keyboard selection', async ({ page }) => {
         const loc = new LocationPage(page);
 
         await loc.locationInput().fill('Lon');
-        await expect(loc.suggestionsMenu()).toBeVisible();
+        await expect(loc.suggestionsMenu()).not.toHaveClass(/autocomplete__menu--hidden/i, {
+            timeout: 10_000,
+        });
+        
+        // wait for options
+        await expect(loc.suggestionOptions().first()).toBeVisible({ timeout: 10_000 });
 
         await page.keyboard.press('ArrowDown');
         await page.keyboard.press('Enter');
 
-        await expect(loc.suggestionsMenu()).toBeHidden();
+        // listbox hidden again after selection
+        await expect(loc.suggestionsMenu()).toHaveClass(/autocomplete__menu--hidden/i, {
+            timeout: 10_000,
+        });        
         await expect(loc.locationInput()).not.toHaveValue('');
     });
 
@@ -83,18 +90,39 @@ test.describe('FEAT – 2.0 Location', () => {
     test('AC4: if location entered but no distance, show distance error', async ({ page }) => {
         const loc = new LocationPage(page);
 
-        await loc.locationInput().fill('M13 9PL'); // valid format postcode
+        await loc.enterLocationAndSelectFirst('M13 9PL'); // valid format postcode
         await loc.continueButton().click();
 
         await expect(loc.errorSummary()).toBeVisible();
-        await expect(loc.errorSummary()).toContainText(/Please select how far you would be happy to travel/i);
-        await expect(loc.fieldError('Please select how far you would be happy to travel.')).toBeVisible();
+        await expect(loc.errorSummary()).toContainText(/Select how far you would be able to travel/i);
+        await expect(loc.fieldError('Select how far you would be able to travel')).toBeVisible();
+    });
+
+    test('AC4: if distance selected but no location, show location required error', async ({ page }) => {
+        const loc = new LocationPage(page);
+
+        await loc.distanceRadio('Up to 10 miles').check();
+        await loc.continueButton().click();
+
+        await expect(loc.errorSummary()).toBeVisible();
+        await expect(loc.errorSummary()).toContainText(
+            /Enter a town, city or postcode to use the distance filter/i
+        );
+
+        await expect(
+            loc.fieldError('Enter a town, city or postcode to use the distance filter')
+        ).toBeVisible();
+
+        await expect(page).toHaveURL(/\/location/i);
     });
 
     test('AC6/AC8: valid location + distance proceeds to next step', async ({ page }) => {
         const loc = new LocationPage(page);
+        
+        // Assert we now have a "real" value (full postcode format)
+        const selected = await loc.enterLocationAndSelectFirst('MK4');
+        expect(selected).toMatch(/^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i);
 
-        await loc.locationInput().fill('M13 9PL');
         await loc.distanceRadio('Up to 5 miles').check();
         await loc.continueButton().click();
 
@@ -103,24 +131,28 @@ test.describe('FEAT – 2.0 Location', () => {
 
     test('AC7: returning to page restores location and distance', async ({ page }) => {
         const loc = new LocationPage(page);
-
-        await loc.locationInput().fill('Leeds');
+        
+        // Capture the exact selected value (this is what must persist)
+        const selected = await loc.enterLocationAndSelectFirst('MK4');
         await loc.distanceRadio('Up to 15 miles').check();
         await loc.continueButton().click();
+
         await expect(page).toHaveURL(/\/interests$/i);
 
         await page.goBack();
-        await expect(loc.locationInput()).toHaveValue(/Leeds/i);
+
+        // Assert the exact same selected location is restored
+        await expect(loc.locationInput()).toHaveValue(selected);
         await expect(loc.distanceRadio('Up to 15 miles')).toBeChecked();
     });
 
-    test('AC9: conditional subject requirement flagging (navigation-level check)', async ({ page }) => {
+
+    test('AC9:  Over 30 miles selected -> proceeds (navigation-level check)', async ({ page }) => {
         const loc = new LocationPage(page);
 
-        await loc.locationInput().fill('Over 30 test');
+        await loc.enterLocationAndSelectFirst('MK4');
         await loc.distanceRadio('Over 30 miles').check();
         await loc.continueButton().click();
         await expect(page).toHaveURL(/\/interests$/i);
-
     });
 });

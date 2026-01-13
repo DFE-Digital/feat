@@ -1,41 +1,37 @@
-// src/api/schemas/searchResponseSchema.ts
-
-/**
- * JSON Schema for validating /api/Search responses.
- * Used by ResponseValidator to ensure the structure is consistent.
- */
 export const searchResponseSchema = {
     type: 'object',
-    required: ['page', 'pageSize', 'courses', 'facets'],
-
+    required: ['page', 'pageSize', 'totalCount', 'courses', 'facets'],
     properties: {
         page: { type: 'integer', minimum: 1 },
         pageSize: { type: 'integer', minimum: 1 },
-        totalCount: { type: ['integer', 'null'] },
+        totalCount: { type: 'integer', minimum: 0 },
 
         courses: {
             type: 'array',
             items: {
                 type: 'object',
-                required: ['providerName', 'id'],
+                required: ['id', 'instanceId', 'title', 'provider', 'location', 'score'],
                 properties: {
+                    id: { type: 'string' },                 // uuid (string)
+                    instanceId: { type: 'string' },         // uuid (string)
+                    title: { type: ['string', 'null'] },
+                    provider: { type: ['string', 'null'] },
+                    courseType: { type: ['string', 'null'] },
+                    requirements: { type: ['string', 'null'] },
+                    overview: { type: ['string', 'null'] },
+                    locationName: { type: ['string', 'null'] },
+                    distance: { type: ['number', 'null'] },
                     score: { type: ['number', 'null'] },
-                    courseName: { type: ['string', 'null'] },
-                    whoThisCourseIsFor: { type: ['string', 'null'] },
-                    providerName: { type: 'string' },
-                    startDate: { type: ['string', 'null'] },
-                    entryRequirements: { type: ['string', 'null'] },
-                    deliveryMode: { type: ['string', 'null'] },
-                    duration: { type: ['string', 'null'] },
-                    cost: { type: ['string', 'null'] },
-                    source: { type: ['string', 'null'] },
-                    postcodeEmpty: { type: ['boolean', 'null'] },
-                    learningAIMTitle: { type: ['string', 'null'] },
-                    ssaT1: { type: ['string', 'null'] },
-                    ssaT2: { type: ['string', 'null'] },
-                    skillsForLifeDescription: { type: ['string', 'null'] },
-                    id: { type: 'string' },
+                    location: {
+                        type: 'object',
+                        required: ['latitude', 'longitude'],
+                        properties: {
+                            latitude: { type: 'number' },
+                            longitude: { type: 'number' },
+                        },
+                    },
                 },
+                additionalProperties: true,
             },
         },
 

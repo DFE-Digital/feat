@@ -11,12 +11,17 @@ export class ApiHelper {
     //Executes a POST request to the given endpoint 
     async post(endpoint: string, body: any, options: RequestOptions = {}): Promise<APIResponse> {
         return await this.request.post(endpoint, {
-            data: body,
-            headers: options.headers,
+            data: JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json',   
+                'Accept': 'application/json',
+                ...(options.headers ?? {}),
+            },
             timeout: options.timeout,
         });
     }
-    
+
+
     //Executes a GET request to the given endpoint
     async get(endpoint: string, options: RequestOptions = {}): Promise<APIResponse> {
         return await this.request.get(endpoint, {
