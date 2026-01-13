@@ -152,14 +152,13 @@ builder.Services.AddOpenTelemetry()
     );
 
 var app = builder.Build();
+var policyCollection = new HeaderPolicyCollection()
+    .AddDefaultApiSecurityHeaders();
+app.UseSecurityHeaders(policyCollection);
 
-if(app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
-
-app.UseHttpsRedirection();
+app.MapOpenApi();
+app.MapScalarApiReference();
 app.MapControllers();
+app.UseHttpsRedirection();
 
 app.Run();

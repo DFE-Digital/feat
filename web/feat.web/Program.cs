@@ -4,8 +4,13 @@ using feat.web.Configuration;
 using feat.web.Services;
 using GovUk.Frontend.AspNetCore;
 using Microsoft.Extensions.Options;
+using NetEscapades.AspNetCore.SecurityHeaders;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.AddServerHeader = false;
+});
 
 // Add layered configuration
 builder.Configuration
@@ -36,6 +41,7 @@ builder.Services.AddGovUkFrontend(options =>
 {
     options.Rebrand = true;
     options.FrontendPackageHostingOptions = FrontendPackageHostingOptions.None;
+    options.GetCspNonceForRequest = context => context.GetNonce();
 });
 
 builder.Services.AddRazorPages().AddJsonOptions(options =>
@@ -45,8 +51,6 @@ builder.Services.AddRazorPages().AddJsonOptions(options =>
         options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
-
-builder.Services.AddDirectoryBrowser();
 
 builder.Services.AddScoped<IApiClient, ApiClient>();
 builder.Services.AddScoped<ISearchService, SearchService>();
@@ -69,19 +73,48 @@ builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
 builder.Services.AddScoped<StaticNavigationHandler>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
+var policyCollection = new HeaderPolicyCollection()
+    .AddDefaultSecurityHeaders()
+    .AddContentSecurityPolicyReportOnly(csp =>
+    {
+        csp.AddBlockAllMixedContent();
+        csp.AddUpgradeInsecureRequests();
+        csp.AddDefaultSrc()
+            .Self();
+        csp.AddScriptSrc()
+            .Self()
+            .WithNonce()
+            .From("*.googletagmanager.com")
+            .From("*.google-analytics.com")
+            .From("c.bing.com")
+            .From("*.clarity.ms");
+        csp.AddStyleSrc()
+            .Self()
+            .WithNonce()
+            .From("rsms.me");
+        csp.AddFontSrc()
+            .Self()
+            .From("res-1.cdn.office.net")
+            .From("rsms.me");
+        csp.AddConnectSrc()
+            .Self()
+            .From("*.googletagmanager.com")
+            .From("*.google-analytics.com")
+            .From("*.analytics.google.com")
+            .From("c.bing.com")
+            .From("*.clarity.ms");
+    });
+    
+app.UseSecurityHeaders(policyCollection);
 
 app.UseExceptionHandler("/Errors/500");
 app.UseStatusCodePagesWithReExecute("/Errors/{0}");
