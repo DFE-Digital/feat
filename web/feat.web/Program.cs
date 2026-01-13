@@ -84,10 +84,12 @@ var app = builder.Build();
 
 var policyCollection = new HeaderPolicyCollection()
     .AddDefaultSecurityHeaders()
-    .AddContentSecurityPolicyReportOnly(csp =>
+    .AddContentSecurityPolicy(csp =>
     {
         csp.AddBlockAllMixedContent();
         csp.AddUpgradeInsecureRequests();
+        csp.AddBaseUri()
+            .Self();
         csp.AddDefaultSrc()
             .Self();
         csp.AddScriptSrc()
