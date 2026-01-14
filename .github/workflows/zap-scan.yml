@@ -32,7 +32,7 @@ jobs:
           artifact_name: 'web_zap_scan'
       
       - name: Add web report
-        # if: ${{ github.event.inputs.environment == 'Beta' }}
+        if: ${{ github.event.inputs.environment == 'Beta' }}
         run: |
           git pull
           cp ./report_md.md docs/scans/Web-Security-Scan-Report.md
@@ -59,7 +59,7 @@ jobs:
           artifact_name: 'api_zap_scan'
 
       - name: Add API report
-        # if: ${{ github.event.inputs.environment == 'Beta' }}
+        if: ${{ github.event.inputs.environment == 'Beta' }}
         run: |
           git pull
           cp ./report_md.md docs/scans/API-Security-Scan-Report.md
