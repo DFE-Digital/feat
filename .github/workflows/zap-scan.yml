@@ -25,16 +25,17 @@ jobs:
         uses: actions/checkout@v4
       
       - name: 'Running ZAP scan against front end https://${{ vars.ENV_PREFIX }}-app-web.azurewebsites.net'
-        uses: zaproxy/action-full-scan@v0.13.0
+        uses: zaproxy/action-baseline@v0.15.0
         with:
-          target: 'https://${{ vars.ENV_PREFIX }}-app-web.azurewebsites.net/openapi/v1.json'
+          target: 'https://${{ vars.ENV_PREFIX }}-app-web.azurewebsites.net'
           allow_issue_writing: 'false'
           artifact_name: 'web_zap_scan'
       
       - name: Add web report
         if: ${{ github.event.inputs.environment == 'Beta' }}
         run: |
-          mv report_md.md docs/scans/Web-Security-Scan-Report.md
+          git pull
+          cp ./report_md.md docs/scans/Web-Security-Scan-Report.md
           git add docs/scans/Web-Security-Scan-Report.md
           git config --global user.name "Documentation Bot"
           git config --global user.email "documentation-bot-bot@users.noreply.github.com"
@@ -53,14 +54,15 @@ jobs:
       - name: 'Running ZAP API scan against API https://${{ vars.ENV_PREFIX }}-app-api.azurewebsites.net'
         uses: zaproxy/action-api-scan@v0.10.0
         with:
-          target: 'https://${{ vars.ENV_PREFIX }}-app-api.azurewebsites.net'
+          target: 'https://${{ vars.ENV_PREFIX }}-app-api.azurewebsites.net/openapi/v1.json'
           allow_issue_writing: 'false'
           artifact_name: 'api_zap_scan'
 
       - name: Add API report
         if: ${{ github.event.inputs.environment == 'Beta' }}
         run: |
-          mv report_md.md docs/scans/API-Security-Scan-Report.md
+          git pull
+          cp ./report_md.md docs/scans/API-Security-Scan-Report.md
           git add docs/scans/API-Security-Scan-Report.md
           git config --global user.name "Documentation Bot"
           git config --global user.email "documentation-bot-bot@users.noreply.github.com"
