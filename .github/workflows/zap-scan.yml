@@ -35,8 +35,8 @@ jobs:
         if: ${{ github.event.inputs.environment == 'Beta' }}
         run: |
           git pull
-          sed -i 's/# ZAP Scanning Report/# Web ZAP Scanning Report/' ./report_md.md
           cp ./report_md.md docs/scans/Web-Security-Scan-Report.md
+          sed -i 's/# ZAP Scanning Report/# Web ZAP Scanning Report/' docs/scans/Web-Security-Scan-Report.md
           git add docs/scans/Web-Security-Scan-Report.md
           git config --global user.name "Documentation Bot"
           git config --global user.email "documentation-bot-bot@users.noreply.github.com"
@@ -63,8 +63,8 @@ jobs:
         if: ${{ github.event.inputs.environment == 'Beta' }}
         run: |
           git pull
-          sed -i 's/# ZAP Scanning Report/# API ZAP Scanning Report/' ./report_md.md
           cp ./report_md.md docs/scans/API-Security-Scan-Report.md
+          sed -i 's/# ZAP Scanning Report/# API ZAP Scanning Report/' docs/scans/API-Security-Scan-Report.md
           git add docs/scans/API-Security-Scan-Report.md
           git config --global user.name "Documentation Bot"
           git config --global user.email "documentation-bot-bot@users.noreply.github.com"
