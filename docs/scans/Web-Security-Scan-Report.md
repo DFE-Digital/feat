@@ -32,7 +32,7 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 | Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of endpoints with method GET | 90 % |
 | Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of endpoints with method POST | 9 % |
 | Info | Informational | https://s265d01-app-web.azurewebsites.net | Count of total endpoints | 21    |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of slow responses | 91 % |
+| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of slow responses | 100 % |
 
 
 
@@ -52,9 +52,9 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 | Cookie Poisoning | Informational | 2 |
 | Information Disclosure - Suspicious Comments | Informational | 2 |
 | Modern Web Application | Informational | Systemic |
-| Non-Storable Content | Informational | 2 |
+| Non-Storable Content | Informational | 1 |
 | Re-examine Cache-control Directives | Informational | Systemic |
-| Session Management Response Identified | Informational | 4 |
+| Session Management Response Identified | Informational | 3 |
 | Storable and Cacheable Content | Informational | Systemic |
 | User Controllable HTML Element Attribute (Potential XSS) | Informational | 1 |
 
@@ -80,35 +80,28 @@ The Content Security Policy fails to define one of the directives that has no fa
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-cUIvUSpym2t9zm0UJrODfdwdHxctCBuX/lnQJAZ3RVw='; style-src 'self' rsms.me 'nonce-cUIvUSpym2t9zm0UJrODfdwdHxctCBuX/lnQJAZ3RVw='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
+  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-ZwrJ8RM6+71/EpYlhdM1VcK8qabHo2jWeQ+S8vF6q+Y='; style-src 'self' rsms.me 'nonce-ZwrJ8RM6+71/EpYlhdM1VcK8qabHo2jWeQ+S8vF6q+Y='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
   * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
 * URL: https://s265d01-app-web.azurewebsites.net
   * Node Name: `https://s265d01-app-web.azurewebsites.net`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-oRPzt0LvmH1n1fuKyDVRspPiQNdRr42sa+6zZyR3w6Y='; style-src 'self' rsms.me 'nonce-oRPzt0LvmH1n1fuKyDVRspPiQNdRr42sa+6zZyR3w6Y='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
+  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-h07p2/2pRR2KQnaa0hcvstvMKmy0MtCvasEOYsdY7rQ='; style-src 'self' rsms.me 'nonce-h07p2/2pRR2KQnaa0hcvstvMKmy0MtCvasEOYsdY7rQ='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
   * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
 * URL: https://s265d01-app-web.azurewebsites.net/location
   * Node Name: `https://s265d01-app-web.azurewebsites.net/location`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-kAVkqHBuVzbc13BRsnGHLt/mEOtT/Fl4p71lfgRSj6U='; style-src 'self' rsms.me 'nonce-kAVkqHBuVzbc13BRsnGHLt/mEOtT/Fl4p71lfgRSj6U='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
-  * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
-* URL: https://s265d01-app-web.azurewebsites.net/robots.txt
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/robots.txt`
-  * Method: `GET`
-  * Parameter: `Content-Security-Policy`
-  * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-elK6LkBfaRdoHh8gJYNJhLive8zrF4kolq0tSYDDA8k='; style-src 'self' rsms.me 'nonce-elK6LkBfaRdoHh8gJYNJhLive8zrF4kolq0tSYDDA8k='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
+  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-+SJpyMMDs/9+9QKBXFMYtqJ8OqmlgJ/34va3r4r7a64='; style-src 'self' rsms.me 'nonce-+SJpyMMDs/9+9QKBXFMYtqJ8OqmlgJ/34va3r4r7a64='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
   * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
 * URL: https://s265d01-app-web.azurewebsites.net/sitemap.xml
   * Node Name: `https://s265d01-app-web.azurewebsites.net/sitemap.xml`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-bnRJyN4hJuUMTGBtO0j3z6GbMfEmHeNwtNoQ+UGcXBY='; style-src 'self' rsms.me 'nonce-bnRJyN4hJuUMTGBtO0j3z6GbMfEmHeNwtNoQ+UGcXBY='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
+  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-cnM9om+fOxqW5DHpJS8Cii0DbVouGNI+dBEc0CbVGTY='; style-src 'self' rsms.me 'nonce-cnM9om+fOxqW5DHpJS8Cii0DbVouGNI+dBEc0CbVGTY='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
   * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
 
 Instances: Systemic
@@ -301,13 +294,6 @@ Cross-Origin-Resource-Policy header is an opt-in header designed to counter side
   * Attack: ``
   * Evidence: `same-site`
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.ico
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.ico`
-  * Method: `GET`
-  * Parameter: `Cross-Origin-Resource-Policy`
-  * Attack: ``
-  * Evidence: `same-site`
-  * Other Info: ``
 * URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg
   * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg`
   * Method: `GET`
@@ -324,6 +310,13 @@ Cross-Origin-Resource-Policy header is an opt-in header designed to counter side
   * Other Info: ``
 * URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg
   * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg`
+  * Method: `GET`
+  * Parameter: `Cross-Origin-Resource-Policy`
+  * Attack: ``
+  * Evidence: `same-site`
+  * Other Info: ``
+* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/manifest.json
+  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/manifest.json`
   * Method: `GET`
   * Parameter: `Cross-Origin-Resource-Policy`
   * Attack: ``
@@ -479,15 +472,15 @@ HTTP Strict Transport Security (HSTS) is a web security policy mechanism whereby
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.ico
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.ico`
+* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png
+  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg`
+* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/manifest.json
+  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/manifest.json`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -555,7 +548,7 @@ This was identified at:
 https://s265d01-app-web.azurewebsites.net/linkpages/cookies
 
 User-input was found in the following cookie:
-AnalyticsCookie=yes; expires=Thu, 14 Jan 2027 10:17:38 GMT; path=/
+AnalyticsCookie=yes; expires=Thu, 14 Jan 2027 10:22:01 GMT; path=/
 
 The user input was:
 AnalyticsCookie=yes`
@@ -572,7 +565,7 @@ This was identified at:
 https://s265d01-app-web.azurewebsites.net/linkpages/cookies
 
 User-input was found in the following cookie:
-AnalyticsCookie=yes; expires=Thu, 14 Jan 2027 10:17:38 GMT; path=/
+AnalyticsCookie=yes; expires=Thu, 14 Jan 2027 10:22:01 GMT; path=/
 
 The user input was:
 MarketingCookie=yes`
@@ -711,13 +704,6 @@ This is an informational alert and so no changes are required.
 
 The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.
 
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `no-store`
-  * Other Info: ``
 * URL: https://s265d01-app-web.azurewebsites.net/location
   * Node Name: `https://s265d01-app-web.azurewebsites.net/location`
   * Method: `GET`
@@ -727,7 +713,7 @@ The response contents are not storable by caching components such as proxy serve
   * Other Info: ``
 
 
-Instances: 2
+Instances: 1
 
 ### Solution
 
@@ -790,12 +776,12 @@ The cache-control header has not been set properly or is missing, allowing the b
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies`
+* URL: https://s265d01-app-web.azurewebsites.net/linkpages/privacy
+  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/privacy`
   * Method: `GET`
   * Parameter: `cache-control`
   * Attack: ``
-  * Evidence: `no-cache, no-store`
+  * Evidence: ``
   * Other Info: ``
 * URL: https://s265d01-app-web.azurewebsites.net/location
   * Node Name: `https://s265d01-app-web.azurewebsites.net/location`
@@ -858,16 +844,9 @@ The given response has been identified as containing a session management token.
   * Attack: ``
   * Evidence: `.AspNetCore.Antiforgery.VyLW6ORzMgk`
   * Other Info: `cookie:.AspNetCore.Antiforgery.VyLW6ORzMgk`
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies`
-  * Method: `GET`
-  * Parameter: `.AspNetCore.Antiforgery.VyLW6ORzMgk`
-  * Attack: ``
-  * Evidence: `.AspNetCore.Antiforgery.VyLW6ORzMgk`
-  * Other Info: `cookie:.AspNetCore.Antiforgery.VyLW6ORzMgk`
 
 
-Instances: 4
+Instances: 3
 
 ### Solution
 
@@ -899,15 +878,15 @@ The response contents are storable by caching components such as proxy servers, 
   * Attack: ``
   * Evidence: ``
   * Other Info: `The response is stale, and stale responses are not configured to be re-validated or blocked, using the 'must-revalidate', 'proxy-revalidate', 's-maxage', or 'max-age' response 'Cache-Control' directives.`
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.ico
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.ico`
+* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png
+  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg`
+* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg
+  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
