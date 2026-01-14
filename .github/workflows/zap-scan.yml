@@ -34,7 +34,7 @@ jobs:
       - name: Add web report
         # if: ${{ github.event.inputs.environment == 'Beta' }}
         run: |
-          find . -iname *.md
+          git pull
           cp ./report_md.md docs/scans/Web-Security-Scan-Report.md
           git add docs/scans/Web-Security-Scan-Report.md
           git config --global user.name "Documentation Bot"
@@ -61,7 +61,7 @@ jobs:
       - name: Add API report
         # if: ${{ github.event.inputs.environment == 'Beta' }}
         run: |
-          find . -iname *.md
+          git pull
           cp ./report_md.md docs/scans/API-Security-Scan-Report.md
           git add docs/scans/API-Security-Scan-Report.md
           git config --global user.name "Documentation Bot"
