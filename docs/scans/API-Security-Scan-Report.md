@@ -1,4 +1,4 @@
-# ZAP Scanning Report
+# API ZAP Scanning Report
 
 ZAP by [Checkmarx](https://checkmarx.com/).
 
@@ -19,11 +19,13 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 
 | Level | Reason | Site | Description | Statistic |
 | --- | --- | --- | --- | --- |
+| Low | Warning |  | ZAP errors logged - see the zap.log file for details | 1    |
+| Info | Informational |  | Percentage of network failures | 1 % |
 | Info | Informational | http://s265t01-app-api.azurewebsites.net | Percentage of responses with status code 3xx | 100 % |
 | Info | Informational | http://s265t01-app-api.azurewebsites.net | Percentage of endpoints with method GET | 50 % |
 | Info | Informational | http://s265t01-app-api.azurewebsites.net | Percentage of endpoints with method POST | 50 % |
 | Info | Informational | http://s265t01-app-api.azurewebsites.net | Count of total endpoints | 4    |
-| Info | Informational | http://s265t01-app-api.azurewebsites.net | Percentage of slow responses | 100 % |
+| Info | Informational | http://s265t01-app-api.azurewebsites.net | Percentage of slow responses | 50 % |
 | Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of responses with status code 2xx | 49 % |
 | Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of responses with status code 4xx | 50 % |
 | Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of endpoints with content type application/json | 8 % |
@@ -31,7 +33,7 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 | Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of endpoints with content type text/html | 16 % |
 | Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of endpoints with method GET | 100 % |
 | Info | Informational | https://s265t01-app-api.azurewebsites.net | Count of total endpoints | 24    |
-| Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of slow responses | 100 % |
+| Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of slow responses | 66 % |
 
 
 
@@ -253,8 +255,8 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265t01-app-api.azurewebsites.net/4669418807347007407
-  * Node Name: `https://s265t01-app-api.azurewebsites.net/4669418807347007407`
+* URL: https://s265t01-app-api.azurewebsites.net/2478936037683434164
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/2478936037683434164`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -281,8 +283,8 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265t01-app-api.azurewebsites.net/api/5516371126594488745
-  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/5516371126594488745`
+* URL: https://s265t01-app-api.azurewebsites.net/api/1271755193394148780
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/1271755193394148780`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -323,8 +325,8 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265t01-app-api.azurewebsites.net/api/Courses/7306727401957456719
-  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Courses/7306727401957456719`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Courses/3782082232337663659
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Courses/3782082232337663659`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -400,8 +402,8 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265t01-app-api.azurewebsites.net/openapi/1469585787215948991
-  * Node Name: `https://s265t01-app-api.azurewebsites.net/openapi/1469585787215948991`
+* URL: https://s265t01-app-api.azurewebsites.net/openapi/8733245847468699568
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/openapi/8733245847468699568`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
