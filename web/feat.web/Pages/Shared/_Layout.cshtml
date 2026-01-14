@@ -215,11 +215,6 @@
 @section BodyEnd {
     <script src="~/js/govuk-frontend.min.js" type="module"></script>
     <script src="~/js/dfefrontend-2.0.0.min.js" type="module"></script>
-    <script src="~/js/moj-frontend.min.js" type="module"></script>
-    <script type="module" asp-add-nonce>
-        import * as MOJFrontend from '/js/moj-frontend.min.js'
-        MOJFrontend.initAll()
-    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
     
