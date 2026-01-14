@@ -10,7 +10,7 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 | High | 0 |
 | Medium | 1 |
 | Low | 7 |
-| Informational | 8 |
+| Informational | 7 |
 
 
 
@@ -19,20 +19,20 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 
 | Level | Reason | Site | Description | Statistic |
 | --- | --- | --- | --- | --- |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of responses with status code 2xx | 86 % |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of responses with status code 3xx | 4 % |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of responses with status code 4xx | 8 % |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of endpoints with content type application/json | 4 % |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of endpoints with content type image/png | 9 % |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of endpoints with content type image/svg+xml | 9 % |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of endpoints with content type image/x-icon | 4 % |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of endpoints with content type text/css | 14 % |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of endpoints with content type text/html | 33 % |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of endpoints with content type text/javascript | 19 % |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of endpoints with method GET | 90 % |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of endpoints with method POST | 9 % |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Count of total endpoints | 21    |
-| Info | Informational | https://s265d01-app-web.azurewebsites.net | Percentage of slow responses | 100 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of responses with status code 2xx | 82 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of responses with status code 3xx | 4 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of responses with status code 4xx | 13 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type application/json | 4 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type image/png | 9 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type image/svg+xml | 9 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type image/x-icon | 4 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type text/css | 14 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type text/html | 28 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type text/javascript | 19 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with method GET | 90 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with method POST | 9 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Count of total endpoints | 21    |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of slow responses | 100 % |
 
 
 
@@ -52,11 +52,10 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 | Cookie Poisoning | Informational | 2 |
 | Information Disclosure - Suspicious Comments | Informational | 2 |
 | Modern Web Application | Informational | Systemic |
-| Non-Storable Content | Informational | 1 |
+| Non-Storable Content | Informational | 2 |
 | Re-examine Cache-control Directives | Informational | Systemic |
-| Session Management Response Identified | Informational | 3 |
+| Session Management Response Identified | Informational | 4 |
 | Storable and Cacheable Content | Informational | Systemic |
-| User Controllable HTML Element Attribute (Potential XSS) | Informational | 1 |
 
 
 
@@ -75,33 +74,40 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 
 The Content Security Policy fails to define one of the directives that has no fallback. Missing/excluding them is the same as allowing anything.
 
-* URL: https://s265d01-app-web.azurewebsites.net
-  * Node Name: `https://s265d01-app-web.azurewebsites.net`
+* URL: https://s265t01-app-web.azurewebsites.net
+  * Node Name: `https://s265t01-app-web.azurewebsites.net`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-ZwrJ8RM6+71/EpYlhdM1VcK8qabHo2jWeQ+S8vF6q+Y='; style-src 'self' rsms.me 'nonce-ZwrJ8RM6+71/EpYlhdM1VcK8qabHo2jWeQ+S8vF6q+Y='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
+  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-VkWJuD8s7YkT0HhEs7iGNffp93uywMgEQHvHbQQbwug='; style-src 'self' rsms.me 'nonce-VkWJuD8s7YkT0HhEs7iGNffp93uywMgEQHvHbQQbwug='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
   * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
-* URL: https://s265d01-app-web.azurewebsites.net
-  * Node Name: `https://s265d01-app-web.azurewebsites.net`
+* URL: https://s265t01-app-web.azurewebsites.net
+  * Node Name: `https://s265t01-app-web.azurewebsites.net`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-h07p2/2pRR2KQnaa0hcvstvMKmy0MtCvasEOYsdY7rQ='; style-src 'self' rsms.me 'nonce-h07p2/2pRR2KQnaa0hcvstvMKmy0MtCvasEOYsdY7rQ='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
+  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-kEE7qyk/pgL5u8GWanw6wT1JSnpvm77M4W8DwOVv+gQ='; style-src 'self' rsms.me 'nonce-kEE7qyk/pgL5u8GWanw6wT1JSnpvm77M4W8DwOVv+gQ='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
   * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
-* URL: https://s265d01-app-web.azurewebsites.net/location
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/location`
+* URL: https://s265t01-app-web.azurewebsites.net/
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-+SJpyMMDs/9+9QKBXFMYtqJ8OqmlgJ/34va3r4r7a64='; style-src 'self' rsms.me 'nonce-+SJpyMMDs/9+9QKBXFMYtqJ8OqmlgJ/34va3r4r7a64='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
+  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-+YfZXAEH3nKFeYtAHx7czO/+rVPBVny1hLZr+byLIQI='; style-src 'self' rsms.me 'nonce-+YfZXAEH3nKFeYtAHx7czO/+rVPBVny1hLZr+byLIQI='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
   * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
-* URL: https://s265d01-app-web.azurewebsites.net/sitemap.xml
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/sitemap.xml`
+* URL: https://s265t01-app-web.azurewebsites.net/robots.txt
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/robots.txt`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-cnM9om+fOxqW5DHpJS8Cii0DbVouGNI+dBEc0CbVGTY='; style-src 'self' rsms.me 'nonce-cnM9om+fOxqW5DHpJS8Cii0DbVouGNI+dBEc0CbVGTY='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
+  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-A9J6Z5hNbjec9Z5jKENQ1tSLZZqPjqsiESGZ5KhS3TY='; style-src 'self' rsms.me 'nonce-A9J6Z5hNbjec9Z5jKENQ1tSLZZqPjqsiESGZ5KhS3TY='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
+  * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
+* URL: https://s265t01-app-web.azurewebsites.net/sitemap.xml
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/sitemap.xml`
+  * Method: `GET`
+  * Parameter: `Content-Security-Policy`
+  * Attack: ``
+  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-SUnAvcRd58ClGG9eYmlcRkeZvvzaEo0WaAoSwcGUmcM='; style-src 'self' rsms.me 'nonce-SUnAvcRd58ClGG9eYmlcRkeZvvzaEo0WaAoSwcGUmcM='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
   * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
 
 Instances: Systemic
@@ -138,15 +144,15 @@ Ensure that your web server, application server, load balancer, etc. is properly
 
 A cookie has been set without the HttpOnly flag, which means that the cookie can be accessed by JavaScript. If a malicious script can be run on this page then the cookie will be accessible and can be transmitted to another site. If this is a session cookie then session hijacking may be possible.
 
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
   * Method: `POST`
   * Parameter: `AnalyticsCookie`
   * Attack: ``
   * Evidence: `Set-Cookie: AnalyticsCookie`
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
   * Method: `POST`
   * Parameter: `MarketingCookie`
   * Attack: ``
@@ -183,29 +189,29 @@ Ensure that the HttpOnly flag is set for all cookies.
 
 A cookie has been set without the secure flag, which means that the cookie can be accessed via unencrypted connections.
 
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies`
   * Method: `GET`
   * Parameter: `.AspNetCore.Antiforgery.VyLW6ORzMgk`
   * Attack: ``
   * Evidence: `Set-Cookie: .AspNetCore.Antiforgery.VyLW6ORzMgk`
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/location
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/location`
+* URL: https://s265t01-app-web.azurewebsites.net/location
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/location`
   * Method: `GET`
   * Parameter: `.AspNetCore.Antiforgery.VyLW6ORzMgk`
   * Attack: ``
   * Evidence: `Set-Cookie: .AspNetCore.Antiforgery.VyLW6ORzMgk`
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
   * Method: `POST`
   * Parameter: `AnalyticsCookie`
   * Attack: ``
   * Evidence: `Set-Cookie: AnalyticsCookie`
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
   * Method: `POST`
   * Parameter: `MarketingCookie`
   * Attack: ``
@@ -242,15 +248,15 @@ Whenever a cookie contains sensitive information or is a session token, then it 
 
 A cookie has been set without the SameSite attribute, which means that the cookie can be sent as a result of a 'cross-site' request. The SameSite attribute is an effective counter measure to cross-site request forgery, cross-site script inclusion, and timing attacks.
 
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
   * Method: `POST`
   * Parameter: `AnalyticsCookie`
   * Attack: ``
   * Evidence: `Set-Cookie: AnalyticsCookie`
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
   * Method: `POST`
   * Parameter: `MarketingCookie`
   * Attack: ``
@@ -287,36 +293,36 @@ Ensure that the SameSite attribute is set to either 'lax' or ideally 'strict' fo
 
 Cross-Origin-Resource-Policy header is an opt-in header designed to counter side-channels attacks like Spectre. Resource should be specifically set as shareable amongst different origins.
 
-* URL: https://s265d01-app-web.azurewebsites.net
-  * Node Name: `https://s265d01-app-web.azurewebsites.net`
+* URL: https://s265t01-app-web.azurewebsites.net
+  * Node Name: `https://s265t01-app-web.azurewebsites.net`
   * Method: `GET`
   * Parameter: `Cross-Origin-Resource-Policy`
   * Attack: ``
   * Evidence: `same-site`
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.ico
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.ico`
   * Method: `GET`
   * Parameter: `Cross-Origin-Resource-Policy`
   * Attack: ``
   * Evidence: `same-site`
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg`
   * Method: `GET`
   * Parameter: `Cross-Origin-Resource-Policy`
   * Attack: ``
   * Evidence: `same-site`
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png`
   * Method: `GET`
   * Parameter: `Cross-Origin-Resource-Policy`
   * Attack: ``
   * Evidence: `same-site`
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/manifest.json
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/manifest.json`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg`
   * Method: `GET`
   * Parameter: `Cross-Origin-Resource-Policy`
   * Attack: ``
@@ -356,36 +362,36 @@ If possible, ensure that the end user uses a standards-compliant and modern web 
 
 Permissions Policy Header is an added layer of security that helps to restrict from unauthorized access or usage of browser/client features by web resources. This policy ensures the user privacy by limiting or specifying the features of the browsers can be used by the web resources. Permissions Policy provides a set of standard HTTP headers that allow website owners to limit which features of browsers can be used by the page such as camera, microphone, location, full screen etc.
 
-* URL: https://s265d01-app-web.azurewebsites.net
-  * Node Name: `https://s265d01-app-web.azurewebsites.net`
+* URL: https://s265t01-app-web.azurewebsites.net
+  * Node Name: `https://s265t01-app-web.azurewebsites.net`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/`
+* URL: https://s265t01-app-web.azurewebsites.net/
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/location
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/location`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/robots.txt
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/robots.txt`
+* URL: https://s265t01-app-web.azurewebsites.net/robots.txt
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/robots.txt`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/sitemap.xml
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/sitemap.xml`
+* URL: https://s265t01-app-web.azurewebsites.net/sitemap.xml
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/sitemap.xml`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -426,8 +432,8 @@ Ensure that your web server, application server, load balancer, etc. is configur
 
 A private IP (such as 10.x.x.x, 172.x.x.x, 192.168.x.x) or an Amazon EC2 private hostname (for example, ip-10-0-56-78) has been found in the HTTP response body. This information might be helpful for further attacks targeting internal systems.
 
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -465,36 +471,36 @@ Remove the private IP address from the HTTP response body. For comments, use JSP
 
 HTTP Strict Transport Security (HSTS) is a web security policy mechanism whereby a web server declares that complying user agents (such as a web browser) are to interact with it using only secure HTTPS connections (i.e. HTTP layered over TLS/SSL). HSTS is an IETF standards track protocol and is specified in RFC 6797.
 
-* URL: https://s265d01-app-web.azurewebsites.net
-  * Node Name: `https://s265d01-app-web.azurewebsites.net`
+* URL: https://s265t01-app-web.azurewebsites.net
+  * Node Name: `https://s265t01-app-web.azurewebsites.net`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.ico
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.ico`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/manifest.json
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/manifest.json`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/robots.txt
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/robots.txt`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/sitemap.xml
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/sitemap.xml`
+* URL: https://s265t01-app-web.azurewebsites.net/robots.txt
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/robots.txt`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -535,8 +541,8 @@ Ensure that your web server, application server, load balancer, etc. is configur
 
 This check looks at user-supplied input in query string parameters and POST data to identify where cookie parameters might be controlled. This is called a cookie poisoning attack, and becomes exploitable when an attacker can manipulate the cookie in various ways. In some cases this will not be exploitable, however, allowing URL parameters to set cookie values is generally considered a bug.
 
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
   * Method: `POST`
   * Parameter: `AnalyticsCookie`
   * Attack: ``
@@ -545,15 +551,15 @@ This check looks at user-supplied input in query string parameters and POST data
 
 This was identified at:
 
-https://s265d01-app-web.azurewebsites.net/linkpages/cookies
+https://s265t01-app-web.azurewebsites.net/linkpages/cookies
 
 User-input was found in the following cookie:
-AnalyticsCookie=yes; expires=Thu, 14 Jan 2027 10:22:01 GMT; path=/
+AnalyticsCookie=yes; expires=Thu, 14 Jan 2027 16:13:37 GMT; path=/
 
 The user input was:
 AnalyticsCookie=yes`
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies ()(AnalyticsCookie,MarketingCookie,__RequestVerificationToken)`
   * Method: `POST`
   * Parameter: `MarketingCookie`
   * Attack: ``
@@ -562,10 +568,10 @@ AnalyticsCookie=yes`
 
 This was identified at:
 
-https://s265d01-app-web.azurewebsites.net/linkpages/cookies
+https://s265t01-app-web.azurewebsites.net/linkpages/cookies
 
 User-input was found in the following cookie:
-AnalyticsCookie=yes; expires=Thu, 14 Jan 2027 10:22:01 GMT; path=/
+AnalyticsCookie=yes; expires=Thu, 14 Jan 2027 16:13:37 GMT; path=/
 
 The user input was:
 MarketingCookie=yes`
@@ -601,15 +607,15 @@ Do not allow user input to control cookie names and values. If some query string
 
 The response appears to contain suspicious comments which may help an attacker.
 
-* URL: https://s265d01-app-web.azurewebsites.net/js/accessible-autocomplete.min.js
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/js/accessible-autocomplete.min.js`
+* URL: https://s265t01-app-web.azurewebsites.net/js/accessible-autocomplete.min.js
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/js/accessible-autocomplete.min.js`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `query`
   * Other Info: `The following pattern was used: \bQUERY\b and was detected in likely comment: "//github.com/zloirock/core-js/blob/v3.36.0/LICENSE",source:"https://github.com/zloirock/core-js"})},4696:function(t,e,n){var r=n", see evidence field for the suspicious comment/snippet.`
-* URL: https://s265d01-app-web.azurewebsites.net/js/moj-frontend.min.js
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/js/moj-frontend.min.js`
+* URL: https://s265t01-app-web.azurewebsites.net/js/moj-frontend.min.js
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/js/moj-frontend.min.js`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -644,40 +650,40 @@ Remove all comments that return information that may help an attacker and fix an
 
 The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one.
 
-* URL: https://s265d01-app-web.azurewebsites.net
-  * Node Name: `https://s265d01-app-web.azurewebsites.net`
+* URL: https://s265t01-app-web.azurewebsites.net
+  * Node Name: `https://s265t01-app-web.azurewebsites.net`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GA-DEV" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
+  * Evidence: `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KX9ZWC6X" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
   * Other Info: `A noScript tag has been found, which is an indication that the application works differently with JavaScript enabled compared to when it is not.`
-* URL: https://s265d01-app-web.azurewebsites.net/
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/`
+* URL: https://s265t01-app-web.azurewebsites.net/
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GA-DEV" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
+  * Evidence: `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KX9ZWC6X" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
   * Other Info: `A noScript tag has been found, which is an indication that the application works differently with JavaScript enabled compared to when it is not.`
-* URL: https://s265d01-app-web.azurewebsites.net/location
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/location`
+* URL: https://s265t01-app-web.azurewebsites.net/location
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/location`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GA-DEV" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
+  * Evidence: `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KX9ZWC6X" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
   * Other Info: `A noScript tag has been found, which is an indication that the application works differently with JavaScript enabled compared to when it is not.`
-* URL: https://s265d01-app-web.azurewebsites.net/robots.txt
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/robots.txt`
+* URL: https://s265t01-app-web.azurewebsites.net/robots.txt
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/robots.txt`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GA-DEV" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
+  * Evidence: `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KX9ZWC6X" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
   * Other Info: `A noScript tag has been found, which is an indication that the application works differently with JavaScript enabled compared to when it is not.`
-* URL: https://s265d01-app-web.azurewebsites.net/sitemap.xml
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/sitemap.xml`
+* URL: https://s265t01-app-web.azurewebsites.net/sitemap.xml
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/sitemap.xml`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
-  * Evidence: `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GA-DEV" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
+  * Evidence: `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KX9ZWC6X" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
   * Other Info: `A noScript tag has been found, which is an indication that the application works differently with JavaScript enabled compared to when it is not.`
 
 Instances: Systemic
@@ -704,8 +710,15 @@ This is an informational alert and so no changes are required.
 
 The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.
 
-* URL: https://s265d01-app-web.azurewebsites.net/location
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/location`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies`
+  * Method: `GET`
+  * Parameter: ``
+  * Attack: ``
+  * Evidence: `no-store`
+  * Other Info: ``
+* URL: https://s265t01-app-web.azurewebsites.net/location
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/location`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -713,7 +726,7 @@ The response contents are not storable by caching components such as proxy serve
   * Other Info: ``
 
 
-Instances: 1
+Instances: 2
 
 ### Solution
 
@@ -755,36 +768,36 @@ It must have a status code that is defined as cacheable by default (200, 203, 20
 
 The cache-control header has not been set properly or is missing, allowing the browser and proxies to cache content. For static assets like css, js, or image files this might be intended, however, the resources should be reviewed to ensure that no sensitive content will be cached.
 
-* URL: https://s265d01-app-web.azurewebsites.net
-  * Node Name: `https://s265d01-app-web.azurewebsites.net`
+* URL: https://s265t01-app-web.azurewebsites.net
+  * Node Name: `https://s265t01-app-web.azurewebsites.net`
   * Method: `GET`
   * Parameter: `cache-control`
   * Attack: ``
   * Evidence: `no-cache,no-store`
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/`
+* URL: https://s265t01-app-web.azurewebsites.net/
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/`
   * Method: `GET`
   * Parameter: `cache-control`
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/manifest.json
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/manifest.json`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/manifest.json
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/manifest.json`
   * Method: `GET`
   * Parameter: `cache-control`
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/privacy
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/privacy`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies`
   * Method: `GET`
   * Parameter: `cache-control`
   * Attack: ``
-  * Evidence: ``
+  * Evidence: `no-cache, no-store`
   * Other Info: ``
-* URL: https://s265d01-app-web.azurewebsites.net/location
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/location`
+* URL: https://s265t01-app-web.azurewebsites.net/location
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/location`
   * Method: `GET`
   * Parameter: `cache-control`
   * Attack: ``
@@ -823,22 +836,29 @@ For secure content, ensure the cache-control HTTP header is set with "no-cache, 
 
 The given response has been identified as containing a session management token. The 'Other Info' field contains a set of header tokens that can be used in the Header Based Session Management Method. If the request is in a context which has a Session Management Method set to "Auto-Detect" then this rule will change the session management to use the tokens identified.
 
-* URL: https://s265d01-app-web.azurewebsites.net
-  * Node Name: `https://s265d01-app-web.azurewebsites.net`
+* URL: https://s265t01-app-web.azurewebsites.net
+  * Node Name: `https://s265t01-app-web.azurewebsites.net`
   * Method: `GET`
   * Parameter: `.AspNetCore.Session`
   * Attack: ``
   * Evidence: `.AspNetCore.Session`
   * Other Info: `cookie:.AspNetCore.Session`
-* URL: https://s265d01-app-web.azurewebsites.net/linkpages/cookies
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/linkpages/cookies`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies`
   * Method: `GET`
   * Parameter: `.AspNetCore.Antiforgery.VyLW6ORzMgk`
   * Attack: ``
   * Evidence: `.AspNetCore.Antiforgery.VyLW6ORzMgk`
   * Other Info: `cookie:.AspNetCore.Antiforgery.VyLW6ORzMgk`
-* URL: https://s265d01-app-web.azurewebsites.net/location
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/location`
+* URL: https://s265t01-app-web.azurewebsites.net/location
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/location`
+  * Method: `GET`
+  * Parameter: `.AspNetCore.Antiforgery.VyLW6ORzMgk`
+  * Attack: ``
+  * Evidence: `.AspNetCore.Antiforgery.VyLW6ORzMgk`
+  * Other Info: `cookie:.AspNetCore.Antiforgery.VyLW6ORzMgk`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies`
   * Method: `GET`
   * Parameter: `.AspNetCore.Antiforgery.VyLW6ORzMgk`
   * Attack: ``
@@ -846,7 +866,7 @@ The given response has been identified as containing a session management token.
   * Other Info: `cookie:.AspNetCore.Antiforgery.VyLW6ORzMgk`
 
 
-Instances: 3
+Instances: 4
 
 ### Solution
 
@@ -871,36 +891,36 @@ This is an informational alert rather than a vulnerability and so there is nothi
 
 The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where "shared" caching servers such as "proxy" caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.
 
-* URL: https://s265d01-app-web.azurewebsites.net
-  * Node Name: `https://s265d01-app-web.azurewebsites.net`
+* URL: https://s265t01-app-web.azurewebsites.net
+  * Node Name: `https://s265t01-app-web.azurewebsites.net`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `The response is stale, and stale responses are not configured to be re-validated or blocked, using the 'must-revalidate', 'proxy-revalidate', 's-maxage', or 'max-age' response 'Cache-Control' directives.`
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: https://s265d01-app-web.azurewebsites.net/robots.txt
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/robots.txt`
+* URL: https://s265t01-app-web.azurewebsites.net/robots.txt
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/robots.txt`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: https://s265d01-app-web.azurewebsites.net/sitemap.xml
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/sitemap.xml`
+* URL: https://s265t01-app-web.azurewebsites.net/sitemap.xml
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/sitemap.xml`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -930,55 +950,6 @@ This configuration directs both HTTP 1.0 and HTTP 1.1 compliant caching servers 
 
 
 #### WASC Id: 13
-
-#### Source ID: 3
-
-### [ User Controllable HTML Element Attribute (Potential XSS) ](https://www.zaproxy.org/docs/alerts/10031/)
-
-
-
-##### Informational (Low)
-
-### Description
-
-This check looks at user-supplied input in query string parameters and POST data to identify where certain HTML attribute values might be controlled. This provides hot-spot detection for XSS (cross-site scripting) that will require further review by a security analyst to determine exploitability.
-
-* URL: https://s265d01-app-web.azurewebsites.net/location
-  * Node Name: `https://s265d01-app-web.azurewebsites.net/location ()(Distance,__RequestVerificationToken)`
-  * Method: `POST`
-  * Parameter: `Distance`
-  * Attack: ``
-  * Evidence: ``
-  * Other Info: `User-controlled HTML attribute values were found. Try injecting special characters to see if XSS might be possible. The page at the following URL:
-
-https://s265d01-app-web.azurewebsites.net/location
-
-appears to include user input in:
-a(n) [input] tag [value] attribute
-
-The user input found was:
-Distance=Two
-
-The user-controlled value was:
-two`
-
-
-Instances: 1
-
-### Solution
-
-Validate all input and sanitize output it before writing to any HTML attributes.
-
-### Reference
-
-
-* [ https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html ](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html)
-
-
-#### CWE Id: [ 20 ](https://cwe.mitre.org/data/definitions/20.html)
-
-
-#### WASC Id: 20
 
 #### Source ID: 3
 
