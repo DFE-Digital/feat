@@ -69,20 +69,30 @@ public class Search
         try
         {
             if (_pageIsChanging)
+            {
                 return;
+            }
+
             _pageIsChanging = true;
 
             if (!History.Contains(page))
             {
                 if (History.Count > 0)
+                {
                     BackPage = History.LastOrDefault();
+                }
+
                 History.Add(page);
-                
+
                 if (VisitedCheckAnswers)
+                {
                     BackPage = History.FirstOrDefault();
-                
-                if (page == PageName.CheckAnswers) 
+                }
+
+                if (page == PageName.CheckAnswers)
+                {
                     VisitedCheckAnswers = true;
+                }
             }
             else
             {

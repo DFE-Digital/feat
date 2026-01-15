@@ -50,12 +50,16 @@ public class AgePageTests
     [Fact]
     public void OnGet_Returns_Redirect_When_No_Age_In_Session()
     {
+        var search = new Search();
         var session = new TestSession();
+        session.Set("Search", Encoding.UTF8.GetBytes(JsonSerializer.Serialize(search)));
+        
         var model = CreateModel(session);
 
         var result = model.OnGet();
 
-        Assert.IsType<RedirectToPageResult>(result);
+        var redirect = Assert.IsType<RedirectToPageResult>(result);
+        Assert.Equal(PageName.Index, redirect.PageName);
         Assert.Null(model.AgeGroup);
     }
 
@@ -116,5 +120,64 @@ public class AgePageTests
         var saved = JsonSerializer.Deserialize<Search>(Encoding.UTF8.GetString(data))!;
         Assert.Null(saved.AgeGroup);
         Assert.True(saved.Updated);
+    }
+    
+    [Fact]
+    public void OnPost_Does_Not_Clear_Existing_AgeGroup_When_Not_Submitted()
+    {
+        var search = new Search { AgeGroup = AgeGroup.TwentyToTwentyFour };
+        var session = new TestSession();
+        session.Set("Search", JsonSerializer.SerializeToUtf8Bytes(search));
+
+        var model = CreateModel(session);
+        model.AgeGroup = null;
+
+        model.OnPost();
+
+        var saved = JsonSerializer.Deserialize<Search>(
+            Encoding.UTF8.GetString(session.Get("Search")!)
+        )!;
+
+        Assert.Equal(AgeGroup.TwentyToTwentyFour, saved.AgeGroup);
+    }
+    
+    [Fact]
+    public void OnGet_Adds_Age_Page_To_Search_History()
+    {
+        var search = new Search
+        {
+            Updated = true
+        };
+
+        var session = new TestSession();
+        session.Set("Search", JsonSerializer.SerializeToUtf8Bytes(search));
+
+        var model = CreateModel(session);
+
+        model.OnGet();
+
+        var saved = JsonSerializer.Deserialize<Search>(
+            Encoding.UTF8.GetString(session.Get("Search")!)
+        )!;
+
+        Assert.Contains(PageName.Age, saved.History);
+    }
+    
+    [Fact]
+    public void OnGet_First_Visit_Sets_No_BackPage()
+    {
+        var search = new Search { Updated = true };
+        var session = new TestSession();
+        session.Set("Search", JsonSerializer.SerializeToUtf8Bytes(search));
+
+        var model = CreateModel(session);
+
+        model.OnGet();
+
+        var saved = JsonSerializer.Deserialize<Search>(
+            Encoding.UTF8.GetString(session.Get("Search")!)
+        )!;
+
+        Assert.Null(saved.BackPage);
     }
 }

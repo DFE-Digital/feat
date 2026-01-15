@@ -150,4 +150,24 @@ public class InterestsPageTests
         var redirect = Assert.IsType<RedirectToPageResult>(result);
         Assert.Equal(PageName.CheckAnswers, redirect.PageName);
     }
+    
+    [Fact]
+    public void OnPost_Ignores_Blank_Optional_Interests()
+    {
+        var search = new Search();
+        var session = new TestSession();
+        session.Set("Search", JsonSerializer.SerializeToUtf8Bytes(search));
+
+        var model = CreateModel(session);
+        model.UserInterest1 = "Maths";
+        model.UserInterest2 = " ";
+        model.UserInterest3 = null;
+
+        model.OnPost();
+
+        var saved = JsonSerializer.Deserialize<Search>(Encoding.UTF8.GetString(session.Get("Search")!))!;
+    
+        Assert.Single(saved.Interests);
+        Assert.Equal("Maths", saved.Interests[0]);
+    }
 }
