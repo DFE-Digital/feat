@@ -1,6 +1,5 @@
 ﻿@page
 @using feat.web.Enums
-@using feat.web.Utils
 @model LocationModel
 @{
     ViewBag.PageTitle = "Where do you want to study?";
@@ -9,12 +8,12 @@
     var locationModelState = ModelState["Location"];
     var locationError = false;
     string[] locationErrors = [];
+    
     if (locationModelState != null)
     {
         locationError = locationModelState.Errors.Count > 0;
         locationErrors = locationModelState.Errors.Select(e => e.ErrorMessage).ToArray();
     }
-    
 }
 
 @section Head 

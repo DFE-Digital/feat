@@ -39,7 +39,6 @@ public class CheckAnswersModel (ILogger<CheckAnswersModel> logger): PageModel
 
     public IActionResult OnPost()
     {
-        logger.LogInformation("OnPost called");
         try
         {
             Search = HttpContext.Session.Get<Search>("Search") ?? new Search();

@@ -28,6 +28,7 @@ public class QualificationLevelPageTests
 			},
 			Search = new Search(),
 		};
+		
 		return model;
 	}
 

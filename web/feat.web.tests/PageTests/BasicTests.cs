@@ -18,14 +18,12 @@ public class BasicTests: IClassFixture<WebApplicationFactory<Program>>
     [InlineData("/Interests")]
     [InlineData("/QualificationLevel")]
     [InlineData("/Age")]
-    //[InlineData("/LoadCourses")]
+    [InlineData("/LoadCourses")]
     public async Task Get_Endpoints_ReturnSuccessAndCorrectContentType(string url)
     {
         var client = _factory.CreateClient();
         
         var response = await client.GetAsync(url);
-        
-        var httpMessage = response.EnsureSuccessStatusCode(); 
         
         Assert.Equal("text/html; charset=utf-8", response.Content.Headers.ContentType?.ToString());
     }

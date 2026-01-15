@@ -71,5 +71,4 @@ public class Location
             return string.IsNullOrEmpty(url) ? GetPostcodeUrl() : url;
         }
     }
-
 }

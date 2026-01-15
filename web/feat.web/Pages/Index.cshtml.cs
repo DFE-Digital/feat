@@ -12,6 +12,7 @@ public class IndexModel(StaticNavigationHandler staticNavigation,ILogger<IndexMo
     public IActionResult OnGet()
     {
         var search = new Search();
+        
         search.SetPage(PageName.Index);
         staticNavigation.Initialise();
         HttpContext.Session.Set("Search", search);

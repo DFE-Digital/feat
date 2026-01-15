@@ -28,6 +28,7 @@ public class InterestsPageTests
             },
             Search = new Search()
         };
+        
         return model;
     }
 
