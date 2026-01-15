@@ -1,4 +1,4 @@
-# ZAP Scanning Report
+# API ZAP Scanning Report
 
 ZAP by [Checkmarx](https://checkmarx.com/).
 
@@ -19,19 +19,21 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 
 | Level | Reason | Site | Description | Statistic |
 | --- | --- | --- | --- | --- |
-| Info | Informational | http://s265d01-app-api.azurewebsites.net | Percentage of responses with status code 3xx | 100 % |
-| Info | Informational | http://s265d01-app-api.azurewebsites.net | Percentage of endpoints with method GET | 50 % |
-| Info | Informational | http://s265d01-app-api.azurewebsites.net | Percentage of endpoints with method POST | 50 % |
-| Info | Informational | http://s265d01-app-api.azurewebsites.net | Count of total endpoints | 4    |
-| Info | Informational | http://s265d01-app-api.azurewebsites.net | Percentage of slow responses | 100 % |
-| Info | Informational | https://s265d01-app-api.azurewebsites.net | Percentage of responses with status code 2xx | 49 % |
-| Info | Informational | https://s265d01-app-api.azurewebsites.net | Percentage of responses with status code 4xx | 50 % |
-| Info | Informational | https://s265d01-app-api.azurewebsites.net | Percentage of endpoints with content type application/json | 8 % |
-| Info | Informational | https://s265d01-app-api.azurewebsites.net | Percentage of endpoints with content type application/problem+json | 8 % |
-| Info | Informational | https://s265d01-app-api.azurewebsites.net | Percentage of endpoints with content type text/html | 16 % |
-| Info | Informational | https://s265d01-app-api.azurewebsites.net | Percentage of endpoints with method GET | 100 % |
-| Info | Informational | https://s265d01-app-api.azurewebsites.net | Count of total endpoints | 24    |
-| Info | Informational | https://s265d01-app-api.azurewebsites.net | Percentage of slow responses | 100 % |
+| Low | Warning |  | ZAP errors logged - see the zap.log file for details | 1    |
+| Info | Informational |  | Percentage of network failures | 1 % |
+| Info | Informational | http://s265t01-app-api.azurewebsites.net | Percentage of responses with status code 3xx | 100 % |
+| Info | Informational | http://s265t01-app-api.azurewebsites.net | Percentage of endpoints with method GET | 50 % |
+| Info | Informational | http://s265t01-app-api.azurewebsites.net | Percentage of endpoints with method POST | 50 % |
+| Info | Informational | http://s265t01-app-api.azurewebsites.net | Count of total endpoints | 4    |
+| Info | Informational | http://s265t01-app-api.azurewebsites.net | Percentage of slow responses | 50 % |
+| Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of responses with status code 2xx | 49 % |
+| Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of responses with status code 4xx | 50 % |
+| Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of endpoints with content type application/json | 8 % |
+| Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of endpoints with content type application/problem+json | 8 % |
+| Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of endpoints with content type text/html | 16 % |
+| Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of endpoints with method GET | 100 % |
+| Info | Informational | https://s265t01-app-api.azurewebsites.net | Count of total endpoints | 24    |
+| Info | Informational | https://s265t01-app-api.azurewebsites.net | Percentage of slow responses | 66 % |
 
 
 
@@ -64,15 +66,15 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 
 Cross-Origin-Resource-Policy header is an opt-in header designed to counter side-channels attacks like Spectre. Resource should be specifically set as shareable amongst different origins.
 
-* URL: https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
+* URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
   * Method: `GET`
   * Parameter: `Cross-Origin-Resource-Policy`
   * Attack: ``
   * Evidence: `same-site`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/openapi/v1.json
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/openapi/v1.json`
+* URL: https://s265t01-app-api.azurewebsites.net/openapi/v1.json
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/openapi/v1.json`
   * Method: `GET`
   * Parameter: `Cross-Origin-Resource-Policy`
   * Attack: ``
@@ -112,29 +114,29 @@ If possible, ensure that the end user uses a standards-compliant and modern web 
 
 HTTP Strict Transport Security (HSTS) is a web security policy mechanism whereby a web server declares that complying user agents (such as a web browser) are to interact with it using only secure HTTPS connections (i.e. HTTP layered over TLS/SSL). HSTS is an IETF standards track protocol and is specified in RFC 6797.
 
-* URL: https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
+* URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/Courses/instanceId
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/Courses/instanceId`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/Search
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/Search`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Search
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Search`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/openapi/v1.json
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/openapi/v1.json`
+* URL: https://s265t01-app-api.azurewebsites.net/openapi/v1.json
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/openapi/v1.json`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -177,29 +179,29 @@ A Content-Type of text/html was returned by the server.
 This is not one of the types expected to be returned by an API.
 Raised by the 'Alert on Unexpected Content Types' script
 
-* URL: https://s265d01-app-api.azurewebsites.net/computeMetadata/v1/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/computeMetadata/v1/`
+* URL: https://s265t01-app-api.azurewebsites.net/computeMetadata/v1/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/computeMetadata/v1/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `text/html`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/latest/meta-data/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/latest/meta-data/`
+* URL: https://s265t01-app-api.azurewebsites.net/latest/meta-data/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/latest/meta-data/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `text/html`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/metadata/instance
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/metadata/instance`
+* URL: https://s265t01-app-api.azurewebsites.net/metadata/instance
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/metadata/instance`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `text/html`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/opc/v1/instance/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/opc/v1/instance/`
+* URL: https://s265t01-app-api.azurewebsites.net/opc/v1/instance/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/opc/v1/instance/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -232,183 +234,183 @@ A response code of 404 was returned by the server.
 This may indicate that the application is failing to handle unexpected input correctly.
 Raised by the 'Alert on HTTP Response Code Error' script
 
-* URL: http://s265d01-app-api.azurewebsites.net/api/Courses/instanceId
-  * Node Name: `http://s265d01-app-api.azurewebsites.net/api/Courses/instanceId`
+* URL: http://s265t01-app-api.azurewebsites.net/api/Courses/instanceId
+  * Node Name: `http://s265t01-app-api.azurewebsites.net/api/Courses/instanceId`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net
-  * Node Name: `https://s265d01-app-api.azurewebsites.net`
+* URL: https://s265t01-app-api.azurewebsites.net
+  * Node Name: `https://s265t01-app-api.azurewebsites.net`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/`
+* URL: https://s265t01-app-api.azurewebsites.net/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/8373501138533912162
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/8373501138533912162`
+* URL: https://s265t01-app-api.azurewebsites.net/2478936037683434164
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/2478936037683434164`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/actuator/health
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/actuator/health`
+* URL: https://s265t01-app-api.azurewebsites.net/actuator/health
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/actuator/health`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api`
+* URL: https://s265t01-app-api.azurewebsites.net/api
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/`
+* URL: https://s265t01-app-api.azurewebsites.net/api/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/8723073428298282105
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/8723073428298282105`
+* URL: https://s265t01-app-api.azurewebsites.net/api/1271755193394148780
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/1271755193394148780`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations%3F=
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations`
+* URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3F=
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `400`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=%2527
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
+* URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=%2527
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `400`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations/`
+* URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `400`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/Courses
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/Courses`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Courses
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Courses`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/Courses/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/Courses/`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Courses/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Courses/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/Courses/8788854286811893351
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/Courses/8788854286811893351`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Courses/3782082232337663659
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Courses/3782082232337663659`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/Courses/instanceId
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/Courses/instanceId`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/Courses/instanceId/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/Courses/instanceId/`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/Search
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/Search`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Search
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Search`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `405`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/api/Search/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/Search/`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Search/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Search/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `405`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/computeMetadata/v1/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/computeMetadata/v1/`
+* URL: https://s265t01-app-api.azurewebsites.net/computeMetadata/v1/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/computeMetadata/v1/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/latest/meta-data/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/latest/meta-data/`
+* URL: https://s265t01-app-api.azurewebsites.net/latest/meta-data/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/latest/meta-data/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/metadata/instance
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/metadata/instance`
+* URL: https://s265t01-app-api.azurewebsites.net/metadata/instance
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/metadata/instance`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/opc/v1/instance/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/opc/v1/instance/`
+* URL: https://s265t01-app-api.azurewebsites.net/opc/v1/instance/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/opc/v1/instance/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/openapi
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/openapi`
+* URL: https://s265t01-app-api.azurewebsites.net/openapi
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/openapi`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/openapi/
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/openapi/`
+* URL: https://s265t01-app-api.azurewebsites.net/openapi/
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/openapi/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/openapi/8025655722143046034
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/openapi/8025655722143046034`
+* URL: https://s265t01-app-api.azurewebsites.net/openapi/8733245847468699568
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/openapi/8733245847468699568`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: http://s265d01-app-api.azurewebsites.net/api/Search
-  * Node Name: `http://s265d01-app-api.azurewebsites.net/api/Search ()({"query":ZAP,"sessionId":"John Doe","page":10,"pageSize":10,"location":"John Doe","radius":1.2,"orderBy":"Relevance","courseType":"John Doe","qualificationLevel":"John Doe","learningMethod":"John Doe","courseHours":"John Doe","studyTime":"John Doe"})`
+* URL: http://s265t01-app-api.azurewebsites.net/api/Search
+  * Node Name: `http://s265t01-app-api.azurewebsites.net/api/Search ()({"query":ZAP,"sessionId":"John Doe","page":10,"pageSize":10,"location":"John Doe","radius":1.2,"orderBy":"Relevance","courseType":"John Doe","qualificationLevel":"John Doe","learningMethod":"John Doe","courseHours":"John Doe","studyTime":"John Doe"})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
@@ -443,15 +445,15 @@ Instances: 26
 
 The cache-control header has not been set properly or is missing, allowing the browser and proxies to cache content. For static assets like css, js, or image files this might be intended, however, the resources should be reviewed to ensure that no sensitive content will be cached.
 
-* URL: https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
+* URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
   * Method: `GET`
   * Parameter: `cache-control`
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265d01-app-api.azurewebsites.net/openapi/v1.json
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/openapi/v1.json`
+* URL: https://s265t01-app-api.azurewebsites.net/openapi/v1.json
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/openapi/v1.json`
   * Method: `GET`
   * Parameter: `cache-control`
   * Attack: ``
@@ -490,57 +492,57 @@ For secure content, ensure the cache-control HTTP header is set with "no-cache, 
 
 The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where "shared" caching servers such as "proxy" caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.
 
-* URL: http://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP
-  * Node Name: `http://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
+* URL: http://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP
+  * Node Name: `http://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: http://s265d01-app-api.azurewebsites.net/api/Courses/instanceId
-  * Node Name: `http://s265d01-app-api.azurewebsites.net/api/Courses/instanceId`
+* URL: http://s265t01-app-api.azurewebsites.net/api/Courses/instanceId
+  * Node Name: `http://s265t01-app-api.azurewebsites.net/api/Courses/instanceId`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
+* URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: https://s265d01-app-api.azurewebsites.net/api/Courses/instanceId
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/Courses/instanceId`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: https://s265d01-app-api.azurewebsites.net/api/Search
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/api/Search`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Search
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Search`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: https://s265d01-app-api.azurewebsites.net/openapi/v1.json
-  * Node Name: `https://s265d01-app-api.azurewebsites.net/openapi/v1.json`
+* URL: https://s265t01-app-api.azurewebsites.net/openapi/v1.json
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/openapi/v1.json`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: http://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP
-  * Node Name: `http://s265d01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
+* URL: http://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP
+  * Node Name: `http://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: http://s265d01-app-api.azurewebsites.net/api/Search
-  * Node Name: `http://s265d01-app-api.azurewebsites.net/api/Search ()({"query":ZAP,"sessionId":"John Doe","page":10,"pageSize":10,"location":"John Doe","radius":1.2,"orderBy":"Relevance","courseType":"John Doe","qualificationLevel":"John Doe","learningMethod":"John Doe","courseHours":"John Doe","studyTime":"John Doe"})`
+* URL: http://s265t01-app-api.azurewebsites.net/api/Search
+  * Node Name: `http://s265t01-app-api.azurewebsites.net/api/Search ()({"query":ZAP,"sessionId":"John Doe","page":10,"pageSize":10,"location":"John Doe","radius":1.2,"orderBy":"Relevance","courseType":"John Doe","qualificationLevel":"John Doe","learningMethod":"John Doe","courseHours":"John Doe","studyTime":"John Doe"})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
