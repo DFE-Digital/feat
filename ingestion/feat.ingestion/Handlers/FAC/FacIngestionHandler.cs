@@ -23,8 +23,7 @@ public class FacIngestionHandler(
     IngestionOptions options, 
     IngestionDbContext dbContext,
     ISearchIndexHandler searchIndexHandler,
-    BlobServiceClient blobServiceClient) 
-    : IngestionHandler(options)
+    BlobServiceClient blobServiceClient) : IngestionHandler
 {
     public override IngestionType IngestionType => IngestionType.Csv | IngestionType.Manual;
     public override string Name => "Find A Course";
@@ -32,7 +31,6 @@ public class FacIngestionHandler(
     public override SourceSystem SourceSystem => SourceSystem.FAC;
 
     private const string ContainerName = "fac";
-    
     
     public override async Task<bool> ValidateAsync(CancellationToken cancellationToken)
     {
@@ -59,7 +57,7 @@ public class FacIngestionHandler(
         var foundAllCourses = false;
         var foundCourses = false;
         var foundTLevels = false;
-        var foundAIMData = false;
+        var foundAimData = false;
 
         await foreach (var blob in files)
         {
@@ -80,7 +78,7 @@ public class FacIngestionHandler(
 
             if (blob.Name.Contains("LearningDelivery", StringComparison.InvariantCultureIgnoreCase))
             {
-                foundAIMData = true;
+                foundAimData = true;
             }
         }
 
@@ -102,7 +100,7 @@ public class FacIngestionHandler(
             return false;
         }
 
-        if (!foundAIMData)
+        if (!foundAimData)
         {
             Console.WriteLine("Unable to find AIM data file");
             return false;
@@ -110,19 +108,17 @@ public class FacIngestionHandler(
 
         // Otherwise, we're returning true
         return true;
-
     }
 
     public override async Task<bool> IngestAsync(CancellationToken cancellationToken)
     {
-        var Aim = ProcessMode.Skip;
-        var ApprovedQualifications = ProcessMode.Skip;
-        var Courses = ProcessMode.Skip;
-        var TLevels = ProcessMode.Skip;
-        var AllCourses = ProcessMode.Skip;
-        var Providers = ProcessMode.Skip;
-        var Venues = ProcessMode.Skip;
-        var Postcodes = ProcessMode.Skip;
+        const ProcessMode Aim = ProcessMode.Process;
+        const ProcessMode ApprovedQualifications = ProcessMode.Process;
+        const ProcessMode Courses = ProcessMode.Process;
+        const ProcessMode TLevels = ProcessMode.Process;
+        const ProcessMode AllCourses = ProcessMode.Process;
+        const ProcessMode Providers = ProcessMode.Process;
+        const ProcessMode Venues = ProcessMode.Process;
         const int batchSize = 5000;
 
         var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
@@ -144,6 +140,7 @@ public class FacIngestionHandler(
         var aimData = files.Where(blob =>
                 blob.Name.StartsWith("LearningDelivery_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (aimData != null && Aim != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of AIM Data");
@@ -177,6 +174,7 @@ public class FacIngestionHandler(
         var approvedQualificationData = files.Where(blob =>
                 blob.Name.StartsWith("ApprovedQualifications_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (approvedQualificationData != null && ApprovedQualifications != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of Approved Qualification Data");
@@ -210,6 +208,7 @@ public class FacIngestionHandler(
         var courseData = files.Where(blob =>
                 blob.Name.StartsWith("Courses_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (courseData != null && Courses != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of Course Data");
@@ -252,6 +251,7 @@ public class FacIngestionHandler(
         var courseRunData = files.Where(blob =>
                 blob.Name.StartsWith("CourseRuns_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (courseRunData != null && Courses != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of Course Run Data");
@@ -294,6 +294,7 @@ public class FacIngestionHandler(
         var tLevelData = files.Where(blob =>
                 blob.Name.StartsWith("TLevels_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (tLevelData != null && TLevels != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of T-Level Data");
@@ -335,6 +336,7 @@ public class FacIngestionHandler(
         var tLevelDefinitionData = files.Where(blob =>
                 blob.Name.StartsWith("TLevelDefinitions_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (tLevelDefinitionData != null && TLevels != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of T-Level Definition Data");
@@ -363,13 +365,13 @@ public class FacIngestionHandler(
             }
 
             Console.WriteLine("Done");
-
         }
         
         // Get our latest T Level Locations file
         var tLevelLocationData = files.Where(blob =>
                 blob.Name.StartsWith("TLevelLocations_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (tLevelLocationData != null && TLevels != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of T-Level Location Data");
@@ -398,13 +400,13 @@ public class FacIngestionHandler(
             }
 
             Console.WriteLine("Done");
-
         }
         
         // Get our latest Providers file
         var providerData = files.Where(blob =>
                 blob.Name.StartsWith("Providers_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (providerData != null && Providers != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of Provider Data");
@@ -435,13 +437,13 @@ public class FacIngestionHandler(
             }
 
             Console.WriteLine("Done");
-
         }
 
         // Get our latest all courses file
         var allCoursesData = files.Where(blob =>
                 blob.Name.StartsWith("AllCoursesReport_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (allCoursesData != null && AllCourses != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of All Course Report Data");
@@ -474,13 +476,13 @@ public class FacIngestionHandler(
             }
 
             Console.WriteLine("Done");
-
         }
         
         // Get our latest venue file
         var venueData = files.Where(blob =>
                 blob.Name.StartsWith("Venues_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (venueData != null && Venues != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of Venue Data");
@@ -513,7 +515,6 @@ public class FacIngestionHandler(
             }
 
             Console.WriteLine("Done");
-
         }
 
         Console.WriteLine($"{Name} Ingestion Done");
@@ -525,7 +526,7 @@ public class FacIngestionHandler(
     {
         var resultInfo = new ResultInfo();
         var auditEntries = new List<AuditEntry>();
-        bool skip = false;
+        var skip = false;
         
         Console.WriteLine($"Starting sync of {Name} data");
 
@@ -585,6 +586,7 @@ public class FacIngestionHandler(
         resultInfo = new ResultInfo();
         
         // PROVIDERS
+        
         Console.WriteLine("Generating providers...");
         var providers =
             from p in dbContext.FAC_Providers
@@ -676,9 +678,9 @@ public class FacIngestionHandler(
 
                 Title = c.COURSE_NAME ?? td.Name,
                 AimOrAltTitle = td.Name,
-                Description = t.WhoFor.CleanHTML(),
-                EntryRequirements = t.EntryRequirements.CleanHTML(),
-                WhatYouWillLearn = t.WhatYoullLearn.CleanHTML(),
+                Description = t.WhoFor.CleanHtml(),
+                EntryRequirements = t.EntryRequirements.CleanHtml(),
+                WhatYouWillLearn = t.WhatYoullLearn.CleanHtml(),
 
 
                 Url = t.Website ?? c.COURSE_URL ?? string.Empty,
@@ -720,9 +722,9 @@ public class FacIngestionHandler(
 
                 Title = c.COURSE_NAME ?? string.Empty,
                 AimOrAltTitle = a != null ? a.LearnAimRefTitle : string.Empty,
-                Description = c.WHO_THIS_COURSE_IS_FOR.CleanHTML(),
-                EntryRequirements = c.ENTRY_REQUIREMENTS.CleanHTML(),
-                WhatYouWillLearn = c2.WhatYoullLearn.CleanHTML(),
+                Description = c.WHO_THIS_COURSE_IS_FOR.CleanHtml(),
+                EntryRequirements = c.ENTRY_REQUIREMENTS.CleanHtml(),
+                WhatYouWillLearn = c2.WhatYoullLearn.CleanHtml(),
 
                 Url = c.COURSE_URL ?? string.Empty,
                 FlexibleStart = c.FLEXIBLE_STARTDATE.GetValueOrDefault(false),
@@ -768,22 +770,27 @@ public class FacIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
+        
         // Run through the audit entries and check to see which entries were created or updated
         var createdIds = auditEntries.Where(e => e.Action == AuditActionType.Insert)
             .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
+        
         // For all of our created entries, we'll need to set those to be indexed
         var createdEntries = dbContext.Entries.WhereBulkContains(createdIds);
         await createdEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending,
             cancellationToken: cancellationToken);
+        
         // We're only interested here if any text fields have changed
         var updatedIds = auditEntries.Where(e => e.Action == AuditActionType.Update
                                                  && e.Values.Exists(ae =>
                                                      ae.ColumnName is "Title" or "AimOrAltTitle" or "Description" &&
                                                      !Equals(ae.OldValue, ae.NewValue)))
             .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
+        
         var updatedEntries = dbContext.Entries.WhereBulkContains(updatedIds);
         await updatedEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending,
             cancellationToken: cancellationToken);
+        
         await dbContext.BulkSaveChangesAsync(cancellationToken);
         
         // ENTRY INSTANCE - T-Level
@@ -909,8 +916,8 @@ public class FacIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
         
-        
         // SECTORS
+        
         Console.WriteLine("Generating sectors...");
         
         var sectors =
@@ -1172,7 +1179,6 @@ public class FacIngestionHandler(
             // Clear our change tracking as we're going to get another batch next and
             // we don't care about the old ones
             dbContext.ChangeTracker.Clear();
-
         }
     }
 }

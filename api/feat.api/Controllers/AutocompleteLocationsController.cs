@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using feat.api.Models;
 using feat.api.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace feat.api.Controllers;

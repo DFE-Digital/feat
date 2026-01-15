@@ -35,7 +35,6 @@ public class Institution
     
     [StringLength(1000)]
     public string? StudentUnionUrl { get; set; }
-
 }
 
 public sealed class InstitutionMap : ClassMap<Institution>

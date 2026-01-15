@@ -9,22 +9,41 @@ namespace feat.ingestion.Models.FAC;
 [Table("FAC_TLevels")]
 public class TLevel
 {
-    [Key] public Guid TLevelId { get; set; }
+    [Key]
+    public Guid TLevelId { get; set; }
+    
     public Guid TLevelDefinitionId { get; set; }
+    
     public Status TLevelStatus { get; set; }
+    
     public DateTime CreatedOn { get; set; }
+    
     public DateTime? UpdatedOn { get; set; }
+    
     public DateTime? DeletedOn { get; set; }
-    [StringLength(4000)] public string WhoFor { get; set; }
-    [StringLength(4000)] public string? EntryRequirements { get; set; }
-    [StringLength(4000)] public string? WhatYoullLearn { get; set; }
-    [StringLength(4000)] public string? HowYoullLearn { get; set; }
-    [StringLength(4000)] public string? HowYoullBeAssessed { get; set; }
-    [StringLength(4000)] public string? WhatYouCanDoNext { get; set; }
-    [StringLength(255)] public string? Website { get; set; }
+    
+    [StringLength(4000)]
+    public string? WhoFor { get; set; }
+    
+    [StringLength(4000)]
+    public string? EntryRequirements { get; set; }
+    
+    [StringLength(4000)]
+    public string? WhatYoullLearn { get; set; }
+    
+    [StringLength(4000)]
+    public string? HowYoullLearn { get; set; }
+    
+    [StringLength(4000)]
+    public string? HowYoullBeAssessed { get; set; }
+    
+    [StringLength(4000)]
+    public string? WhatYouCanDoNext { get; set; }
+    
+    [StringLength(255)]
+    public string? Website { get; set; }
+    
     public DateTime? StartDate { get; set; }
-    
-    
 }
 
 public sealed class TLevelMap : ClassMap<TLevel>

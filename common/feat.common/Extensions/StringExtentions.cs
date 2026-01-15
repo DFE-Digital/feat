@@ -27,7 +27,7 @@ public static class StringExtensions
             return result;
         }
    
-        public string? CleanHTML()
+        public string? CleanHtml()
         {
             // If our string is null, empty, return the string
             return string.IsNullOrEmpty(source) ? source : Converter.Convert(source);
@@ -38,7 +38,7 @@ public static class StringExtensions
             return string.IsNullOrEmpty(source) ? SharedStrings.NotProvided : source;
         }
 
-        public string? TruncateString(out string remainder, int cutoffLength = 300)
+        public string TruncateString(out string remainder, int cutoffLength = 300)
         {
             {
                 remainder = string.Empty;
@@ -56,7 +56,7 @@ public static class StringExtensions
                 }
 
                 // Sentence-ending punctuation to look for
-                char[] sentenceEndings = { '.', '!', '?' };
+                char[] sentenceEndings = ['.', '!', '?'];
 
                 // Define lower boundary where we still accept punctuation
                 var punctuationMin = cutoffLength - 50;  // mirrors 300-50 = 250 logic

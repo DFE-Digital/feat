@@ -9,11 +9,13 @@ namespace feat.ingestion.Models.FAC;
 [Table("FAC_TLevelDefinitions")]
 public class TLevelDefinition
 {
-    [Key] public Guid TLevelDefinitionId { get; set; }
-    [StringLength(500)]public string Name { get; set; }
+    [Key]
+    public Guid TLevelDefinitionId { get; set; }
+    
+    [StringLength(500)]
+    public required string Name { get; set; }
+    
     public EducationLevel? QualificationLevel { get; set; }
-    
-    
 }
 
 public sealed class TLevelDefinitionMap : ClassMap<TLevelDefinition>

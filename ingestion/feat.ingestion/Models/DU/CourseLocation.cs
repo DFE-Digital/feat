@@ -19,7 +19,6 @@ public class CourseLocation
     
     [StringLength(200)]
     public required string LocationId { get; set; }
-
 }
 
 public sealed class CourseLocationMap : ClassMap<CourseLocation>
@@ -33,7 +32,5 @@ public sealed class CourseLocationMap : ClassMap<CourseLocation>
         Map(m => m.StudyMode).Name("KISMODE")
             .Default(StudyMode.Unknown, useOnConversionFailure: true);
         Map(m => m.LocationId).Name("LOCID");
-
-        
     }
 }

@@ -10,24 +10,47 @@ namespace feat.ingestion.Models.FAC;
 [Table("FAC_Courses")]
 public class Course
 {
-    [Key] public Guid CourseId { get; set; }
+    [Key]
+    public Guid CourseId { get; set; }
+    
     public Status CourseStatus { get; set; }
+    
     public DateTime CreatedOn { get; set; }
+    
     public DateTime? UpdatedOn { get; set; }
-    [StringLength(8)] public string LearnAimRef { get; set; }
+    
+    [StringLength(8)]
+    public string? LearnAimRef { get; set; }
+    
     public int ProviderUkprn { get; set; }
-    [StringLength(4000)] public string? CourseDescription { get; set; }
-    [StringLength(4000)] public string? EntryRequirements { get; set; }
-    [StringLength(4000)] public string? WhatYoullLearn { get; set; }
-    [StringLength(4000)] public string? HowYoullLearn { get; set; }
-    [StringLength(4000)] public string? WhatYoullNeed { get; set; }
-    [StringLength(4000)] public string? HowYoullBeAssessed { get; set; }
-    [StringLength(4000)] public string? WhereNext { get; set; }
+    
+    [StringLength(4000)]
+    public string? CourseDescription { get; set; }
+    
+    [StringLength(4000)]
+    public string? EntryRequirements { get; set; }
+    
+    [StringLength(4000)]
+    public string? WhatYoullLearn { get; set; }
+    
+    [StringLength(4000)]
+    public string? HowYoullLearn { get; set; }
+    
+    [StringLength(4000)]
+    public string? WhatYoullNeed { get; set; }
+    
+    [StringLength(4000)]
+    public string? HowYoullBeAssessed { get; set; }
+    
+    [StringLength(4000)]
+    public string? WhereNext { get; set; }
+    
     public CourseType? CourseType { get; set; }
+    
     public EducationLevel? EducationLevel  { get; set; }
-    [StringLength(500)] public string? AwardingBody { get; set; }
     
-    
+    [StringLength(500)]
+    public string? AwardingBody { get; set; }
 }
 
 public sealed class CourseMap : ClassMap<Course>
@@ -41,7 +64,6 @@ public sealed class CourseMap : ClassMap<Course>
         Map(m => m.UpdatedOn).Default(new DateTime?(), useOnConversionFailure: true);
         Map(m => m.LearnAimRef);
         Map(m => m.ProviderUkprn);
-        
         
         // String data, taking into account HTML encoding
         
@@ -72,9 +94,6 @@ public sealed class CourseMap : ClassMap<Course>
         Map(m => m.WhereNext).Convert(args => HtmlDecode(
             args.Row.GetField<bool?>("DataIsHtmlEncoded"),
             args.Row.GetField<string?>("WhereNext")));
-        
-        
-        
     }
 
     private static string? HtmlDecode(bool? dataIsHtmlEncoded, string? data)
@@ -87,7 +106,7 @@ public sealed class CourseMap : ClassMap<Course>
         
         var myWriter = new StringWriter();
         HttpUtility.HtmlDecode(data, myWriter);
+        
         return myWriter.ToString();
-
     }
 }

@@ -18,6 +18,4 @@ public sealed class OpenNameMap : ClassMap<OpenName>
         Map(m => m.County).Index(24);
         Map(m => m.Country).Index(29);
     }
-    
-    
 }

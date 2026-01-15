@@ -6,7 +6,7 @@ namespace feat.ingestion.Models.FAA;
 [Table("FAA_Apprenticeships")]
 public class Apprenticeship
 {
-    public object Wage;
+    public object? Wage;
 
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -27,12 +27,12 @@ public class Apprenticeship
     public DateTime? StartDate { get; set; }
     
     [StringLength(50)]
-    public string WageType { get; set; }
+    public required string WageType { get; set; }
     
     public double? WageAmount { get; set; }
     
     [StringLength(20)]
-    public string WageUnit { get; set; }
+    public required string WageUnit { get; set; }
     
     [StringLength(250)]
     public string? WageAdditionalInformation { get; set; }

@@ -1,5 +1,4 @@
 using CsvHelper.Configuration;
-using feat.common.Models;
 using feat.ingestion.Models.Geolocation.Converters;
 
 namespace feat.ingestion.Models.Geolocation;

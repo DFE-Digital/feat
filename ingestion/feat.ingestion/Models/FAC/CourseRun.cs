@@ -11,10 +11,15 @@ namespace feat.ingestion.Models.FAC;
 [Table("FAC_CourseRuns")]
 public class CourseRun
 {
-    [Key] public Guid CourseRunId { get; set; }
+    [Key]
+    public Guid CourseRunId { get; set; }
+    
     public Guid CourseId { get; set; }
+    
     public Status CourseRunStatus { get; set; }
+    
     public DateTime CreatedOn { get; set; }
+    
     public DateTime? UpdatedOn { get; set; }
 
     public Guid? VenueId { get; set; }
@@ -39,7 +44,6 @@ public class CourseRun
     public AttendancePattern? AttendancePattern { get; set; }
     
     public bool National { get; set; }
-    
 }
 
 public sealed class CourseRunMap : ClassMap<CourseRun>
@@ -60,6 +64,5 @@ public sealed class CourseRunMap : ClassMap<CourseRun>
         Map(m => m.CourseWebsite).TypeConverter<CleanStringExtension>();
         Map(m => m.AttendancePattern).TypeConverter<AttendancePatternEnumConverter>();
         Map(m => m.National).Default(false, useOnConversionFailure: true);
-
     }
 }

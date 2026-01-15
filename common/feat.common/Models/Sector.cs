@@ -8,7 +8,8 @@ namespace feat.common.Models;
 public class Sector
 {
     [Key]
-    public Guid Id { get; set; } 
+    public Guid Id { get; set; }
+    
     public SourceSystem? SourceSystem { get; set; }
 
     [StringLength(255)]

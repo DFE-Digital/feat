@@ -33,5 +33,4 @@ public class Employer
 
     [InverseProperty("Employer")]
     public ICollection<Vacancy> Vacancies { get; set; } = new List<Vacancy>();
-    
 }

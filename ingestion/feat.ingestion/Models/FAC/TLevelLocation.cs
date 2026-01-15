@@ -8,14 +8,14 @@ namespace feat.ingestion.Models.FAC;
 [Table("FAC_TLevelLocations")]
 public class TLevelLocation
 {
-    [Key] public Guid TLevelLocationId { get; set; }
+    [Key]
+    public Guid TLevelLocationId { get; set; }
     
     public Guid TLevelId { get; set; }
     
     public Guid VenueId { get; set; }
+    
     public Status? TLevelLocationStatus { get; set; }
-    
-    
 }
 
 public sealed class TLevelLocationMap : ClassMap<TLevelLocation>

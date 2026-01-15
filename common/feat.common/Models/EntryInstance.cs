@@ -31,7 +31,7 @@ public class EntryInstance
     public SourceSystem? SourceSystem { get; set; }
     
     [StringLength(200)]
-    public string SourceReference { get; set; }
+    public required string SourceReference { get; set; }
 
     [ForeignKey("EntryId")]
     [InverseProperty("EntryInstances")]
@@ -39,6 +39,6 @@ public class EntryInstance
     
     [ForeignKey("LocationId")]
     [InverseProperty("EntryInstances")]
-    public Location? Location { get; set; } = null!;
+    public Location? Location { get; set; }
 }
 

@@ -11,27 +11,33 @@ public class ApprovedQualification
 {
     [StringLength(8)]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    [Key] public string QualificationNumber { get; set; }
+    [Key]
+    public required string QualificationNumber { get; set; }
     
     public ApprovedQualificationLevel? Level { get; set; }
 
     public ApprovedQualificationType? QualificationType { get; set; }
     
     [StringLength(255)]
-    public string SectorSubjectArea { get; set; }
+    public required string SectorSubjectArea { get; set; }
     
     public bool Age1416_FundingAvailable { get; set; }
+    
     public bool Age1619_FundingAvailable { get; set; }
+    
     public bool LocalFlexibilities_FundingAvailable { get; set; }
+    
     public bool LegalEntitlementL2L3_FundingAvailable { get; set; }
+    
     public bool LegalEntitlementEnglishandMaths_FundingAvailable { get; set; }
+    
     public bool DigitalEntitlement_FundingAvailable { get; set; }
+    
     public bool LifelongLearningEntitlement_FundingAvailable { get; set; }
+    
     public bool AdvancedLearnerLoans_FundingAvailable { get; set; }
+    
     public bool FreeCoursesForJobs_FundingAvailable { get; set; }
-    
-    
-    
 }
 
 public sealed class ApprovedQualificationMap : ClassMap<ApprovedQualification>
@@ -52,6 +58,5 @@ public sealed class ApprovedQualificationMap : ClassMap<ApprovedQualification>
         Map(m => m.LifelongLearningEntitlement_FundingAvailable);
         Map(m => m.AdvancedLearnerLoans_FundingAvailable);
         Map(m => m.FreeCoursesForJobs_FundingAvailable);
-        
     }
 }

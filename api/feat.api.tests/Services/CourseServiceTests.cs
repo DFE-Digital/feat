@@ -13,9 +13,9 @@ namespace feat.api.tests.Services;
 [TestFixture]
 public class CourseServiceTests
 {
-    private CourseDbContext _dbContext;
-    private IFusionCache _cache;
-    private CourseService _service;
+    private CourseDbContext _dbContext = null!;
+    private IFusionCache _cache = null!;
+    private CourseService _service = null!;
 
     [SetUp]
     public void Setup()

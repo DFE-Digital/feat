@@ -17,43 +17,95 @@ namespace feat.ingestion.Models.FAC;
 public class AllCoursesCourse
 {
     public Guid COURSE_ID { get; set; }
+    
     public Guid COURSE_RUN_ID { get; set; }
+    
     public int PROVIDER_UKPRN { get; set; }
-    [StringLength(255)] public string? PROVIDER_NAME { get; set; }
-    [StringLength(8)] public string? LEARN_AIM_REF { get; set; }
-    [StringLength(255)] public string? COURSE_NAME { get; set; }
-    [StringLength(4000)] public string? WHO_THIS_COURSE_IS_FOR { get; set; }
+    
+    [StringLength(255)]
+    public string? PROVIDER_NAME { get; set; }
+    
+    [StringLength(8)]
+    public string? LEARN_AIM_REF { get; set; }
+    
+    [StringLength(255)]
+    public string? COURSE_NAME { get; set; }
+    
+    [StringLength(4000)]
+    public string? WHO_THIS_COURSE_IS_FOR { get; set; }
+    
     public DeliveryMode? DELIVER_MODE { get; set; }
+    
     public StudyMode? STUDY_MODE { get; set; }
+    
     public AttendancePattern? ATTENDANCE_PATTERN { get; set; }
+    
     public bool? FLEXIBLE_STARTDATE { get; set; }
+    
     public DateTime? STARTDATE { get; set; }
+    
     [Column(TypeName = "bigint")]
     public TimeSpan? DURATION { get; set; }
+    
     public decimal? COST { get; set; }
-    [StringLength(2000)] public string? COST_DESCRIPTION { get; set; }
+    
+    [StringLength(2000)]
+    public string? COST_DESCRIPTION { get; set; }
+    
     public bool? NATIONAL { get; set; }
+    
     public string[]? REGIONS { get; set; }
-    [StringLength(255)] public string? LOCATION_NAME { get; set; }
-    [StringLength(255)] public string? LOCATION_ADDRESS1 { get; set; }
-    [StringLength(255)] public string? LOCATION_ADDRESS2 { get; set; }
-    [StringLength(255)] public string? LOCATION_COUNTY { get; set; }
-    [StringLength(255)] public string? LOCATION_EMAIL { get; set; }
+    
+    [StringLength(255)]
+    public string? LOCATION_NAME { get; set; }
+    
+    [StringLength(255)]
+    public string? LOCATION_ADDRESS1 { get; set; }
+    
+    [StringLength(255)] 
+    public string? LOCATION_ADDRESS2 { get; set; }
+    
+    [StringLength(255)]
+    public string? LOCATION_COUNTY { get; set; }
+    
+    [StringLength(255)]
+    public string? LOCATION_EMAIL { get; set; }
+    
     public Point? LOCATION { get; set; }
-    [StringLength(10)] public string? LOCATION_POSTCODE { get; set; }
-    [StringLength(255)] public string? LOCATION_TELEPHONE { get; set; }
-    [StringLength(255)] public string? LOCATION_TOWN { get; set; }
-    [StringLength(255)] public string? LOCATION_WEBSITE { get; set; }
-    [StringLength(255)] public string? COURSE_URL { get; set; }
+    
+    [StringLength(10)]
+    public string? LOCATION_POSTCODE { get; set; }
+    
+    [StringLength(255)]
+    public string? LOCATION_TELEPHONE { get; set; }
+    
+    [StringLength(255)]
+    public string? LOCATION_TOWN { get; set; }
+    
+    [StringLength(255)]
+    public string? LOCATION_WEBSITE { get; set; }
+    
+    [StringLength(255)]
+    public string? COURSE_URL { get; set; }
+    
     public DateTime? UPDATED_DATE { get; set; }
 
-    [StringLength(4000)] public string? ENTRY_REQUIREMENTS { get; set; }
+    [StringLength(4000)]
+    public string? ENTRY_REQUIREMENTS { get; set; }
 
-    [StringLength(4000)] public string? HOW_YOU_WILL_BE_ASSESSED { get; set; }
+    [StringLength(4000)]
+    public string? HOW_YOU_WILL_BE_ASSESSED { get; set; }
+    
     public CourseType? COURSE_TYPE { get; set; }
-    [StringLength(255)] public string? SECTOR { get; set; }
+    
+    [StringLength(255)]
+    public string? SECTOR { get; set; }
+    
     public EducationLevel? EDUCATION_LEVEL { get; set; }
-    [StringLength(255)] public string? AWARDING_BODY { get; set; }
+    
+    [StringLength(255)]
+    public string? AWARDING_BODY { get; set; }
+    
     public DateTime? CREATED_DATE { get; set; }
 }
 
@@ -160,7 +212,7 @@ public sealed class AllCoursesCourseMap : ClassMap<AllCoursesCourse>
         return new Point(new Coordinate(longitude, latitude)) { SRID = 4326 };
     }
 
-    private static TimeSpan? CalculateDuration(DurationUnit? durationUnit, string? durationText,string? date)
+    private static TimeSpan? CalculateDuration(DurationUnit? durationUnit, string? durationText, string? date)
     {
         if (!int.TryParse(durationText, out var duration))
         {
@@ -171,7 +223,8 @@ public sealed class AllCoursesCourseMap : ClassMap<AllCoursesCourse>
                 out DateTime start))
         {
             start = new DateTime(2025, 1, 1);
-        }        
+        }
+        
         DateTime end = durationUnit switch
         {
             DurationUnit.Days => start.AddDays(duration),
