@@ -80,10 +80,10 @@
                     </div>
                 </div>
                 <div class="govuk-button-group">
-                    <button type="button" class="govuk-button" data-module="govuk-button" onclick="acceptCookies(true);">
+                    <button id="acceptAnalytics" type="button" class="govuk-button" data-module="govuk-button">
                         Accept analytics cookies
                     </button>
-                    <button type="button" class="govuk-button" data-module="govuk-button" onclick="acceptCookies(false);">
+                    <button id="rejectAnalytics" type="button" class="govuk-button" data-module="govuk-button">
                         Reject analytics cookies
                     </button>
                     <a class="govuk-link" asp-page="/linkpages/cookies">View cookies</a>
@@ -239,7 +239,7 @@
         <script asp-add-nonce>
             function acceptCookies(args) {
                 document.getElementById("cookieConsent").style.display = "none";
-                if (args === true) {
+                if (this.id === "acceptAnalytics") {
                     createCookie("AnalyticsCookie", "yes");
                     createCookie("MarketingCookie", "yes");
                 } else {
@@ -254,6 +254,9 @@
                 document.cookie =
                     cookiname + "=" + cookivalue + ";" + expires + ";path=/;Secure";
             }
+
+            document.getElementById("acceptAnalytics").addEventListener("click", acceptCookies);
+            document.getElementById("rejectAnalytics").addEventListener("click", acceptCookies);
         </script>
     }
 }
