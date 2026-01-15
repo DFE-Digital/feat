@@ -15,7 +15,6 @@ namespace feat.web.tests.PageTests;
 
 public class LocationPageTests
 {
-
 	private static LocationModel CreateModel(ISession session)
 	{
 		var httpContext = new DefaultHttpContext
@@ -41,6 +40,7 @@ public class LocationPageTests
 			},
 			Search = new Search()
 		};
+		
 		return model;
 	}
 	
@@ -174,15 +174,5 @@ public class LocationPageTests
 		Assert.IsType<PageResult>(result);
 		Assert.False(model.ModelState.IsValid, "ModelState is invalid");
 		Assert.True(model.ModelState.ContainsKey("Distance"));
-	}
-
-	[Fact]
-	public async Task WbApplicationFactory()
-	{
-		var factory = new WebApplicationFactory<Program>();
-		var client = factory.CreateClient();
-		
-		var response = await client.GetAsync("/");
-		
 	}
 }
