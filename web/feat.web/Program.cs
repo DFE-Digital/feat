@@ -94,7 +94,6 @@ var policyCollection = new HeaderPolicyCollection()
             .Self();
         csp.AddScriptSrc()
             .Self()
-            .WithNonce()
             .UnsafeInline()
             .From("https://*.googletagmanager.com")
             .From("https://tagmanager.google.com")
