@@ -13,7 +13,7 @@ public class TLevelDefinition
     public Guid TLevelDefinitionId { get; set; }
     
     [StringLength(500)]
-    public required string Name { get; set; }
+    public string Name { get; set; }
     
     public EducationLevel? QualificationLevel { get; set; }
 }

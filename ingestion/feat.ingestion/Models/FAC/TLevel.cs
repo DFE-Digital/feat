@@ -23,7 +23,7 @@ public class TLevel
     public DateTime? DeletedOn { get; set; }
     
     [StringLength(4000)]
-    public string? WhoFor { get; set; }
+    public string WhoFor { get; set; }
     
     [StringLength(4000)]
     public string? EntryRequirements { get; set; }

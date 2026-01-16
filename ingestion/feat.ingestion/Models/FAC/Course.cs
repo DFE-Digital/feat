@@ -20,7 +20,7 @@ public class Course
     public DateTime? UpdatedOn { get; set; }
     
     [StringLength(8)]
-    public string? LearnAimRef { get; set; }
+    public string LearnAimRef { get; set; }
     
     public int ProviderUkprn { get; set; }
     

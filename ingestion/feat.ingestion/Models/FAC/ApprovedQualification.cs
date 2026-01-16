@@ -12,14 +12,14 @@ public class ApprovedQualification
     [StringLength(8)]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     [Key]
-    public required string QualificationNumber { get; set; }
+    public string QualificationNumber { get; set; }
     
     public ApprovedQualificationLevel? Level { get; set; }
 
     public ApprovedQualificationType? QualificationType { get; set; }
     
     [StringLength(255)]
-    public required string SectorSubjectArea { get; set; }
+    public string SectorSubjectArea { get; set; }
     
     public bool Age1416_FundingAvailable { get; set; }
     

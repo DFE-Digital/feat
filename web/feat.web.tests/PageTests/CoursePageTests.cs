@@ -85,6 +85,26 @@ public class CoursePageTests
         
         Assert.Equal(testReferer, _model.RefererUrl);
     }
+    
+    [Fact]
+    public async Task OnGet_Handles_Course_Type()
+    {
+        var instanceId = Guid.NewGuid();
+        var course = new CourseDetailsCourse
+        {
+            Title = "Potato Farmer",
+            ProviderName = "Farmer Giles"
+        };
+
+        _searchService.GetCourseDetails(instanceId.ToString())
+            .Returns(Task.FromResult<CourseDetailsBase?>(course));
+        
+        await _model.OnGet(instanceId);
+        
+        Assert.IsType<CourseDetailsCourse>(_model.Course);
+        var actual = (CourseDetailsCourse)_model.Course!;
+        Assert.Equal("Farmer Giles", actual.ProviderName);
+    }
 
     [Fact]
     public async Task OnGet_Handles_Apprenticeship_Type()
@@ -104,5 +124,25 @@ public class CoursePageTests
         Assert.IsType<CourseDetailsApprenticeship>(_model.Course);
         var actual = (CourseDetailsApprenticeship)_model.Course!;
         Assert.Equal("Plumbers R Us", actual.EmployerName);
+    }
+    
+    [Fact]
+    public async Task OnGet_Handles_University_Type()
+    {
+        var instanceId = Guid.NewGuid();
+        var universityCourse = new CourseDetailsUniversity()
+        {
+            Title = "BSc History of Potatoes",
+            University = "University of Manchester"
+        };
+
+        _searchService.GetCourseDetails(instanceId.ToString())
+            .Returns(Task.FromResult<CourseDetailsBase?>(universityCourse));
+        
+        await _model.OnGet(instanceId);
+        
+        Assert.IsType<CourseDetailsUniversity>(_model.Course);
+        var actual = (CourseDetailsUniversity)_model.Course!;
+        Assert.Equal("University of Manchester", actual.University);
     }
 }

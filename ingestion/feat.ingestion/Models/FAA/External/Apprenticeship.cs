@@ -14,7 +14,7 @@ public class Apprenticeship
     
     public DateTime StartDate { get; set; }
     
-    public required Wage Wage { get; set; }
+    public Wage Wage { get; set; }
     
     public decimal? HoursPerWeek { get; set; }
     
@@ -36,7 +36,7 @@ public class Apprenticeship
     
     public string? EmployerContactEmail { get; set; }
     
-    public required Course Course { get; set; }
+    public Course Course { get; set; }
     
     public string? ApprenticeshipLevel { get; set; }
     

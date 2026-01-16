@@ -13,7 +13,7 @@ public class Address
     [ForeignKey(nameof(Apprenticeship))]
     public int ApprenticeshipId { get; set; }
     
-    public Apprenticeship? Apprenticeship { get; set; }
+    public Apprenticeship Apprenticeship { get; set; }
 
     [StringLength(100)]
     public string? AddressLine1 { get; set; }
