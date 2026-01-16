@@ -6,7 +6,7 @@ namespace feat.web.Models;
 public class Search
 {
     public List<string> History { get; set; } = [];
-    public bool Updated { get; set; } = false;
+    public bool Updated { get; set; }
     
     public string? Location { get; set; } 
     public Distance? Distance { get; set; }
@@ -31,7 +31,7 @@ public class Search
         { QualificationLevel.FourToEight, [4, 5, 6, 7, 8] }
     };
     
-    private bool _pageIsChanging = false;
+    private bool _pageIsChanging;
 
     private string Query => string.Join(", ", Interests.Select(i => i.ToLower().Trim()));
     
@@ -69,20 +69,30 @@ public class Search
         try
         {
             if (_pageIsChanging)
+            {
                 return;
+            }
+
             _pageIsChanging = true;
 
             if (!History.Contains(page))
             {
                 if (History.Count > 0)
+                {
                     BackPage = History.LastOrDefault();
+                }
+
                 History.Add(page);
-                
+
                 if (VisitedCheckAnswers)
+                {
                     BackPage = History.FirstOrDefault();
-                
-                if (page == PageName.CheckAnswers) 
+                }
+
+                if (page == PageName.CheckAnswers)
+                {
                     VisitedCheckAnswers = true;
+                }
             }
             else
             {

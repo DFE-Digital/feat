@@ -12,11 +12,13 @@ public class Venue
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     [Key] 
     public Guid VenueId { get; set; }
+    
     public Guid? ProviderId { get; set; }
     
     public VenueStatus? VenueStatus { get; set; }
     
     public DateTime? CreatedOn { get; set; }
+    
     public DateTime? UpdatedOn { get; set; }
     
     [StringLength(500)]
@@ -47,9 +49,6 @@ public class Venue
     
     [StringLength(500)]
     public string? Website { get; set; }
-    
-
-    
 }
 
 public sealed class VenueMap : ClassMap<Venue>

@@ -15,6 +15,5 @@ public class YYYYMM : DateTimeConverter
         var month = Convert.ToInt32(text.Substring(4, 2));
         
         return new  DateTime(year, month, 1);
-
     }
 }

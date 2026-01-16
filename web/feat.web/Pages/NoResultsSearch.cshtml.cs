@@ -12,8 +12,6 @@ public class NoResultsSearchModel(ILogger<NoResultsSearchModel> logger) : PageMo
     
     public IActionResult OnGet()
     {
-        logger.LogInformation("OnGet called");
-
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         
         if (!Search.Updated)
@@ -26,5 +24,4 @@ public class NoResultsSearchModel(ILogger<NoResultsSearchModel> logger) : PageMo
         
         return Page();
     }
-    
 }

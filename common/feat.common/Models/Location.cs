@@ -36,7 +36,7 @@ public class Location
     [StringLength(320)]
     public string? Email { get; set; }
     
-    public Point? GeoLocation { get; set; }       // Geography Point (Latitude, Longitude)
+    public Point? GeoLocation { get; set; }
 
     [StringLength(10)]
     public string? Postcode { get; set; }
@@ -47,7 +47,7 @@ public class Location
     [StringLength(100)]
     public string? Town { get; set; }
 
-    [StringLength(2083)] // Maximum length for a URL
+    [StringLength(2083)]
     public string? Url { get; set; }
     
     public SourceSystem? SourceSystem { get; set; }

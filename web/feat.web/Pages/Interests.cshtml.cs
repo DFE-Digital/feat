@@ -19,32 +19,30 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
     public string? UserInterest3 { get; set; }
     
     [BindProperty] 
-    public bool FirstOptionMandatory { get; set; } = false;
+    public bool FirstOptionMandatory { get; set; }
     
     public required Search Search { get; set; }
 
     public IActionResult OnGet()
     {
-        logger.LogInformation("OnGet");
-        
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
         if (!Search.Updated)
+        {
             return RedirectToPage(PageName.Index);
-
-        // Populate the three individual interest fields
-        if (Search.Interests.Count > 0 &&
-            !string.IsNullOrEmpty(Search.Interests[0]))
+        }
+        
+        if (Search.Interests.Count > 0 && !string.IsNullOrEmpty(Search.Interests[0]))
         {
             UserInterest1 = Search.Interests[0];
         }
-        if (Search.Interests.Count > 1 &&
-            !string.IsNullOrEmpty(Search.Interests[1]))
+        
+        if (Search.Interests.Count > 1 && !string.IsNullOrEmpty(Search.Interests[1]))
         {
             UserInterest2 = Search.Interests[1];
         }
-        if (Search.Interests.Count > 2 &&
-            !string.IsNullOrEmpty(Search.Interests[2]))
+        
+        if (Search.Interests.Count > 2 && !string.IsNullOrEmpty(Search.Interests[2]))
         {
             UserInterest3 = Search.Interests[2];
         }
@@ -77,17 +75,29 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
         }
 
         if (!ModelState.IsValid)
-            return Page(); 
-        
+        {
+            return Page();
+        }
+
         Search.Interests.Clear();
         
         List<string> interests = [];
+
         if (!string.IsNullOrWhiteSpace(UserInterest1))
+        {
             interests.Add(UserInterest1.Trim());
+        }
+
         if (!string.IsNullOrWhiteSpace(UserInterest2))
+        {
             interests.Add(UserInterest2.Trim());
+        }
+
         if (!string.IsNullOrWhiteSpace(UserInterest3))
+        {
             interests.Add(UserInterest3.Trim());
+        }
+
         Search.Interests = interests;
 
         Search.Updated = true;
@@ -97,6 +107,7 @@ public class InterestsModel(ILogger<InterestsModel> logger) : PageModel
         {
             return RedirectToPage(PageName.CheckAnswers);
         }
+        
         return RedirectToPage(PageName.QualificationLevel); 
     }
 }

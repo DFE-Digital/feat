@@ -22,11 +22,8 @@ public class FaaIngestionHandler(
     IngestionOptions options,
     IApiClient apiClient,
     IngestionDbContext dbContext,
-    ISearchIndexHandler searchIndexHandler)
-    : IngestionHandler(options)
+    ISearchIndexHandler searchIndexHandler) : IngestionHandler
 {
-    private readonly IngestionOptions _options = options;
-
     public override IngestionType IngestionType => IngestionType.Api | IngestionType.Automatic;
     public override string Name => "Find An Apprenticeship";
     public override string Description => "Ingestion from Find An Apprenticeship API";
@@ -34,14 +31,14 @@ public class FaaIngestionHandler(
 
     public override async Task<bool> ValidateAsync(CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(_options.ApprenticeshipApiKey))
+        if (string.IsNullOrEmpty(options.ApprenticeshipApiKey))
         {
             Console.WriteLine("Find An Apprenticeship API key not set.");
             return false;
         }
 
         const string url = "vacancies/vacancy?PageNumber=1&PageSize=1";
-        External.ApiResponse response;
+        External.ApiResponse? response;
 
         try
         {
@@ -54,7 +51,7 @@ public class FaaIngestionHandler(
             return false;
         }
 
-        if (response.Total == 0)
+        if (response is { Total: 0 })
         {
             Console.WriteLine("No results returned from Find An Apprenticeship API.");
             return false;
@@ -82,17 +79,17 @@ public class FaaIngestionHandler(
                 var response = await apiClient.GetAsync<External.ApiResponse>(
                     ApiClientNames.FindAnApprenticeship, url, cancellationToken: cancellationToken);
 
-                var apprenticeships = response.Vacancies.FromDtoList();
+                var apprenticeships = response?.Vacancies.FromDtoList();
 
-                if (apprenticeships.Count == 0)
+                if (apprenticeships is { Count: 0 })
                 {
                     Console.WriteLine($"No more apprenticeships found after page {pageNumber}. Stopping pagination.");
                     break;
                 }
 
-                allApprenticeships.AddRange(apprenticeships);
+                allApprenticeships.AddRange(apprenticeships!);
    
-                Console.WriteLine($"Fetched {apprenticeships.Count} apprenticeships from page {pageNumber}.");
+                Console.WriteLine($"Fetched {apprenticeships!.Count} apprenticeships from page {pageNumber}.");
 
                 if (apprenticeships.Count < apiPageSize)
                 {
@@ -169,7 +166,7 @@ public class FaaIngestionHandler(
     {
         var resultInfo = new ResultInfo();
         var auditEntries = new List<AuditEntry>();
-        bool skip = false;
+        var skip = false;
 
         Console.WriteLine($"Starting sync of {Name} data");
 
@@ -194,7 +191,9 @@ public class FaaIngestionHandler(
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
         
         // PROVIDER
+        
         Console.WriteLine("Generating providers...");
+        
         var providers = apprenticeships
             .GroupBy(a => a.Ukprn)
             .Select(a => new Provider
@@ -227,6 +226,7 @@ public class FaaIngestionHandler(
             .ToDictionary(p => p.Ukprn!, p => p.Id);
 
         // SECTOR
+        
         Console.WriteLine("Generating sectors...");
  
         var sectors = apprenticeships
@@ -257,6 +257,7 @@ public class FaaIngestionHandler(
             .ToDictionary(s => s.Name.ToLower().Trim(), s => s.Id);
         
         // ENTRY
+        
         var entries = apprenticeships.Select(a =>
         {
             var providerId = providerLookup[a.Ukprn.ToString()];
@@ -267,7 +268,7 @@ public class FaaIngestionHandler(
                 Reference = a.VacancyReference!,
                 Title = a.Title!,
                 AimOrAltTitle = a.CourseTitle!,
-                Description = a.Description.CleanHTML(),
+                Description = a.Description.CleanHtml(),
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
                 Url = !string.IsNullOrEmpty(a.ApplicationUrl) ? a.ApplicationUrl :
@@ -281,6 +282,7 @@ public class FaaIngestionHandler(
                 SourceReference = a.VacancyReference!
             };
         }).ToList();
+        
         Console.WriteLine($"Generating entries for {entries.LongCount()} courses...");
         
         await dbContext.BulkSynchronizeAsync(entries, options =>
@@ -304,9 +306,11 @@ public class FaaIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
+        
         // Run through the audit entries and check to see which entries were created or updated
         var createdIds = auditEntries.Where(e => e.Action == AuditActionType.Insert)
             .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
+        
         // For all of our created entries, we'll need to set those to be indexed
         var createdEntries = dbContext.Entries.WhereBulkContains(createdIds);
         await createdEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending,
@@ -322,14 +326,15 @@ public class FaaIngestionHandler(
         var updatedEntries = dbContext.Entries.WhereBulkContains(updatedIds);
         await updatedEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending,
             cancellationToken: cancellationToken);
-        await dbContext.BulkSaveChangesAsync(cancellationToken);
         
+        await dbContext.BulkSaveChangesAsync(cancellationToken);
         
         var entryLookup = dbContext.Set<Entry>()
             .Where(e => e.SourceSystem == SourceSystem)
             .ToDictionary(e => e.SourceReference, e => e.Id);
         
         // ENTRYSECTOR
+        
         Console.WriteLine("Generating entry sectors...");
 
         var entrySectors = apprenticeships
@@ -359,6 +364,7 @@ public class FaaIngestionHandler(
         resultInfo = new ResultInfo();
         
         // EMPLOYER
+        
         Console.WriteLine("Generating employers...");
         
         var employers = apprenticeships
@@ -394,6 +400,7 @@ public class FaaIngestionHandler(
             .ToDictionary(e => e.Name.ToLower().Trim(), e => e.Id);
 
         // VACANCY
+        
         Console.WriteLine("Generating vacancies...");
         
         var vacancies = apprenticeships.Select(a =>
@@ -433,16 +440,22 @@ public class FaaIngestionHandler(
         resultInfo = new ResultInfo();
         
         // Reset locations
-        await dbContext.EntryInstances.Where(ei => ei.SourceSystem == SourceSystem)
-            .UpdateFromQueryAsync(ei => new EntryInstance() { Reference = ei.Reference, LocationId = null }, 
-                cancellationToken: cancellationToken);
+        await dbContext.EntryInstances
+            .Where(ei => ei.SourceSystem == SourceSystem)
+            .UpdateFromQueryAsync(ei => new EntryInstance
+            {
+                Reference = ei.Reference,
+                SourceReference = string.Empty,
+                LocationId = null
+            }, cancellationToken: cancellationToken);
 
         // Remove employer locations
         await dbContext.BulkDeleteAsync(dbContext.EmployerLocations, cancellationToken);
         
-        
         // LOCATION
+        
         Console.WriteLine("Generating locations...");
+        
         var locations = apprenticeships
             .SelectMany(a => a.Addresses)
             .GroupBy(a => new
@@ -489,6 +502,7 @@ public class FaaIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
         // Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        
         resultInfo = new ResultInfo();
         
         var locationLookup = new Dictionary<(string?, string?, string?), Guid>();
@@ -508,7 +522,9 @@ public class FaaIngestionHandler(
         }
         
         // ENTRYINSTANCE
+        
         Console.WriteLine($"Generating entry instances ...");
+        
         var entryInstances = new List<EntryInstance>();
 
         foreach (var apprenticeship in apprenticeships)
@@ -574,6 +590,7 @@ public class FaaIngestionHandler(
         resultInfo = new ResultInfo();
         
         // EMPLOYERLOCATION
+        
         Console.WriteLine("Generating employer locations...");
         
         var employerLocationKeys = apprenticeships
@@ -609,7 +626,6 @@ public class FaaIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
-        resultInfo = new ResultInfo();
         
         Console.WriteLine("Cleaning up unused locations...");
         await dbContext.Locations
@@ -623,8 +639,6 @@ public class FaaIngestionHandler(
         
         await transaction.CommitAsync(cancellationToken);
         
-        
-        
         Console.WriteLine($"{Name} table sync complete.");
 
         return true;
@@ -633,6 +647,7 @@ public class FaaIngestionHandler(
     public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine($"Starting {Name} AI Search indexing...");
+        
         var sb = new StringBuilder();
         var total = await dbContext.Entries
             .LongCountAsync(x => x.SourceSystem == SourceSystem, cancellationToken: cancellationToken);

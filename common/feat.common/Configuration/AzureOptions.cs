@@ -18,10 +18,6 @@ public class AzureOptions
     public string AiSearchKey { get; set; } = string.Empty;
     
     public string AiSearchAdminKey { get; set; } = string.Empty;
-    
-    public string AiSearchIndexScoringProfile { get; set; } = string.Empty;
-    
-    public string AiSearchIndexScoringParameters { get; set; } = string.Empty;
 
     public float? Weight { get; set; } = 1.25f;
     

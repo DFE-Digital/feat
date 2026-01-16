@@ -10,8 +10,8 @@ namespace feat.api.tests.Controllers;
 [TestFixture]
 public class CoursesControllerTests
 {
-    private ICourseService _courseService;
-    private CoursesController _controller;
+    private ICourseService _courseService = null!;
+    private CoursesController _controller = null!;
 
     [SetUp]
     public void Setup()

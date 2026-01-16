@@ -163,8 +163,6 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
 
     public IActionResult OnPostUpdateSelection()
     {
-        logger.LogDebug("OnPostUpdateSelection called");
-        
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         Search.Distance = SelectedTravelDistance;
         
@@ -178,11 +176,11 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
 
     internal List<int> GetPageNumbers()
     {
-        List<int> pages = new List<int>();
+        var pages = new List<int>();
 
         if (TotalPages <= 3)
         {
-            for (int i = 1; i <= TotalPages; i++)
+            for (var i = 1; i <= TotalPages; i++)
             {
                 pages.Add(i);
             }

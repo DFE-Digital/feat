@@ -1,35 +1,33 @@
 using System.Globalization;
 using System.IO.Compression;
-using System.Security.Cryptography;
 using Azure.Storage.Blobs;
 using CsvHelper;
 using feat.common.Models;
 using feat.common.Models.Enums;
-using feat.ingestion.Configuration;
 using feat.ingestion.Data;
 using feat.ingestion.Enums;
-using feat.ingestion.Models.FAC;
 using feat.ingestion.Models.Geolocation;
 using feat.ingestion.Models.Geolocation.Converters;
 
 namespace feat.ingestion.Handlers.Geolocation;
 
 public class GeolocationHandler(
-    IngestionOptions options,
     IngestionDbContext dbContext,
-    BlobServiceClient blobServiceClient) : IngestionHandler(options)
+    BlobServiceClient blobServiceClient) : IngestionHandler
 {
     public override IngestionType IngestionType => IngestionType.Api;
     public override string Name => "Geolocation Handler";
     public override string Description => "Ingestion handler to grab postcode and location information from ONS";
+#pragma warning disable CS0618 // Type or member is obsolete
     public override SourceSystem SourceSystem => SourceSystem.NotSpecified;
+#pragma warning restore CS0618 // Type or member is obsolete
 
     private const string ContainerName = "geolocation";
-
-
+    
     public override async Task<bool> IngestAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine($"Starting ingestion for {Name}...");
+        
         var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
         await containerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
         var valid = await ValidateAsync(cancellationToken);

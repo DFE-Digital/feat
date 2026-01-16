@@ -34,20 +34,18 @@ public class IndexPageTests
                 HttpContext = httpContext
             }
         };
+        
         return model;
     }
 
     [Fact]
     public void OnGet_Sets_Search_In_Session_And_Sets_PageHistory()
     {
-        //arrange
         var session = new TestSession();
         var model = CreateModel(session);
-
-        //act
+        
         var result = model.OnGet();
-
-        //assert
+        
         Assert.IsType<PageResult>(result);
         Assert.True(session.TryGetValue("Search", out var data));
         

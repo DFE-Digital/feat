@@ -16,5 +16,4 @@ public enum QualificationLevel
     
     [Display(Name = "Level 4 to 8 (like diplomas and degrees)")] 
     FourToEight = 1 << 4
-        
 }

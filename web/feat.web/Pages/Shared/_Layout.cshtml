@@ -39,9 +39,7 @@
     <link rel="stylesheet" href="~/css/moj-frontend.min.css" />
 }
 
-
 @await RenderSectionAsync("Head", required: false)
-
 
 @section BodyStart {
     <!-- Google Tag Manager (noscript) -->
@@ -85,7 +83,6 @@
     }
 }
 
-
 @section Header {
     <header class="govuk-header" data-module="govuk-header" data-govuk-header-init>
         <div class="govuk-header__container govuk-width-container">
@@ -114,7 +111,6 @@
         <govuk-back-link href="@ViewBag.StaticBackPageUrl">Back </govuk-back-link>
     }
 }
-
 
 @await RenderSectionAsync("BeforeContent", required: false)
 

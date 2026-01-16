@@ -10,8 +10,8 @@ namespace feat.api.tests.Controllers;
 [TestFixture]
 public class SearchControllerTests
 {
-    private ISearchService _searchService;
-    private SearchController _controller;
+    private ISearchService _searchService = null!;
+    private SearchController _controller = null!;
 
     [SetUp]
     public void Setup()

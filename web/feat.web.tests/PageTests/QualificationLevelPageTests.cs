@@ -13,115 +13,123 @@ namespace feat.web.tests.PageTests;
 
 public class QualificationLevelPageTests
 {
-	private static QualificationLevelModel CreateModel(ISession session)
-	{
-		var httpContext = new DefaultHttpContext
-		{
-			Session = session
-		};
+    private static (QualificationLevelModel model, TestSession session) CreateModelWithSearch(Search? search = null)
+    {
+        var session = new TestSession();
+        session.Set("Search", Encoding.UTF8.GetBytes(JsonSerializer.Serialize(search ?? new Search { Updated = true })));
 
-		var model = new QualificationLevelModel(NullLogger<QualificationLevelModel>.Instance)
-		{
-			PageContext = new PageContext
-			{
-				HttpContext = httpContext
-			},
-			Search = new Search(),
-		};
-		return model;
-	}
+        var model = new QualificationLevelModel(NullLogger<QualificationLevelModel>.Instance)
+        {
+            PageContext = new PageContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    Session = session
+                }
+            },
+            Search = null!
+        };
 
-	[Fact]
-	public void OnGet_Populates_SelectedQualificationOptions_From_Session_And_Returns_Page()
-	{
-		var search = new Search { Updated = true, QualificationLevels = new List<QualificationLevel>
-		{
-			QualificationLevel.FourToEight, QualificationLevel.OneAndTwo
-		} };
-		var session = new TestSession();
-		session.Set("Search", Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(search)));
+        return (model, session);
+    }
 
-		var model = CreateModel(session);
+    [Fact]
+    public void OnGet_Populates_SelectedQualificationOptions_From_Session()
+    {
+        var search = new Search
+        {
+            Updated = true,
+            QualificationLevels = [QualificationLevel.FourToEight, QualificationLevel.OneAndTwo]
+        };
+        var (model, _) = CreateModelWithSearch(search);
 
-		var result = model.OnGet();
+        var result = model.OnGet();
 
-		Assert.IsType<PageResult>(result);
-		Assert.Contains(QualificationLevel.FourToEight, model.SelectedQualificationOptions);
-		Assert.Contains(QualificationLevel.OneAndTwo, model.SelectedQualificationOptions);
-	}
+        Assert.IsType<PageResult>(result);
+        Assert.Contains(QualificationLevel.FourToEight, model.SelectedQualificationOptions);
+        Assert.Contains(QualificationLevel.OneAndTwo, model.SelectedQualificationOptions);
+    }
 
-	[Fact]
-	public void OnPost_Returns_Page_When_No_Qualification_Selection()
-	{
-		var search = new Search();
-		var session = new TestSession();
-		session.Set("Search", Encoding.UTF8.GetBytes(JsonSerializer.Serialize(search)));
+    [Fact]
+    public void OnGet_Populates_SelectedQualificationOptions_From_TempData()
+    {
+        var (model, _) = CreateModelWithSearch();
+        model.SelectedQualificationsJson = JsonSerializer.Serialize(new List<QualificationLevel> { QualificationLevel.Three });
 
-		var model = CreateModel(session);
-		model.SelectedQualificationOptions = new List<QualificationLevel>();
+        var result = model.OnGet();
 
-		var result = model.OnPost();
+        Assert.IsType<PageResult>(result);
+        Assert.Contains(QualificationLevel.Three, model.SelectedQualificationOptions);
+    }
 
-		var redirect = Assert.IsType<RedirectToPageResult>(result);
-		Assert.Null(redirect.PageName);
-		Assert.Equal(SharedStrings.SelectQualificationLevel, model.ValidationError);
-	}
+    [Fact]
+    public void OnGet_Adds_ModelState_Error_From_ValidationError()
+    {
+        var (model, _) = CreateModelWithSearch();
+        model.ValidationError = "Custom error";
 
-	[Fact]
-	public void OnPost_Redirects_To_Age_When_Selects_QualificationNone_And_Not_VisitedCheckAnswers()
-	{
-		var search = new Search { VisitedCheckAnswers = false };
-		var session = new TestSession();
-		session.Set("Search", Encoding.UTF8.GetBytes(JsonSerializer.Serialize(search)));
+        var result = model.OnGet();
 
-		var model = CreateModel(session);
-		model.SelectedQualificationOptions = new List<QualificationLevel> { QualificationLevel.None };
+        Assert.IsType<PageResult>(result);
+        Assert.False(model.ModelState.IsValid);
+        Assert.True(model.ModelState.ContainsKey(nameof(model.SelectedQualificationOptions)));
+    }
 
-		var result = model.OnPost();
+    [Fact]
+    public void OnPost_Returns_Page_When_No_Qualification_Selected()
+    {
+        var (model, _) = CreateModelWithSearch();
+        model.SelectedQualificationOptions = new List<QualificationLevel>();
 
-		var redirect = Assert.IsType<RedirectToPageResult>(result);
-		Assert.Equal(PageName.Age, redirect.PageName);
+        var result = model.OnPost();
 
-		Assert.True(session.TryGetValue("Search", out var data));
-		var saved = JsonSerializer.Deserialize<Search>(Encoding.UTF8.GetString(data))!;
-		
-		Assert.Contains(QualificationLevel.None, saved.QualificationLevels);
-		Assert.True(saved.Updated);
-	}
+        var redirect = Assert.IsType<RedirectToPageResult>(result);
+        Assert.Null(redirect.PageName);
+        Assert.Equal(SharedStrings.SelectQualificationLevel, model.ValidationError);
+    }
 
-	[Fact]
-	public void OnPost_Redirects_To_CheckAnswers_When_Selects_None_And_VisitedCheckAnswers_And_AgeGroupSet()
-	{
-		var search = new Search { VisitedCheckAnswers = true, AgeGroup = AgeGroup.Eighteen }; 
-		var session = new TestSession();
-		session.Set("Search", Encoding.UTF8.GetBytes(JsonSerializer.Serialize(search)));
+    [Theory]
+    [InlineData(QualificationLevel.None, PageName.Age, false)]
+    [InlineData(QualificationLevel.None, PageName.CheckAnswers, true)]
+    [InlineData(QualificationLevel.OneAndTwo, PageName.Age, false)]
+    [InlineData(QualificationLevel.OneAndTwo, PageName.CheckAnswers, true)]
+    public void OnPost_Redirects_Correctly_Based_On_Selection(QualificationLevel level, string expectedPage, bool visitedCheckAnswers)
+    {
+        var search = new Search
+        {
+            VisitedCheckAnswers = visitedCheckAnswers,
+            AgeGroup = visitedCheckAnswers ? AgeGroup.Eighteen : null
+        };
+        var (model, session) = CreateModelWithSearch(search);
 
-		var model = CreateModel(session);
-		model.SelectedQualificationOptions = new List<QualificationLevel> { QualificationLevel.None };
+        model.SelectedQualificationOptions = [level];
 
-		var result = model.OnPost();
+        var result = model.OnPost();
+        var redirect = Assert.IsType<RedirectToPageResult>(result);
+        Assert.Equal(expectedPage, redirect.PageName);
 
-		var redirect = Assert.IsType<RedirectToPageResult>(result);
-		Assert.Equal(PageName.CheckAnswers, redirect.PageName);
-	}
+        Assert.True(session.TryGetValue("Search", out var data));
+        var saved = JsonSerializer.Deserialize<Search>(Encoding.UTF8.GetString(data))!;
+        Assert.Contains(level, saved.QualificationLevels);
+        Assert.True(saved.Updated);
+    }
 
-	[Fact]
-	public void OnPost_Clears_AgeGroup_And_Redirects_CheckAnswers_When_Selects_Other_And_VisitedCheckAnswers_True()
-	{
-		var search = new Search { VisitedCheckAnswers = true, AgeGroup = AgeGroup.Eighteen };
-		var session = new TestSession();
-		session.Set("Search", Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(search)));
+    [Fact]
+    public void OnPost_Clears_AgeGroup_And_Redirects_CheckAnswers_When_Selects_Other_And_VisitedCheckAnswers()
+    {
+        var search = new Search { VisitedCheckAnswers = true, AgeGroup = AgeGroup.Eighteen };
+        var (model, session) = CreateModelWithSearch(search);
 
-		var model = CreateModel(session);
-		model.SelectedQualificationOptions = new List<QualificationLevel> { QualificationLevel.FourToEight };
+        model.SelectedQualificationOptions = [QualificationLevel.FourToEight];
 
-		var result = model.OnPost();
+        var result = model.OnPost();
+        var redirect = Assert.IsType<RedirectToPageResult>(result);
 
-		var redirect = Assert.IsType<RedirectToPageResult>(result);
-		Assert.Equal(PageName.CheckAnswers, redirect.PageName);
+        Assert.Equal(PageName.CheckAnswers, redirect.PageName);
 
-		Assert.True(session.TryGetValue("Search", out var data));
-		var saved = JsonSerializer.Deserialize<Search>(Encoding.UTF8.GetString(data))!;
-		Assert.Null(saved.AgeGroup);
-	}
+        Assert.True(session.TryGetValue("Search", out var data));
+        var saved = JsonSerializer.Deserialize<Search>(Encoding.UTF8.GetString(data))!;
+        Assert.Null(saved.AgeGroup);
+        Assert.True(saved.Updated);
+    }
 }
