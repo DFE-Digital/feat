@@ -25,10 +25,9 @@ async function goToAgeWithQualificationSelections(
 
     // Pick a location + distance that keeps Interests optional 
     await loc.enterLocationAndSelectFirst('Leeds');
-    await loc.distanceRadio('Up to 10 miles').check();
-    await expect(loc.distanceRadio('Up to 10 miles')).toBeChecked();
-
+    await loc.selectDistance('Up to 10 miles');
     await loc.continueButton().click();
+
     await expect(page).toHaveURL(/\/interests$/i);
 
     // 3) Interests step (optional path -> can continue blank)
