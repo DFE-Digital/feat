@@ -25,7 +25,7 @@ public class AiSearchEntry
     [StringLength(255)]
     public required string Title { get; set; }
     
-    [VectorSearchField(IsHidden = true, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
+    [VectorSearchField(IsHidden = false, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
     [NotMapped]
     public IReadOnlyList<float> TitleVector { get; set; } = new List<float>();
     
@@ -33,14 +33,14 @@ public class AiSearchEntry
     [StringLength(255)]
     public string? LearningAimTitle { get; set; }
 
-    [VectorSearchField(IsHidden = true, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
+    [VectorSearchField(IsHidden = false, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
     [NotMapped]
     public IReadOnlyList<float> LearningAimTitleVector { get; set; } = new List<float>();
     
     [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
     public string? Description { get; set; }
     
-    [VectorSearchField(IsHidden = true, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
+    [VectorSearchField(IsHidden = false, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
     [NotMapped]
     public IReadOnlyList<float> DescriptionVector { get; set; } = new List<float>();
     
@@ -48,7 +48,7 @@ public class AiSearchEntry
     [StringLength(800)]
     public string? Sector { get; set; }
     
-    [VectorSearchField(IsHidden = true, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
+    [VectorSearchField(IsHidden = false, VectorSearchDimensions = 3072, VectorSearchProfileName = "my-vector-profile")]
     [NotMapped]
     public IReadOnlyList<float> SectorVector { get; set; } = new List<float>();
     
