@@ -25,6 +25,8 @@ public static class DtoMapper
             LocationName = course.LocationName,
             Distance = course.Distance,
             CourseType = course.CourseType,
+            DeliveryMode = course.DeliveryMode.ToDeliveryMode(),
+            IsNational =  course.IsNational,
             Requirements = course.Requirements,
             Overview = course.Overview
         };

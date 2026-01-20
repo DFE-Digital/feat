@@ -33,7 +33,7 @@ public static class StringExtensions
             return string.IsNullOrEmpty(source) ? source : Converter.Convert(source);
         }
 
-        public string? ValueOrNotProvided()
+        public string ValueOrNotProvided()
         {
             return string.IsNullOrEmpty(source) ? SharedStrings.NotProvided : source;
         }

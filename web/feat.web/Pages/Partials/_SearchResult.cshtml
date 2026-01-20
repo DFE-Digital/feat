@@ -23,14 +23,7 @@
       <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Location</dt>
         <dd class="govuk-summary-list__value">
-          @if (Model.Distance == null)
-          {
-            @Model.LocationName.ValueOrNotProvided()
-          }
-          else
-          {
-            @(Model.LocationName.ValueOrNotProvided() + ", " + Model.DistanceDisplay)
-          }
+          @Model.LocationDisplay
         </dd>
       </div>
       <div class="govuk-summary-list__row">
@@ -49,7 +42,7 @@
             
             if (string.IsNullOrEmpty(remainderText))
             {
-              <p>@Model.Overview</p>
+              <p>@Model.Overview.ValueOrNotProvided()</p>
             }
             else
             {

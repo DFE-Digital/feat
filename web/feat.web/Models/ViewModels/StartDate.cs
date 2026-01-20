@@ -6,5 +6,7 @@ public record StartDate(DateTime Date)
 {
     private static readonly CultureInfo DisplayCulture = new("en-GB");
 
-    public string Display => Date.ToString("d MMMM yyyy", DisplayCulture);
+    public string? Display => Date != DateTime.MinValue
+        ? Date.ToString("d MMMM yyyy", DisplayCulture)
+        : null;
 }
