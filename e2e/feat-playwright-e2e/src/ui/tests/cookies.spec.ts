@@ -3,7 +3,7 @@ import { CookieBanner } from '../pages/cookieBanner';
 
 test.describe('FEAT – Cookies', () => {
     test('Cookie banner is shown on first visit', async ({ page, baseURL }) => {
-        await page.goto(baseURL || '/', { waitUntil: 'networkidle' });
+        await page.goto(baseURL || '/', { waitUntil: 'domcontentloaded' });
 
         const banner = new CookieBanner(page);
         await banner.expectVisible();
@@ -13,13 +13,13 @@ test.describe('FEAT – Cookies', () => {
                                                                                                  page,
                                                                                                  baseURL,
                                                                                              }) => {
-        await page.goto(baseURL || '/', { waitUntil: 'networkidle' });
+        await page.goto(baseURL || '/', { waitUntil: 'domcontentloaded' });
 
         const banner = new CookieBanner(page);
         await banner.accept();
 
         // Reload -> banner should stay hidden
-        await page.reload({ waitUntil: 'networkidle' });
+        await page.reload({ waitUntil: 'domcontentloaded' });
         await banner.expectHidden();
 
         const cookies = await page.context().cookies();
@@ -38,12 +38,12 @@ test.describe('FEAT – Cookies', () => {
                                                                                                  page,
                                                                                                  baseURL,
                                                                                              }) => {
-        await page.goto(baseURL || '/', { waitUntil: 'networkidle' });
+        await page.goto(baseURL || '/', { waitUntil: 'domcontentloaded' });
 
         const banner = new CookieBanner(page);
         await banner.reject();
 
-        await page.reload({ waitUntil: 'networkidle' });
+        await page.reload({ waitUntil: 'domcontentloaded' });
         await banner.expectHidden();
 
         const cookies = await page.context().cookies();
@@ -59,19 +59,19 @@ test.describe('FEAT – Cookies', () => {
     });
 
     test('If cookies are cleared, banner reappears', async ({ page, baseURL }) => {
-        await page.goto(baseURL || '/', { waitUntil: 'networkidle' });
+        await page.goto(baseURL || '/', { waitUntil: 'domcontentloaded' });
 
         const banner = new CookieBanner(page);
         await banner.accept();
 
         await page.context().clearCookies();
 
-        await page.goto(baseURL || '/', { waitUntil: 'networkidle' });
+        await page.goto(baseURL || '/', { waitUntil: 'domcontentloaded' });
         await banner.expectVisible();
     });
 
     test('View cookies link navigates to cookies page', async ({ page, baseURL }) => {
-        await page.goto(baseURL || '/', { waitUntil: 'networkidle' });
+        await page.goto(baseURL || '/', { waitUntil: 'domcontentloaded' });
 
         const banner = new CookieBanner(page);
         await banner.expectVisible();

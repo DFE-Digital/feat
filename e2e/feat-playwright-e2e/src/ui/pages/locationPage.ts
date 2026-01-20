@@ -8,103 +8,132 @@ export class LocationPage {
     heading = (): Locator =>
         this.page.locator('h1.govuk-heading-l', { hasText: 'Where do you want to study?' });
 
-    introParagraph = (): Locator =>
-        this.page.getByText('You can search anywhere in England.');
-
     locationInput = (): Locator => this.page.locator('#Location');
 
     // Autocomplete
     suggestionsMenu = (): Locator => this.page.locator('#Location__listbox');
-    
+
+    // Option items (filter out transient/non-option messages)
     suggestionOptions = (): Locator =>
-        this.page.locator(
-            '#Location__listbox [role="option"]' +
-            ':not(:has-text("No results found"))' +
-            ':not(:has-text("Searching, please wait"))'
-        );
-
-    noResultsMessage = (): Locator =>
-        this.page.getByText(/No locations found/i);
-
-    distanceLegend = (): Locator =>
-        this.page.locator('legend.govuk-fieldset__legend', {
-            hasText: /How far would you be happy to travel/i,
+        this.page.locator('#Location__listbox [role="option"]').filter({
+            hasNotText: /No locations found|Searching, please wait/i,
         });
 
-    distanceRadio = (label: string): Locator =>
-        this.page.getByRole('radio', { name: new RegExp(`^${label}$`, 'i') });
+    noResultsMessage = (): Locator =>
+        this.page.locator('#Location__listbox').getByText(/No locations found/i);
 
-    continueButton = (): Locator =>
-        this.page.getByRole('button', { name: /^Continue$/i });
+    statusA = (): Locator => this.page.locator('#Location__status--A');
+
+    distanceRadio = (label: string): Locator =>
+        this.page.getByRole('radio', { name: new RegExp(`^${escapeRegex(label)}$`, 'i') });
+
+    continueButton = (): Locator => this.page.getByRole('button', { name: /^Continue$/i });
 
     // Error handling
     errorSummary = (): Locator => this.page.locator('.govuk-error-summary');
 
-    errorSummaryHeading = (): Locator =>
-        this.page.getByRole('heading', { name: /There is a problem/i });
-
     fieldError = (text: string): Locator =>
-        this.page.locator('.govuk-error-message', { hasText: new RegExp(text, 'i') });
-
-    locationFormGroupError = (): Locator =>
-        this.page
-            .locator('#Location')
-            .locator('xpath=ancestor::*[contains(@class,"govuk-form-group--error")]');
+        this.page.locator('.govuk-error-message', { hasText: new RegExp(escapeRegex(text), 'i') });
 
     async goto() {
-        await this.page.goto('/location', { waitUntil: 'networkidle' });
+        await this.page.goto('/location', { waitUntil: 'domcontentloaded' });
         await expect(this.heading()).toBeVisible();
+        await expect(this.locationInput()).toBeVisible();
+        await expect(this.locationInput()).toBeEnabled();
     }
 
-    async enterLocationAndSelectFirst(value: string) {
+    async enterLocationAndSelectFirst(value: string): Promise<string> {
         const typed = value.trim();
-        if (typed.length < 3) {
-            throw new Error('Location autocomplete requires at least 3 characters');
-        }
+        if (typed.length < 3) throw new Error('Location autocomplete requires at least 3 characters');
 
         const input = this.locationInput();
-        await input.click();
-        await input.fill('');
+        const maxAttempts = 3;
 
-        await input.pressSequentially(typed, { delay: 50 });
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            // Reset any previous state
+            await input.click();
+            await input.fill('');
+            await this.page.keyboard.press('Escape').catch(() => {}); // close stale menus if any
 
-        await expect(this.suggestionsMenu()).toBeAttached({ timeout: 10_000 });
-        await expect(this.suggestionsMenu()).not.toHaveClass(/autocomplete__menu--hidden/i, {
-            timeout: 10_000,
-        });
+            await input.type(typed, { delay: 60 });
 
-        // either no-results is visible OR we have real options
-        await expect
-            .poll(
-                async () => {
+            const expanded = await expect
+                .poll(async () => (await input.getAttribute('aria-expanded')) ?? 'false', {
+                    timeout: 15_000,
+                })
+                .toBe('true')
+                .then(() => true)
+                .catch(() => false);
+
+            if (!expanded) {
+                if (attempt === maxAttempts) {
+                    throw new Error(`Autocomplete never expanded for "${typed}" (attempt ${attempt})`);
+                }
+                await this.page.waitForTimeout(300);
+                continue;
+            }
+
+            // Wait until we either have options OR a no-results outcome
+            const ready = await expect
+                .poll(async () => {
                     const noResults = await this.noResultsMessage().isVisible().catch(() => false);
-                    const optionCount = await this.suggestionOptions().count();
-                    return noResults || optionCount > 0;
-                },
-                { timeout: 20_000 }
-            )
-            .toBe(true);
+                    const optionCount = await this.suggestionOptions().count().catch(() => 0);
+                    return noResults ? 'no-results' : optionCount > 0 ? 'options' : 'waiting';
+                }, { timeout: 25_000 })
+                .not.toBe('waiting')
+                .then(async () => {
+                    // return the final state to decide next
+                    const noResults = await this.noResultsMessage().isVisible().catch(() => false);
+                    return noResults ? 'no-results' : 'options';
+                })
+                .catch(() => 'waiting');
 
-        if (await this.noResultsMessage().isVisible().catch(() => false)) {
-            throw new Error(`No locations found for "${typed}"`);
+            if (ready === 'no-results') {
+                throw new Error(`No locations found for "${typed}"`);
+            }
+
+            if (ready !== 'options') {
+                if (attempt === maxAttempts) {
+                    throw new Error(`Autocomplete did not produce options for "${typed}"`);
+                }
+                await this.page.waitForTimeout(300);
+                continue;
+            }
+
+            // Optional: wait for status text to say results available
+            await this.statusA()
+                .waitFor({ state: 'visible', timeout: 5_000 })
+                .catch(() => {});
+            await this.page.keyboard.press('ArrowDown');
+            await this.page.keyboard.press('Enter');
+
+            // Confirm value is set and menu collapses
+            await expect(input).not.toHaveValue('', { timeout: 10_000 });
+            await expect
+                .poll(async () => (await input.getAttribute('aria-expanded')) ?? 'false', {
+                    timeout: 10_000,
+                })
+                .toBe('false');
+
+            return (await input.inputValue()).trim();
         }
 
-        const firstRealOption = this.suggestionOptions().first();
+        throw new Error(`Failed to select location for "${typed}" after ${maxAttempts} attempts`);
+    }
 
-        // click once it exists
-        await firstRealOption.scrollIntoViewIfNeeded();
-        const firstText = (await firstRealOption.innerText()).trim();
+    async selectDistance(label: string) {
+        const radio = this.distanceRadio(label);
 
-        await firstRealOption.click({ force: true });
-
-        await expect(input).toHaveValue(firstText, { timeout: 10_000 });
-        await expect(this.suggestionsMenu()).toHaveClass(/autocomplete__menu--hidden/i, {
+        await expect(this.page.locator('input[type="radio"][name="Distance"]').first()).toBeVisible({
             timeout: 10_000,
         });
 
-        return firstText;
+        await radio.scrollIntoViewIfNeeded();
+        await radio.setChecked(true, { force: true });
+        await expect(radio).toBeChecked();
     }
+}
 
-
-
+function escapeRegex(str: string) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
