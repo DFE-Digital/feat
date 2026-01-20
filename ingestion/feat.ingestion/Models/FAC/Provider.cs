@@ -10,7 +10,8 @@ namespace feat.ingestion.Models.FAC;
 public class Provider
 {
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    [Key] public Guid ProviderId { get; set; }
+    [Key]
+    public Guid ProviderId { get; set; }
     
     public int? Ukprn { get; set; }
     
@@ -31,8 +32,6 @@ public class Provider
     public string? Alias { get; set; }
     
     public DateTime? UpdatedOn { get; set; }
-
-    
 }
 
 public sealed class ProviderMap : ClassMap<Provider>

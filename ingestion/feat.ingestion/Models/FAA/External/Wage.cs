@@ -11,5 +11,4 @@ public class Wage
     public string? WageAdditionalInformation { get; set; }
     
     public string? WorkingWeekDescription { get; set; }
-
 }

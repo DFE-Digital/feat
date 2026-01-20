@@ -27,7 +27,6 @@ public class Location
     
     [StringLength(1000)]
     public string? StudentUnionUrl { get; set; }
-
 }
 
 public sealed class LocationMap : ClassMap<Location>

@@ -3,9 +3,7 @@
 const sass = require("gulp-sass")(require('sass'));
 const sourcemaps = require('gulp-sourcemaps');
 
-const { task, series, dest, src, parallel } = require("gulp");
-    
-
+const { task, series, dest, src } = require("gulp");
 
 let paths = {
     src: 'AssetSrc/',

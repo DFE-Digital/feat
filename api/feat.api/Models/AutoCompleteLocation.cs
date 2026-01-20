@@ -1,5 +1,3 @@
-using feat.common.Models;
-
 namespace feat.api.Models;
 
 public record AutoCompleteLocation

@@ -90,7 +90,6 @@ public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : 
     public DbSet<FAC.Provider> FAC_Providers { get; set; }
     public DbSet<FAC.Venue> FAC_Venues { get; set; }
     
-    
     #endregion
     
     #region Find an Apprenticeship

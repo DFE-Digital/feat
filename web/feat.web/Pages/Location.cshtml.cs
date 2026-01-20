@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using feat.web.Enums;
 using feat.web.Extensions;
 using feat.web.Models;
@@ -6,13 +5,11 @@ using feat.web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using feat.web.Utils;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace feat.web.Pages;
 
 public class LocationModel(ILogger<LocationModel> logger, ISearchService searchService) : PageModel
 {
-
     [BindProperty]
     public string? Location { get; set; }
     
@@ -23,7 +20,6 @@ public class LocationModel(ILogger<LocationModel> logger, ISearchService searchS
 
     public async Task<JsonResult> OnGetAutoCompleteAsync([FromQuery] string query, CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("OnGetAutoComplete");
         AutoCompleteLocation[] locations = [];
         
         if (query.Length > 2)
@@ -36,8 +32,6 @@ public class LocationModel(ILogger<LocationModel> logger, ISearchService searchS
     
     public IActionResult OnGet()
     {
-        logger.LogInformation("OnGet");
-        
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
         
         // If you've come here from LoadCourses page then start to 'new Search'
@@ -46,12 +40,17 @@ public class LocationModel(ILogger<LocationModel> logger, ISearchService searchS
             Search = new Search();
             Search.SetPage(PageName.Index);
         }
-        
+
         if (!string.IsNullOrEmpty(Search.Location))
+        {
             Location = Search.Location;
+        }
+
         if (Search.Distance.HasValue)
+        {
             Distance = Search.Distance;
-        
+        }
+
         Search.SetPage(PageName.Location);
         HttpContext.Session.Set("Search", Search);
         
@@ -68,6 +67,7 @@ public class LocationModel(ILogger<LocationModel> logger, ISearchService searchS
         {
             // Try to fetch the location from the search service and, if we have no results, show an error
             var locationValid = await searchService.IsLocationValid(Location, cancellationToken);
+            
             if (!locationValid)
             {
                 ModelState.AddModelError("Location", SharedStrings.LocationNotFound);
@@ -83,20 +83,28 @@ public class LocationModel(ILogger<LocationModel> logger, ISearchService searchS
         {
             ModelState.AddModelError("Distance", SharedStrings.SelectHowFarCanUTravel);
         }
+        
         if (string.IsNullOrEmpty(Location) && distanceValue > 0)
         {
             ModelState.AddModelError("Location", SharedStrings.EnterCityOrPostcode);
         }
 
         if (!ModelState.IsValid)
+        {
             return Page();
-        
+        }
+
         Search.Updated = true;
         
-        if (!string.IsNullOrEmpty(Location)) 
+        if (!string.IsNullOrEmpty(Location))
+        {
             Search.Location = Location.Trim();
-        if (Distance != null) 
+        }
+
+        if (Distance != null)
+        {
             Search.Distance = Distance.Value;
+        }
         
         Search.OriginalDistance = Distance;
 
@@ -104,16 +112,18 @@ public class LocationModel(ILogger<LocationModel> logger, ISearchService searchS
 
         if (Search.VisitedCheckAnswers)
         {
-            bool mustAnswerInterests = Distance == null || Distance == Enums.Distance.ThirtyPlus;
-            if (!mustAnswerInterests) 
+            var mustAnswerInterests = Distance == null || Distance == Enums.Distance.ThirtyPlus;
+
+            if (!mustAnswerInterests)
+            {
                 return RedirectToPage(PageName.CheckAnswers);
+            }
 
             var hasInterests = Search.Interests.Any(searchInterest => !string.IsNullOrEmpty(searchInterest));
+            
             return RedirectToPage(hasInterests ? PageName.CheckAnswers : PageName.Interests);
         }
-        else
-        {
-            return RedirectToPage(PageName.Interests);
-        }
+
+        return RedirectToPage(PageName.Interests);
     }
 }

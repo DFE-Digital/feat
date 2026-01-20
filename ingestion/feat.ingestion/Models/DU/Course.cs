@@ -9,6 +9,7 @@ namespace feat.ingestion.Models.DU;
 public class Course
 {
     public int UKPRN { get; set; }
+    
     public int PubUKPRN { get; set; }
 
     [StringLength(50)]
@@ -45,17 +46,17 @@ public class Course
     
     public int? NumberOfYears { get; set; }
     
-   
-    
     public int? Hecos { get; set; }
+    
     public int? Hecos2 { get; set; }
+    
     public int? Hecos3 { get; set; }
+    
     public int? Hecos4 { get; set; }
+    
     public int? Hecos5 { get; set; }
     
     public int? Aim { get; set; }
-    
-
 }
 
 public sealed class CourseMap : ClassMap<Course>
@@ -94,6 +95,5 @@ public sealed class CourseMap : ClassMap<Course>
         Map(m => m.Hecos5).Name("HECOS").NameIndex(4);
         
         Map(m => m.Aim).Name("KISAIMCODE");
-        
     }
 }

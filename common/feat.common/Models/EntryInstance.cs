@@ -39,6 +39,6 @@ public class EntryInstance
     
     [ForeignKey("LocationId")]
     [InverseProperty("EntryInstances")]
-    public Location? Location { get; set; } = null!;
+    public Location? Location { get; set; }
 }
 

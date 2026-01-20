@@ -10,8 +10,8 @@ namespace feat.api.tests.Controllers;
 [TestFixture]
 public class AutocompleteLocationsControllerTests
 {
-    private ISearchService _searchService;
-    private AutocompleteLocationsController _controller;
+    private ISearchService _searchService = null!;
+    private AutocompleteLocationsController _controller = null!;
 
     [SetUp]
     public void Setup()

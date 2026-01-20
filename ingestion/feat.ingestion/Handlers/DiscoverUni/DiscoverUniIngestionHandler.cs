@@ -26,8 +26,7 @@ public class DiscoverUniIngestionHandler(
     IngestionOptions options,
     IngestionDbContext dbContext,
     ISearchIndexHandler searchIndexHandler,
-    BlobServiceClient blobServiceClient)
-    : IngestionHandler(options)
+    BlobServiceClient blobServiceClient) : IngestionHandler
 {
     public override IngestionType IngestionType => IngestionType.Compressed | IngestionType.Csv | IngestionType.Manual;
     public override string Name => "Discover Uni";
@@ -35,7 +34,6 @@ public class DiscoverUniIngestionHandler(
     public override SourceSystem SourceSystem => SourceSystem.DiscoverUni;
 
     private const string ContainerName = "discoveruni";
-
 
     public override async Task<bool> ValidateAsync(CancellationToken cancellationToken)
     {
@@ -57,22 +55,23 @@ public class DiscoverUniIngestionHandler(
         }
 
         return true;
-
     }
 
     public override async Task<bool> IngestAsync(CancellationToken cancellationToken)
     {
-        bool changes = false;
-        var Download = ProcessMode.Process;
-        var Extract = ProcessMode.Process;
-        var Aims = ProcessMode.Process;
-        var Locations = ProcessMode.Process;
-        var Providers = ProcessMode.Process;
-        var HECOS = ProcessMode.Process;
-        var Courses = ProcessMode.Process;
+        const ProcessMode Download = ProcessMode.Process;
+        const ProcessMode Extract = ProcessMode.Process;
+        const ProcessMode Aims = ProcessMode.Process;
+        const ProcessMode Locations = ProcessMode.Process;
+        const ProcessMode Providers = ProcessMode.Process;
+        const ProcessMode HECOS = ProcessMode.Process;
+        const ProcessMode Courses = ProcessMode.Process;
+        
+        var changes = false;
         
         var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
         await containerClient.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
+        
         var valid = await ValidateAsync(cancellationToken);
 
         const string discoverUniDownload =
@@ -96,9 +95,6 @@ public class DiscoverUniIngestionHandler(
         }
 
         ingestionState = dbContext.DU_IngestionState.First();
-
-
-
 
         var tempPath = Path.GetTempFileName();
         
@@ -142,50 +138,62 @@ public class DiscoverUniIngestionHandler(
             }
         }
 
-        if ((!ingestionState.Extracted || Extract == ProcessMode.Force) && File.Exists(tempPath) && Extract != ProcessMode.Skip)
+        if ((!ingestionState.Extracted || Extract == ProcessMode.Force)
+            && File.Exists(tempPath) && Extract != ProcessMode.Skip)
         {
             // We need to extract the files we need
+
+            await using var archive = await ZipFile.OpenReadAsync(tempPath, cancellationToken);
             
-            using var archive = ZipFile.OpenRead(tempPath);
             foreach (var entry in archive.Entries)
             {
                 if (entry.FullName.EndsWith(Path.GetFileName("INSTITUTION.csv")))
                 {
                     Console.WriteLine("Uploading providers...");
-                    await containerClient.DeleteBlobIfExistsAsync("INSTITUTION.csv", cancellationToken: cancellationToken);
-                    await containerClient.UploadBlobAsync("INSTITUTION.csv", entry.Open(), cancellationToken);
+                    await containerClient
+                        .DeleteBlobIfExistsAsync("INSTITUTION.csv", cancellationToken: cancellationToken);
+                    await containerClient
+                        .UploadBlobAsync("INSTITUTION.csv", await entry.OpenAsync(cancellationToken), cancellationToken);
                     Console.WriteLine("Done.");
                 }
 
                 if (entry.FullName.EndsWith(Path.GetFileName("LOCATION.csv")))
                 {
                     Console.WriteLine("Uploading locations...");
-                    await containerClient.DeleteBlobIfExistsAsync("LOCATION.csv", cancellationToken: cancellationToken);
-                    await containerClient.UploadBlobAsync("LOCATION.csv", entry.Open(), cancellationToken);
+                    await containerClient
+                        .DeleteBlobIfExistsAsync("LOCATION.csv", cancellationToken: cancellationToken);
+                    await containerClient
+                        .UploadBlobAsync("LOCATION.csv", await entry.OpenAsync(cancellationToken), cancellationToken);
                     Console.WriteLine("Done.");
                 }
 
                 if (entry.FullName.EndsWith(Path.GetFileName("KISCOURSE.csv")))
                 {
                     Console.WriteLine("Uploading courses...");
-                    await containerClient.DeleteBlobIfExistsAsync("KISCOURSE.csv", cancellationToken: cancellationToken);
-                    await containerClient.UploadBlobAsync("KISCOURSE.csv", entry.Open(), cancellationToken);
+                    await containerClient
+                        .DeleteBlobIfExistsAsync("KISCOURSE.csv", cancellationToken: cancellationToken);
+                    await containerClient
+                        .UploadBlobAsync("KISCOURSE.csv", await entry.OpenAsync(cancellationToken), cancellationToken);
                     Console.WriteLine("Done.");
                 }
 
                 if (entry.FullName.EndsWith(Path.GetFileName("COURSELOCATION.csv")))
                 {
                     Console.WriteLine("Uploading course locations...");
-                    await containerClient.DeleteBlobIfExistsAsync("COURSELOCATION.csv", cancellationToken: cancellationToken);
-                    await containerClient.UploadBlobAsync("COURSELOCATION.csv", entry.Open(), cancellationToken);
+                    await containerClient
+                        .DeleteBlobIfExistsAsync("COURSELOCATION.csv", cancellationToken: cancellationToken);
+                    await containerClient
+                        .UploadBlobAsync("COURSELOCATION.csv", await entry.OpenAsync(cancellationToken), cancellationToken);
                     Console.WriteLine("Done.");
                 }
                 
                 if (entry.FullName.EndsWith(Path.GetFileName("KISAIM.csv")))
                 {
                     Console.WriteLine("Uploading AIM Codes...");
-                    await containerClient.DeleteBlobIfExistsAsync("KISAIM.csv", cancellationToken: cancellationToken);
-                    await containerClient.UploadBlobAsync("KISAIM.csv", entry.Open(), cancellationToken);
+                    await containerClient
+                        .DeleteBlobIfExistsAsync("KISAIM.csv", cancellationToken: cancellationToken);
+                    await containerClient
+                        .UploadBlobAsync("KISAIM.csv", await entry.OpenAsync(cancellationToken), cancellationToken);
                     Console.WriteLine("Done.");
                 }
             }
@@ -195,8 +203,8 @@ public class DiscoverUniIngestionHandler(
             changes = true;
         }
 
-
         const int batchSize = 5000;
+        
         // If we're not passing validation, stop
         if (!valid)
         {
@@ -221,6 +229,7 @@ public class DiscoverUniIngestionHandler(
         var aimData = files.Where(blob =>
                 blob.Name.StartsWith("KISAIM", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (aimData != null && Aims != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of aim level data...");
@@ -246,7 +255,6 @@ public class DiscoverUniIngestionHandler(
                         options.UseTableLock = true;
                     }, cancellationToken);
             }
-            
 
             Console.WriteLine("Done");
         }
@@ -255,6 +263,7 @@ public class DiscoverUniIngestionHandler(
         var hecosData = files.Where(blob =>
                 blob.Name.StartsWith("HECOS", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (hecosData != null && HECOS != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of HECOS sector data...");
@@ -286,6 +295,7 @@ public class DiscoverUniIngestionHandler(
         var locationData = files.Where(blob =>
                 blob.Name.StartsWith("LOCATION", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (locationData != null && Locations != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of location data...");
@@ -317,6 +327,7 @@ public class DiscoverUniIngestionHandler(
         var institutionData = files.Where(blob =>
                 blob.Name.StartsWith("INSTITUTION", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (institutionData != null && Providers != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of institution data...");
@@ -340,8 +351,7 @@ public class DiscoverUniIngestionHandler(
                     options.UseTableLock = true;
                 }, cancellationToken);
             }
-
-
+            
             Console.WriteLine("Done");
         }
 
@@ -380,6 +390,7 @@ public class DiscoverUniIngestionHandler(
         var courseLocationData = files.Where(blob =>
                 blob.Name.StartsWith("COURSELOCATION", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
+        
         if (courseLocationData != null && Courses != ProcessMode.Skip)
         {
             Console.WriteLine("Starting import of course location data...");
@@ -417,7 +428,7 @@ public class DiscoverUniIngestionHandler(
     {
         var resultInfo = new ResultInfo();
         var auditEntries = new List<AuditEntry>();
-        bool skip = false;
+        var skip = false;
 
         Console.WriteLine($"Starting sync of {Name} data");
 
@@ -432,6 +443,7 @@ public class DiscoverUniIngestionHandler(
         // LOCATIONS
 
         Console.WriteLine("Generating locations...");
+        
         var locations =
             from l in dbContext.DU_Locations
             where l.Country == RegionCode.XF
@@ -445,9 +457,7 @@ public class DiscoverUniIngestionHandler(
                 SourceReference = $"{l.UKPRN}_{l.LocationId}",
                 SourceSystem = SourceSystem
             };
-
-       
-
+        
         await dbContext.BulkSynchronizeAsync(locations.Distinct(), options =>
         {
             options.IgnoreOnSynchronizeUpdateExpression = l => new
@@ -468,8 +478,8 @@ public class DiscoverUniIngestionHandler(
 
         // INSTITUTIONS
         
-        
         Console.WriteLine("Generating providers...");
+        
         var providers =
             from i in dbContext.DU_Institutions
             where i.UKPRN == i.PubUKPRN
@@ -504,7 +514,9 @@ public class DiscoverUniIngestionHandler(
         resultInfo = new ResultInfo();
 
         // PROVIDER LOCATIONS
+        
         Console.WriteLine("Generating provider locations...");
+        
         var providerLocations =
             from i in dbContext.DU_Institutions
             join p in dbContext.Providers
@@ -540,9 +552,9 @@ public class DiscoverUniIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
-
         
         // ENTRY
+        
         var courses = 
             from c in dbContext.DU_Courses
             join p in dbContext.Providers on
@@ -551,8 +563,7 @@ public class DiscoverUniIngestionHandler(
                 c.Aim equals a.AimCode into aims
             from a in aims.DefaultIfEmpty()
             
-            
-            select new Entry()
+            select new Entry
             {
                 Created = DateTime.Now,
                 Updated = DateTime.Now,
@@ -602,22 +613,27 @@ public class DiscoverUniIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
+        
         // Run through the audit entries and check to see which entries were created or updated
         var createdIds = auditEntries.Where(e => e.Action == AuditActionType.Insert)
             .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
+        
         // For all of our created entries, we'll need to set those to be indexed
         var createdEntries = dbContext.Entries.WhereBulkContains(createdIds);
         await createdEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending,
             cancellationToken: cancellationToken);
+        
         // We're only interested here if any text fields have changed
         var updatedIds = auditEntries.Where(e => e.Action == AuditActionType.Update
                                                  && e.Values.Exists(ae =>
                                                      ae.ColumnName is "Title" or "AimOrAltTitle" or "Description" &&
                                                      !Equals(ae.OldValue, ae.NewValue)))
             .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
+        
         var updatedEntries = dbContext.Entries.WhereBulkContains(updatedIds);
         await updatedEntries.ForEachAsync(e => e.IngestionState = IngestionState.Pending,
             cancellationToken: cancellationToken);
+        
         await dbContext.BulkSaveChangesAsync(cancellationToken);
 
         var instances =
@@ -650,13 +666,11 @@ public class DiscoverUniIngestionHandler(
                     $"{c.UKPRN}_{c.CourseId}_{(int)c.StudyMode}",
                 EntryId = e.Id,
                 LocationId = l != null ? l.Id : null,
-                StudyMode = c.DistanceLearning != null ? c.DistanceLearning.Value.ToStudyMode() : null
+                StudyMode = c.DistanceLearning != null ? c.DistanceLearning!.Value.ToStudyMode() : null
             };
         
-        
-        var distinctInstances = instances.Distinct();
-        
         Console.WriteLine($"Generating entry instances ...");
+        
         await dbContext.BulkSynchronizeAsync(instances, options =>
         {
             options.IgnoreOnSynchronizeUpdateExpression = p => new
@@ -674,9 +688,9 @@ public class DiscoverUniIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
-
         
         // SECTORS
+        
         Console.WriteLine("Generating sectors...");
 
         var distinctSectors =
@@ -686,7 +700,6 @@ public class DiscoverUniIngestionHandler(
                 SourceSystem = SourceSystem,
                 Name = h.Label
             };
-        
 
         await dbContext.BulkSynchronizeAsync(distinctSectors.Distinct(), options =>
         {
@@ -774,6 +787,7 @@ public class DiscoverUniIngestionHandler(
         resultInfo = new ResultInfo();
         
         // UNIVERSITY SPECIFIC DATA
+        
         Console.WriteLine("Generating university course specific data...");
         
         var uniData =
@@ -807,7 +821,6 @@ public class DiscoverUniIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
 
-
         await transaction.CommitAsync(cancellationToken);
         Console.WriteLine($"{Name} Sync Done");
 
@@ -817,6 +830,7 @@ public class DiscoverUniIngestionHandler(
     public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine($"Starting {Name} AI Search indexing...");
+        
         var sb = new StringBuilder();
         var total = await dbContext.Entries
             .LongCountAsync(x => x.SourceSystem == SourceSystem, cancellationToken: cancellationToken);
@@ -965,6 +979,7 @@ public class DiscoverUniIngestionHandler(
                     .DeleteFromQueryAsync(cancellationToken: cancellationToken);
 
                 Console.WriteLine($"{Name} AI Search indexing {(result ? "complete" : "failed")}.");
+                
                 return result;
             }
 

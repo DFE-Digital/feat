@@ -3,21 +3,14 @@ using System.Net.Http.Json;
 
 namespace feat.common;
 
-public class ApiClient : IApiClient
+public class ApiClient(IHttpClientFactory httpClientFactory) : IApiClient
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-
-    public ApiClient(IHttpClientFactory httpClientFactory)
-    {
-        _httpClientFactory = httpClientFactory;
-    }
-
     public async Task<T?> GetAsync<T>(
         string clientName,
         string url,
         CancellationToken cancellationToken = default)
     {
-        var client = _httpClientFactory.CreateClient(clientName);
+        var client = httpClientFactory.CreateClient(clientName);
 
         var response = await client.GetAsync(url, cancellationToken);
         
@@ -46,7 +39,7 @@ public class ApiClient : IApiClient
         object body,
         CancellationToken cancellationToken = default)
     {
-        var client = _httpClientFactory.CreateClient(clientName);
+        var client = httpClientFactory.CreateClient(clientName);
 
         var response = await client.PostAsJsonAsync(url, body, cancellationToken);
 

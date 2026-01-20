@@ -76,12 +76,9 @@ services.AddSingleton(ingestionOptions);
 
 services.AddIngestionServices();
 
-
-
-
-switch (cacheOptions?.Type)
+switch (cacheOptions.Type)
 {
-    case "Memory":
+    case CacheOptions.Memory:
         services.AddMemoryCache();
         services.AddFusionCache()
             .WithSerializer(
@@ -93,7 +90,7 @@ switch (cacheOptions?.Type)
                 SkipBackplaneNotifications = true
             });
         break;
-    case "Redis":
+    case CacheOptions.Redis:
         var cacheConnectionString = config.GetConnectionString("Cache");
         if (string.IsNullOrEmpty(cacheConnectionString))
         {

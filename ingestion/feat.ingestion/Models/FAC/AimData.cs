@@ -10,14 +10,16 @@ public class AimData
 {
     [StringLength(8)]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    [Key] public string LearnAimRef { get; set; }
+    [Key]
+    public string LearnAimRef { get; set; }
+    
     public EducationLevel? NotionalNVQLevelv2 { get; set; }
+    
     [StringLength(255)]
     public string LearnAimRefTitle { get; set; }
+    
     [StringLength(50)]
     public string AwardOrgCode { get; set; }
-    
-    
 }
 
 public sealed class AimDataMap : ClassMap<AimData>

@@ -10,6 +10,7 @@ public class MigrationsHandler(IngestionDbContext dbContext) : IMigrationsHandle
         try
         {
             var pendingMigrations = dbContext.Database.GetPendingMigrations();
+            
             if (pendingMigrations.Any())
             {
                 Console.WriteLine("FEAT ingestion migrations found.");

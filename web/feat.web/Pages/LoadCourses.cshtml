@@ -259,7 +259,10 @@
 </div>
 
 @section Scripts {
-  <script src="~/js/moj-frontend.min.js"></script>
+  <script asp-add-nonce type="module">
+        import * as MOJFrontend from '/js/moj-frontend.min.js'
+        MOJFrontend.initAll()
+  </script>
   <script src="~/js/filter-toggle.js"></script>
 }
 

@@ -1,10 +1,9 @@
 using feat.common.Models.Enums;
-using feat.ingestion.Configuration;
 using feat.ingestion.Enums;
 
 namespace feat.ingestion.Handlers;
 
-public abstract class IngestionHandler(IngestionOptions options) : IIngestionHandler
+public abstract class IngestionHandler : IIngestionHandler
 {
     public virtual IngestionType IngestionType => IngestionType.Manual;
     public virtual string Name => "Default Ingestion Handler";

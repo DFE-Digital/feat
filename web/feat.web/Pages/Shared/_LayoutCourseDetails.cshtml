@@ -17,12 +17,14 @@
 }
 @* ReSharper disable Razor.SectionNotResolved *@
 @section Head {
+    <meta name="nonce" content="@Context.GetNonce()" />
+    
     <!-- Google Tag Manager -->
-    <script asp-add-nonce>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-        var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
-        j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-        j.setAttribute('nonce','@Context.GetNonce()');
-        f.parentNode.insertBefore(j,f);
+    <script asp-add-nonce>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;var n=d.querySelector('[nonce]');
+    n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','@analyticsOptions.GoogleTagManager');</script>
     <!-- End Google Tag Manager -->
     
@@ -45,7 +47,6 @@
         }
     </style>
 }
-
 
 @await RenderSectionAsync("Head", required: false)
 
@@ -78,10 +79,10 @@
                     </div>
                 </div>
                 <div class="govuk-button-group">
-                    <button type="button" class="govuk-button" data-module="govuk-button" onclick="acceptCookies(true);">
+                    <button id="acceptAnalytics" type="button" class="govuk-button" data-module="govuk-button">
                         Accept analytics cookies
                     </button>
-                    <button type="button" class="govuk-button" data-module="govuk-button" onclick="acceptCookies(false);">
+                    <button id="rejectAnalytics" type="button" class="govuk-button" data-module="govuk-button">
                         Reject analytics cookies
                     </button>
                     <a class="govuk-link" asp-page="/linkpages/cookies">View cookies</a>
@@ -90,7 +91,6 @@
         </div>
     }
 }
-
 
 @section Header {
     <header class="govuk-header" data-module="govuk-header" data-govuk-header-init>
@@ -229,11 +229,6 @@
 @section BodyEnd {
     <script src="~/js/govuk-frontend.min.js" type="module"></script>
     <script src="~/js/dfefrontend-2.0.0.min.js" type="module"></script>
-    <script src="~/js/moj-frontend.min.js" type="module"></script>
-    <script asp-add-nonce type="module">
-        import * as MOJFrontend from '/js/moj-frontend.min.js'
-        MOJFrontend.initAll()
-    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
     
@@ -242,7 +237,7 @@
         <script asp-add-nonce>
             function acceptCookies(args) {
                 document.getElementById("cookieConsent").style.display = "none";
-                if (args === true) {
+                if (this.id === "acceptAnalytics") {
                     createCookie("AnalyticsCookie", "yes");
                     createCookie("MarketingCookie", "yes");
                 } else {
@@ -257,6 +252,9 @@
                 document.cookie =
                     cookiname + "=" + cookivalue + ";" + expires + ";path=/;Secure";
             }
+
+            document.getElementById("acceptAnalytics").addEventListener("click", acceptCookies);
+            document.getElementById("rejectAnalytics").addEventListener("click", acceptCookies);
         </script>
     }
 }
