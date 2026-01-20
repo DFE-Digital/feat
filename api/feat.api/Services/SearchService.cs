@@ -84,7 +84,7 @@ public class SearchService(
         
         var courseDictionary = courses.ToDictionary(c => c.InstanceId);
         
-        foreach (var result in searchResults)
+        foreach (var result in searchResults.Where(c => courseDictionary.ContainsKey(c.InstanceId)))
         {
             var course = courseDictionary[result.InstanceId];
             
