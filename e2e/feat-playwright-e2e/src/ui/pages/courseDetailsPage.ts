@@ -29,16 +29,14 @@ export class CourseDetailsPage {
             .filter({ hasText: new RegExp(`^${escapeRegex(key)}$`, 'i') })
             .first();
 
-    cardValueForKey = (cardTitle: string, key: string): Locator =>
-        this.cardByTitle(cardTitle)
-            .locator('.govuk-summary-list__row', {
-                has: this.page.locator('.govuk-summary-list__key', {
-                    hasText: new RegExp(`^${escapeRegex(key)}$`, 'i'),
-                }),
-            })
-            .locator('.govuk-summary-list__value')
+    cardValueForKey(section: string, key: string): Locator {
+        return this.page.locator('.govuk-summary-card')
+            .filter({ has: this.page.locator('.govuk-summary-card__title', { hasText: section }) })
+            .locator('.govuk-summary-list__row')
+            .filter({ has: this.page.locator('.govuk-summary-list__key', { hasText: key }) })
+            .locator('> dd.govuk-summary-list__value') 
             .first();
-
+    }
     goToButton = (): Locator =>
         this.page.getByRole('button', { name: /go to/i });
 
