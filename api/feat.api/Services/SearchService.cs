@@ -67,15 +67,18 @@ public class SearchService(
                 Title = ei.Entry.Title,
                 Provider = ei.Entry.Provider.Name,
                 CourseType = ei.Entry.CourseType,
+                DeliveryMode = ei.StudyMode,
                 Requirements = ei.Entry.EntryRequirements,
                 Overview = ei.Entry.Description,
-                Location = ei.Location != null ? ei.Location.ToLocation().GeoLocation :
-                        ei.Entry.Provider.ProviderLocations.FirstOrDefault() != null ?
-                ei.Entry.Provider.ProviderLocations.First().Location.ToLocation().GeoLocation : null,
-                LocationName =
-                    ei.Location != null ? GetLocationName(ei.Location) :
-                        ei.Entry.Provider.ProviderLocations.FirstOrDefault() != null ?
-                            GetLocationName(ei.Entry.Provider.ProviderLocations.First().Location) : null
+                Location = ei.Location != null
+                    ? ei.Location.ToLocation().GeoLocation
+                    : null,
+                LocationName = ei.Location != null
+                    ? GetLocationName(ei.Location)
+                    : null,
+                IsNational = ei.Entry.Vacancies.FirstOrDefault() != null
+                    ? ei.Entry.Vacancies.First().NationalVacancy
+                    : null
             })
             .ToListAsync();
         

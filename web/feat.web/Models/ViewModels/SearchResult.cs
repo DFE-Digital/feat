@@ -1,4 +1,5 @@
 using feat.common;
+using feat.common.Extensions;
 using feat.common.Models.Enums;
 using feat.web.Extensions;
 
@@ -16,8 +17,6 @@ public class SearchResult
     
     public GeoLocation? Location { get; init; }
     
-    public string? LocationName { get; init; }
-    
     public double? Distance { get; init; }
     
     public string DistanceDisplay =>
@@ -29,7 +28,42 @@ public class SearchResult
     
     public string CourseTypeDisplay => CourseType?.GetDescription() ?? SharedStrings.NotProvided;
     
+    public DeliveryMode? DeliveryMode { get; init; }
+    
+    public bool? IsNational { get; init; }
+    
     public string? Requirements { get; init; }
     
     public string? Overview { get; init; }
+    
+    public string? LocationName { private get; init; }
+    
+    public string LocationDisplay
+    {
+        get
+        {
+            if (CourseType == feat.common.Models.Enums.CourseType.Apprenticeship)
+            {
+                return IsNational == true
+                    ? "National"
+                    : AppendDistance(LocationName.ValueOrNotProvided());
+            }
+            
+            if (DeliveryMode == feat.common.Models.Enums.DeliveryMode.Online)
+            {
+                return string.IsNullOrWhiteSpace(LocationName)
+                    ? "Online"
+                    : AppendDistance(LocationName);
+            }
+            
+            return AppendDistance(LocationName.ValueOrNotProvided());
+        }
+    }
+
+    private string AppendDistance(string location)
+    {
+        return Distance == null
+            ? location
+            : $"{location}, {DistanceDisplay}";
+    }
 }
