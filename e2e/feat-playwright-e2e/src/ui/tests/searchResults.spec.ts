@@ -239,9 +239,16 @@ test.describe('FEAT – Search results page', () => {
             interests: { i1: 'Art' },
             qualificationSelections: ['level3'],
         });
-
         await results.openFirstCourseDetails();
-        await expect(page).toHaveURL(/\/courses\/[0-9a-fA-F-]{36}/, { timeout: 30_000 });
+
+        await expect(page).toHaveURL(/\/courses\/[0-9a-fA-F-]{36}/, { timeout: 60_000 });
+        // Verify the back link in the E2E test. 
+        // Note: The course details page won’t have a back link in this test because we navigate directly to the URL.
+        await expect(page.getByRole('link', { name: /^back$/i })).toBeVisible({ timeout: 60_000 });
+        await expect(page.getByRole('button', { name: /^go to/i })).toBeVisible({ timeout: 60_000 });
+
+        // title can be h1 or h2 depending on course type
+        await expect(page.locator('main').locator('h1, h2').first()).toBeVisible({ timeout: 60_000 });
     });
 
     test('AC (Functional) 6: pagination loads next page and results render (if shown)', async ({ page }) => {

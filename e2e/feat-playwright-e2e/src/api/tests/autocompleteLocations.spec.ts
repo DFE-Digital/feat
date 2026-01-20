@@ -64,5 +64,43 @@ test.describe('API – AutocompleteLocations', () => {
             expect(json.length, `Expected results for query "${q}"`).toBeGreaterThan(0);
         }
     });
+    
+    // Invalid input / validation tests
+    const invalidInputs = [
+        null,
+        '12345',
+        'MK1!!!',
+        '!!@@'
+    ];
+
+    invalidInputs.forEach((input) => {
+        test(`Invalid input "${input}" returns empty list`, async ({ request }) => {
+            const res = await fetchAutocompleteLocations(request, input as string | null);
+
+            // Expect 200 OK
+            expect(res.status()).toBe(200);
+
+            // Expect empty array
+            const json = await res.json();
+            expect(Array.isArray(json)).toBeTruthy();
+            expect(json.length).toBe(0);
+        });
+    });
+
+    test('Empty string query returns validation error', async ({ request }) => {
+        const res = await fetchAutocompleteLocations(request, '');
+        expect(res.status()).toBe(400);
+
+        const body = await res.json();
+
+        // Check it has expected structure
+        expect(body).toHaveProperty('errors.query');
+        expect(Array.isArray(body.errors.query)).toBeTruthy();
+        expect(body.errors.query[0]).toBe('The query field is required.');
+
+        // Optional: check status and title
+        expect(body).toHaveProperty('status', 400);
+        expect(body).toHaveProperty('title', 'One or more validation errors occurred.');
+    });
 
 });
