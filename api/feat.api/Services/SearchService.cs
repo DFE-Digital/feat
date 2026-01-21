@@ -6,6 +6,7 @@ using feat.api.Enums;
 using feat.api.Extensions;
 using feat.api.Models;
 using feat.common.Configuration;
+using feat.common.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
@@ -91,6 +92,11 @@ public class SearchService(
             course.Score = result.RerankerScore;
             course.CalculateDistance(userLocation);
         }
+        
+        // Remove any apprenticeships without locations from the results unless they are national
+        // TODO: Sort these out by adding the national flag to the search index and filtering there
+        //       this can be done at the same time as ingesting extra info from FAA
+        RemoveApprenticeshipsWithoutLocations(courses);
 
         RemoveDuplicateCourses(courses);
         
@@ -109,7 +115,13 @@ public class SearchService(
         
         return (validation, response);
     }
-    
+
+    private static void RemoveApprenticeshipsWithoutLocations(List<Course> courses)
+    {
+        courses.RemoveAll(c =>
+            c is { CourseType: CourseType.Apprenticeship, Location: null } && !c.IsNational.GetValueOrDefault(false));
+    }
+
     public async Task<GeoLocationResponse> GetGeoLocationAsync(string location)
     {
         return await cache.GetOrSetAsync(
@@ -287,6 +299,20 @@ public class SearchService(
         {
             searchOptions = new SearchOptions
             {
+                Select =
+                {
+                    nameof(SearchIndexFields.Title), 
+                    nameof(SearchIndexFields.Description), 
+                    nameof(SearchIndexFields.CourseType), 
+                    nameof(SearchIndexFields.QualificationLevel), 
+                    nameof(SearchIndexFields.LearningMethod), 
+                    nameof(SearchIndexFields.CourseHours), 
+                    nameof(SearchIndexFields.StudyTime),
+                    nameof(SearchIndexFields.Location),
+                    nameof(SearchIndexFields.Id),
+                    nameof(SearchIndexFields.InstanceId),
+                    nameof(SearchIndexFields.Sector)
+                },
                 SearchFields =
                 {
                     nameof(SearchIndexFields.Title), 
@@ -316,8 +342,8 @@ public class SearchService(
                 return result.Value.ToFloats();
             }
         );
-        
-        var filterExpression = BuildFilterExpression(request, userLocation);
+
+        var filterExpression = BuildFilterExpression(request, userLocation)?.ReplaceLineEndings("");
         
         if (request.OrderBy == OrderBy.Distance && userLocation != null)
         {
@@ -418,7 +444,18 @@ public class SearchService(
             var radius = RadiusInKilometers(request.Radius);
             
             filters.Add(
-                $"(geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius} or Location eq null)"
+                $"""
+                    (
+                        geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius}
+                        or (
+                            Location eq null and
+                            (
+                                LearningMethod eq 'Online' or
+                                CourseType eq 'Apprenticeship'
+                            )
+                        )
+                    )
+                 """
             );
         }
         
