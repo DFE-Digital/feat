@@ -206,6 +206,7 @@ public class GeolocationHandler(
             if (postcode is { Longitude: not null, Latitude: not null })
             {
                 missingLocation.GeoLocation = postcode.ToPoint();
+                missingLocation.Updated = DateTime.Now;
                 entriesToUpdate.AddRange(missingLocation.EntryInstances.Select(ei => ei.EntryId));
             }
         }
@@ -269,42 +270,64 @@ public class GeolocationHandler(
                      locationDifference.Instance.Location.Postcode.Replace(" ", "").Trim() == locationDifference.AllCourse.LOCATION_POSTCODE.Replace(" ", "").Trim())
             {
                 locationDifference.Instance.Location.GeoLocation = locationDifference.AllCourse.LOCATION;
+                locationDifference.Instance.Location.Updated = DateTime.Now;
                 entriesToUpdate.Add(locationDifference.Instance.EntryId);
             }
         }
 
         var entries = entriesToUpdate.Distinct().ToList();
-        
-        var locations = from l in dbContext.Locations
-            join ei  in dbContext.EntryInstances on
-                l.Id equals ei.LocationId
-            join e in dbContext.Entries on 
-                ei.EntryId equals e.Id
-            join aie in dbContext.AiSearchEntries on 
-                ei.Id.ToString() equals aie.Id
-            select new { InstanceId = ei.Id, LocationId = l.Id, EntryId = e.Id, Location = l.GeoLocation };
 
+        var locationsToUpdate =
+            dbContext.Entries.WhereBulkContains(entries).SelectMany(e => e.EntryInstances)
+                .Include(ei => ei.Location)
+                .Include(ei => ei.Entry);
 
-        var locationsToUpdate = dbContext.Entries.WhereBulkContains(entries).SelectMany(e => e.EntryInstances)
-            .Include(ei => ei.Location);
-
-        var aiEntries = new List<AiSearchEntry>();
         foreach (var entryInstance in locationsToUpdate)
         {
             var aiSearchEntry = dbContext.AiSearchEntries.Single(aie => aie.InstanceId == entryInstance.Id.ToString());
             aiSearchEntry.Location = entryInstance.Location?.GeoLocation.ToGeographyPoint();
-            aiEntries.Add(aiSearchEntry);
+            entryInstance.Entry.IngestionState = IngestionState.ProcessingGeolocation;
+        }
+        
+        // Grab our differences
+        var tolerance = 0.000000001;
+        var aiDifferences = 
+            from aiEntry in dbContext.AiSearchEntries
+            join ei in dbContext.EntryInstances on 
+                aiEntry.InstanceId equals ei.Id.ToString()
+            where 
+                aiEntry.LocationPoint != null && ei.Location != null && ei.Location.GeoLocation != null &&
+                (
+                    Math.Abs(aiEntry.LocationPoint.X - ei.Location.GeoLocation.X) > tolerance || 
+                    Math.Abs(aiEntry.LocationPoint.X - ei.Location.GeoLocation.X) > tolerance
+                )
+            select new { aiEntry, ei.Location, ei.Entry };
+
+        // Set them to processing
+        foreach (var locationDifference in aiDifferences)
+        {
+            locationDifference.aiEntry.LocationPoint = locationDifference.Location.GeoLocation;
+            locationDifference.Entry.IngestionState = IngestionState.ProcessingGeolocation;
         }
         
         await dbContext.BulkSaveChangesAsync(cancellationToken);
         
-        await searchIndexHandler.Update(aiEntries, cancellationToken);
-
         return true;
     }
 
-    public override Task<bool> IndexAsync(CancellationToken cancellationToken)
+    public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
-        return Task.FromResult(true);
+        var aiEntries = from aiEntry in dbContext.AiSearchEntries
+            join ei in dbContext.EntryInstances on aiEntry.InstanceId equals ei.Id.ToString()
+            join e in dbContext.Entries on ei.EntryId equals e.Id
+            where e.IngestionState == IngestionState.ProcessingGeolocation
+            select aiEntry;
+        
+        await searchIndexHandler.Update(aiEntries.ToList(), cancellationToken);
+
+        await dbContext.Entries.WhereBulkContains(aiEntries.Select(aie => Guid.Parse(aie.Id)).ToList())
+            .ExecuteUpdateAsync(x => x.SetProperty(e => e.IngestionState, IngestionState.Complete), cancellationToken);
+        
+        return true;
     }
 }
