@@ -116,12 +116,6 @@ public class SearchService(
         return (validation, response);
     }
 
-    private static void RemoveApprenticeshipsWithoutLocations(List<Course> courses)
-    {
-        courses.RemoveAll(c =>
-            c is { CourseType: CourseType.Apprenticeship, Location: null } && !c.IsNational.GetValueOrDefault(false));
-    }
-
     public async Task<GeoLocationResponse> GetGeoLocationAsync(string location)
     {
         return await cache.GetOrSetAsync(
@@ -218,6 +212,12 @@ public class SearchService(
             Latitude = x.Latitude!.Value,
             Longitude = x.Longitude!.Value
         }).ToArray();
+    }
+    
+    private static void RemoveApprenticeshipsWithoutLocations(List<Course> courses)
+    {
+        courses.RemoveAll(c =>
+            c is { CourseType: CourseType.Apprenticeship, Location: null } && !c.IsNational.GetValueOrDefault(false));
     }
 
     private static void RemoveDuplicateCourses(List<Course> courses)
