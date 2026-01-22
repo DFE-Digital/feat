@@ -247,7 +247,8 @@ public class SearchService(
     {
         var searchOptions = await BuildSearchOptions(request, userLocation);
 
-        var search = await aiSearchClient.SearchAsync<AiSearchResponse>(request.Query, searchOptions);
+        var search = await aiSearchClient.SearchAsync<AiSearchResponse>(request.LuceneQuery, searchOptions);
+        
         var searchResults = search.Value;
         
         var results = new List<AiSearchResult>();
@@ -274,74 +275,46 @@ public class SearchService(
 
     private Task<SearchOptions> BuildSearchOptions(SearchRequest request, GeoLocation? userLocation)
     {
-        SearchOptions searchOptions;
-
-        if (request.Query == "*")
+        var searchOptions = new SearchOptions
         {
-            searchOptions = new SearchOptions
+            Select =
             {
-                SearchFields =
-                {
-                    nameof(SearchIndexFields.Title), 
-                    nameof(SearchIndexFields.Description)
-                },
-                Facets =
-                {
-                    nameof(SearchIndexFields.CourseType), 
-                    nameof(SearchIndexFields.QualificationLevel), 
-                    nameof(SearchIndexFields.LearningMethod), 
-                    nameof(SearchIndexFields.CourseHours), 
-                    nameof(SearchIndexFields.StudyTime)
-                }
-            };
-        }
-        else
-        {
-            searchOptions = new SearchOptions
+                nameof(SearchIndexFields.Id),
+                nameof(SearchIndexFields.InstanceId),
+            },
+            SearchFields =
             {
-                Select =
-                {
-                    nameof(SearchIndexFields.Title), 
-                    nameof(SearchIndexFields.Description), 
-                    nameof(SearchIndexFields.CourseType), 
-                    nameof(SearchIndexFields.QualificationLevel), 
-                    nameof(SearchIndexFields.LearningMethod), 
-                    nameof(SearchIndexFields.CourseHours), 
-                    nameof(SearchIndexFields.StudyTime),
-                    nameof(SearchIndexFields.Location),
-                    nameof(SearchIndexFields.Id),
-                    nameof(SearchIndexFields.InstanceId),
-                    nameof(SearchIndexFields.Sector)
-                },
-                SearchFields =
-                {
-                    nameof(SearchIndexFields.Title), 
-                    nameof(SearchIndexFields.Description)
-                },
-                Facets =
-                {
-                    nameof(SearchIndexFields.CourseType), 
-                    nameof(SearchIndexFields.QualificationLevel), 
-                    nameof(SearchIndexFields.LearningMethod), 
-                    nameof(SearchIndexFields.CourseHours), 
-                    nameof(SearchIndexFields.StudyTime)
-                },
-                HighlightFields =
-                {
-                    nameof(SearchIndexFields.Title),
-                    nameof(SearchIndexFields.Description)
-                }
-            };
-        }
+                nameof(SearchIndexFields.Title), 
+                nameof(SearchIndexFields.Description),
+                nameof(SearchIndexFields.LearningAimTitle),
+                nameof(SearchIndexFields.Sector)
+            },
+            Facets =
+            {
+                nameof(SearchIndexFields.CourseType), 
+                nameof(SearchIndexFields.QualificationLevel), 
+                nameof(SearchIndexFields.LearningMethod), 
+                nameof(SearchIndexFields.CourseHours), 
+                nameof(SearchIndexFields.StudyTime)
+            },
+            QueryType = request.OrderBy != OrderBy.Distance ? SearchQueryType.Semantic : SearchQueryType.Simple 
+        };
 
-        var embedding = cache.GetOrSet(
-            $"query:{request.Query.ToLowerInvariant()}",
-            entry =>
-            {
-                var result = embeddingClient.GenerateEmbedding(request.Query.ToLowerInvariant(), cancellationToken: entry);
-                return result.Value.ToFloats();
-            }
-        );
+        var embeddings = new Dictionary<string, ReadOnlyMemory<float>>();
+        foreach (var query in request.Query)
+        {
+            var embedding = cache.GetOrSet(
+                $"query:{query.ToLowerInvariant()}",
+                entry =>
+                {
+                    var result = embeddingClient.GenerateEmbedding(query.ToLowerInvariant(), cancellationToken: entry);
+                    return result.Value.ToFloats();
+                }
+            );
+            embeddings[query.ToLowerInvariant()] = embedding;
+        }
+        
+        
 
         var filterExpression = BuildFilterExpression(request, userLocation)?.ReplaceLineEndings("");
         
@@ -350,15 +323,14 @@ public class SearchService(
             searchOptions.OrderBy.Add(
                 $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') asc"
             );
-            
-            searchOptions.QueryType = SearchQueryType.Simple;
         }
         else
         {
-            searchOptions.QueryType = SearchQueryType.Semantic;
+            searchOptions.QueryLanguage = QueryLanguage.EnGb;
             searchOptions.SemanticSearch = new SemanticSearchOptions
             {
-                SemanticConfigurationName = "semantic-title-description"
+                SemanticConfigurationName = "semantic-title-description",
+                SemanticQuery = request.LuceneQuery
             };
         }
         
@@ -367,20 +339,25 @@ public class SearchService(
         searchOptions.Skip = (request.Page - 1) * request.PageSize;
         searchOptions.IncludeTotalCount = true;
         searchOptions.Filter = filterExpression;
-        searchOptions.SearchMode = SearchMode.Any;
-        searchOptions.VectorSearch = new VectorSearchOptions
+        searchOptions.SearchMode = SearchMode.All;
+        searchOptions.VectorSearch = new VectorSearchOptions();
+        
+        foreach (var embedding in embeddings.Values)
         {
-            Queries =
+            searchOptions.VectorSearch.Queries.Add(new VectorizedQuery(embedding)
             {
-                new VectorizedQuery(embedding)
-                {
-                    KNearestNeighborsCount = _azureOptions.Knn,
-                    Fields = { "TitleVector", "LearningAimTitleVector", "DescriptionVector", "SectorVector" },
-                    Weight = _azureOptions.Weight,
-                }
-            },
-        };
-
+                KNearestNeighborsCount = _azureOptions.Knn,
+                Fields = { 
+                    $"{nameof(SearchIndexFields.Title)}Vector", 
+                    $"{nameof(SearchIndexFields.Description)}Vector",
+                    $"{nameof(SearchIndexFields.LearningAimTitle) }Vector"
+                },
+                Weight = _azureOptions.Weight,
+                //Exhaustive = true,
+                //Threshold = new VectorSimilarityThreshold(0.3)
+            });
+        }
+        
         return Task.FromResult(searchOptions);
     }
     
