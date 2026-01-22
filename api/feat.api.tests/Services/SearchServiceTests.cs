@@ -46,7 +46,7 @@ public class SearchServiceTests
 
         var request = new SearchRequest
         {
-            Query = "Art",
+            Query = ["Art"],
             Location = invalidLocation
         };
 

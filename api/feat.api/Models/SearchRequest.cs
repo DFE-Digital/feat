@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using feat.api.Enums;
 
 namespace feat.api.Models;
@@ -6,7 +7,8 @@ namespace feat.api.Models;
 public class SearchRequest
 {
     [Required]
-    public required string Query { get; set; }
+    [MaxLength(3)]
+    public required string[] Query { get; set; }
     
     public string? SessionId { get; set; } = Guid.NewGuid().ToString();
     
@@ -30,4 +32,13 @@ public class SearchRequest
     public IEnumerable<string>? CourseHours { get; set; }
 
     public IEnumerable<string>? StudyTime { get; set; }
+
+    [JsonIgnore]
+    protected internal string LuceneQuery
+    {
+        get
+        {
+            return Query.Length > 0 ? string.Join(" OR ", Query.Select(q => $"\"{q}\"")) : "*";
+        }
+    }
 }
