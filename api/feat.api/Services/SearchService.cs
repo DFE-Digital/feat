@@ -324,7 +324,7 @@ public class SearchService(
                 $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') asc"
             );
         }
-        else
+        else if (request.Query.Length > 0)
         {
             searchOptions.QueryLanguage = QueryLanguage.EnGb;
             searchOptions.SemanticSearch = new SemanticSearchOptions
