@@ -53,6 +53,10 @@ public class LoadCoursesModel(ISearchService searchService, ILogger<LoadCoursesM
                 ? OrderBy.Distance 
                 : OrderBy.Relevance;
         }
+        else if (Search.Interests.Count == 0)
+        {
+            Search.OrderBy = OrderBy.Distance;
+        }
         
         Search.SetPage(PageName.LoadCourses);
         HttpContext.Session.Set("Search", Search);
