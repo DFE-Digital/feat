@@ -32,8 +32,6 @@ public class GeolocationHandler(
     
     public override async Task<bool> IngestAsync(CancellationToken cancellationToken)
     {
-        return true;
-        
         Console.WriteLine($"Starting ingestion for {Name}...");
         
         var containerClient = blobServiceClient.GetBlobContainerClient(ContainerName);
@@ -186,6 +184,10 @@ public class GeolocationHandler(
     {
         List<Guid> entriesToUpdate = [];
         
+        Console.WriteLine($"Starting sync for {Name}...");
+        
+        Console.WriteLine($"Fetching locations with missing geolocation that have a postcode...");
+        
         // Use this to attempt to match up any locations that are incorrect
         var missingLocations = dbContext
             .Locations
@@ -194,6 +196,8 @@ public class GeolocationHandler(
 
         // Loop through any matching postcodes and update the geolocation accordingly, plus pull out the list
         // of affected instance IDs
+        Console.WriteLine($"Looking up geolocation for postcodes...");
+        
         foreach (var missingLocation in missingLocations)
         {
             var lookupPostcode = missingLocation.Postcode?.Replace(" ", "");
@@ -211,6 +215,7 @@ public class GeolocationHandler(
             }
         }
         
+        Console.WriteLine($"Fetching entries with a missing location but that have one in FAC...");
         // Match up any values where we're missing,but have it in the source
         var locationDifferences = from 
             ac in dbContext.FAC_AllCourses
@@ -226,6 +231,7 @@ public class GeolocationHandler(
             where ac.LOCATION != null && (ei.Location == null || (ei.Location != null && ei.Location.GeoLocation == null))
         select new { AllCourse = ac, Instance = ei };
 
+        Console.WriteLine($"Updating those locations...");
         var addedLocations = new List<Location>();
         foreach (var locationDifference in locationDifferences)
         {
@@ -275,6 +281,8 @@ public class GeolocationHandler(
             }
         }
 
+        Console.WriteLine($"Creating {addedLocations.Count} locations...");
+        
         var entries = entriesToUpdate.Distinct().ToList();
 
         var locationsToUpdate =
@@ -282,12 +290,16 @@ public class GeolocationHandler(
                 .Include(ei => ei.Location)
                 .Include(ei => ei.Entry);
 
+        Console.WriteLine($"Updating {locationsToUpdate.Count()} locations...");
+        
         foreach (var entryInstance in locationsToUpdate)
         {
             var aiSearchEntry = dbContext.AiSearchEntries.Single(aie => aie.InstanceId == entryInstance.Id.ToString());
             aiSearchEntry.Location = entryInstance.Location?.GeoLocation.ToGeographyPoint();
             entryInstance.Entry.IngestionState = IngestionState.ProcessingGeolocation;
         }
+        
+        Console.WriteLine($"Finding AI Search locations with different locations to the DB...");
         
         // Grab our differences
         var tolerance = 0.000000001;
@@ -304,29 +316,41 @@ public class GeolocationHandler(
             select new { aiEntry, ei.Location, ei.Entry };
 
         // Set them to processing
+        Console.WriteLine($"Updating AI Entries for {aiDifferences.Count()} entries...");
+        
         foreach (var locationDifference in aiDifferences)
         {
             locationDifference.aiEntry.LocationPoint = locationDifference.Location.GeoLocation;
             locationDifference.Entry.IngestionState = IngestionState.ProcessingGeolocation;
         }
         
+        Console.WriteLine($"Writing changes to DB...");
         await dbContext.BulkSaveChangesAsync(cancellationToken);
         
+        Console.WriteLine($"Done");
         return true;
     }
 
     public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
+        Console.WriteLine($"Starting indexing for {Name}...");
+        
         var aiEntries = from aiEntry in dbContext.AiSearchEntries
             join ei in dbContext.EntryInstances on aiEntry.InstanceId equals ei.Id.ToString()
             join e in dbContext.Entries on ei.EntryId equals e.Id
             where e.IngestionState == IngestionState.ProcessingGeolocation
             select aiEntry;
         
+        Console.WriteLine($"Updating search index for {aiEntries.Count()} entries...");
+        
         await searchIndexHandler.Update(aiEntries.ToList(), cancellationToken);
 
+        Console.WriteLine($"Marking entries as indexed...");
+        
         await dbContext.Entries.WhereBulkContains(aiEntries.Select(aie => Guid.Parse(aie.Id)).ToList())
             .ExecuteUpdateAsync(x => x.SetProperty(e => e.IngestionState, IngestionState.Complete), cancellationToken);
+        
+        Console.WriteLine($"Done");
         
         return true;
     }
