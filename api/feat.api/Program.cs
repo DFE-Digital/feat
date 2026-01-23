@@ -153,7 +153,9 @@ builder.Services.AddOpenTelemetry()
 
 var app = builder.Build();
 var policyCollection = new HeaderPolicyCollection()
-    .AddDefaultApiSecurityHeaders();
+    .AddDefaultApiSecurityHeaders()
+    .AddDefaultSecurityHeaders();
+
 app.UseSecurityHeaders(policyCollection);
 
 app.MapOpenApi();

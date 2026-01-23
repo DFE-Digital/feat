@@ -14,6 +14,10 @@ public class Course
     
     public CourseType? CourseType { get; set; }
     
+    public LearningMethod? DeliveryMode { get; set; }
+    
+    public bool? IsNational { get; set; }
+    
     public string? Requirements { get; set; }
     
     public string? Overview { get; set; }

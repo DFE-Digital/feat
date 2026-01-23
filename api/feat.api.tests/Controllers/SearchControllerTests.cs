@@ -23,7 +23,7 @@ public class SearchControllerTests
     [Test]
     public async Task Search_ReturnsOk_WhenValidationPasses()
     {
-        var request = new SearchRequest { Query = "Art" };
+        var request = new SearchRequest { Query = ["Art"] };
         
         var response = new SearchResponse();
         
@@ -42,7 +42,7 @@ public class SearchControllerTests
     [Test]
     public async Task Search_ReturnsBadRequest_WhenValidationFails()
     {
-        var request = new SearchRequest { Query = "" };
+        var request = new SearchRequest { Query = [] };
         
         var validation = new ValidationResult();
         validation.AddError("Query", "Required field");

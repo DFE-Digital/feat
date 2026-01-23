@@ -6,6 +6,7 @@ using feat.api.Enums;
 using feat.api.Extensions;
 using feat.api.Models;
 using feat.common.Configuration;
+using feat.common.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OpenAI.Embeddings;
@@ -67,27 +68,35 @@ public class SearchService(
                 Title = ei.Entry.Title,
                 Provider = ei.Entry.Provider.Name,
                 CourseType = ei.Entry.CourseType,
+                DeliveryMode = ei.StudyMode,
                 Requirements = ei.Entry.EntryRequirements,
                 Overview = ei.Entry.Description,
-                Location = ei.Location != null ? ei.Location.ToLocation().GeoLocation :
-                        ei.Entry.Provider.ProviderLocations.FirstOrDefault() != null ?
-                ei.Entry.Provider.ProviderLocations.First().Location.ToLocation().GeoLocation : null,
-                LocationName =
-                    ei.Location != null ? GetLocationName(ei.Location) :
-                        ei.Entry.Provider.ProviderLocations.FirstOrDefault() != null ?
-                            GetLocationName(ei.Entry.Provider.ProviderLocations.First().Location) : null
+                Location = ei.Location != null
+                    ? ei.Location.ToLocation().GeoLocation
+                    : null,
+                LocationName = ei.Location != null
+                    ? GetLocationName(ei.Location)
+                    : null,
+                IsNational = ei.Entry.Vacancies.FirstOrDefault() != null
+                    ? ei.Entry.Vacancies.First().NationalVacancy
+                    : null
             })
             .ToListAsync();
         
         var courseDictionary = courses.ToDictionary(c => c.InstanceId);
         
-        foreach (var result in searchResults)
+        foreach (var result in searchResults.Where(c => courseDictionary.ContainsKey(c.InstanceId)))
         {
             var course = courseDictionary[result.InstanceId];
             
             course.Score = result.RerankerScore;
             course.CalculateDistance(userLocation);
         }
+        
+        // Remove any apprenticeships without locations from the results unless they are national
+        // TODO: Sort these out by adding the national flag to the search index and filtering there
+        //       this can be done at the same time as ingesting extra info from FAA
+        RemoveApprenticeshipsWithoutLocations(courses);
 
         RemoveDuplicateCourses(courses);
         
@@ -106,7 +115,7 @@ public class SearchService(
         
         return (validation, response);
     }
-    
+
     public async Task<GeoLocationResponse> GetGeoLocationAsync(string location)
     {
         return await cache.GetOrSetAsync(
@@ -204,6 +213,12 @@ public class SearchService(
             Longitude = x.Longitude!.Value
         }).ToArray();
     }
+    
+    private static void RemoveApprenticeshipsWithoutLocations(List<Course> courses)
+    {
+        courses.RemoveAll(c =>
+            c is { CourseType: CourseType.Apprenticeship, Location: null } && !c.IsNational.GetValueOrDefault(false));
+    }
 
     private static void RemoveDuplicateCourses(List<Course> courses)
     {
@@ -232,7 +247,8 @@ public class SearchService(
     {
         var searchOptions = await BuildSearchOptions(request, userLocation);
 
-        var search = await aiSearchClient.SearchAsync<AiSearchResponse>(request.Query, searchOptions);
+        var search = await aiSearchClient.SearchAsync<AiSearchResponse>(request.LuceneQuery, searchOptions);
+        
         var searchResults = search.Value;
         
         var results = new List<AiSearchResult>();
@@ -259,77 +275,62 @@ public class SearchService(
 
     private Task<SearchOptions> BuildSearchOptions(SearchRequest request, GeoLocation? userLocation)
     {
-        SearchOptions searchOptions;
-
-        if (request.Query == "*")
+        var searchOptions = new SearchOptions
         {
-            searchOptions = new SearchOptions
+            Select =
             {
-                SearchFields =
-                {
-                    nameof(SearchIndexFields.Title), 
-                    nameof(SearchIndexFields.Description)
-                },
-                Facets =
-                {
-                    nameof(SearchIndexFields.CourseType), 
-                    nameof(SearchIndexFields.QualificationLevel), 
-                    nameof(SearchIndexFields.LearningMethod), 
-                    nameof(SearchIndexFields.CourseHours), 
-                    nameof(SearchIndexFields.StudyTime)
-                }
-            };
-        }
-        else
-        {
-            searchOptions = new SearchOptions
+                nameof(SearchIndexFields.Id),
+                nameof(SearchIndexFields.InstanceId),
+            },
+            SearchFields =
             {
-                SearchFields =
-                {
-                    nameof(SearchIndexFields.Title), 
-                    nameof(SearchIndexFields.Description)
-                },
-                Facets =
-                {
-                    nameof(SearchIndexFields.CourseType), 
-                    nameof(SearchIndexFields.QualificationLevel), 
-                    nameof(SearchIndexFields.LearningMethod), 
-                    nameof(SearchIndexFields.CourseHours), 
-                    nameof(SearchIndexFields.StudyTime)
-                },
-                HighlightFields =
-                {
-                    nameof(SearchIndexFields.Title),
-                    nameof(SearchIndexFields.Description)
-                }
-            };
-        }
+                nameof(SearchIndexFields.Title), 
+                nameof(SearchIndexFields.Description),
+                nameof(SearchIndexFields.LearningAimTitle),
+                nameof(SearchIndexFields.Sector)
+            },
+            Facets =
+            {
+                nameof(SearchIndexFields.CourseType), 
+                nameof(SearchIndexFields.QualificationLevel), 
+                nameof(SearchIndexFields.LearningMethod), 
+                nameof(SearchIndexFields.CourseHours), 
+                nameof(SearchIndexFields.StudyTime)
+            },
+            QueryType = request.OrderBy != OrderBy.Distance ? SearchQueryType.Semantic : SearchQueryType.Simple 
+        };
 
-        var embedding = cache.GetOrSet(
-            $"query:{request.Query.ToLowerInvariant()}",
-            entry =>
-            {
-                var result = embeddingClient.GenerateEmbedding(request.Query.ToLowerInvariant(), cancellationToken: entry);
-                return result.Value.ToFloats();
-            }
-        );
+        var embeddings = new Dictionary<string, ReadOnlyMemory<float>>();
+        foreach (var query in request.Query)
+        {
+            var embedding = cache.GetOrSet(
+                $"query:{query.ToLowerInvariant()}",
+                entry =>
+                {
+                    var result = embeddingClient.GenerateEmbedding(query.ToLowerInvariant(), cancellationToken: entry);
+                    return result.Value.ToFloats();
+                }
+            );
+            embeddings[query.ToLowerInvariant()] = embedding;
+        }
         
-        var filterExpression = BuildFilterExpression(request, userLocation);
+        
+
+        var filterExpression = BuildFilterExpression(request, userLocation)?.ReplaceLineEndings("");
         
         if (request.OrderBy == OrderBy.Distance && userLocation != null)
         {
             searchOptions.OrderBy.Add(
                 $"geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') asc"
             );
-            
-            searchOptions.QueryType = SearchQueryType.Simple;
         }
-        else
+        else if (request.Query.Length > 0)
         {
-            searchOptions.QueryType = SearchQueryType.Semantic;
+            searchOptions.QueryLanguage = QueryLanguage.EnGb;
             searchOptions.SemanticSearch = new SemanticSearchOptions
             {
-                SemanticConfigurationName = "semantic-title-description"
+                SemanticConfigurationName = "semantic-title-description",
+                SemanticQuery = request.LuceneQuery
             };
         }
         
@@ -338,20 +339,25 @@ public class SearchService(
         searchOptions.Skip = (request.Page - 1) * request.PageSize;
         searchOptions.IncludeTotalCount = true;
         searchOptions.Filter = filterExpression;
-        searchOptions.SearchMode = SearchMode.Any;
-        searchOptions.VectorSearch = new VectorSearchOptions
+        searchOptions.SearchMode = SearchMode.All;
+        searchOptions.VectorSearch = new VectorSearchOptions();
+        
+        foreach (var embedding in embeddings.Values)
         {
-            Queries =
+            searchOptions.VectorSearch.Queries.Add(new VectorizedQuery(embedding)
             {
-                new VectorizedQuery(embedding)
-                {
-                    KNearestNeighborsCount = _azureOptions.Knn,
-                    Fields = { "TitleVector", "LearningAimTitleVector", "DescriptionVector", "SectorVector" },
-                    Weight = _azureOptions.Weight,
-                }
-            },
-        };
-
+                KNearestNeighborsCount = _azureOptions.Knn,
+                Fields = { 
+                    $"{nameof(SearchIndexFields.Title)}Vector", 
+                    $"{nameof(SearchIndexFields.Description)}Vector",
+                    $"{nameof(SearchIndexFields.LearningAimTitle) }Vector"
+                },
+                Weight = _azureOptions.Weight,
+                //Exhaustive = true,
+                //Threshold = new VectorSimilarityThreshold(0.3)
+            });
+        }
+        
         return Task.FromResult(searchOptions);
     }
     
@@ -415,7 +421,18 @@ public class SearchService(
             var radius = RadiusInKilometers(request.Radius);
             
             filters.Add(
-                $"(geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius} or Location eq null)"
+                $"""
+                    (
+                        geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius}
+                        or (
+                            Location eq null and
+                            (
+                                LearningMethod eq 'Online' or
+                                CourseType eq 'Apprenticeship'
+                            )
+                        )
+                    )
+                 """
             );
         }
         

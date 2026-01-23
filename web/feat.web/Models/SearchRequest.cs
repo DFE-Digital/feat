@@ -1,10 +1,11 @@
+using System.Text.Json.Serialization;
 using feat.web.Enums;
 
 namespace feat.web.Models;
 
 public class SearchRequest
 {
-    public required string Query { get; set; }
+    public required string[] Query { get; set; }
     
     public string? SessionId { get; set; } = Guid.NewGuid().ToString();
     

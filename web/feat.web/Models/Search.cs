@@ -33,13 +33,11 @@ public class Search
     
     private bool _pageIsChanging;
 
-    private string Query => string.Join(", ", Interests.Select(i => i.ToLower().Trim()));
-    
     public SearchRequest ToSearchRequest()
     {
         var request = new SearchRequest
         {
-            Query = !string.IsNullOrWhiteSpace(Query) ? Query : "*",
+            Query = Interests.Where(i => !string.IsNullOrWhiteSpace(i)).ToArray(),
             Page = CurrentPage,
             PageSize = PageSize,
             Location = Location,
