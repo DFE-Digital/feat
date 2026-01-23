@@ -11,6 +11,11 @@ public class SearchController(ISearchService searchService) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<SearchResponse>> Search([FromBody] SearchRequest request)
     {
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
         var (validation, response) = await searchService.SearchAsync(request);
 
         if (!validation.IsValid)
