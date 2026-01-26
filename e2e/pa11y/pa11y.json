@@ -1,0 +1,21 @@
+{
+  "urls": [
+    "https://s265t02-app-web.azurewebsites.net/",
+    "https://s265t02-app-web.azurewebsites.net/location",
+    "https://s265t02-app-web.azurewebsites.net/interests",
+    "https://s265t02-app-web.azurewebsites.net/qualification-level",
+    "https://s265t02-app-web.azurewebsites.net/loadcourses"
+  ],
+  "defaults": {
+    "standard": "WCAG2AA",
+    "timeout": 10000,
+    "viewport": {
+      "width": 320,
+      "height": 480
+    },
+    "chromeLaunchConfig": {
+      "ignoreHTTPSErrors": true,
+      "args": ["--no-sandbox"]
+    }
+  }
+}

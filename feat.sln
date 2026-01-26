@@ -56,6 +56,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "feat.api.tests", "api\feat.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "feat.web.tests", "web\feat.web.tests\feat.web.tests.csproj", "{D3C36150-E16E-4008-8856-558AE8618A65}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pa11y", "pa11y", "{CEE909AF-9B9F-4388-998E-8EC532A78ED0}"
+	ProjectSection(SolutionItems) = preProject
+		e2e\pa11y\package.json = e2e\pa11y\package.json
+		e2e\pa11y\pa11y.json = e2e\pa11y\pa11y.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,5 +102,6 @@ Global
 		{8DC45152-DAB5-4175-B769-4810089C40F7} = {7CF4075C-5269-4F36-98F9-E18A57077B3A}
 		{29B40F87-DC89-4B4C-887C-92A6BDDDC8CE} = {C456EAA1-9574-4778-912E-1D115569BA35}
 		{D3C36150-E16E-4008-8856-558AE8618A65} = {ED762B9B-8875-45D1-8C94-60967CB86495}
+		{CEE909AF-9B9F-4388-998E-8EC532A78ED0} = {8BF3D5E1-6737-4758-8CDA-23F8DECBF71A}
 	EndGlobalSection
 EndGlobal
