@@ -2,17 +2,23 @@ using System.Globalization;
 using System.IO.Compression;
 using Azure.Storage.Blobs;
 using CsvHelper;
+using feat.common.Extensions;
 using feat.common.Models;
+using feat.common.Models.AiSearch;
 using feat.common.Models.Enums;
 using feat.ingestion.Data;
 using feat.ingestion.Enums;
 using feat.ingestion.Models.Geolocation;
 using feat.ingestion.Models.Geolocation.Converters;
+using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
+using Location = feat.common.Models.Location;
 
 namespace feat.ingestion.Handlers.Geolocation;
 
 public class GeolocationHandler(
     IngestionDbContext dbContext,
+    ISearchIndexHandler searchIndexHandler,
     BlobServiceClient blobServiceClient) : IngestionHandler
 {
     public override IngestionType IngestionType => IngestionType.Api;
@@ -174,13 +180,178 @@ public class GeolocationHandler(
         return true;
     }
 
-    public override Task<bool> SyncAsync(CancellationToken cancellationToken)
+    public override async Task<bool> SyncAsync(CancellationToken cancellationToken)
     {
-        return Task.FromResult(true);
+        List<Guid> entriesToUpdate = [];
+        
+        Console.WriteLine($"Starting sync for {Name}...");
+        
+        Console.WriteLine($"Fetching locations with missing geolocation that have a postcode...");
+        
+        // Use this to attempt to match up any locations that are incorrect
+        var missingLocations = dbContext
+            .Locations
+            .Include(location => location.EntryInstances)
+            .Where(l => l.GeoLocation == null && !string.IsNullOrWhiteSpace(l.Postcode) && l.EntryInstances.Any());
+
+        // Loop through any matching postcodes and update the geolocation accordingly, plus pull out the list
+        // of affected instance IDs
+        Console.WriteLine($"Looking up geolocation for postcodes...");
+        
+        foreach (var missingLocation in missingLocations)
+        {
+            var lookupPostcode = missingLocation.Postcode?.Replace(" ", "");
+
+            // Get the postcode from the location if we have one
+            var postcode = await
+                dbContext.LookupPostcodes.FirstOrDefaultAsync(p => 
+                    p.CleanPostcode == lookupPostcode && p.Latitude >= -90 && p.Latitude <= 90 && p.Longitude >= -180 && p.Longitude <= 180, cancellationToken: cancellationToken);
+
+            if (postcode is { Longitude: not null, Latitude: not null })
+            {
+                missingLocation.GeoLocation = postcode.ToPoint();
+                missingLocation.Updated = DateTime.Now;
+                entriesToUpdate.AddRange(missingLocation.EntryInstances.Select(ei => ei.EntryId));
+            }
+        }
+        
+        Console.WriteLine($"Fetching entries with a missing location but that have one in FAC...");
+        // Match up any values where we're missing,but have it in the source
+        var locationDifferences = from 
+            ac in dbContext.FAC_AllCourses
+            join ei in dbContext.EntryInstances on
+                new {
+                    SourceReference = ac.COURSE_RUN_ID.ToString(),
+                    SourceSystem = (SourceSystem?)SourceSystem.FAC
+                }
+                equals new {
+                    ei.SourceReference,
+                    ei.SourceSystem
+                } 
+            where ac.LOCATION != null && (ei.Location == null || (ei.Location != null && ei.Location.GeoLocation == null))
+        select new { AllCourse = ac, Instance = ei };
+
+        Console.WriteLine($"Updating those locations...");
+        var addedLocations = new List<Location>();
+        foreach (var locationDifference in locationDifferences)
+        {
+            if (locationDifference.Instance.Location == null)
+            {
+                var newLocation = addedLocations.FirstOrDefault(l =>
+                    l.Address1 == locationDifference.AllCourse.LOCATION_ADDRESS1 &&
+                    l.Address2 == locationDifference.AllCourse.LOCATION_ADDRESS2 &&
+                    l.Town == locationDifference.AllCourse.LOCATION_TOWN &&
+                    l.County == locationDifference.AllCourse.LOCATION_COUNTY &&
+                    l.Postcode == locationDifference.AllCourse.LOCATION_POSTCODE);
+
+                if (newLocation != null)
+                {
+                    locationDifference.Instance.Location = newLocation;
+                }
+                else
+                {
+                    var location = new Location()
+                    {
+                        Created = DateTime.Now,
+                        Address1 = locationDifference.AllCourse.LOCATION_ADDRESS1,
+                        Address2 = locationDifference.AllCourse.LOCATION_ADDRESS2,
+                        Town = locationDifference.AllCourse.LOCATION_TOWN,
+                        County = locationDifference.AllCourse.LOCATION_COUNTY,
+                        Postcode = locationDifference.AllCourse.LOCATION_POSTCODE,
+                        Email = locationDifference.AllCourse.LOCATION_EMAIL,
+                        Telephone = locationDifference.AllCourse.LOCATION_TELEPHONE,
+                        SourceSystem = SourceSystem.FAC,
+                        SourceReference = locationDifference.AllCourse.COURSE_RUN_ID.ToString(),
+                        Url = locationDifference.AllCourse.LOCATION_WEBSITE,
+                        GeoLocation = locationDifference.AllCourse.LOCATION
+                    };
+                    addedLocations.Add(location);
+                    locationDifference.Instance.Location = location;
+                }
+
+                entriesToUpdate.Add(locationDifference.Instance.EntryId);
+            }
+            else if (locationDifference.Instance.Location.Postcode != null && 
+                     locationDifference.AllCourse.LOCATION_POSTCODE != null && 
+                     locationDifference.Instance.Location.Postcode.Replace(" ", "").Trim().Equals(locationDifference.AllCourse.LOCATION_POSTCODE.Replace(" ", "").Trim(), StringComparison.InvariantCultureIgnoreCase))
+            {
+                locationDifference.Instance.Location.GeoLocation = locationDifference.AllCourse.LOCATION;
+                locationDifference.Instance.Location.Updated = DateTime.Now;
+                entriesToUpdate.Add(locationDifference.Instance.EntryId);
+            }
+        }
+
+        Console.WriteLine($"Creating {addedLocations.Count} locations...");
+        
+        var entries = entriesToUpdate.Distinct().ToList();
+
+        var locationsToUpdate =
+            dbContext.Entries.WhereBulkContains(entries).SelectMany(e => e.EntryInstances)
+                .Include(ei => ei.Location)
+                .Include(ei => ei.Entry);
+
+        Console.WriteLine($"Updating {locationsToUpdate.Count()} locations...");
+        
+        foreach (var entryInstance in locationsToUpdate)
+        {
+            var aiSearchEntry = dbContext.AiSearchEntries.Single(aie => aie.InstanceId == entryInstance.Id.ToString());
+            aiSearchEntry.Location = entryInstance.Location?.GeoLocation.ToGeographyPoint();
+            entryInstance.Entry.IngestionState = IngestionState.ProcessingGeolocation;
+        }
+        
+        Console.WriteLine($"Finding AI Search locations with different locations to the DB...");
+        
+        // Grab our differences
+        var tolerance = 0.000000001;
+        var aiDifferences = 
+            from aiEntry in dbContext.AiSearchEntries
+            join ei in dbContext.EntryInstances on 
+                aiEntry.InstanceId equals ei.Id.ToString()
+            where 
+                aiEntry.LocationPoint != null && ei.Location != null && ei.Location.GeoLocation != null &&
+                (
+                    Math.Abs(aiEntry.LocationPoint.X - ei.Location.GeoLocation.X) > tolerance || 
+                    Math.Abs(aiEntry.LocationPoint.X - ei.Location.GeoLocation.X) > tolerance
+                )
+            select new { aiEntry, ei.Location, ei.Entry };
+
+        // Set them to processing
+        Console.WriteLine($"Updating AI Entries for {aiDifferences.Count()} entries...");
+        
+        foreach (var locationDifference in aiDifferences)
+        {
+            locationDifference.aiEntry.LocationPoint = locationDifference.Location.GeoLocation;
+            locationDifference.Entry.IngestionState = IngestionState.ProcessingGeolocation;
+        }
+        
+        Console.WriteLine($"Writing changes to DB...");
+        await dbContext.BulkSaveChangesAsync(cancellationToken);
+        
+        Console.WriteLine($"Done");
+        return true;
     }
 
-    public override Task<bool> IndexAsync(CancellationToken cancellationToken)
+    public override async Task<bool> IndexAsync(CancellationToken cancellationToken)
     {
-        return Task.FromResult(true);
+        Console.WriteLine($"Starting indexing for {Name}...");
+        
+        var aiEntries = from aiEntry in dbContext.AiSearchEntries
+            join ei in dbContext.EntryInstances on aiEntry.InstanceId equals ei.Id.ToString()
+            join e in dbContext.Entries on ei.EntryId equals e.Id
+            where e.IngestionState == IngestionState.ProcessingGeolocation
+            select aiEntry;
+        
+        Console.WriteLine($"Updating search index for {aiEntries.Count()} entries...");
+        
+        await searchIndexHandler.Update(aiEntries.ToList(), cancellationToken);
+
+        Console.WriteLine($"Marking entries as indexed...");
+        
+        await dbContext.Entries.WhereBulkContains(aiEntries.Select(aie => Guid.Parse(aie.Id)).ToList())
+            .ExecuteUpdateAsync(x => x.SetProperty(e => e.IngestionState, IngestionState.Complete), cancellationToken);
+        
+        Console.WriteLine($"Done");
+        
+        return true;
     }
 }
