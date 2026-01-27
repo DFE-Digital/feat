@@ -1,4 +1,4 @@
-name: Generate - Zap Scan
+name: Validate - Zap Scan
 
 on:
   workflow_dispatch:

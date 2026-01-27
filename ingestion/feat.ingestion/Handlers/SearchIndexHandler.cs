@@ -137,6 +137,54 @@ public class SearchIndexHandler(
         }
     }
 
+    public async Task<bool> Update(List<AiSearchEntry> entries, CancellationToken cancellationToken)
+    {
+        var searchClient = aiSearchClient.GetSearchClient(_azureOptions.AiSearchIndex);
+        var updatedEntries = new List<AiSearchEntry>();
+        
+        foreach (var aiSearchEntry in entries)
+        {
+            var entry = await searchClient.GetDocumentAsync<AiSearchEntry>(aiSearchEntry.InstanceId, cancellationToken: cancellationToken);
+            if (entry != null)
+            {
+                var oldEntry = entry.Value;
+                if (oldEntry.Title != aiSearchEntry.Title)
+                {
+                    oldEntry.Title = aiSearchEntry.Title;
+                    oldEntry.TitleVector = GetVector(aiSearchEntry.Title);
+                }
+                if (oldEntry.Description != aiSearchEntry.Description)
+                {
+                    oldEntry.Description = aiSearchEntry.Description;
+                    oldEntry.DescriptionVector = GetVector(aiSearchEntry.Description);
+                }
+                if (oldEntry.LearningAimTitle != aiSearchEntry.LearningAimTitle)
+                {
+                    oldEntry.LearningAimTitle = aiSearchEntry.LearningAimTitle;
+                    oldEntry.LearningAimTitleVector = GetVector(aiSearchEntry.LearningAimTitle);
+                }
+                if (oldEntry.Sector != aiSearchEntry.Sector)
+                {
+                    oldEntry.Sector = aiSearchEntry.Sector;
+                    oldEntry.SectorVector = GetVector(aiSearchEntry.Sector);
+                }
+                
+                oldEntry.Location = aiSearchEntry.Location;
+                oldEntry.CourseHours = aiSearchEntry.CourseHours;
+                oldEntry.CourseType  = aiSearchEntry.CourseType;
+                oldEntry.EntryType = aiSearchEntry.EntryType;
+                oldEntry.LearningMethod =  aiSearchEntry.LearningMethod;
+                oldEntry.QualificationLevel =  aiSearchEntry.QualificationLevel;
+                oldEntry.Source =  aiSearchEntry.Source;
+                oldEntry.StudyTime = aiSearchEntry.StudyTime;
+                
+                updatedEntries.Add(oldEntry);
+            }
+        }
+
+        return await Ingest(updatedEntries, cancellationToken);
+    }
+
     private static string GetHash(HashAlgorithm hashAlgorithm, string input)
     {
 

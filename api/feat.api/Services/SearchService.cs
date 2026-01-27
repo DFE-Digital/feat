@@ -357,7 +357,8 @@ public class SearchService(
                 nameof(SearchIndexFields.CourseHours), 
                 nameof(SearchIndexFields.StudyTime)
             },
-            QueryType = request.OrderBy != OrderBy.Distance ? SearchQueryType.Semantic : SearchQueryType.Simple 
+            QueryType = 
+                request.Query.Length == 0 || request.OrderBy == OrderBy.Distance ? SearchQueryType.Simple : SearchQueryType.Semantic
         };
 
         var embeddings = new Dictionary<string, ReadOnlyMemory<float>>();

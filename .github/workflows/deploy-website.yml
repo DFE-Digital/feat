@@ -18,6 +18,8 @@ permissions:
   checks: write
   pull-requests: write
 
+run-name: Deploying Website to ${{ github.event.inputs.environment }}
+
 jobs:
   build-and-test:
     name: Build & Test
