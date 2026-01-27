@@ -273,7 +273,7 @@ public class GeolocationHandler(
             }
             else if (locationDifference.Instance.Location.Postcode != null && 
                      locationDifference.AllCourse.LOCATION_POSTCODE != null && 
-                     locationDifference.Instance.Location.Postcode.Replace(" ", "").Trim() == locationDifference.AllCourse.LOCATION_POSTCODE.Replace(" ", "").Trim())
+                     locationDifference.Instance.Location.Postcode.Replace(" ", "").Trim().Equals(locationDifference.AllCourse.LOCATION_POSTCODE.Replace(" ", "").Trim(), StringComparison.InvariantCultureIgnoreCase))
             {
                 locationDifference.Instance.Location.GeoLocation = locationDifference.AllCourse.LOCATION;
                 locationDifference.Instance.Location.Updated = DateTime.Now;
