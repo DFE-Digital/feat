@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import * as dotenv from 'dotenv';
+import * as path from 'path';
+
 dotenv.config();
 
 export default defineConfig({
@@ -15,32 +17,73 @@ export default defineConfig({
         trace: 'on-first-retry',
         screenshot: 'only-on-failure',
         video: 'retain-on-failure',
-        baseURL: process.env.FEAT_BASE_URL || 'http://localhost:3000',
+        //baseURL: process.env.FEAT_BASE_URL || 'http://localhost:3000',
         ignoreHTTPSErrors: true,
         headless: true,
     },
     projects: [
+        //clean context
+        {
+            name: 'Cookies (clean) – Desktop',
+            testDir: './src/ui/tests',
+            testMatch: '**/cookies.spec.ts',
+            use: {
+                ...devices['Desktop Chrome'],
+                baseURL:
+                    process.env.FEAT_UI_BASE_URL ||
+                    'https://s265d01-app-web.azurewebsites.net/',
+            },
+        },
         // UI Project
-        { name: 'Chromium', use: { browserName: 'chromium' } },
+        {
+            name: 'Desktop Chromium',
+            testDir: './src/ui/tests',
+            testIgnore: '**/cookies.spec.ts',
+            use: {
+                ...devices['Desktop Chrome'],
+                baseURL:
+                    process.env.FEAT_UI_BASE_URL ||
+                    'https://s265d01-app-web.azurewebsites.net/',
+                storageState: path.resolve('src/ui/.auth/storageState.accepted.json'),
+            },
+        },
         {
             name: 'Mobile Chrome',
-            use: { browserName: 'chromium', ...devices['Pixel 8'], isMobile: true },
+            testDir: './src/ui/tests',
+            testIgnore: '**/cookies.spec.ts',
+            use: {
+                ...devices['Pixel 8'],
+                isMobile: true,
+                baseURL:
+                    process.env.FEAT_UI_BASE_URL ||
+                    'https://s265d01-app-web.azurewebsites.net/',
+                storageState: path.resolve('src/ui/.auth/storageState.accepted.json'),
+            },
         },
         {
             name: 'Mobile Safari',
-            use: { browserName: 'webkit', ...devices['iPhone 16'] },
+            testDir: './src/ui/tests',
+            testIgnore: '**/cookies.spec.ts',
+            use: {
+                ...devices['iPhone 16'],
+                baseURL:
+                    process.env.FEAT_UI_BASE_URL ||
+                    'https://s265d01-app-web.azurewebsites.net/',
+                storageState: path.resolve('src/ui/.auth/storageState.accepted.json'),
+            },
         },
 
         // API Project
         {
             name: 'API',
-            testDir: './src/api',   // API test files live here
+            testDir: './src/api/tests',   // API test files live here
             use: {
                 // No browser needed
-                baseURL: process.env.FEAT_API_BASE_URL || 'http://localhost:5000',
+                baseURL: process.env.FEAT_API_BASE_URL || 'https://s265d01-app-api.azurewebsites.net',
                 extraHTTPHeaders: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${process.env.FEAT_API_TOKEN || ''}`,
+                    Accept: '*/*',
+                    //Authorization: `Bearer ${process.env.FEAT_API_TOKEN || ''}`,
                 },
             },
         },

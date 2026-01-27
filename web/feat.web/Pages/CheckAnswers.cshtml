@@ -1,0 +1,104 @@
+@page
+@using System.Text
+@using feat.web.Enums
+@using feat.web.Utils
+@model feat.web.Pages.CheckAnswersModel
+@{
+    ViewBag.PageTitle = "Check your answers"; 
+    ViewBag.BackPageUrl = Url.Page(Model.Search.BackPage);
+}
+
+<h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
+
+<dl class="govuk-summary-list">
+    
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Location
+        </dt>
+        <dd class="govuk-summary-list__value">
+            @(string.IsNullOrEmpty(Model.Search.Location) ? SharedStrings.NoLocationAdded : Model.Search.Location)
+        </dd>
+        <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" asp-page="@(PageName.Location)">Change<span class="govuk-visually-hidden"> location</span></a>
+        </dd>
+    </div>
+
+    
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Travel distance
+        </dt>
+        <dd class="govuk-summary-list__value">
+            @(Model.Search.Distance is null ? SharedStrings.NoTravelDistanceAdded : Model.Search.Distance?.GetDisplayName())
+        </dd>
+        <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" asp-page="@(PageName.Location)">Change<span class="govuk-visually-hidden"> travel distance</span></a>
+        </dd>
+    </div>
+    
+    
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Interests
+        </dt>
+        <dd class="govuk-summary-list__value">
+            @{
+                var interests = Model.Search.Interests.Where(x => !string.IsNullOrEmpty(x)).Select(x => x).ToList();
+            }
+            @(interests.Any() ? string.Join(", ", interests) : SharedStrings.NoInterestAdded)
+        </dd>
+        <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" asp-page="@PageName.Interests">Change<span class="govuk-visually-hidden"> interests</span></a>
+        </dd>
+    </div>
+
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">
+            Qualification level
+        </dt>
+        <dd class="govuk-summary-list__value">
+            @{
+                bool first = true;
+                StringBuilder sbQualificationsLevelText = new();
+                foreach (var qualificationsLevel in Model.Search.QualificationLevels)
+                {
+                    if (first)
+                        first = false;
+                    else
+                        sbQualificationsLevelText.Append(", ");
+
+                    sbQualificationsLevelText.Append(qualificationsLevel.GetDisplayName());
+                }
+                @sbQualificationsLevelText.ToString()
+            }
+        </dd>
+        <dd class="govuk-summary-list__actions">
+            <a class="govuk-link" asp-page="@PageName.QualificationLevel">Change<span class="govuk-visually-hidden"> qualification level</span></a>
+        </dd>
+    </div>
+
+    
+    @if (Model.Search.QualificationLevels.Contains(QualificationLevel.None) || 
+         Model.Search.QualificationLevels.Contains(QualificationLevel.OneAndTwo))
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                Age
+            </dt>
+            <dd class="govuk-summary-list__value">
+                @(Model.Search.AgeGroup is null ? SharedStrings.NoAgeAdded : Model.Search.AgeGroup?.GetDisplayName())
+            </dd>
+            <dd class="govuk-summary-list__actions">
+                <a class="govuk-link" asp-page="@PageName.Age">Change<span class="govuk-visually-hidden"> travel distance</span></a>
+            </dd>
+        </div>
+    }
+
+</dl>
+
+<p class="govuk-body">Find out <a asp-page="@PageName.Ai" class="govuk-link">how we use AI</a> to bring you relevant results.</p>
+
+<govuk-button-link asp-page="@PageName.LoadCourses">Search</govuk-button-link>
+    

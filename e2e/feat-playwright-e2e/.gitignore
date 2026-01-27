@@ -1,6 +1,9 @@
 # Node.js dependencies
 node_modules/
 
+# Playwright auth / storage state
+src/ui/.auth/
+
 # Playwright artifacts
 test-results/
 playwright-report/
@@ -17,3 +20,13 @@ build/
 
 # Other testing outputs
 coverage/
+
+# Playwright test reports
+playwright-report/
+test-results/
+
+# Playwright UI cache
+.playwright/
+playwright/.cache/
+playwright/.last-run.json
+playwright/index.json

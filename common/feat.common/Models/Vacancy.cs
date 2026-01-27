@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using feat.common.Models.Enums;
 
 namespace feat.common.Models;
 
@@ -12,17 +13,34 @@ public class Vacancy
     public Guid EntryId { get; set; }
 
     public Guid EmployerId { get; set; }
+    
+    public ApprenticeshipLevel? Level { get; set; }
 
     public short? Positions { get; set; }
-
-    [Column(TypeName = "money")] 
-    public decimal? Wage { get; set; }
+    
+    [StringLength(250)]
+    public string? Wage { get; set; }
 
     public WageUnit? WageUnit { get; set; }
+    
+    public WageType? WageType { get; set; }
 
-    public int? HoursPerWeek { get; set; }
+    public decimal? HoursPerWeek { get; set; }
+    
+    [StringLength(1000)]
+    public string? WorkingWeekDescription { get; set; }
     
     public DateTime? ClosingDate { get; set; }
+    
+    public DateTime? PostedDate { get; set; }
+
+    [StringLength(2083)] 
+    public string? Url { get; set; }
+    
+    public bool? NationalVacancy { get; set; }
+    
+    [StringLength(1000)]
+    public string? NationalVacancyDetails { get; set; }
 
     [ForeignKey("EmployerId")]
     [InverseProperty("Vacancies")]

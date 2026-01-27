@@ -1,14 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 
 namespace feat.common.Models;
 
 [Table("EmployerLocation")]
 public class EmployerLocation
 {
-    [Key]
-    public Guid Id { get; set; }
-
     public Guid EmployerId { get; set; }
 
     [ForeignKey("EmployerId")]

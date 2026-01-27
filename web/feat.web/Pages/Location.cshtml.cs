@@ -1,15 +1,15 @@
-using System.ComponentModel.DataAnnotations;
 using feat.web.Enums;
 using feat.web.Extensions;
 using feat.web.Models;
+using feat.web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using feat.web.Utils;
 
 namespace feat.web.Pages;
 
-public class LocationModel(ILogger<LocationModel> logger) : PageModel
+public class LocationModel(ILogger<LocationModel> logger, ISearchService searchService) : PageModel
 {
-
     [BindProperty]
     public string? Location { get; set; }
     
@@ -17,63 +17,113 @@ public class LocationModel(ILogger<LocationModel> logger) : PageModel
     public Distance? Distance { get; set; }
     
     public required Search Search { get; set; }
+
+    public async Task<JsonResult> OnGetAutoCompleteAsync([FromQuery] string query, CancellationToken cancellationToken = default)
+    {
+        AutoCompleteLocation[] locations = [];
+        
+        if (query.Length > 2)
+        {
+            locations = await searchService.GetAutoCompleteLocations(query, cancellationToken);
+        }
+
+        return new JsonResult(locations);
+    }
     
     public IActionResult OnGet()
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
-        if (!Search.Updated)
-            return RedirectToPage("Index");
         
-        if (Search.Distance.HasValue)
-            Distance = Search.Distance;
+        // If you've come here from LoadCourses page then start to 'new Search'
+        if (Search.History.Contains(PageName.LoadCourses))
+        {
+            Search = new Search();
+            Search.SetPage(PageName.Index);
+        }
+
         if (!string.IsNullOrEmpty(Search.Location))
+        {
             Location = Search.Location;
-        
-        Search.SetPage("Location");
+        }
+
+        if (Search.Distance.HasValue)
+        {
+            Distance = Search.Distance;
+        }
+
+        Search.SetPage(PageName.Location);
         HttpContext.Session.Set("Search", Search);
         
         return Page();
     }
 
-    public IActionResult OnPost()
+    public async Task<IActionResult> OnPost(CancellationToken cancellationToken = default)
     {
         Search = HttpContext.Session.Get<Search>("Search") ?? new Search();
 
-        // If its anything other than HE, we need to validate distance and location
-        if (Search.SearchType != SearchType.HE)
+        var distanceValue = Distance ?? new Distance();
+
+        if (!string.IsNullOrEmpty(Location) && Location.Length > 2)
         {
-            if (string.IsNullOrEmpty(Location))
-                ModelState.AddModelError("Location", "Please enter a location");
-            if (!Distance.HasValue)
-                ModelState.AddModelError("Distance", "Please select how far you would be happy to travel");
+            // Try to fetch the location from the search service and, if we have no results, show an error
+            var locationValid = await searchService.IsLocationValid(Location, cancellationToken);
+            
+            if (!locationValid)
+            {
+                ModelState.AddModelError("Location", SharedStrings.LocationNotFound);
+            }
         }
-        else
+        
+        if (!string.IsNullOrEmpty(Location) && Location.Length <= 2)
         {
-            if (string.IsNullOrEmpty(Location))
-                ModelState.AddModelError("Location", "Please enter a location or click \"Skip this step\"");
+            ModelState.AddModelError("Location", SharedStrings.LocationNotFound);
+        }
+        
+        if (!string.IsNullOrEmpty(Location) && distanceValue == 0)
+        {
+            ModelState.AddModelError("Distance", SharedStrings.SelectHowFarCanUTravel);
+        }
+        
+        if (string.IsNullOrEmpty(Location) && distanceValue > 0)
+        {
+            ModelState.AddModelError("Location", SharedStrings.EnterCityOrPostcode);
         }
 
-        
-        
         if (!ModelState.IsValid)
+        {
             return Page();
-        
+        }
+
         Search.Updated = true;
         
-        if (!string.IsNullOrEmpty(Location)) Search.Location = Location;
-        if (Distance != null) Search.Distance = Distance.Value;
+        if (!string.IsNullOrEmpty(Location))
+        {
+            Search.Location = Location.Trim();
+        }
 
+        if (Distance != null)
+        {
+            Search.Distance = Distance.Value;
+        }
+        
+        Search.OriginalDistance = Distance;
 
         HttpContext.Session.Set("Search", Search);
 
-        if (Search.AgeGroup is AgeGroup.UnderEighteen && Search.SearchType is SearchType.FE or SearchType.Return)
+        if (Search.VisitedCheckAnswers)
         {
-            return RedirectToPage("How");
-        }
-        
-        if (Search.Interests.Any() || Search.Subjects.Any() || Search.Careers.Any())
-            return RedirectToPage("Summary");
+            var mustAnswerInterests = Distance == null || Distance == Enums.Distance.ThirtyPlus;
 
-        return RedirectToPage("Interests");
+            if (!mustAnswerInterests)
+            {
+                return RedirectToPage(PageName.CheckAnswers);
+            }
+
+            var hasInterests = Search.Interests.Any(searchInterest => !string.IsNullOrEmpty(searchInterest));
+            
+            return RedirectToPage(hasInterests ? PageName.CheckAnswers : PageName.Interests);
+        }
+
+        return RedirectToPage(PageName.Interests);
     }
 }

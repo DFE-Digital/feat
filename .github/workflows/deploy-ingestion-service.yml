@@ -8,11 +8,9 @@ on:
         required: true
         type: choice
         options:
-          - development
-          - test
-
-  schedule:
-    - cron: '0 4 * * *'  # Daily at 04:00
+          - Development
+          - Test
+          - Beta
 
 jobs:
   build-and-deploy:

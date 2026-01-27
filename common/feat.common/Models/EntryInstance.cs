@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using feat.common.Models.Enums;
 
 namespace feat.common.Models;
 
@@ -17,15 +18,27 @@ public class EntryInstance
 
     public DateTime? StartDate { get; set; }
 
+    [Column(TypeName = "bigint")]
     public TimeSpan? Duration { get; set; }
 
-    public StudyMode? StudyMode { get; set; }       // e.g., Full-time, Part-time, DistanceLearning
+    public LearningMethod? StudyMode { get; set; }
+    
+    public Guid? LocationId { get; set; }
     
     [StringLength(255)]
     public required string Reference { get; set; } = string.Empty; 
+    
+    public SourceSystem? SourceSystem { get; set; }
+    
+    [StringLength(200)]
+    public string SourceReference { get; set; }
 
     [ForeignKey("EntryId")]
     [InverseProperty("EntryInstances")]
     public Entry Entry { get; set; } = null!;
+    
+    [ForeignKey("LocationId")]
+    [InverseProperty("EntryInstances")]
+    public Location? Location { get; set; }
 }
 

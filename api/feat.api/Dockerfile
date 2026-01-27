@@ -1,11 +1,12 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 EXPOSE 8080
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["api/feat.api/feat.api.csproj", "api/feat.api/"]
+COPY ["common/feat.common/feat.common.csproj", "common/feat.common/"]
 RUN dotnet restore "api/feat.api/feat.api.csproj"
 COPY . .
 WORKDIR "/src/api/feat.api"

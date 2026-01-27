@@ -9,6 +9,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{BE87DC58-9B7F-4581-8ADB-44EB89DC6FDE}"
 	ProjectSection(SolutionItems) = preProject
 		infrastructure\docker\docker-compose.yml = infrastructure\docker\docker-compose.yml
+		infrastructure\docker\docker-compose-redis.yml = infrastructure\docker\docker-compose-redis.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "terraform", "terraform", "{8DC45152-DAB5-4175-B769-4810089C40F7}"
@@ -19,8 +20,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "terraform", "terraform", "{
 		infrastructure\terraform\variables.tf = infrastructure\terraform\variables.tf
 		infrastructure\terraform\development.tfvars = infrastructure\terraform\development.tfvars
 		infrastructure\terraform\network.tf = infrastructure\terraform\network.tf
-		infrastructure\terraform\ms-az-search-service.tf = infrastructure\terraform\ms-az-search-service.tf
-		infrastructure\terraform\ms-sql-srv-db.tf = infrastructure\terraform\ms-sql-srv-db.tf
+		infrastructure\terraform\filestore.tf = infrastructure\terraform\filestore.tf
+		infrastructure\terraform\cache.tf = infrastructure\terraform\cache.tf
+		infrastructure\terraform\aisearch.tf = infrastructure\terraform\aisearch.tf
+		infrastructure\terraform\database.tf = infrastructure\terraform\database.tf
+		infrastructure\terraform\logging.tf = infrastructure\terraform\logging.tf
+		infrastructure\terraform\web.tf = infrastructure\terraform\web.tf
+		infrastructure\terraform\ingestion.tf = infrastructure\terraform\ingestion.tf
+		infrastructure\terraform\registry.tf = infrastructure\terraform\registry.tf
+		infrastructure\terraform\readme.md = infrastructure\terraform\readme.md
+		infrastructure\terraform\beta.tfvars = infrastructure\terraform\beta.tfvars
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "e2e", "e2e", "{8BF3D5E1-6737-4758-8CDA-23F8DECBF71A}"
@@ -42,6 +51,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution files", "solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "feat.ingestion", "ingestion\feat.ingestion\feat.ingestion.csproj", "{D51A6605-6089-4C1B-A0E6-F6441AC4911C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "feat.api.tests", "api\feat.api.tests\feat.api.tests.csproj", "{29B40F87-DC89-4B4C-887C-92A6BDDDC8CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "feat.web.tests", "web\feat.web.tests\feat.web.tests.csproj", "{D3C36150-E16E-4008-8856-558AE8618A65}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +78,14 @@ Global
 		{D51A6605-6089-4C1B-A0E6-F6441AC4911C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D51A6605-6089-4C1B-A0E6-F6441AC4911C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D51A6605-6089-4C1B-A0E6-F6441AC4911C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29B40F87-DC89-4B4C-887C-92A6BDDDC8CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29B40F87-DC89-4B4C-887C-92A6BDDDC8CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29B40F87-DC89-4B4C-887C-92A6BDDDC8CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29B40F87-DC89-4B4C-887C-92A6BDDDC8CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3C36150-E16E-4008-8856-558AE8618A65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3C36150-E16E-4008-8856-558AE8618A65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3C36150-E16E-4008-8856-558AE8618A65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3C36150-E16E-4008-8856-558AE8618A65}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0B40ABB2-1E70-49B9-844D-BBCCE755B737} = {14F19F95-F466-4C0C-BAFB-A11A7C4107EA}
@@ -73,5 +94,7 @@ Global
 		{D51A6605-6089-4C1B-A0E6-F6441AC4911C} = {466E77EF-CAE3-44A4-8A09-EA7F3CCE6A10}
 		{BE87DC58-9B7F-4581-8ADB-44EB89DC6FDE} = {7CF4075C-5269-4F36-98F9-E18A57077B3A}
 		{8DC45152-DAB5-4175-B769-4810089C40F7} = {7CF4075C-5269-4F36-98F9-E18A57077B3A}
+		{29B40F87-DC89-4B4C-887C-92A6BDDDC8CE} = {C456EAA1-9574-4778-912E-1D115569BA35}
+		{D3C36150-E16E-4008-8856-558AE8618A65} = {ED762B9B-8875-45D1-8C94-60967CB86495}
 	EndGlobalSection
 EndGlobal

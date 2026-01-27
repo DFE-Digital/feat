@@ -1,0 +1,170 @@
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace feat.ingestion.Migrations
+{
+    /// <inheritdoc />
+    public partial class UpdateFACCourseStringLengths3 : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AlterColumn<string>(
+                name: "WhereNext",
+                table: "FAC_Courses",
+                type: "nvarchar(4000)",
+                maxLength: 4000,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(3000)",
+                oldMaxLength: 3000,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "WhatYoullNeed",
+                table: "FAC_Courses",
+                type: "nvarchar(4000)",
+                maxLength: 4000,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(3000)",
+                oldMaxLength: 3000,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "WhatYoullLearn",
+                table: "FAC_Courses",
+                type: "nvarchar(4000)",
+                maxLength: 4000,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(3000)",
+                oldMaxLength: 3000,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "HowYoullLearn",
+                table: "FAC_Courses",
+                type: "nvarchar(4000)",
+                maxLength: 4000,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(3000)",
+                oldMaxLength: 3000,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "HowYoullBeAssessed",
+                table: "FAC_Courses",
+                type: "nvarchar(4000)",
+                maxLength: 4000,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(3000)",
+                oldMaxLength: 3000,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "EntryRequirements",
+                table: "FAC_Courses",
+                type: "nvarchar(4000)",
+                maxLength: 4000,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(3000)",
+                oldMaxLength: 3000,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "CourseDescription",
+                table: "FAC_Courses",
+                type: "nvarchar(4000)",
+                maxLength: 4000,
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(3000)",
+                oldMaxLength: 3000);
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AlterColumn<string>(
+                name: "WhereNext",
+                table: "FAC_Courses",
+                type: "nvarchar(3000)",
+                maxLength: 3000,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(4000)",
+                oldMaxLength: 4000,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "WhatYoullNeed",
+                table: "FAC_Courses",
+                type: "nvarchar(3000)",
+                maxLength: 3000,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(4000)",
+                oldMaxLength: 4000,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "WhatYoullLearn",
+                table: "FAC_Courses",
+                type: "nvarchar(3000)",
+                maxLength: 3000,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(4000)",
+                oldMaxLength: 4000,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "HowYoullLearn",
+                table: "FAC_Courses",
+                type: "nvarchar(3000)",
+                maxLength: 3000,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(4000)",
+                oldMaxLength: 4000,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "HowYoullBeAssessed",
+                table: "FAC_Courses",
+                type: "nvarchar(3000)",
+                maxLength: 3000,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(4000)",
+                oldMaxLength: 4000,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "EntryRequirements",
+                table: "FAC_Courses",
+                type: "nvarchar(3000)",
+                maxLength: 3000,
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(4000)",
+                oldMaxLength: 4000,
+                oldNullable: true);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "CourseDescription",
+                table: "FAC_Courses",
+                type: "nvarchar(3000)",
+                maxLength: 3000,
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(4000)",
+                oldMaxLength: 4000);
+        }
+    }
+}

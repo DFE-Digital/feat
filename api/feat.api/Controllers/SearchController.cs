@@ -1,14 +1,27 @@
+using feat.api.Models;
+using feat.api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace feat.api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SearchController : ControllerBase
+public class SearchController(ISearchService searchService) : ControllerBase
 {
-    [HttpGet]
-    public IActionResult Get()
+    [HttpPost]
+    public async Task<ActionResult<SearchResponse>> Search([FromBody] SearchRequest request)
     {
-        return Ok();
+        var (validation, response) = await searchService.SearchAsync(request);
+
+        if (!validation.IsValid)
+        {
+            return ValidationProblem(new ValidationProblemDetails(validation.Errors)
+            {
+                Title = "One or more validation errors occurred.",
+                Status = StatusCodes.Status400BadRequest
+            });
+        }
+
+        return Ok(response);
     }
 }

@@ -1,19 +1,17 @@
 @page
 @model feat.web.Pages.IndexModel
+@using feat.web.Utils
 @{
-    ViewBag.Title = "Find education and training";
+    ViewBag.PageTitle = "Find education and training opportunities";
 }
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-    
-        <h1 class="govuk-heading-l">@ViewBag.Title</h1>
-    
-        <p class="govuk-body">Whether you're already in education or training, or coming back after a break, we can help you work out what to do next.</p>
-        <p class="govuk-body">Our <a href="ai" class="govuk-link">AI-powered</a> service makes it easy to find courses that are relevant to you.</p>
-    
-        <govuk-button-link asp-page="Situation" is-start-button="false">Start now</govuk-button-link>
-    
+<div class="govuk-width-container">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
+            <p>Whether you're already in education or training, or coming back after a break, we can help you work out what to do next.</p>
+            
+            <govuk-button-link asp-page="@PageName.Location" is-start-button="false">Start now</govuk-button-link>
+        </div>
     </div>
-
 </div>

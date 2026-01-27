@@ -1,0 +1,9 @@
+﻿@page
+@using feat.web.Models.ViewModels
+@using feat.web.Utils
+@model NoResultsSearchModel
+@{
+    ViewBag.BackPageUrl = Url.Page(PageName.CheckAnswers);
+}
+
+<partial name="Partials/_NoResults" model="new NoResults { HasFilters = false }" />

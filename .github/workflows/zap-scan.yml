@@ -1,0 +1,73 @@
+name: Generate - Zap Scan
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: 'Environment to run scan against'
+        required: true
+        default: 'Test'
+        options:
+          - 'Development'
+          - 'Test'
+          - 'Beta'
+
+run-name: Running ZAP scan against ${{ github.event.inputs.environment }}
+jobs:
+  zap_scan_web:
+    name: 'Run Zap Scan on Front End'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment }}
+    steps:
+      - name: 'Checkout source'
+        uses: actions/checkout@v4
+      
+      - name: 'Running ZAP scan against front end https://${{ vars.ENV_PREFIX }}-app-web.azurewebsites.net'
+        uses: zaproxy/action-baseline@v0.15.0
+        with:
+          target: 'https://${{ vars.ENV_PREFIX }}-app-web.azurewebsites.net'
+          allow_issue_writing: 'false'
+          artifact_name: 'web_zap_scan'
+      
+      - name: Add web report
+        if: ${{ github.event.inputs.environment == 'Beta' }}
+        run: |
+          git pull
+          cp ./report_md.md docs/scans/Web-Security-Scan-Report.md
+          sed -i 's/# ZAP Scanning Report/# Web ZAP Scanning Report/' docs/scans/Web-Security-Scan-Report.md
+          git add docs/scans/Web-Security-Scan-Report.md
+          git config --global user.name "Documentation Bot"
+          git config --global user.email "documentation-bot-bot@users.noreply.github.com"
+          git commit -m "Generated web zap scan report"
+          git push
+        continue-on-error: true
+  zap_scan_api:
+    name: 'Run Zap Scan against API'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment }}
+    steps:
+      - name: 'Checkout source'
+        uses: actions/checkout@v4
+        
+      - name: 'Running ZAP API scan against API https://${{ vars.ENV_PREFIX }}-app-api.azurewebsites.net'
+        uses: zaproxy/action-api-scan@v0.10.0
+        with:
+          target: 'https://${{ vars.ENV_PREFIX }}-app-api.azurewebsites.net/openapi/v1.json'
+          allow_issue_writing: 'false'
+          artifact_name: 'api_zap_scan'
+
+      - name: Add API report
+        if: ${{ github.event.inputs.environment == 'Beta' }}
+        run: |
+          git pull
+          cp ./report_md.md docs/scans/API-Security-Scan-Report.md
+          sed -i 's/# ZAP Scanning Report/# API ZAP Scanning Report/' docs/scans/API-Security-Scan-Report.md
+          git add docs/scans/API-Security-Scan-Report.md
+          git config --global user.name "Documentation Bot"
+          git config --global user.email "documentation-bot-bot@users.noreply.github.com"
+          git commit -m "Generated API zap scan report"
+          git push
+        continue-on-error: true

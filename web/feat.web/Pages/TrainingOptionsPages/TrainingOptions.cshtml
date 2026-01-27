@@ -1,0 +1,40 @@
+@page
+@model TrainingOptionsPages.TrainingOptionsModel
+@{
+    ViewBag.PageTitle = "Different training options";
+     
+    ViewBag.StaticBackPageUrl = Model.RefererUrl;
+}
+
+<div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
+
+        <h2 class="govuk-heading-m">A Levels</h2>
+        <p>A levels are subject-based qualifications usually assessed by exams. You usually choose 3 subjects to study but you can take more or fewer.</p>
+        <p><a asp-page="/TrainingOptionsPages/AboutALevels" class="govuk-link">Find out more about A Levels</a></p>
+
+        <h2 class="govuk-heading-m">Apprenticeships</h2>
+        <p>Apprenticeships are real jobs that allow you to earn a wage while you learn. You'll work alongside experienced staff to learn on the job.</p>
+        <p><a asp-page="/TrainingOptionsPages/AboutApprenticeships" class="govuk-link">Find out more about Apprenticeships</a></p>
+
+        <h2 class="govuk-heading-m">BTECs</h2>
+        <p>BTECs are vocational qualifications that focus on practical, hands-on learning. They can prepare you for work, an apprenticeship or further study, including university.</p>
+        <p><a asp-page="/TrainingOptionsPages/AboutBtecs" class="govuk-link">Find out more about BTECs</a></p>
+
+        <h2 class="govuk-heading-m">Degrees</h2>
+        <p>A degree is a higher education qualification that usually takes 3 or more years to complete if you study full time.</p>
+        <p><a asp-page="/TrainingOptionsPages/AboutDegrees" class="govuk-link">Find out more about Degrees</a></p>
+
+        <h2 class="govuk-heading-m">Diplomas</h2>
+        <p>Diplomas are work-related qualifications that help you gain knowledge and skills for a specific job, industry or subject. You can take a diploma at different levels, depending on your experience and career goals.
+        </p>
+        <p><a asp-page="/TrainingOptionsPages/AboutDiplomas" class="govuk-link">Find out more about Diplomas</a></p>
+
+        <h2 class="govuk-heading-m">T Levels</h2>
+        <p>A T Level gives you a mix of learning in the classroom and on the job. Businesses and employers helped design T Levels to teach you the skills you'll need.</p>
+        <p><a asp-page="/TrainingOptionsPages/AboutTLevels" class="govuk-link">Find out more about T Levels</a></p>
+        
+    </div>
+</div>

@@ -8,27 +8,27 @@ output "website_url" {
 
 // Virtual network-related outputs
 output "azurerm_virtual_network" {
-  value = azurerm_virtual_network.feat_vnet.name
+  value       = azurerm_virtual_network.feat_vnet.name
   description = "Virtual network name"
 }
 
 output "azurerm_network_security_group" {
-  value = azurerm_network_security_group.feat-nsg.name
+  value       = azurerm_network_security_group.feat-nsg.name
   description = "Network security group name"
 }
 
 output "azurerm_subnet" {
-  value = azurerm_subnet.feat_main_subnet.name
+  value       = azapi_resource.feat_main_subnet.name
   description = "Subnet name"
 }
 
 output "azurerm_private_dns_zone" {
-  value = azurerm_private_dns_zone.default.name
+  value       = azurerm_private_dns_zone.default.name
   description = "Private DNS Zone name"
 }
 
 output "azurerm_private_dns_zone_virtual_network_link" {
-  value = azurerm_private_dns_zone_virtual_network_link.default.name
+  value       = azurerm_private_dns_zone_virtual_network_link.default.name
   description = "Private DNS Zone Virtual Network Link name"
 }
 
@@ -50,4 +50,18 @@ output "mssql_server_fqdn" {
 output "search_service_name" {
   value       = azurerm_search_service.feat_search_service.name
   description = "The name of the Azure Search Service"
+}
+
+output "cache_hostname" {
+  value       = azurerm_managed_redis.feat_redis_enterprise.hostname
+  description = "The DNS hostname for the cache"
+}
+output "cache_port" {
+  value       = azurerm_managed_redis.feat_redis_enterprise.default_database[0].port
+  description = "The port the managed redis cache is running on"
+}
+output "cache_primary_access_key" {
+  value       = azurerm_managed_redis.feat_redis_enterprise.default_database[0].primary_access_key
+  description = "The Managed Redis primary access key."
+  sensitive   = true
 }

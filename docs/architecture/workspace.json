@@ -3,8 +3,8 @@
     "description": "Find Education and Training - Hosting internal AI Search",
     "documentation": {},
     "id": 2,
-    "lastModifiedAgent": "structurizr-onpremises/dsl-editor/3007b16d-1d92-4cff-9470-12bd1c2c2025",
-    "lastModifiedDate": "2025-09-23T13:52:06Z",
+    "lastModifiedAgent": "structurizr-onpremises/dsl-editor/dd273879-ec98-42a1-90bc-7fa67a9995b9",
+    "lastModifiedDate": "2025-10-16T15:34:49Z",
     "lastModifiedUser": "stuart",
     "model": {
         "deploymentNodes": [
@@ -20,23 +20,23 @@
                                         "description": "Automatically distributes and secures incoming application traffic",
                                         "environment": "Service",
                                         "id": "21",
-                                        "name": "Azure Front Door",
+                                        "name": "Shared DfE WAF",
                                         "properties": {
                                             "structurizr.dsl.identifier": "gateway"
                                         },
                                         "relationships": [
                                             {
                                                 "description": "Fowards requests to",
-                                                "destinationId": "32",
-                                                "id": "33",
+                                                "destinationId": "34",
+                                                "id": "35",
                                                 "sourceId": "21",
                                                 "tags": "Relationship",
                                                 "technology": "HTTPS"
                                             },
                                             {
                                                 "description": "Provides secured access",
-                                                "destinationId": "34",
-                                                "id": "42",
+                                                "destinationId": "36",
+                                                "id": "44",
                                                 "sourceId": "21",
                                                 "tags": "Relationship"
                                             }
@@ -108,24 +108,24 @@
                                                             "Default"
                                                         ],
                                                         "environment": "Service",
-                                                        "id": "32",
+                                                        "id": "34",
                                                         "instanceId": 1,
                                                         "properties": {
                                                             "structurizr.dsl.identifier": "webapplicationinstance"
                                                         },
                                                         "relationships": [
                                                             {
-                                                                "destinationId": "35",
-                                                                "id": "38",
+                                                                "destinationId": "37",
+                                                                "id": "40",
                                                                 "linkedRelationshipId": "4",
-                                                                "sourceId": "32"
+                                                                "sourceId": "34"
                                                             }
                                                         ],
                                                         "tags": "Container Instance"
                                                     }
                                                 ],
                                                 "environment": "Service",
-                                                "id": "31",
+                                                "id": "33",
                                                 "instances": "1",
                                                 "name": "Web - Azure Container App",
                                                 "properties": {
@@ -141,7 +141,7 @@
                                                             "Default"
                                                         ],
                                                         "environment": "Service",
-                                                        "id": "35",
+                                                        "id": "37",
                                                         "instanceId": 1,
                                                         "properties": {
                                                             "structurizr.dsl.identifier": "apiinstance"
@@ -150,24 +150,24 @@
                                                             {
                                                                 "description": "Queries",
                                                                 "destinationId": "24",
-                                                                "id": "36",
+                                                                "id": "38",
                                                                 "linkedRelationshipId": "15",
-                                                                "sourceId": "35",
+                                                                "sourceId": "37",
                                                                 "technology": "HTTPS"
                                                             },
                                                             {
                                                                 "description": "Queries",
                                                                 "destinationId": "27",
-                                                                "id": "37",
+                                                                "id": "39",
                                                                 "linkedRelationshipId": "8",
-                                                                "sourceId": "35",
+                                                                "sourceId": "37",
                                                                 "technology": "HTTPS"
                                                             },
                                                             {
                                                                 "description": "Saves semantic results and geolocation lookups",
                                                                 "destinationId": "28",
-                                                                "id": "39",
-                                                                "sourceId": "35",
+                                                                "id": "41",
+                                                                "sourceId": "37",
                                                                 "tags": "Relationship"
                                                             }
                                                         ],
@@ -175,7 +175,7 @@
                                                     }
                                                 ],
                                                 "environment": "Service",
-                                                "id": "34",
+                                                "id": "36",
                                                 "instances": "1",
                                                 "name": "API - Azure Container App",
                                                 "properties": {
@@ -185,7 +185,7 @@
                                             }
                                         ],
                                         "environment": "Service",
-                                        "id": "30",
+                                        "id": "32",
                                         "instances": "1",
                                         "name": "Auto-Scaling Web Container",
                                         "properties": {
@@ -203,7 +203,7 @@
                                                             "Default"
                                                         ],
                                                         "environment": "Service",
-                                                        "id": "45",
+                                                        "id": "47",
                                                         "instanceId": 1,
                                                         "properties": {
                                                             "structurizr.dsl.identifier": "ingestioninstance"
@@ -212,31 +212,31 @@
                                                             {
                                                                 "description": "Queries",
                                                                 "destinationId": "24",
-                                                                "id": "46",
+                                                                "id": "48",
                                                                 "linkedRelationshipId": "17",
-                                                                "sourceId": "45",
+                                                                "sourceId": "47",
                                                                 "technology": "HTTPS"
                                                             },
                                                             {
                                                                 "description": "Writes to",
                                                                 "destinationId": "27",
-                                                                "id": "47",
+                                                                "id": "49",
                                                                 "linkedRelationshipId": "12",
-                                                                "sourceId": "45",
+                                                                "sourceId": "47",
                                                                 "technology": "HTTPS"
                                                             },
                                                             {
                                                                 "description": "Saves semantic results and geolocation lookups",
                                                                 "destinationId": "28",
-                                                                "id": "48",
-                                                                "sourceId": "45",
+                                                                "id": "50",
+                                                                "sourceId": "47",
                                                                 "tags": "Relationship"
                                                             },
                                                             {
                                                                 "description": "Saves additional information for display",
-                                                                "destinationId": "29",
-                                                                "id": "50",
-                                                                "sourceId": "45",
+                                                                "destinationId": "30",
+                                                                "id": "52",
+                                                                "sourceId": "47",
                                                                 "tags": "Relationship"
                                                             }
                                                         ],
@@ -244,7 +244,7 @@
                                                     }
                                                 ],
                                                 "environment": "Service",
-                                                "id": "44",
+                                                "id": "46",
                                                 "instances": "1",
                                                 "name": "Ingestion - Azure Container Job",
                                                 "properties": {
@@ -254,7 +254,7 @@
                                             }
                                         ],
                                         "environment": "Service",
-                                        "id": "43",
+                                        "id": "45",
                                         "instances": "1",
                                         "name": "Auto-Scaling Ingestion Container",
                                         "properties": {
@@ -282,35 +282,61 @@
                                 "id": "25",
                                 "infrastructureNodes": [
                                     {
-                                        "description": "Redis-backed cache for short term storage of data",
+                                        "description": "Azure Cache - Redis",
                                         "environment": "Service",
                                         "id": "28",
-                                        "name": "Azure Cache",
+                                        "name": "Distributed Cache",
                                         "properties": {
                                             "structurizr.dsl.identifier": "cache"
                                         },
                                         "relationships": [
                                             {
-                                                "description": "Fetches semantic results and geolocation lookups",
-                                                "destinationId": "35",
-                                                "id": "40",
+                                                "description": "Backing store",
+                                                "destinationId": "30",
+                                                "id": "31",
                                                 "sourceId": "28",
                                                 "tags": "Relationship"
                                             },
                                             {
                                                 "description": "Fetches semantic results and geolocation lookups",
-                                                "destinationId": "45",
-                                                "id": "49",
+                                                "destinationId": "37",
+                                                "id": "42",
+                                                "sourceId": "28",
+                                                "tags": "Relationship"
+                                            },
+                                            {
+                                                "description": "Fetches semantic results and geolocation lookups",
+                                                "destinationId": "47",
+                                                "id": "51",
                                                 "sourceId": "28",
                                                 "tags": "Relationship"
                                             }
                                         ],
-                                        "tags": "Element,Infrastructure Node,Microsoft Azure - Cache"
+                                        "tags": "Element,Infrastructure Node,Microsoft Azure - Cache Redis"
+                                    },
+                                    {
+                                        "description": "Staging location for CSV file imports and data storage",
+                                        "environment": "Service",
+                                        "id": "29",
+                                        "name": "Azure Blob Storage",
+                                        "properties": {
+                                            "structurizr.dsl.identifier": "staging"
+                                        },
+                                        "relationships": [
+                                            {
+                                                "description": "Loads data from",
+                                                "destinationId": "47",
+                                                "id": "53",
+                                                "sourceId": "29",
+                                                "tags": "Relationship"
+                                            }
+                                        ],
+                                        "tags": "Element,Infrastructure Node,Microsoft Azure - Storage Accounts"
                                     },
                                     {
                                         "description": "Data store for information to be surfaced to users that isn't required to be searchable",
                                         "environment": "Service",
-                                        "id": "29",
+                                        "id": "30",
                                         "name": "Relational DB",
                                         "properties": {
                                             "structurizr.dsl.identifier": "db"
@@ -318,9 +344,9 @@
                                         "relationships": [
                                             {
                                                 "description": "Fetches additional information for display",
-                                                "destinationId": "35",
-                                                "id": "41",
-                                                "sourceId": "29",
+                                                "destinationId": "37",
+                                                "id": "43",
+                                                "sourceId": "30",
                                                 "tags": "Relationship"
                                             }
                                         ],
@@ -340,7 +366,7 @@
                         "instances": "1",
                         "name": "West Europe",
                         "properties": {
-                            "structurizr.dsl.identifier": "1702b4f4-4953-4d5c-89e4-dc8e74f8e326"
+                            "structurizr.dsl.identifier": "3096e830-b2d5-4c10-9527-15309b18da39"
                         },
                         "tags": "Element,Deployment Node,Microsoft Azure - Region Management"
                     }
@@ -350,7 +376,7 @@
                 "instances": "1",
                 "name": "Microsoft Azure",
                 "properties": {
-                    "structurizr.dsl.identifier": "9859e98b-0c7e-45ea-8d5a-acd54583eed3"
+                    "structurizr.dsl.identifier": "053d47a6-15b0-45a0-99eb-f8b9f038e8c2"
                 },
                 "tags": "Element,Deployment Node,Microsoft Azure - Azure A"
             }
@@ -530,7 +556,7 @@
     },
     "name": "FEATv1",
     "properties": {
-        "structurizr.dsl": "d29ya3NwYWNlICJGRUFUdjEiICJGaW5kIEVkdWNhdGlvbiBhbmQgVHJhaW5pbmcgLSBIb3N0aW5nIGludGVybmFsIEFJIFNlYXJjaCIgewoKICAgIG1vZGVsIHsKICAgICAgICBwcm9wZXJ0aWVzIHsKICAgICAgICAgICAgInN0cnVjdHVyaXpyLmdyb3VwU2VwYXJhdG9yIiAiLyIKICAgICAgICB9CgogICAgICAgIGdyb3VwICJEZkUiIHsKCiAgICAgICAgICAgIGZpbmRBU3lzdGVtID0gc29mdHdhcmVTeXN0ZW0gIkZpbmQgRWR1Y2F0aW9uIGFuZCBUcmFpbmluZyIgewogICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlNlcnZlcmxlc3MgY29udGFpbmVyIHBsYXRmb3JtIgogICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQ29udGFpbmVyIEFwcHMgRW52aXJvbm1lbnRzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgIHdlYmFwcCA9IGNvbnRhaW5lciAiRkVBVCBXZWJzaXRlIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlByb29mIG9mIGNvbmNlcHQgc2l0ZSB0byBkZW1vbnN0cmF0ZSBhIGZyb250LWVuZCBmb3IgZmluZGluZyBpbmZvcm1hdGlvbiIKICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJkb3RuZXQgOS4wIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIFdlYnNpdGUgU3RhZ2luZyIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGFwaSA9IGNvbnRhaW5lciAiRkVBVCBBUEkgU2VydmljZSIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJGRUFUIEFQSSB0aGF0IGludGVycm9nYXRlcyBBenVyZSBBSSBTZWFyY2giCiAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiZG90bmV0IDkuMCIKICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBBUEkgTWFuYWdlbWVudCBTZXJ2aWNlcyIKICAgICAgICAgICAgICAgICAgICB3ZWJhcHAgLT4gdGhpcwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgaW5nZXN0aW9uID0gY29udGFpbmVyICJGRUFUIEluZ2VzdGlvbiBKb2IiIHsKICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJkb3RuZXQgOS4wIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIERhdGEgU2hhcmVzIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgCiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgCiAgICAgICAgCiAgICAgICAgZ3JvdXAgIkF6dXJlIEFJIiB7CiAgICAgICAgICAgIGFpID0gc29mdHdhcmVTeXN0ZW0gIk1pY3Jvc29mdCBBSSBTZXJ2aWNlcyIgewogICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQ29nbml0aXZlIFNlcnZpY2VzIgogICAgICAgICAgICAgICAgYWlTZWFyY2ggPSBjb250YWluZXIgIk1pY3Jvc29mdCBBSSBTZWFyY2giIHsKICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJNaWNyb3NvZnQgQUkiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQ29nbml0aXZlIFNlYXJjaCIKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiVmVjdG9yIHNlYXJjaCBkYXRhYmFzZSIKICAgICAgICAgICAgICAgICAgICBhcGkgLT4gdGhpcyAiUXVlcmllcyIgIkhUVFBTIgogICAgICAgICAgICAgICAgICAgIGluZ2VzdGlvbiAtPiB0aGlzICJXcml0ZXMgdG8iICJIVFRQUyIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgb3BlbkFJID0gY29udGFpbmVyICJPcGVuQUkgTExNIiB7CiAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiTWljcm9zb2Z0IEFJIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEF6dXJlIE9wZW5BSSIKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiRW1iZWRkaW5ncyBnZW5lcmF0b3IiCiAgICAgICAgICAgICAgICAgICAgYXBpIC0+IHRoaXMgIlF1ZXJpZXMiICJIVFRQUyIKICAgICAgICAgICAgICAgICAgICBpbmdlc3Rpb24gLT4gdGhpcyAiUXVlcmllcyIgIkhUVFBTIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIAogICAgICAgIHNlcnZpY2UgPSBkZXBsb3ltZW50RW52aXJvbm1lbnQgIlNlcnZpY2UiIHsKCiAgICAgICAgICAgIGRlcGxveW1lbnROb2RlICJNaWNyb3NvZnQgQXp1cmUiIHsKICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEF6dXJlIEEiCgogICAgICAgICAgICAgICAgZGVwbG95bWVudE5vZGUgIldlc3QgRXVyb3BlIiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gUmVnaW9uIE1hbmFnZW1lbnQiCiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgaW50ZXJuZXQgPSBkZXBsb3ltZW50Tm9kZSAiUHVibGljIEludGVybmV0IiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEVudHJhIEludGVybmV0IEFjY2VzcyIKICAgICAgICAgICAgICAgICAgICAgICAgZ2F0ZXdheSA9IGluZnJhc3RydWN0dXJlTm9kZSAiQXp1cmUgRnJvbnQgRG9vciIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiQXp1cmUgRnJvbnQgRG9vciBhbmQgRmlyZXdhbGxzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkF1dG9tYXRpY2FsbHkgZGlzdHJpYnV0ZXMgYW5kIHNlY3VyZXMgaW5jb21pbmcgYXBwbGljYXRpb24gdHJhZmZpYyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEZpcmV3YWxscyIKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgYmFzdGlvbiA9IGluZnJhc3RydWN0dXJlTm9kZSAiQmFzdGlvbiIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlJlbW90ZSBTU0ggZm9yIGNvbm5lY3RpbmcgdG8gdGhlIHZpcnR1YWwgbmV0d29yayIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEJhc3Rpb25zIgogICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIGRmZSA9IGRlcGxveW1lbnROb2RlICJEZkUgQUkgQ2VudHJlIGZvciBFeGNlbGxlbmNlIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIFZpcnR1YWwgTmV0d29ya3MiCiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgb3BlbkFJSW5zdGFuY2UgPSBjb250YWluZXJJbnN0YW5jZSBvcGVuQUkgewoKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICAgICAgdm5ldCA9IGRlcGxveW1lbnROb2RlICJGRUFUIFZuZXQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gVmlydHVhbCBOZXR3b3JrcyIKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGJhc3Rpb24gLT4gdGhpcyAiQWxsb3dzIHNlY3VyZWQgYWNjZXNzIHRvIgogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGFpU2VhcmNoSW5zdGFuY2UgPSBjb250YWluZXJJbnN0YW5jZSBhaVNlYXJjaCB7CiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgY2FjaGUgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIkF6dXJlIENhY2hlIiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiUmVkaXMtYmFja2VkIGNhY2hlIGZvciBzaG9ydCB0ZXJtIHN0b3JhZ2Ugb2YgZGF0YSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIENhY2hlIgogICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAvKiAKICAgICAgICAgICAgICAgICAgICAgICAgc3RhZ2luZyA9IGluZnJhc3RydWN0dXJlTm9kZSAiQXp1cmUgQmxvYiBTdG9yYWdlIiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiQXp1cmUgQmxvYiBTdG9yYWdlIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gU3RvcmFnZSBBY2NvdW50cyIKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAqLwogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgZGIgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIlJlbGF0aW9uYWwgREIiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJEYXRhIHN0b3JlIGZvciBpbmZvcm1hdGlvbiB0byBiZSBzdXJmYWNlZCB0byB1c2VycyB0aGF0IGlzbid0IHJlcXVpcmVkIHRvIGJlIHNlYXJjaGFibGUiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBTUUwgU2VydmVyIgogICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAvKgogICAgICAgICAgICAgICAgICAgICAgICBkYXRhZmFjdG9yeSA9IGluZnJhc3RydWN0dXJlTm9kZSAiQXp1cmUgRGF0YSBGYWN0b3J5IiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiRkFBIERhdGEgRmFjdG9yeSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIERhdGEgRmFjdG9yaWVzIgogICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICovCiAgICAgICAgICAgICAgICAgICAgICAgIHdlYkNvbnRhaW5lciA9IGRlcGxveW1lbnROb2RlICJBdXRvLVNjYWxpbmcgV2ViIENvbnRhaW5lciIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQ29udGFpbmVyIEFwcHMgRW52aXJvbm1lbnRzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB3ZWJBcHBTZXJ2aWNlID0gZGVwbG95bWVudE5vZGUgIldlYiAtIEF6dXJlIENvbnRhaW5lciBBcHAiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBDb250YWluZXIgSW5zdGFuY2VzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHdlYkFwcGxpY2F0aW9uSW5zdGFuY2UgPSBjb250YWluZXJJbnN0YW5jZSB3ZWJhcHAgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBnYXRld2F5IC0+IHRoaXMgIkZvd2FyZHMgcmVxdWVzdHMgdG8iICJIVFRQUyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFwaUFwcFNlcnZpY2UgPSBkZXBsb3ltZW50Tm9kZSAiQVBJIC0gQXp1cmUgQ29udGFpbmVyIEFwcCIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIENvbnRhaW5lciBJbnN0YW5jZXMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYXBpSW5zdGFuY2UgPSBjb250YWluZXJJbnN0YW5jZSBhcGkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGNhY2hlICJTYXZlcyBzZW1hbnRpYyByZXN1bHRzIGFuZCBnZW9sb2NhdGlvbiBsb29rdXBzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjYWNoZSAtPiB0aGlzICJGZXRjaGVzIHNlbWFudGljIHJlc3VsdHMgYW5kIGdlb2xvY2F0aW9uIGxvb2t1cHMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRiIC0+IHRoaXMgIkZldGNoZXMgYWRkaXRpb25hbCBpbmZvcm1hdGlvbiBmb3IgZGlzcGxheSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ2F0ZXdheSAtPiB0aGlzICJQcm92aWRlcyBzZWN1cmVkIGFjY2VzcyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGlnZXN0aW9uQ29udGFpbmVyID0gZGVwbG95bWVudE5vZGUgIkF1dG8tU2NhbGluZyBJbmdlc3Rpb24gQ29udGFpbmVyIiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBDb250YWluZXIgQXBwcyBFbnZpcm9ubWVudHMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGluZ2VzdGlvbkFwcFNlcnZpY2UgPSBkZXBsb3ltZW50Tm9kZSAiSW5nZXN0aW9uIC0gQXp1cmUgQ29udGFpbmVyIEpvYiIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIFdvcmtlciBDb250YWluZXIgQXBwIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGluZ2VzdGlvbkluc3RhbmNlID0gY29udGFpbmVySW5zdGFuY2UgaW5nZXN0aW9uIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiBjYWNoZSAiU2F2ZXMgc2VtYW50aWMgcmVzdWx0cyBhbmQgZ2VvbG9jYXRpb24gbG9va3VwcyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2FjaGUgLT4gdGhpcyAiRmV0Y2hlcyBzZW1hbnRpYyByZXN1bHRzIGFuZCBnZW9sb2NhdGlvbiBsb29rdXBzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGRiICJTYXZlcyBhZGRpdGlvbmFsIGluZm9ybWF0aW9uIGZvciBkaXNwbGF5IgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAvKgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdGFnaW5nIC0+IHRoaXMgIkxvYWRzIGRhdGEgZnJvbSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKi8KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAKCiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgLyogCiAgICAgICAgICAgICAgICAgICAgICAgIGRhdGFmYWN0b3J5IC0+IHN0YWdpbmcgIkV4cG9ydHMgZGF0YSB0byIgCiAgICAgICAgICAgICAgICAgICAgICAgICovCiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgCgogICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgCgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICAgIAogICAgICAgIH0KICAgICAgICAKICAgIH0KCiAgICB2aWV3cyB7CiAgICAgICAgCiAgICAgICAgZGVwbG95bWVudCAqIFNlcnZpY2UgewogICAgICAgICAgICB0aXRsZSAiU2VydmljZSBWaWV3IgogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICB9CiAgICAgICAgCiAgICAgICAgdGhlbWVzIGh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9zdHJ1Y3R1cml6ci90aGVtZXMvcmVmcy9oZWFkcy9tYXN0ZXIvbWljcm9zb2Z0LWF6dXJlLTIwMjQuMDcuMTUvaWNvbnMuanNvbgogICAgICAgIC8vIHRoZW1lcyBodHRwczovL3N0YXRpYy5zdHJ1Y3R1cml6ci5jb20vdGhlbWVzL21pY3Jvc29mdC1henVyZS0yMDIzLjAxLjI0L3RoZW1lLmpzb24KICAgIH0KCn0="
+        "structurizr.dsl": "d29ya3NwYWNlICJGRUFUdjEiICJGaW5kIEVkdWNhdGlvbiBhbmQgVHJhaW5pbmcgLSBIb3N0aW5nIGludGVybmFsIEFJIFNlYXJjaCIgewoKICAgIG1vZGVsIHsKICAgICAgICBwcm9wZXJ0aWVzIHsKICAgICAgICAgICAgInN0cnVjdHVyaXpyLmdyb3VwU2VwYXJhdG9yIiAiLyIKICAgICAgICB9CgogICAgICAgIGdyb3VwICJEZkUiIHsKCiAgICAgICAgICAgIGZpbmRBU3lzdGVtID0gc29mdHdhcmVTeXN0ZW0gIkZpbmQgRWR1Y2F0aW9uIGFuZCBUcmFpbmluZyIgewogICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlNlcnZlcmxlc3MgY29udGFpbmVyIHBsYXRmb3JtIgogICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQ29udGFpbmVyIEFwcHMgRW52aXJvbm1lbnRzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgIHdlYmFwcCA9IGNvbnRhaW5lciAiRkVBVCBXZWJzaXRlIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlByb29mIG9mIGNvbmNlcHQgc2l0ZSB0byBkZW1vbnN0cmF0ZSBhIGZyb250LWVuZCBmb3IgZmluZGluZyBpbmZvcm1hdGlvbiIKICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJkb3RuZXQgOS4wIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIFdlYnNpdGUgU3RhZ2luZyIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGFwaSA9IGNvbnRhaW5lciAiRkVBVCBBUEkgU2VydmljZSIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJGRUFUIEFQSSB0aGF0IGludGVycm9nYXRlcyBBenVyZSBBSSBTZWFyY2giCiAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiZG90bmV0IDkuMCIKICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBBUEkgTWFuYWdlbWVudCBTZXJ2aWNlcyIKICAgICAgICAgICAgICAgICAgICB3ZWJhcHAgLT4gdGhpcwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgaW5nZXN0aW9uID0gY29udGFpbmVyICJGRUFUIEluZ2VzdGlvbiBKb2IiIHsKICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJkb3RuZXQgOS4wIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIERhdGEgU2hhcmVzIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgCiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgCiAgICAgICAgCiAgICAgICAgZ3JvdXAgIkF6dXJlIEFJIiB7CiAgICAgICAgICAgIGFpID0gc29mdHdhcmVTeXN0ZW0gIk1pY3Jvc29mdCBBSSBTZXJ2aWNlcyIgewogICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQ29nbml0aXZlIFNlcnZpY2VzIgogICAgICAgICAgICAgICAgYWlTZWFyY2ggPSBjb250YWluZXIgIk1pY3Jvc29mdCBBSSBTZWFyY2giIHsKICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJNaWNyb3NvZnQgQUkiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQ29nbml0aXZlIFNlYXJjaCIKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiVmVjdG9yIHNlYXJjaCBkYXRhYmFzZSIKICAgICAgICAgICAgICAgICAgICBhcGkgLT4gdGhpcyAiUXVlcmllcyIgIkhUVFBTIgogICAgICAgICAgICAgICAgICAgIGluZ2VzdGlvbiAtPiB0aGlzICJXcml0ZXMgdG8iICJIVFRQUyIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgb3BlbkFJID0gY29udGFpbmVyICJPcGVuQUkgTExNIiB7CiAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiTWljcm9zb2Z0IEFJIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEF6dXJlIE9wZW5BSSIKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiRW1iZWRkaW5ncyBnZW5lcmF0b3IiCiAgICAgICAgICAgICAgICAgICAgYXBpIC0+IHRoaXMgIlF1ZXJpZXMiICJIVFRQUyIKICAgICAgICAgICAgICAgICAgICBpbmdlc3Rpb24gLT4gdGhpcyAiUXVlcmllcyIgIkhUVFBTIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIAogICAgICAgIHNlcnZpY2UgPSBkZXBsb3ltZW50RW52aXJvbm1lbnQgIlNlcnZpY2UiIHsKCiAgICAgICAgICAgIGRlcGxveW1lbnROb2RlICJNaWNyb3NvZnQgQXp1cmUiIHsKICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEF6dXJlIEEiCgogICAgICAgICAgICAgICAgZGVwbG95bWVudE5vZGUgIldlc3QgRXVyb3BlIiB7CiAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gUmVnaW9uIE1hbmFnZW1lbnQiCiAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgaW50ZXJuZXQgPSBkZXBsb3ltZW50Tm9kZSAiUHVibGljIEludGVybmV0IiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEVudHJhIEludGVybmV0IEFjY2VzcyIKICAgICAgICAgICAgICAgICAgICAgICAgZ2F0ZXdheSA9IGluZnJhc3RydWN0dXJlTm9kZSAiU2hhcmVkIERmRSBXQUYiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIkF6dXJlIEZyb250IERvb3IgYW5kIEZpcmV3YWxscyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJBdXRvbWF0aWNhbGx5IGRpc3RyaWJ1dGVzIGFuZCBzZWN1cmVzIGluY29taW5nIGFwcGxpY2F0aW9uIHRyYWZmaWMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBGaXJld2FsbHMiCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGJhc3Rpb24gPSBpbmZyYXN0cnVjdHVyZU5vZGUgIkJhc3Rpb24iIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJSZW1vdGUgU1NIIGZvciBjb25uZWN0aW5nIHRvIHRoZSB2aXJ0dWFsIG5ldHdvcmsiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBCYXN0aW9ucyIKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICBkZmUgPSBkZXBsb3ltZW50Tm9kZSAiRGZFIEFJIENlbnRyZSBmb3IgRXhjZWxsZW5jZSIgewogICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBWaXJ0dWFsIE5ldHdvcmtzIgogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIG9wZW5BSUluc3RhbmNlID0gY29udGFpbmVySW5zdGFuY2Ugb3BlbkFJIHsKCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgICAgIHZuZXQgPSBkZXBsb3ltZW50Tm9kZSAiRkVBVCBWbmV0IiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIFZpcnR1YWwgTmV0d29ya3MiCiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICBiYXN0aW9uIC0+IHRoaXMgIkFsbG93cyBzZWN1cmVkIGFjY2VzcyB0byIKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICBhaVNlYXJjaEluc3RhbmNlID0gY29udGFpbmVySW5zdGFuY2UgYWlTZWFyY2ggewogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGNhY2hlID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJEaXN0cmlidXRlZCBDYWNoZSIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkF6dXJlIENhY2hlIC0gUmVkaXMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBDYWNoZSBSZWRpcyIKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICBzdGFnaW5nID0gaW5mcmFzdHJ1Y3R1cmVOb2RlICJBenVyZSBCbG9iIFN0b3JhZ2UiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJTdGFnaW5nIGxvY2F0aW9uIGZvciBDU1YgZmlsZSBpbXBvcnRzIGFuZCBkYXRhIHN0b3JhZ2UiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBTdG9yYWdlIEFjY291bnRzIgogICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgZGIgPSBpbmZyYXN0cnVjdHVyZU5vZGUgIlJlbGF0aW9uYWwgREIiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJEYXRhIHN0b3JlIGZvciBpbmZvcm1hdGlvbiB0byBiZSBzdXJmYWNlZCB0byB1c2VycyB0aGF0IGlzbid0IHJlcXVpcmVkIHRvIGJlIHNlYXJjaGFibGUiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBTUUwgU2VydmVyIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgY2FjaGUgLT4gdGhpcyAiQmFja2luZyBzdG9yZSIKICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIHdlYkNvbnRhaW5lciA9IGRlcGxveW1lbnROb2RlICJBdXRvLVNjYWxpbmcgV2ViIENvbnRhaW5lciIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQ29udGFpbmVyIEFwcHMgRW52aXJvbm1lbnRzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICB3ZWJBcHBTZXJ2aWNlID0gZGVwbG95bWVudE5vZGUgIldlYiAtIEF6dXJlIENvbnRhaW5lciBBcHAiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBDb250YWluZXIgSW5zdGFuY2VzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHdlYkFwcGxpY2F0aW9uSW5zdGFuY2UgPSBjb250YWluZXJJbnN0YW5jZSB3ZWJhcHAgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBnYXRld2F5IC0+IHRoaXMgIkZvd2FyZHMgcmVxdWVzdHMgdG8iICJIVFRQUyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGFwaUFwcFNlcnZpY2UgPSBkZXBsb3ltZW50Tm9kZSAiQVBJIC0gQXp1cmUgQ29udGFpbmVyIEFwcCIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIENvbnRhaW5lciBJbnN0YW5jZXMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYXBpSW5zdGFuY2UgPSBjb250YWluZXJJbnN0YW5jZSBhcGkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGNhY2hlICJTYXZlcyBzZW1hbnRpYyByZXN1bHRzIGFuZCBnZW9sb2NhdGlvbiBsb29rdXBzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjYWNoZSAtPiB0aGlzICJGZXRjaGVzIHNlbWFudGljIHJlc3VsdHMgYW5kIGdlb2xvY2F0aW9uIGxvb2t1cHMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRiIC0+IHRoaXMgIkZldGNoZXMgYWRkaXRpb25hbCBpbmZvcm1hdGlvbiBmb3IgZGlzcGxheSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZ2F0ZXdheSAtPiB0aGlzICJQcm92aWRlcyBzZWN1cmVkIGFjY2VzcyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIGlnZXN0aW9uQ29udGFpbmVyID0gZGVwbG95bWVudE5vZGUgIkF1dG8tU2NhbGluZyBJbmdlc3Rpb24gQ29udGFpbmVyIiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBDb250YWluZXIgQXBwcyBFbnZpcm9ubWVudHMiCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGluZ2VzdGlvbkFwcFNlcnZpY2UgPSBkZXBsb3ltZW50Tm9kZSAiSW5nZXN0aW9uIC0gQXp1cmUgQ29udGFpbmVyIEpvYiIgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIFdvcmtlciBDb250YWluZXIgQXBwIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGluZ2VzdGlvbkluc3RhbmNlID0gY29udGFpbmVySW5zdGFuY2UgaW5nZXN0aW9uIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiBjYWNoZSAiU2F2ZXMgc2VtYW50aWMgcmVzdWx0cyBhbmQgZ2VvbG9jYXRpb24gbG9va3VwcyIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY2FjaGUgLT4gdGhpcyAiRmV0Y2hlcyBzZW1hbnRpYyByZXN1bHRzIGFuZCBnZW9sb2NhdGlvbiBsb29rdXBzIgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGRiICJTYXZlcyBhZGRpdGlvbmFsIGluZm9ybWF0aW9uIGZvciBkaXNwbGF5IgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdGFnaW5nIC0+IHRoaXMgIkxvYWRzIGRhdGEgZnJvbSIKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgCgogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgIC8qIAogICAgICAgICAgICAgICAgICAgICAgICBkYXRhZmFjdG9yeSAtPiBzdGFnaW5nICJFeHBvcnRzIGRhdGEgdG8iIAogICAgICAgICAgICAgICAgICAgICAgICAqLwogICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIAoKICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgIAoKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgICAgICAKICAgICAgICB9CiAgICAgICAgCiAgICB9CgogICAgdmlld3MgewogICAgICAgIAogICAgICAgIGRlcGxveW1lbnQgKiBTZXJ2aWNlIHsKICAgICAgICAgICAgdGl0bGUgIlNlcnZpY2UgVmlldyIKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgfQogICAgICAgIAogICAgICAgIHRoZW1lcyBodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vc3RydWN0dXJpenIvdGhlbWVzL3JlZnMvaGVhZHMvbWFzdGVyL21pY3Jvc29mdC1henVyZS0yMDI0LjA3LjE1L2ljb25zLmpzb24KICAgICAgICAvLyB0aGVtZXMgaHR0cHM6Ly9zdGF0aWMuc3RydWN0dXJpenIuY29tL3RoZW1lcy9taWNyb3NvZnQtYXp1cmUtMjAyMy4wMS4yNC90aGVtZS5qc29uCiAgICB9Cgp9"
     },
     "views": {
         "configuration": {
@@ -567,13 +593,13 @@
                     },
                     {
                         "id": "21",
-                        "x": 1970,
-                        "y": 230
+                        "x": 1960,
+                        "y": 225
                     },
                     {
                         "id": "22",
-                        "x": 260,
-                        "y": 235
+                        "x": 265,
+                        "y": 230
                     },
                     {
                         "id": "23",
@@ -582,8 +608,8 @@
                     },
                     {
                         "id": "24",
-                        "x": 2500,
-                        "y": 1925
+                        "x": 2540,
+                        "y": 1740
                     },
                     {
                         "id": "25",
@@ -592,56 +618,61 @@
                     },
                     {
                         "id": "27",
-                        "x": 1970,
-                        "y": 1242
+                        "x": 1975,
+                        "y": 1215
                     },
                     {
                         "id": "28",
-                        "x": 260,
-                        "y": 1745
+                        "x": 290,
+                        "y": 1765
                     },
                     {
                         "id": "29",
-                        "x": 260,
-                        "y": 965
+                        "x": 1995,
+                        "y": 2210
                     },
                     {
                         "id": "30",
+                        "x": 285,
+                        "y": 820
+                    },
+                    {
+                        "id": "32",
                         "x": 350,
                         "y": 350
                     },
                     {
-                        "id": "31",
+                        "id": "33",
                         "x": 1925,
                         "y": 1925
                     },
                     {
-                        "id": "32",
+                        "id": "34",
                         "x": 1190,
                         "y": 740
                     },
                     {
-                        "id": "34",
+                        "id": "36",
                         "x": 1925,
                         "y": 1925
                     },
                     {
-                        "id": "35",
+                        "id": "37",
                         "x": 1190,
                         "y": 1242
                     },
                     {
-                        "id": "43",
-                        "x": 1925,
-                        "y": 1925
-                    },
-                    {
-                        "id": "44",
-                        "x": 1925,
-                        "y": 1925
-                    },
-                    {
                         "id": "45",
+                        "x": 1925,
+                        "y": 1925
+                    },
+                    {
+                        "id": "46",
+                        "x": 1925,
+                        "y": 1925
+                    },
+                    {
+                        "id": "47",
                         "x": 1190,
                         "y": 1825
                     }
@@ -661,7 +692,10 @@
                         ]
                     },
                     {
-                        "id": "33",
+                        "id": "31"
+                    },
+                    {
+                        "id": "35",
                         "vertices": [
                             {
                                 "x": 1910,
@@ -670,19 +704,19 @@
                         ]
                     },
                     {
-                        "id": "36"
-                    },
-                    {
-                        "id": "37"
-                    },
-                    {
                         "id": "38"
                     },
                     {
                         "id": "39"
                     },
                     {
-                        "id": "40",
+                        "id": "40"
+                    },
+                    {
+                        "id": "41"
+                    },
+                    {
+                        "id": "42",
                         "vertices": [
                             {
                                 "x": 635,
@@ -691,7 +725,7 @@
                         ]
                     },
                     {
-                        "id": "41",
+                        "id": "43",
                         "vertices": [
                             {
                                 "x": 975,
@@ -700,7 +734,7 @@
                         ]
                     },
                     {
-                        "id": "42",
+                        "id": "44",
                         "vertices": [
                             {
                                 "x": 1800,
@@ -709,13 +743,13 @@
                         ]
                     },
                     {
-                        "id": "46"
+                        "id": "48"
                     },
                     {
-                        "id": "47"
+                        "id": "49"
                     },
                     {
-                        "id": "48",
+                        "id": "50",
                         "vertices": [
                             {
                                 "x": 965,
@@ -724,7 +758,7 @@
                         ]
                     },
                     {
-                        "id": "49",
+                        "id": "51",
                         "vertices": [
                             {
                                 "x": 950,
@@ -733,7 +767,7 @@
                         ]
                     },
                     {
-                        "id": "50",
+                        "id": "52",
                         "vertices": [
                             {
                                 "x": 1085,
@@ -744,6 +778,9 @@
                                 "y": 1280
                             }
                         ]
+                    },
+                    {
+                        "id": "53"
                     }
                 ],
                 "title": "Service View"

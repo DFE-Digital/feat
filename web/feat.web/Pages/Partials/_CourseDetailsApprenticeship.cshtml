@@ -1,0 +1,171 @@
+@using feat.common.Extensions
+@using feat.web.Utils
+@model feat.web.Models.ViewModels.CourseDetailsApprenticeship
+
+<div class="govuk-width-container local_top_spacing">
+  <main class="govuk-main-wrapper" id="main-content">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full"></div>
+
+      <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">About the course</h2>
+          </div>
+
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Qualification type</dt>
+                <dd class="govuk-summary-list__value">@Model.CourseTypeDisplay</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Level</dt>
+                <dd class="govuk-summary-list__value">
+                  @Model.LevelDisplay
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Entry requirements</dt>
+                <dd class="govuk-summary-list__value">
+                  @Model.EntryRequirements.ValueOrNotProvided()
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Wage</dt>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrWhiteSpace(Model.Wage) ? "Competitive" : Model.Wage)
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Positions available</dt>
+                <dd class="govuk-summary-list__value">@(Model.PositionsAvailable > 0 ? Model.PositionsAvailable : 1)</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Course description</dt>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrWhiteSpace(Model.Description) ? "You will need to visit the employer’s website for information about this course" : Model.Description))
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Location</h2>
+          </div>
+
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Employer</dt>
+                <dd class="govuk-summary-list__value">@Model.EmployerName.ValueOrNotProvided()</dd>
+                <dd class="govuk-summary-list__actions">
+                  @if (!string.IsNullOrEmpty(Model.EmployerUrl))
+                  {
+                    <a class="govuk-link" href="@(Model.EmployerUrl)">View website
+                      <span class="govuk-visually-hidden">@(Model.EmployerName + "(" + Model.EmployerAddress?.Display + ")")</span>
+                    </a>
+                  }
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Employer address</dt>
+                <dd class="govuk-summary-list__value">@Model.EmployerAddress?.Display</dd>
+                <dd class="govuk-summary-list__actions">
+                  @if (!string.IsNullOrEmpty(Model.EmployerAddress?.MapLocationUrl))
+                  {
+                    <a class="govuk-link" href="@Model.EmployerAddress?.MapLocationUrl">View on a map
+                      <span class="govuk-visually-hidden">@Model.EmployerAddress?.Display</span>
+                    </a>
+                  }
+                  
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+                <dt class="govuk-summary-list__key">About this employer</dt>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrWhiteSpace(Model.EmployerDescription) ? SharedStrings.NotProvided : Model.EmployerDescription)
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+                <dt class="govuk-summary-list__key">Training provider</dt>
+                <dd class="govuk-summary-list__value">@Model.TrainingProvider</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Course details</h2>
+          </div>
+
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Delivery method</dt>
+                <dd class="govuk-summary-list__value">@Model.DeliveryModeDisplay</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Start date</dt>
+                <dd class="govuk-summary-list__value">
+                  @(Model.StartDate?.Display ?? SharedStrings.NotProvided)
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Duration</dt>
+                <dd class="govuk-summary-list__value">@Model.DurationDisplay</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Hours</dt>
+                <dd class="govuk-summary-list__value">@Model.HoursDisplay</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        @if(!string.IsNullOrEmpty(Model.CourseUrlAbsolute))
+        {
+          <govuk-button-link href="@(Model.CourseUrlAbsolute)" is-start-button="false">Go to Apprenticeship opportunity</govuk-button-link>
+        }
+        <p>The information we show you about a course comes from the provider. If you want to know more about a course visit their website. You can also email or call them if you have any questions or want to discuss your options.</p>
+      </div>
+      <div class="govuk-grid-column-one-third">
+        <div class="x-govuk-related-navigation">
+          <nav class="x-govuk-related-navigation__nav-section" aria-labelledby="related-navigation-related-content">
+            <h2 class="x-govuk-related-navigation__main-heading" id="related-navigation-related-content">Related links</h2>
+            <ul class="x-govuk-related-navigation__link-list">
+              <li class="x-govuk-related-navigation__link">
+                <a class="govuk-link x-govuk-related-navigation__section-link" 
+                   href="https://nationalcareers.service.gov.uk/explore-careers">Explore jobs and careers you could do after this course</a>
+              </li>
+              <li class="x-govuk-related-navigation__link">
+                <a class="govuk-link x-govuk-related-navigation__section-link" 
+                   asp-page="TrainingOptionsPages/AboutApprenticeships">More information about Apprenticeships</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style asp-add-nonce>
+  .local_top_spacing{
+    margin-top: -40px;
+  }
+</style>

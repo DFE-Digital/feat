@@ -1,0 +1,45 @@
+@page
+@model feat.web.Pages.TrainingOptionsPages.AboutApprenticeshipsModel
+@{
+    ViewBag.PageTitle = "About Apprenticeships";
+    
+    ViewBag.StaticBackPageUrl = Model.RefererUrl; 
+}
+
+<div class="govuk-width-container">
+    <div class="govuk-grid-row">
+
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
+            <h2 class="govuk-heading-m">Types of apprenticeships</h2>
+            <p>There are over 700 types of apprenticeships in different areas of work.</p>
+
+            <p>So no matter what career you’re interested in, there’s likely to be an apprenticeship for you.</p>          
+          
+
+            <h2 class="govuk-heading-m"> Entry requirements for Apprenticeships</h2>
+            <p> To start an apprenticeship, you'll need to:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>be 16 or over</li>
+                <li>live in England</li>
+                <li>not already be in full time education</li>
+            </ul>
+            <p> You can apply for an apprenticeship while you're still at school.</p>
+
+            <p>To apply for some apprenticeships, you might need to have certain qualifications, such as GCSE English or maths. If there are any additional entry requirements, they will be listed in the apprenticeship application details.</p>
+
+            <h2 class="govuk-heading-m">What you'll do as an apprentice</h2>
+            <p>You’ll also earn a qualification from your apprenticeship.</p>
+            <p>The 4 different apprenticeship qualifications levels are:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>intermediate: level 2</li>
+                <li>advanced: level 3</li>
+                <li>higher: level 4 or 5</li>
+                <li>degree: level 6 or 7</li>
+            </ul>
+
+            <p>It takes between 1 and 5 years to complete an apprenticeship, depending on the level.</p>
+        </div>
+      
+    </div>
+</div>

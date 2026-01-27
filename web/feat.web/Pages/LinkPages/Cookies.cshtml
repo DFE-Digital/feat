@@ -1,0 +1,250 @@
+@page
+@model feat.web.Pages.LinkPages.Cookies
+@{
+    ViewBag.PageTitle = "Cookies on the Find education and training website";
+    ViewBag.StaticBackPageUrl = Model.RefererUrl;
+}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    @if (!string.IsNullOrEmpty(Model.AnalyticsCookie) && !string.IsNullOrEmpty(Model.MarketingCookie))
+    {
+      <div id="cookie-banner" class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" >
+        <div class="govuk-notification-banner__header">
+          <h2 class="govuk-notification-banner__title">Success</h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+          <p class="govuk-notification-banner__heading">You’ve saved your cookie settings.</p>
+        </div>
+      </div>
+    }
+    
+    <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
+    
+    <p class="govuk-body">
+      Cookies are files saved on your phone, tablet or computer when you visit a website.
+    </p>
+    <p class="govuk-body">
+      We use cookies to make Find education and training work and collect information about how you use our service.
+    </p>
+
+    <h2 class="govuk-heading-m">Essential cookies</h2>
+
+    <p class="govuk-body">
+      Essential cookies keep your information secure while you use Find education and training. We do not need to ask permission to use them.
+    </p>
+
+    <table class="govuk-table">
+      <caption class="govuk-table__caption govuk-table__caption--m">Essential cookies we use</caption>
+      <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Name</th>
+        <th scope="col" class="govuk-table__header">Purpose</th>
+        <th scope="col" class="govuk-table__header">Expires</th>
+      </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">.AspNetCore_Session</td>
+        <td class="govuk-table__cell">Used to store page data between HTTP requests at our server</td>
+        <td class="govuk-table__cell">When you close your browser</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">BNES_.AspNetCore_Session</td>
+        <td class="govuk-table__cell">An encrypted copy of .AspNetCore_Session which is used by our firewall to provide an extra level of security</td>
+        <td class="govuk-table__cell">When you close your browser</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">cookies_policy</td>
+        <td class="govuk-table__cell">Saves your cookie consent settings</td>
+        <td class="govuk-table__cell">1 year</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">cookies_preferences_set</td>
+        <td class="govuk-table__cell">Lets us know that you've saved your cookie consent settings</td>
+        <td class="govuk-table__cell">1 year</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h2 class="govuk-heading-m">Third party cookies</h2>
+
+    <p class="govuk-body">
+      Some cookies may be be placed on your computer by third parties and partners we work with.
+    </p>
+    <p class="govuk-body">
+      We use these cookies to:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>help us understand how you use our website</li>
+      <li>capture your comments and feedback through surveys</li>
+    </ul>
+
+    <p class="govuk-body">
+      Sometimes we’ll include content from other sites, such as YouTube, who may set their own cookies.
+    </p>
+    <p class="govuk-body">
+      We might also share information about your use of our pages with our social media and advertising partners, such as Facebook. We do this to help improve the relevancy of advertising campaigns you receive from us.
+    </p>
+    <p class="govuk-body">
+      If you decide to share a link to one of our pages, the service you share it on might set a cookie. We have no control over cookies set on other websites and you can turn them off but only through the website you’ve used.
+    </p>
+    
+    <h2 class="govuk-heading-m">Analytics cookies (optional)</h2>
+
+    <p class="govuk-body">
+      With your permission, we use Google Analytics to collect data about how you use this service. This information helps us to improve our service.
+    </p>
+    <p class="govuk-body">
+      Google is not allowed to use or share our analytics data with anyone.
+    </p>
+    <p class="govuk-body">
+      Google Analytics stores anonymised information about:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>how you got to Find education and training</li>
+      <li>the pages you visit on Find education and training</li>
+      <li>how long you spend on each page</li>
+      <li>how you interact with search on Find education and training</li>
+    </ul>
+
+    <table class="govuk-table">
+      <caption class="govuk-table__caption govuk-table__caption--m">Google Analytics cookies we use</caption>
+      <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Name</th>
+        <th scope="col" class="govuk-table__header">Purpose</th>
+        <th scope="col" class="govuk-table__header">Expires</th>
+      </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">_ga</td>
+        <td class="govuk-table__cell">This helps us count how many people visit this website by tracking if you've visited before</td>
+        <td class="govuk-table__cell">2 years</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">_gat</td>
+        <td class="govuk-table__cell">Used to manage the rate at which page view requests are made</td>
+        <td class="govuk-table__cell">1 minute</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">_gid</td>
+        <td class="govuk-table__cell">Stores and updates a unique value for each page you've visited to help us improve your experience</td>
+        <td class="govuk-table__cell">1 day</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h2 class="govuk-heading-m">Microsoft Clarity</h2>
+
+    <p class="govuk-body">
+      We use Microsoft Clarity to understand how you use the Find education and training website. This information helps us to improve the website.
+    </p>
+    <p class="govuk-body">
+      Microsoft Clarity uses the following cookies:
+    </p>
+
+    <table class="govuk-table">
+      <caption class="govuk-table__caption govuk-table__caption--m">Microsoft Clarity cookies we use</caption>
+      <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Name</th>
+        <th scope="col" class="govuk-table__header">Purpose</th>
+        <th scope="col" class="govuk-table__header">Expires</th>
+      </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">_clck</td>
+        <td class="govuk-table__cell">Checks if you’ve visited the Skills for Careers website before and makes sure you're given the same ID.</td>
+        <td class="govuk-table__cell">1 year</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">_clsk</td>
+        <td class="govuk-table__cell">Connects a user’s page views into a single session recording.</td>
+        <td class="govuk-table__cell">1 day</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">CLID</td>
+        <td class="govuk-table__cell">Identifies the first time Microsoft Clarity saw this user on any website that uses Microsoft Clarity.</td>
+        <td class="govuk-table__cell">1 year</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">ANONCHK</td>
+        <td class="govuk-table__cell">
+          Indicates whether the MUID cookie is sent to ANID, a cookie used for advertising. ANID is not used by Microsoft Clarity, so is set to expire at the end of your session.
+        </td>
+        <td class="govuk-table__cell">End of session</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">MUID</td>
+        <td class="govuk-table__cell">Identifies unique web browsers visiting Microsoft sites. These cookies are used for advertising, analytics and operational purposes.</td>
+        <td class="govuk-table__cell">1 year</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">MR</td>
+        <td class="govuk-table__cell">Indicates whether to refresh the MUID cookie.</td>
+        <td class="govuk-table__cell">7 days</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">SM</td>
+        <td class="govuk-table__cell">Used to synchronise the MUID cookie across Microsoft domains.</td>
+        <td class="govuk-table__cell">End of session</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h2 class="govuk-heading-m">Marketing cookies (optional)</h2>
+
+    <p class="govuk-body">
+      Some cookies help us improve the adverts you receive from us by making them more relevant to you.
+    </p>
+    <p class="govuk-body">
+      We also share information about your use of this service with our social media, advertising and analytics partner. They use the information to decide what type of adverts to create.
+    </p>
+
+    <h2 class="govuk-heading-m">Change your cookie settings</h2>
+    <form id="cookie-form" method="post">
+      <div class="remember-radio" data-key="analytics-cookies">
+        <govuk-radios for="AnalyticsCookie"> 
+          <govuk-radios-fieldset>
+            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s">
+              Do you want to accept analytics cookies?
+            </govuk-radios-fieldset-legend>
+            <govuk-radios-hint>
+              We use analytics cookies to understand how you use Find education and training so we can improve it.
+            </govuk-radios-hint>
+            <govuk-radios-item value="yes">Yes</govuk-radios-item>
+            <govuk-radios-item value="no">No</govuk-radios-item>
+          </govuk-radios-fieldset>
+        </govuk-radios>
+        
+      </div>
+
+      <div class="remember-radio" data-key="marketing-cookies">
+        <govuk-radios for="MarketingCookie">
+          <govuk-radios-fieldset>
+            <govuk-radios-fieldset-legend class="govuk-fieldset__legend--s">
+              Do you want to accept marketing cookies?
+            </govuk-radios-fieldset-legend>
+            <govuk-radios-hint>
+              We use marketing cookies to help improve the adverts you receive from us.
+            </govuk-radios-hint>
+            <govuk-radios-item value="yes">Yes</govuk-radios-item>
+            <govuk-radios-item value="no">No</govuk-radios-item>
+          </govuk-radios-fieldset>
+        </govuk-radios>
+
+      </div>
+      
+      <div class="govuk-button-group">
+        <govuk-button type="submit" >Save cookie settings</govuk-button>
+      </div>
+    </form>
+
+  </div>
+</div>

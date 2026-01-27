@@ -24,27 +24,30 @@ We needed to ensure:
 
 ### Evaluation
 
-|     Criteria     | Comment                                                                                                                          | No Caching | In-Memory | FusionCache | Hybrid/Redis | Hybrid/SQL |
-|:----------------:|:---------------------------------------------------------------------------------------------------------------------------------|:----------:|:---------:|:-----------:|:------------:|:----------:|
-|     Adoption     | The implementation should we widely used and have excellent documentation                                                        |     1      |     4     |      4      |      5       |     5      |
-| Development Cost | The implementation should not require any additional development cost, tooling, or understanding of the backing cache            |     1      |     3     |      4      |      4       |     4      |
-|   Performance    | The caching should work with as little latency as possible across various environments                                           |     1      |     3     |      4      |      4       |     4      |
-|     Scaling      | The caching should survive an application restart, deployment, or scaling automatically                                          |     1      |     1     |      4      |      4       |     4      |
-|  Clearing Cache  | The caching should allow quick and easy clearing, plus support additional things like tagging for easier related content removal |     1      |     4     |      4      |      4       |     4      |
-| Deployment Cost  | The caching should use existing technologies where available which wouldn't incur additional costs                               |     5      |     5     |      3      |      3       |     5      |
-|    **Total**     |                                                                                                                                  |   **10**   |  **22**   |   **23**    |    **24**    |   **26**   |
+|     Criteria     | Comment                                                                                                                                                                                                                                 | No Caching | In-Memory | FusionCache | Hybrid/Redis | Hybrid/SQL |
+|:----------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|:---------:|:-----------:|:------------:|:----------:|
+|     Adoption     | The implementation should we widely used and have excellent documentation                                                                                                                                                               |     1      |     4     |      4      |      4       |     4      |
+| Development Cost | The implementation should not require any additional development cost, tooling, or understanding of the backing cache                                                                                                                   |     1      |     3     |      4      |      4       |     4      |
+|   Performance    | The caching should work with as little latency as possible across various environments                                                                                                                                                  |     1      |     3     |      4      |      4       |     4      |
+|     Scaling      | The caching should survive an application restart, deployment, or scaling automatically                                                                                                                                                 |     1      |     1     |      4      |      4       |     4      |
+|  Clearing Cache  | The caching should allow quick and easy clearing, plus support additional things like tagging for easier related content removal, plus clearing the cache on one node of a load balanced system MUST clear the cache on all other nodes |     1      |     2     |      5      |      2       |     2      |
+| Deployment Cost  | The caching should use existing technologies where available which wouldn't incur additional costs                                                                                                                                      |     5      |     5     |      3      |      3       |     4      |
+|    **Total**     |                                                                                                                                                                                                                                         |   **10**   |  **20**   |   **24**    |    **21**    |   **22**   |
 
 ## Decision Outcome
 
-Based on the analysis above, we have chosen Microsoft's Hybrid Search to use an in-memory L1 cache and a SQL Server L2 cache.
+Based on the analysis above, we have chose to use FusionCache as this has great documentation and was, in fact, ahead of Microsoft in making itself HybridCache compatible.
 
-Since making a similar choice within another project last year, Microsoft's Hybrid Cache has become generally available and is the recommended Microsoft choice within .NET 9.
+FusionCache allows us to support the following features:
 
-Documentation has massively improved and support for SQL Server means that we can rely on the SQL Server for our secondary cache, rather than an additional instance of Azure Cache for Redis, which could potentially reduce costings.
+* L1 cache in-memory
+* L2 cache using IDistributedCache (in this case, Redis)
+* Ability to use the Redis instance as a backplane to enable communication between nodes
+* Tagging support
+* Clearing the cache using the * tag
 
+While HybridCache is now in mainstream support, it still does not support using the L2 layer as a backplane and notifying other nodes that the cache has been cleared, therefore leaving stale in-memory cache entries in all other nodes.
 
 ### Considerations on selected technology
 
 During development, the cache can be deployed using L1 cache only, which allows application restarts to flush the cache, but still allow for testing of caching.
-
-Switching over to Redis, if required, is easy enough, but would increase some costs if SQL Server ends up having problems with performance - we will be able to look into this further as part of our performance testing

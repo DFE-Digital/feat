@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using feat.common.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace feat.common.Models;
 
 [Table("Entry")]
+[Index(nameof(IngestionState), nameof(SourceSystem))]
 public class Entry
 {
     [Key]
@@ -28,25 +29,42 @@ public class Entry
     
     [StringLength(255)]
     public required string Title { get; set; } = string.Empty;
+    
+    [StringLength(255)]
+    public required string AimOrAltTitle { get; set; } = string.Empty;
 
     public string? Description { get; set; }
 
     public required bool FlexibleStart { get; set; }
 
-    public AttendancePattern? AttendancePattern { get; set; }   // Enum: FullTime, PartTime, Flexible, Other
+    public CourseHours? AttendancePattern { get; set; }
 
     [Column("URL")]
     [StringLength(2083)] 
     public required string Url { get; set; } = string.Empty;
+    
+    public SourceSystem? SourceSystem { get; set; }
+    
+    [StringLength(200)]
+    public string SourceReference { get; set; }
 
     public DateTime? SourceUpdated { get; set; }
 
     [StringLength(2083)]
     public string? EntryRequirements { get; set; }
+    
+    [StringLength(2083)]
+    public string? WhatYouWillLearn { get; set; }
 
-    public EntryType? Type { get; set; }    // Enum: Apprenticeship, Traineeship, T Level
+    public EntryType? Type { get; set; }
+    
+    public CourseType? CourseType { get; set; }
 
-    public EntryLevel? Level { get; set; }  // Enum: Intermediate, Advanced, Higher, Degree, Professional
+    public QualificationLevel? Level { get; set; }
+    
+    public StudyTime? StudyTime { get; set; }
+    
+    public IngestionState? IngestionState { get; set; } 
 
     [InverseProperty("Entry")]
     public ICollection<EntryCost> EntryCosts { get; set; } = new List<EntryCost>();
@@ -54,9 +72,6 @@ public class Entry
     [InverseProperty("Entry")]
     public ICollection<EntryInstance> EntryInstances { get; set; } = new List<EntryInstance>();
     
-    [InverseProperty("Entry")]
-    public ICollection<EntryLocation> EntryLocations { get; set; } = new List<EntryLocation>();
-
     [InverseProperty("Entry")]
     public ICollection<EntrySector> EntrySectors { get; set; } = new List<EntrySector>();
 

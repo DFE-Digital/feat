@@ -1,0 +1,220 @@
+@using feat.common.Extensions
+@using feat.web.Utils
+@model feat.web.Models.ViewModels.CourseDetailsUniversity
+
+<div class="govuk-width-container local_top_spacing">
+  <main class="govuk-main-wrapper" id="main-content">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full"></div>
+
+      <div class="govuk-grid-column-two-thirds">
+
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">
+              About the course
+            </h2>
+          </div>
+
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Qualification type</dt>
+                <dd class="govuk-summary-list__value">@Model.CourseTypeDisplay</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Level</dt>
+                <dd class="govuk-summary-list__value">@Model.LevelDisplay</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Entry requirements</dt>
+                <dd class="govuk-summary-list__value">
+                  @Model.EntryRequirements.ValueOrNotProvided()
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Tuition fee</dt>
+                <dd class="govuk-summary-list__value">@Model.TuitionFeeDisplay</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Awarding organisation</dt>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrWhiteSpace(Model.AwardingOrganisation) ? Model.University: Model.AwardingOrganisation)
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Course description</dt>
+                <dd class="govuk-summary-list__value">
+                  @(string.IsNullOrWhiteSpace(Model.Description)? "You will need to visit the institution’s website for information about this course." : Model.Description)
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Location</h2>
+          </div>
+
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">University</dt>
+                <dd class="govuk-summary-list__value">@Model.University</dd>
+                <dd class="govuk-summary-list__actions">
+                  @if (!string.IsNullOrEmpty(Model.UniversityUrl))
+                  {
+                    <a class="govuk-link" href="@Model.UniversityUrl">View website
+                      <span class="govuk-visually-hidden">@(Model.University + "(" + Model.CampusAddresses?.FirstOrDefault()?.Display + ")")</span>
+                    </a>
+                  }
+                </dd>
+              </div>
+
+              <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+                <dt class="govuk-summary-list__key">Campus name</dt>
+                <dd class="govuk-summary-list__value">@Model.CampusName</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Campus address</dt>
+                <dd class="govuk-summary-list__value">
+                  @Model.CampusAddresses?.FirstOrDefault()?.Display
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                  @if (!string.IsNullOrEmpty(Model.CampusAddresses?.FirstOrDefault()?.MapLocationUrl))
+                  {
+                    <a class="govuk-link" href="@Model.CampusAddresses?.FirstOrDefault()?.MapLocationUrl">View on a map
+                      <span class="govuk-visually-hidden">@(Model.University + "(" + Model.CampusAddresses?.FirstOrDefault()?.Display + ")")</span>
+                    </a>
+                  }
+                </dd>
+              </div>
+            </dl>
+            @if (Model.CampusAddresses?.Count > 1)
+            {
+              var addressCount = Model.CampusAddresses?.Count;
+              var isFirst = true;
+                    
+              <details class="govuk-details govuk-!-margin-top-2 govuk-!-margin-bottom-0" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                  @{
+                    var sPlural = addressCount > 2 ? "s are" : " is";
+                    <span class="govuk-details__summary-text">@($"{addressCount - 1} other location{sPlural} available")</span>
+                  }
+                </summary>
+                <div class="govuk-details__text">
+                  @foreach (var location in Model.CampusAddresses!)
+                  {
+                    if (!isFirst)
+                    {
+                      <p>@($"{location.Display} - ") 
+                        <a class="govuk-link" href="@location.MapLocationUrl">View on a map
+                          <span class="govuk-visually-hidden">@location.Display</span>
+                        </a>
+                      </p>
+                    }
+                    isFirst = false;
+                  }
+                </div>
+              </details>
+            }
+          </div>
+        </div>
+
+        <div class="govuk-summary-card">
+          <div class="govuk-summary-card__title-wrapper">
+            <h2 class="govuk-summary-card__title">Course details</h2>
+          </div>
+
+          <div class="govuk-summary-card__content">
+            <dl class="govuk-summary-list">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Delivery method</dt>
+                <dd class="govuk-summary-list__value">@Model.DeliveryModeDisplay</dd>
+              </div>
+              @if (Model.StartDates?.Count(s => !string.IsNullOrEmpty(s.Display))> 1)
+              {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Start dates</dt>
+                  <dd class="govuk-summary-list__value">
+                    @foreach (var startDate in Model.StartDates
+                                .Where(sd => !string.IsNullOrEmpty(sd.Display))
+                                .OrderBy(sd => sd.Date))
+                    {
+                      <p>@startDate.Display</p>
+                    }
+                  </dd>
+                </div>
+              }
+              else if (!string.IsNullOrEmpty(Model.StartDates?.FirstOrDefault()?.Display))
+              {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Start date</dt>
+                  <dd class="govuk-summary-list__value">
+                    @Model.StartDates?.FirstOrDefault()?.Display
+                  </dd>
+                </div>
+              }
+              else
+              {
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">Start date</dt>
+                  <dd class="govuk-summary-list__value">@SharedStrings.NotProvided
+                  </dd>
+                </div>
+              }
+              
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Duration</dt>
+                <dd class="govuk-summary-list__value">@Model.DurationDisplay</dd>
+              </div>
+
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Hours</dt>
+                <dd class="govuk-summary-list__value">@Model.HoursDisplay</dd>
+              </div>
+
+            </dl>
+          </div>
+        </div>
+        
+        @if (!string.IsNullOrEmpty(Model.CourseUrlAbsolute))
+        {
+          <govuk-button-link href="@(Model.CourseUrlAbsolute)" is-start-button="false">Go to course</govuk-button-link>
+        }
+        <p>The information we show you about a course comes from the provider. If you want to know more about a course visit their website. You can also email or call them if you have any questions or want to discuss your options.</p>
+      </div>
+      <div class="govuk-grid-column-one-third">
+        <div class="x-govuk-related-navigation">
+          <nav class="x-govuk-related-navigation__nav-section" aria-labelledby="related-navigation-related-content">
+            <h2 class="x-govuk-related-navigation__main-heading" id="related-navigation-related-content">Related links</h2>
+            <ul class="x-govuk-related-navigation__link-list">
+              <li class="x-govuk-related-navigation__link">
+                <a class="govuk-link x-govuk-related-navigation__section-link" 
+                   href="https://nationalcareers.service.gov.uk/explore-careers">Explore jobs and careers you could do after this course</a>
+              </li>
+              <li class="x-govuk-related-navigation__link">
+                <a class="govuk-link x-govuk-related-navigation__section-link" 
+                   asp-page="TrainingOptionsPages/AboutDegrees">More information about Degrees</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style asp-add-nonce>
+  .local_top_spacing{
+    margin-top: -40px;
+  }
+</style>

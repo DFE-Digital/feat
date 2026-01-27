@@ -1,0 +1,322 @@
+@page
+@using feat.web.Enums
+@using feat.web.Models.ViewModels
+@using feat.web.Utils
+@model feat.web.Pages.LoadCoursesModel
+
+@{
+  ViewBag.PageTitle = "Your search results";
+
+  var totalResults = Model.TotalPages == 1 ? Model.Courses.Count : Model.TotalCourseCount;
+  var pluralText = totalResults == 1 ? string.Empty : "s";
+  var locationText = string.IsNullOrEmpty(Model.Search.Location) ? string.Empty : "near <strong>" + Model.Search.Location + "</strong>";
+  var interestText = Model.Search.Interests.Count > 0 ? $"for <strong>{string.Join(", ", Model.Search.Interests)}</strong>" : string.Empty;
+  var searchResultText = $"Showing {totalResults} course{pluralText} {locationText} {interestText}";
+}
+
+<div class="govuk-width-container">
+  
+    <div class="govuk-grid-row">
+      <!--Header section -->
+      <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
+        <p class="govuk-body-l">@Html.Raw(searchResultText)</p>
+        <p><a asp-page="@PageName.Location">Search again</a></p>
+        <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+      </div>
+    </div>
+
+    <div class="govuk-grid-row">
+      <!--Filters-->
+      <div class="govuk-grid-column-one-third">
+        <button type="button"
+                class="govuk-button govuk-button--secondary mobile-filter-toggle"
+                data-module="govuk-button"
+                id="filterToggleBtn"
+                aria-expanded="true"
+                aria-controls="filterSection">
+          <span class="filter-toggle-text">Hide filters</span>
+        </button>
+
+        <div id="filter-panel" class="filter-container">
+          <form method="post" asp-page-handler="UpdateSelection">
+            <div class="filter-container">
+              <div id="filterSection" class="filter-section">
+                <div class="govuk-summary-card">
+                  <div class="govuk-summary-card__title-wrapper">
+                    <div class="filter-heading">
+                      <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Filter</h2>
+                    </div>
+                  </div>
+
+                  <div class="govuk-summary-card__content">
+                    <div class="govuk-summary-list">
+                      @if (Model.AllFacets is { Count: > 0 })
+                      {
+                        var facetIndex = 0;
+
+                        foreach (var facet in Model.AllFacets.OrderBy(f => f.Index))
+                        {
+                          var orderedFacetValues = facet.Values
+                            .Where(v => v.Index >= 0)
+                            .OrderBy(v => v.Index)
+                            .ToList();
+                          
+                          if (facetIndex == 1 && Model.SelectedTravelDistance != null)
+                          {
+                            <div class="govuk-summary-list__row">
+                              <div class="govuk-form-group">
+                                <govuk-select for="SelectedTravelDistance">
+                                  <govuk-select-label class="govuk-!-margin-top-4 govuk-!-font-weight-bold">
+                                    Travel distance
+                                  </govuk-select-label>
+                                  @foreach (var option in Enum.GetValues<Distance>())
+                                  {
+                                    <govuk-select-item 
+                                      value="@((int)option)"
+                                      selected="@(Model.SelectedTravelDistance == option)">
+                                      @option.GetDisplayName()
+                                    </govuk-select-item>
+                                  }
+                                </govuk-select>
+                              </div>
+                            </div>
+                          }
+                          
+                          <div class="govuk-summary-list__row">
+                              <div class="govuk-form-group">
+                                  <input type="hidden" name="AllFacets[@facetIndex].Name" value="@facet.Name" />
+
+                                  <govuk-checkboxes name="facet-@facetIndex">
+                                      <govuk-checkboxes-fieldset class="govuk-checkboxes--small">
+                                          <govuk-checkboxes-fieldset-legend 
+                                              is-page-heading="false" 
+                                              class="govuk-fieldset__legend--s">
+                                              @facet.DisplayName
+                                          </govuk-checkboxes-fieldset-legend>
+
+                                          @for (var valueIndex = 0; valueIndex < orderedFacetValues.Count; valueIndex++)
+                                          {
+                                              var facetValue = orderedFacetValues[valueIndex];
+
+                                              <govuk-checkboxes-item
+                                                  id="facet-@facetIndex-value-@valueIndex"
+                                                  name="AllFacets[@facetIndex].Values[@valueIndex].Selected"
+                                                  value="true"
+                                                  checked="@(facetValue.Selected)">
+                                                  @facetValue.DisplayName
+                                              </govuk-checkboxes-item>
+                                          }
+                                      </govuk-checkboxes-fieldset>
+                                  </govuk-checkboxes>
+                                  
+                                  @for (var valueIndex = 0; valueIndex < orderedFacetValues.Count; valueIndex++)
+                                  {
+                                      var facetValue = orderedFacetValues[valueIndex];
+
+                                      <input type="hidden"
+                                             name="AllFacets[@facetIndex].Values[@valueIndex].Name"
+                                             value="@facetValue.Name" />
+
+                                      <input type="hidden"
+                                             name="AllFacets[@facetIndex].Values[@valueIndex].Selected"
+                                             value="false" />
+                                  }
+                                  @if (orderedFacetValues.Exists(v => v.Selected))
+                                  {
+                                    <p class="govuk-body">
+                                      <a class="govuk-link" asp-page-handler="ClearFacet" asp-route-facetname="@facet.Name" id="clear-facet-@facet.Name">Clear filter<span class="govuk-visually-hidden"> for @facet.DisplayName</span></a>
+                                    </p>
+                                  }
+                              </div>
+                          </div>
+
+                          facetIndex++;
+                        }
+                      }
+                      <button class="govuk-button govuk-!-margin-top-4" type="submit">Apply filters</button>
+                      <p class="govuk-body">
+                        <a class="govuk-link" asp-page-handler="ClearFilters">Clear all filters</a>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Results Section (Right Column) -->
+      <div class="govuk-grid-column-two-thirds">
+
+        @if (!Model.Courses.Any())
+        {
+          <partial name="Partials/_NoResults" model="new NoResults { HasFilters = true }" />
+        }
+        else
+        {
+          <!-- Results & Pagination -->
+          <h2 class="govuk-heading-m">Available courses</h2>
+          
+          <!-- Sort Region-->
+          <p class="govuk-body govuk-!-margin-bottom-6">
+            <span class="govuk-!-font-weight-bold">Sort courses by:</span>
+            <span class="govuk-!-margin-left-2">
+              @{
+                if (Model.Search.Location == null)
+                {
+                  <span aria-current="true">Relevance</span>
+                }
+                else
+                {
+                  if (Model.Search.OrderBy == OrderBy.Distance)
+                  {
+                    <span aria-current="true">Distance</span>
+                    <span> | </span> 
+                    <a asp-page="@PageName.LoadCourses" asp-route-orderBy="relevance">Relevance</a>
+                  }
+                  else
+                  {
+                    <a asp-page="@PageName.LoadCourses" asp-route-orderBy="distance">Distance</a>
+                    <span> | </span> 
+                    <span aria-current="true">Relevance</span>
+                  }
+                }
+              }
+            </span>
+          </p>
+          
+          @foreach (var searchResult in Model.Courses)
+          {
+            await Html.RenderPartialAsync("Partials/_SearchResult", searchResult.ToResultViewModel());
+          }
+
+          <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+              <nav class="govuk-pagination" aria-label="Pagination">
+                @if (Model.HasPreviousPage)
+                {
+                  <div class="govuk-pagination__prev">
+                    <a class="govuk-link govuk-pagination__link"
+                       asp-route-pageNumber="@(Model.PreviousPage)"
+                       aria-label="Previous Page, Page @(Model.PreviousPage)">
+                      <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg"
+                           height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                        <path d="m6.5938-0.0088125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                      </svg>
+                      <span class="govuk-pagination__link-title">Previous<span class="govuk-visually-hidden"> page</span></span>
+                    </a>
+                  </div>
+                }
+                <ul class="govuk-pagination__list">
+                  @foreach (var pageNumber in Model.GetPageNumbers())
+                  {
+                    @if (pageNumber == Model.CurrentPage)
+                    {
+                      <li class="govuk-pagination__item govuk-pagination__item--current">
+                        <a class="govuk-link govuk-pagination__link"
+                           asp-route-pageNumber="@pageNumber"
+                           aria-label="@($"Current Page, Page {pageNumber}")" aria-current="page">
+                          @pageNumber
+                        </a>
+                      </li>
+                    }
+                    else
+                    {
+                      <li class="govuk-pagination__item">
+                        <a class="govuk-link govuk-pagination__link"
+                           asp-route-pageNumber="@pageNumber"
+                           aria-label="@($"Page {pageNumber}")">
+                          @pageNumber
+                        </a>
+                      </li>
+                    }
+                  }
+                </ul>
+                
+                @if (Model.HasNextPage)
+                {
+                  <div class="govuk-pagination__next">
+                    <a class="govuk-link govuk-pagination__link"
+                       asp-route-pageNumber="@Model.NextPage"
+                       aria-label="Next Page, Page @(Model.NextPage)">
+                      <span class="govuk-pagination__link-title">Next<span class="govuk-visually-hidden"> page</span></span>
+                      <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg"
+                           height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                        <path d="m8.108-0.0088125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                      </svg>
+                    </a>
+                  </div>
+                }
+              </nav>
+            }
+        }
+      </div>
+
+    </div>
+</div>
+
+@section Scripts {
+  <script asp-add-nonce type="module">
+        import * as MOJFrontend from '/js/moj-frontend.min.js'
+        MOJFrontend.initAll()
+  </script>
+  <script src="~/js/filter-toggle.js"></script>
+}
+
+<style asp-add-nonce>
+    /* Mobile filter toggle button - hidden by default */
+    .mobile-filter-toggle {
+        display: none;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    /* Show toggle button only on mobile/tablet */
+    @@media (max-width: 768px) {
+        .mobile-filter-toggle {
+            display: block;
+        }
+
+        /* Filter section transitions */
+        .filter-section {
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+
+        .filter-section.collapsed {
+            max-height: 0;
+            margin-bottom: 0;
+        }
+    }
+
+    /* Ensure proper stacking on mobile */
+    @@media (max-width: 768px) {
+        .govuk-grid-column-one-third {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .govuk-grid-column-two-thirds {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 40.0625em) {
+      .govuk-pagination__list .govuk-pagination__item {
+        display: inline-block;
+      }
+    }
+    
+    #filterSection > div > div.govuk-summary-card__content > div > div > div > p
+    {
+      margin-top: 20px;
+    }
+    
+    #filterSection div.govuk-summary-list__row:not(:first-child) div.govuk-form-group {
+      margin-top: 20px;
+    }
+    
+</style>

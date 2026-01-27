@@ -8,13 +8,57 @@ on:
         required: true
         type: choice
         options:
-          - development
-          - test
+          - Development
+          - Test
+          - Beta
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+  pull-requests: write
 
 jobs:
-  build-and-deploy:
-    name: "Build & Deploy"
+  build-and-test:
+    name: Build & Test
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build Solution
+        run: dotnet build feat.sln --configuration Release
+
+      - name: Run Tests
+        run: |
+          dotnet test feat.sln \
+            --configuration Release \
+            --no-build \
+            --logger "trx" \
+            --results-directory ./TestResults
+          
+      - name: Test Report
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: "TestResults/*.trx"
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: "TestResults/*.trx"
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build-and-test
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -25,9 +69,8 @@ jobs:
       ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
       ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
       RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
-      API_NAME: s213d01-app-api
+      API_NAME: ${{ vars.ENV_PREFIX }}-app-api
     environment: ${{ github.event.inputs.environment }}
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -62,7 +105,4 @@ jobs:
           az webapp config container set \
             --name "$API_NAME" \
             --resource-group "$RESOURCE_GROUP" \
-            --docker-custom-image-name "$ACR_LOGIN_SERVER/feat-api:${{ github.sha }}" \
-            --docker-registry-server-url "https://$ACR_LOGIN_SERVER" \
-            --docker-registry-server-user "$ACR_USERNAME" \
-            --docker-registry-server-password "$ACR_PASSWORD"
+            --container-image-name "$ACR_LOGIN_SERVER/feat-api:${{ github.sha }}"

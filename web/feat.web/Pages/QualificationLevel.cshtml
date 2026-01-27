@@ -2,28 +2,41 @@
 @using feat.web.Enums
 @model QualificationLevelModel
 @{
-    ViewBag.Title = "What qualification level are you looking for?";
-    
+    ViewBag.PageTitle = "What qualification level are you looking for?"; 
+    ViewBag.BackPageUrl = Url.Page(Model.Search.BackPage);
 }
 
-
-@section BeforeContent {
-    <govuk-back-link href="@Url.Page(Model.Search.GetBackPage("How"))">Back</govuk-back-link>
-}
+<h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
+<p>Most qualifications have a difficulty level. The higher the level, the more difficult. Some qualifications like Apprenticeships or vocational qualifications can be studied at different levels.</p>
+<p><a class="govuk-link" href="https://www.gov.uk/what-different-qualification-levels-mean/list-of-qualification-levels" >What qualification levels mean</a></p>
 
 <form method="post">
-    <govuk-radios for="QualificationLevel">
-        <govuk-radios-fieldset>
-            <govuk-radios-fieldset-legend class="govuk-heading-l" is-page-heading="true">@ViewBag.Title</govuk-radios-fieldset-legend>
-            @foreach (var option in Enum.GetValues<QualificationLevel>())
-            {
-                <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
+    
+    <govuk-checkboxes name="SelectedQualificationOptions" for="SelectedQualificationOptions">
+        <govuk-checkboxes-fieldset>
+            <govuk-checkboxes-fieldset-legend is-page-heading="false" class="govuk-fieldset__legend--m">
+                Qualification level
+            </govuk-checkboxes-fieldset-legend>
+            <govuk-checkboxes-hint>
+                Select all that apply.
+            </govuk-checkboxes-hint>
+            @{
+                foreach (var qualificationLevel in Enum.GetValues<QualificationLevel>())
+                {
+                    var isTrue = Model.SelectedQualificationOptions.Contains(qualificationLevel);
+
+                    <govuk-checkboxes-item
+                                           value="@(qualificationLevel.ToString("G"))"
+                                           checked="@(isTrue)">
+                        @qualificationLevel.GetDisplayName()
+                    </govuk-checkboxes-item>
+                }
             }
-        </govuk-radios-fieldset>
-    </govuk-radios>
-    <p><a href="" class="govuk-link">What qualification levels mean</a></p>
+
+        </govuk-checkboxes-fieldset>
+    </govuk-checkboxes>
 
     <div class="govuk-button-group">
-        <govuk-button type="submit">Continue</govuk-button>
+        <govuk-button type="Submit">Continue</govuk-button>
     </div>
 </form>

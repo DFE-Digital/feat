@@ -1,0 +1,27 @@
+@page "/courses/{instanceId:guid}"
+@model feat.web.Pages.CourseModel
+@using feat.web.Models.ViewModels
+
+@{
+    ViewBag.StaticBackPageUrl = Model.RefererUrl;
+}
+
+@switch (Model.Course)
+{
+    case CourseDetailsCourse course:
+        ViewBag.CourseTitle = course.Title;
+        <partial name="Partials/_CourseDetailsCourse" model="course" />
+        break;
+    case CourseDetailsApprenticeship apprenticeship:
+        ViewBag.CourseTitle = apprenticeship.Title;
+        <partial name="Partials/_CourseDetailsApprenticeship" model="apprenticeship" />
+        break;
+    case CourseDetailsUniversity university:
+        ViewBag.CourseTitle = university.Title;
+        <partial name="Partials/_CourseDetailsUniversity" model="university" />
+        break;
+}
+
+@{
+    ViewBag.PageTitle = ViewBag.CourseTitle;
+}

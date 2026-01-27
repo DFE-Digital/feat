@@ -1,108 +1,152 @@
-using System.Text;
 using feat.web.Enums;
+using feat.web.Utils;
 
 namespace feat.web.Models;
 
 public class Search
 {
-    public bool Updated { get; set; } = true;
-    
     public List<string> History { get; set; } = [];
+    public bool Updated { get; set; }
     
+    public string? Location { get; set; } 
+    public Distance? Distance { get; set; }
+    public Distance? OriginalDistance { get; set; }
+    public List<string> Interests { get; set; } = []; 
+    public List<QualificationLevel> QualificationLevels { get; set; } = []; 
     public AgeGroup? AgeGroup { get; set; }
     
-    public QualificationLevel? QualificationLevel { get; set; }
-
-    public Distance? Distance { get; set; }
+    public List<Models.ViewModels.Facet> Facets { get; set; } = [];
     
-    public SearchMethod? SearchMethod { get; set; }
+    public int CurrentPage { get; set; } = 1;
+    public int TotalPages { get; set; }
+    public int PageSize { get; set; } = 10;
     
-    public SearchType? SearchType { get; set; }
-
-    public bool IncludeOnlineCourses { get; set; } = true;
+    public OrderBy OrderBy { get; set; } = OrderBy.Relevance;
     
-    public bool Debug { get; set; } = false;
-
-    public string? Location { get; set; }
-
-    public List<string> Interests { get; set; } = [];
-
-    public List<string> Subjects { get; set; } = [];
-    
-    public List<string> Careers { get; set; } = [];
-    
-    
-    public CourseType? CourseType { get; set; }
-    
-    public CourseLevel? CourseLevel { get; set; }
-    
-    public string? Query {
-        get
-        {
-            var mergedList = Interests.Union(Subjects).Union(Careers).ToList();
-            
-            
-            if (mergedList.Count == 0)
-            {
-                return "*";
-            }
-            
-            var sb = new StringBuilder();
-            foreach (var entry in mergedList.Distinct())
-            {
-                // If we have quotes in the terms, don't quite them
-                if (entry.IndexOf('"') >= 0 && entry.LastIndexOf('"') < entry.Length - 1 && entry.IndexOf('"') < entry.LastIndexOf('"'))
-                    sb.Append(entry + " ");
-                // Otherwise, wrap the term in quotes
-                else
-                    sb.Append($"\"{entry}\" ");
-            }
-            
-            return sb.ToString().Trim();
-        }
-    }
-
-    public FindARequest ToFindARequest()
+    public static Dictionary<QualificationLevel, int[]> QualificationLevelMap { get; } = new()
     {
-        return new FindARequest
+        { QualificationLevel.None, [0] },
+        { QualificationLevel.OneAndTwo, [1, 2] },
+        { QualificationLevel.Three, [3] },
+        { QualificationLevel.FourToEight, [4, 5, 6, 7, 8] }
+    };
+    
+    private bool _pageIsChanging;
+
+    public SearchRequest ToSearchRequest()
+    {
+        var request = new SearchRequest
         {
-            Query = Query ?? string.Empty,
-            IncludeOnlineCourses = IncludeOnlineCourses,
+            Query = Interests.Where(i => !string.IsNullOrWhiteSpace(i)).ToArray(),
+            Page = CurrentPage,
+            PageSize = PageSize,
             Location = Location,
             Radius = Distance.HasValue ? (int)Distance.Value : 1000,
-            OrderBy = OrderBy.Relevance,
-            Page = 1,
-            PageSize = 20,
-            Debug = Debug
+            OrderBy = OrderBy,
+            CourseType = GetSelectedFilters(nameof(SearchRequest.CourseType)),
+            QualificationLevel = GetQualificationLevelFilters(),
+            LearningMethod = GetSelectedFilters(nameof(SearchRequest.LearningMethod)),
+            CourseHours = GetSelectedFilters(nameof(SearchRequest.CourseHours)),
+            StudyTime = GetSelectedFilters(nameof(SearchRequest.StudyTime))
         };
+
+        return request;
+    }
+
+    public string? BackPage { get; set; }
+    public bool VisitedCheckAnswers { get; set; }
+    
+    public void ResetHistory(string startPage)
+    {
+        History.Clear();
+        History.Add(startPage);
     }
 
     public void SetPage(string page)
     {
-        if (!History.Contains(page))
+        try
         {
-            History.Add(page);
+            if (_pageIsChanging)
+            {
+                return;
+            }
+
+            _pageIsChanging = true;
+
+            if (!History.Contains(page))
+            {
+                if (History.Count > 0)
+                {
+                    BackPage = History.LastOrDefault();
+                }
+
+                History.Add(page);
+
+                if (VisitedCheckAnswers)
+                {
+                    BackPage = History.FirstOrDefault();
+                }
+
+                if (page == PageName.CheckAnswers)
+                {
+                    VisitedCheckAnswers = true;
+                }
+            }
+            else
+            {
+                if (!History.Contains(PageName.CheckAnswers))
+                {
+                    History.RemoveAt(History.Count - 1);
+                    BackPage = History.Contains(page) ? History.ElementAt(History.Count - 2) : History.LastOrDefault();
+                }
+                else if (VisitedCheckAnswers)
+                {
+                    BackPage = History.LastOrDefault();
+                }
+            }
         }
-        else
+        catch (Exception e)
         {
-            var index = History.LastIndexOf(page);
-            History.RemoveRange(index, History.Count - index);
+            Console.WriteLine(e);
+            throw;
         }
-        
-        
+        finally
+        {
+            _pageIsChanging = false;
+        }
+    }
+    
+    private IEnumerable<string>? GetSelectedFilters(string name)
+    {
+        var facet = Facets
+            .FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+
+        return facet?.Values
+            .Where(fv => fv.Selected)
+            .Select(fv => fv.Name);
     }
 
-    public string GetBackPage(string page)
+    private IEnumerable<string> GetQualificationLevelFilters(List<Models.ViewModels.Facet>? facets = null)
     {
-        if (!History.Contains(page))
+        const string name = nameof(SearchRequest.QualificationLevel);
+        
+        var facet = (facets ?? Facets)
+            .FirstOrDefault(f => f.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+
+        if (facet != null)
         {
-            return History.LastOrDefault() ?? "Index";
+            return facet.Values
+                .Where(v => v.Selected)
+                .Select(v => v.Name);
         }
 
-        var index = History.LastIndexOf(page);
-        if (index == 0)
-            return "Index";
+        if (QualificationLevels.Count == 0)
+        {
+            return [];
+        }
         
-        return History[index - 1];
+        return QualificationLevels
+            .SelectMany(ql => QualificationLevelMap[ql])
+            .Select(x => ((feat.common.Models.Enums.QualificationLevel)x).ToString());
     }
 }

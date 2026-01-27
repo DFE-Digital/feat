@@ -1,0 +1,29 @@
+﻿@page
+@using feat.web.Enums
+@model AgeModel
+@{
+    ViewBag.PageTitle = "Your age";
+    ViewBag.BackPageUrl = Url.Page(Model.Search.BackPage);
+}
+
+<h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
+<p class="govuk-body">This is optional but telling us means you will see more relevant results.</p>
+<p class="govuk-body">Not all education and training courses are available to everyone.</p>
+<p class="govuk-body">This is often linked to age. As well as what qualifications you already have or your employment status.</p>
+<p><a asp-page="TrainingOptionsPages/TrainingOptions" class="govuk-link">Discover the different training options</a></p>
+
+<form method="post">
+    <govuk-radios for="AgeGroup">
+        <govuk-radios-fieldset>
+            <govuk-radios-fieldset-legend class="govuk-heading-m">How old are you? (optional)</govuk-radios-fieldset-legend>
+            @foreach (var option in Enum.GetValues<AgeGroup>())
+            {
+                <govuk-radios-item value="@option">@option.GetDisplayName()</govuk-radios-item>
+            }
+        </govuk-radios-fieldset>
+    </govuk-radios>
+    
+    <div class="govuk-button-group">
+        <govuk-button type="submit">Continue</govuk-button>
+    </div>
+</form>
