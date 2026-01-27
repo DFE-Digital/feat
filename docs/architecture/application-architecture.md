@@ -10,8 +10,9 @@
 |      Component       | SLA    |
 |:--------------------:|:-------|
 |  Azure App Service   | 99.95% |
-|   Azure Front Door   | 99.95% |
-|  Azure Redis Cache   | 99.99% |
+| Azure Container Apps | 99.95% |
+|  Barracuda Firewall  | 99.90% |
+| Azure Managed Redis  | 99.99% |
 |   Azure SQL Server   | 99.99% |
 | Microsoft AI Search  | 99.95% |
 | Azure OpenAI Service | 99.99% |
@@ -25,4 +26,4 @@ The table shows the composite availability. All Services is for when the entire 
 
 |         Scenario         | Availability |
 |:------------------------:|:------------:|
-|      All Services        |    99.97%    |
+|      All Services        |    99.72%    |

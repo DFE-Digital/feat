@@ -11,18 +11,18 @@ workspace "FEATv1" "Find Education and Training - Hosting internal AI Search" {
                 description "Serverless container platform"
                 tags "Microsoft Azure - Container Apps Environments"
             
-                webapp = container "FEAT Website" {
+                webapp = container "Website" {
                     description "Proof of concept site to demonstrate a front-end for finding information"
                     technology "dotnet 9.0"
                     tags "Microsoft Azure - Website Staging"
                 }
-                api = container "FEAT API Service" {
+                api = container "API" {
                     description "FEAT API that interrogates Azure AI Search"
                     technology "dotnet 9.0"
                     tags "Microsoft Azure - API Management Services"
                     webapp -> this
                 }
-                ingestion = container "FEAT Ingestion Job" {
+                ingestion = container "Ingestion Job" {
                     technology "dotnet 9.0"
                     tags "Microsoft Azure - Data Shares"
                 }
@@ -52,38 +52,43 @@ workspace "FEATv1" "Find Education and Training - Hosting internal AI Search" {
             }
         }
         
+        group "Find an Apprenticeship" {
+            faa = softwareSystem "Find an Apprenticeship" {
+                tags "Microsoft Azure - API Management Services"
+                
+                faaApi = container "Display Advert API" {
+                    tags "Microsoft Azure - API Management Services"
+                    description "Display Advert API"
+                    ingestion -> this "Queries" "HTTPS"
+                }
+            }
+            
+        }
+        
         service = deploymentEnvironment "Service" {
 
+            internet = deploymentNode "Public Internet" {
+                tags "Microsoft Azure - Entra Internet Access"
+                gateway = infrastructureNode "Shared DfE WAF" {
+                    technology "Azure Front Door and Firewalls"
+                    description "Automatically distributes and secures incoming application traffic"
+                    tags "Microsoft Azure - Firewalls"
+                }
+                
+                
+            }
+                
             deploymentNode "Microsoft Azure" {
                 tags "Microsoft Azure - Azure A"
-
-                deploymentNode "West Europe" {
+                    
+                deploymentNode "UK South"  {
                     tags "Microsoft Azure - Region Management"
                     
-                    internet = deploymentNode "Public Internet" {
-                        tags "Microsoft Azure - Entra Internet Access"
-                        gateway = infrastructureNode "Shared DfE WAF" {
-                            technology "Azure Front Door and Firewalls"
-                            description "Automatically distributes and secures incoming application traffic"
-                            tags "Microsoft Azure - Firewalls"
-                        }
-                        
-                        bastion = infrastructureNode "Bastion" {
-                            description "Remote SSH for connecting to the virtual network"
-                            tags "Microsoft Azure - Bastions"
-                        }
+                    bastion = infrastructureNode "Bastion" {
+                        description "Remote SSH for connecting to the virtual network"
+                        tags "Microsoft Azure - Bastions"
                     }
                     
-                    
-                    dfe = deploymentNode "DfE AI Centre for Excellence" {
-                        tags "Microsoft Azure - Virtual Networks"
-                        
-                        
-                        openAIInstance = containerInstance openAI {
-
-                        }
-                    }
-
                     vnet = deploymentNode "FEAT Vnet" {
                         tags "Microsoft Azure - Virtual Networks"
                         
@@ -96,7 +101,7 @@ workspace "FEATv1" "Find Education and Training - Hosting internal AI Search" {
                         
                         
                         cache = infrastructureNode "Distributed Cache" {
-                            description "Azure Cache - Redis"
+                            description "Azure Managed Redis"
                             tags "Microsoft Azure - Cache Redis"
                         }
                         
@@ -114,18 +119,18 @@ workspace "FEATv1" "Find Education and Training - Hosting internal AI Search" {
                         }
                         
                         
-                        webContainer = deploymentNode "Auto-Scaling Web Container" {
-                            tags "Microsoft Azure - Container Apps Environments"
+                        webContainer = deploymentNode "Auto-Scaling ASP" {
+                            tags "Microsoft Azure - App Service Plans"
                             
-                            webAppService = deploymentNode "Web - Azure Container App" {
-                                tags "Microsoft Azure - Container Instances"
+                            webAppService = deploymentNode "Web - App Service" {
+                                tags "Microsoft Azure - App Services"
                                 webApplicationInstance = containerInstance webapp {
                                     gateway -> this "Fowards requests to" "HTTPS"
                                 }
                             }
                             
-                            apiAppService = deploymentNode "API - Azure Container App" {
-                                tags "Microsoft Azure - Container Instances"
+                            apiAppService = deploymentNode "API - App Service" {
+                                tags "Microsoft Azure - App Services"
                                 apiInstance = containerInstance api {
                                     this -> cache "Saves semantic results and geolocation lookups"
                                     cache -> this "Fetches semantic results and geolocation lookups"
@@ -138,10 +143,10 @@ workspace "FEATv1" "Find Education and Training - Hosting internal AI Search" {
                             
                         }
                         
-                        igestionContainer = deploymentNode "Auto-Scaling Ingestion Container" {
+                        igestionContainer = deploymentNode "Container Environment" {
                             tags "Microsoft Azure - Container Apps Environments"
                             
-                            ingestionAppService = deploymentNode "Ingestion - Azure Container Job" {
+                            ingestionAppService = deploymentNode "Auto-scaling Container" {
                                 tags "Microsoft Azure - Worker Container App"
                                 ingestionInstance = containerInstance ingestion {
                                     this -> cache "Saves semantic results and geolocation lookups"
@@ -154,25 +159,30 @@ workspace "FEATv1" "Find Education and Training - Hosting internal AI Search" {
                             
                         }
                         
-
-                        
-                        
-                            
-                        
-                        /* 
-                        datafactory -> staging "Exports data to" 
-                        */
-                        
-                        
                     }
                     
-                    
-                    
+                }
 
-                
+                deploymentNode "West Europe" {
+                    tags "Microsoft Azure - Region Management"
                     
+                    dfeCOE = deploymentNode "DfE AI CoE" {
+                        tags "Microsoft Azure - Virtual Networks"
+                        
+                        openAIInstance = containerInstance openAI {
+
+                        }
+                    }
                     
-                    
+                    faaDeployment = deploymentNode "Apprenticeship Service" {
+                        tags "Microsoft Azure - Virtual Networks"
+                        
+                        faaApiInstance = containerInstance faaApi {
+                            
+                            
+                        }
+
+                    }
 
                 }
             }

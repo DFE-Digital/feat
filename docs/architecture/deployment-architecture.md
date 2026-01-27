@@ -14,4 +14,8 @@ have been modified. Any failures should be addressed before merging. Failures on
 
 ## Release Pipeline
 
-TODO
+Releases are currently run manually.
+
+These releases should come from `main` to ensure the artifacts deployed are the latest tested versoins.
+
+The ability to release from an alternate branch has been enabled to allow testing of fixes/patches in lower environments if needed.
