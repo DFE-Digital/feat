@@ -29,6 +29,12 @@ public class SearchService(
         SearchAsync(SearchRequest request)
     {
         var validation = new ValidationResult();
+        
+        if (!string.IsNullOrWhiteSpace(request.Location) && request.Radius <= 0)
+        {
+            validation.AddError("radius", "Radius must be greater than 0.");
+            return (validation, null);
+        }
 
         GeoLocation? userLocation = null;
 
@@ -45,7 +51,7 @@ public class SearchService(
                 userLocation = locationResult.Location;
             }
         }
-        
+
         if (!validation.IsValid)
         {
             return (validation, null);
@@ -100,9 +106,7 @@ public class SearchService(
 
         RemoveDuplicateCourses(courses);
         
-        courses = courses
-            .OrderBy(c => searchResults.FindIndex(sr => sr.InstanceId == c.InstanceId))
-            .ToList();
+        courses = ApplySearchOrdering(courses, searchResults);
 
         var response = new SearchResponse
         {
@@ -214,6 +218,62 @@ public class SearchService(
         }).ToArray();
     }
     
+    public static string? BuildFilterExpression(SearchRequest request, GeoLocation? userLocation)
+    {
+        var filters = new List<string>();
+
+        AddFacet(nameof(SearchIndexFields.CourseType), request.CourseType);
+        AddFacet(nameof(SearchIndexFields.QualificationLevel), request.QualificationLevel);
+        AddFacet(nameof(SearchIndexFields.LearningMethod), request.LearningMethod);
+        AddFacet(nameof(SearchIndexFields.CourseHours), request.CourseHours);
+        AddFacet(nameof(SearchIndexFields.StudyTime), request.StudyTime);
+        
+        if (userLocation != null)
+        {
+            var radius = RadiusInKilometers(request.Radius);
+            
+            filters.Add(
+                $"""
+                    (
+                        geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius}
+                        or (
+                            Location eq null and
+                            (
+                                LearningMethod eq 'Online' or
+                                CourseType eq 'Apprenticeship'
+                            )
+                        )
+                    )
+                 """
+            );
+        }
+        
+        return filters.Count != 0
+            ? string.Join(" and ", filters)
+            : null;
+
+        void AddFacet(string field, IEnumerable<string>? values)
+        {
+            var valueList = (values ?? []).ToList();
+            if (valueList.Count == 0)
+            {
+                return;
+            }
+            
+            var ors = valueList.Select(v => $"{field} eq '{v.Replace("'", "''")}'");
+            filters.Add("(" + string.Join(" or ", ors) + ")");
+        }
+    }
+    
+    public static List<Course> ApplySearchOrdering(
+        List<Course> courses,
+        List<AiSearchResult> searchResults)
+    {
+        return courses
+            .OrderBy(c => searchResults.FindIndex(sr => sr.InstanceId == c.InstanceId))
+            .ToList();
+    }
+    
     private static void RemoveApprenticeshipsWithoutLocations(List<Course> courses)
     {
         courses.RemoveAll(c =>
@@ -297,7 +357,8 @@ public class SearchService(
                 nameof(SearchIndexFields.CourseHours), 
                 nameof(SearchIndexFields.StudyTime)
             },
-            QueryType = request.OrderBy != OrderBy.Distance ? SearchQueryType.Semantic : SearchQueryType.Simple 
+            QueryType = 
+                request.Query.Length == 0 || request.OrderBy == OrderBy.Distance ? SearchQueryType.Simple : SearchQueryType.Semantic
         };
 
         var embeddings = new Dictionary<string, ReadOnlyMemory<float>>();
@@ -404,53 +465,6 @@ public class SearchService(
         }
 
         return new GeoLocationResponse(null, false, "Location not found.");
-    }
-    
-    private static string? BuildFilterExpression(SearchRequest request, GeoLocation? userLocation)
-    {
-        var filters = new List<string>();
-
-        AddFacet(nameof(SearchIndexFields.CourseType), request.CourseType);
-        AddFacet(nameof(SearchIndexFields.QualificationLevel), request.QualificationLevel);
-        AddFacet(nameof(SearchIndexFields.LearningMethod), request.LearningMethod);
-        AddFacet(nameof(SearchIndexFields.CourseHours), request.CourseHours);
-        AddFacet(nameof(SearchIndexFields.StudyTime), request.StudyTime);
-        
-        if (userLocation != null)
-        {
-            var radius = RadiusInKilometers(request.Radius);
-            
-            filters.Add(
-                $"""
-                    (
-                        geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius}
-                        or (
-                            Location eq null and
-                            (
-                                LearningMethod eq 'Online' or
-                                CourseType eq 'Apprenticeship'
-                            )
-                        )
-                    )
-                 """
-            );
-        }
-        
-        return filters.Count != 0
-            ? string.Join(" and ", filters)
-            : null;
-
-        void AddFacet(string field, IEnumerable<string>? values)
-        {
-            var valueList = (values ?? []).ToList();
-            if (valueList.Count == 0)
-            {
-                return;
-            }
-            
-            var ors = valueList.Select(v => $"{field} eq '{v.Replace("'", "''")}'");
-            filters.Add("(" + string.Join(" or ", ors) + ")");
-        }
     }
     
     private static string? GetLocationName(Location? location)
