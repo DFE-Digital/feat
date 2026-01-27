@@ -40,21 +40,53 @@ public class SearchControllerTests
     }
 
     [Test]
-    public async Task Search_ReturnsBadRequest_WhenValidationFails()
+    public async Task Search_ReturnsBadRequest_WhenQueryMissing()
     {
         var request = new SearchRequest { Query = [] };
-        
-        var validation = new ValidationResult();
-        validation.AddError("Query", "Required field");
-        
-        _searchService
-            .SearchAsync(request)
-            .Returns((validation, null));
+        _controller.ModelState.AddModelError(nameof(request.Query), "Required");
 
         var result = await _controller.Search(request);
-        
-        var badRequestResult = result.Result as BadRequestObjectResult;
-        Assert.That(badRequestResult, Is.Not.Null);
-        Assert.That(badRequestResult!.StatusCode, Is.EqualTo(400));
+
+        var objectResult = result.Result as ObjectResult;
+        Assert.That(objectResult, Is.Not.Null);
+
+        var problem = objectResult!.Value as ValidationProblemDetails;
+        Assert.That(problem, Is.Not.Null);
+        Assert.That(problem!.Errors, Is.Not.Empty);
+        Assert.That(problem!.Errors.ContainsKey(nameof(SearchRequest.Query)));
+    }
+
+    [Test]
+    public async Task Search_ReturnsBadRequest_WhenPageInvalid()
+    {
+        var request = new SearchRequest { Query = ["Art"], Page = 0 };
+        _controller.ModelState.AddModelError(nameof(request.Page), "Page must be at least 1.");
+
+        var result = await _controller.Search(request);
+
+        var objectResult = result.Result as ObjectResult;
+        Assert.That(objectResult, Is.Not.Null);
+
+        var problem = objectResult!.Value as ValidationProblemDetails;
+        Assert.That(problem, Is.Not.Null);
+        Assert.That(problem!.Errors, Is.Not.Empty);
+        Assert.That(problem!.Errors.ContainsKey(nameof(SearchRequest.Page)));
+    }
+
+    [Test]
+    public async Task Search_ReturnsBadRequest_WhenPageSizeInvalid()
+    {
+        var request = new SearchRequest { Query = ["Art"], PageSize = 0 };
+        _controller.ModelState.AddModelError(nameof(request.PageSize), "PageSize must be greater than 0.");
+
+        var result = await _controller.Search(request);
+
+        var objectResult = result.Result as ObjectResult;
+        Assert.That(objectResult, Is.Not.Null);
+
+        var problem = objectResult!.Value as ValidationProblemDetails;
+        Assert.That(problem, Is.Not.Null);
+        Assert.That(problem!.Errors, Is.Not.Empty);
+        Assert.That(problem!.Errors.ContainsKey(nameof(SearchRequest.PageSize)));
     }
 }
