@@ -22,4 +22,9 @@ Before pushing to main/raising a pull request, ensure the following:
 
 The following checks/actions run on every pull request or main push:
 
-TODO: Define these
+- Validate - PR
+  - Restores .net projects
+  - Builds solution
+  - Runs all unit and integration tests
+  - Publishes results to GitHub
+

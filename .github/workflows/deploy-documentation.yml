@@ -9,17 +9,17 @@ on:
       - 'mkdocs.yml'
       - 'resources/tech_docs_template/**'
       - '.github/workflows/generate-tf-docs.yaml'
-      - '.github/workflows/deploy-github-pages.yaml'
+      - '.github/workflows/deploy-documentation.yaml'
 
 jobs:
   build:
-    name: Deploy docs
+    name: Publish docs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
         uses: actions/checkout@v5
 
-      - name: Deploy docs
+      - name: Publish docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
