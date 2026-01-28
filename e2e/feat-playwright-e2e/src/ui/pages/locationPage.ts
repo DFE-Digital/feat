@@ -57,17 +57,15 @@ export class LocationPage {
 
             await input.type(typed, { delay: 60 });
 
-            const expanded = await expect
-                .poll(async () => (await input.getAttribute('aria-expanded')) ?? 'false', {
-                    timeout: 15_000,
-                })
-                .toBe('true')
+            // Don't sync on aria-expanded 
+            const menuVisible = await this.suggestionsMenu()
+                .waitFor({ state: 'visible', timeout: 15_000 })
                 .then(() => true)
                 .catch(() => false);
 
-            if (!expanded) {
+            if (!menuVisible) {
                 if (attempt === maxAttempts) {
-                    throw new Error(`Autocomplete never expanded for "${typed}" (attempt ${attempt})`);
+                    throw new Error(`Autocomplete listbox never became visible for "${typed}" (attempt ${attempt})`);
                 }
                 await this.page.waitForTimeout(300);
                 continue;
@@ -82,7 +80,6 @@ export class LocationPage {
                 }, { timeout: 25_000 })
                 .not.toBe('waiting')
                 .then(async () => {
-                    // return the final state to decide next
                     const noResults = await this.noResultsMessage().isVisible().catch(() => false);
                     return noResults ? 'no-results' : 'options';
                 })
@@ -100,20 +97,24 @@ export class LocationPage {
                 continue;
             }
 
-            // Optional: wait for status text to say results available
+            // Optional: wait for status element to exist 
             await this.statusA()
-                .waitFor({ state: 'visible', timeout: 5_000 })
+                .waitFor({ state: 'attached', timeout: 2_000 })
                 .catch(() => {});
+
+            // Select first option via keyboard
             await this.page.keyboard.press('ArrowDown');
             await this.page.keyboard.press('Enter');
 
-            // Confirm value is set and menu collapses
+            // Confirm value is set
             await expect(input).not.toHaveValue('', { timeout: 10_000 });
-            await expect
-                .poll(async () => (await input.getAttribute('aria-expanded')) ?? 'false', {
-                    timeout: 10_000,
-                })
-                .toBe('false');
+
+            await this.suggestionsMenu()
+                .waitFor({ state: 'hidden', timeout: 10_000 })
+                .catch(() => {});
+
+            // Strong readiness signal: once Continue is enabled, location has been accepted and state is settled.
+            await expect(this.continueButton()).toBeEnabled({ timeout: 10_000 });
 
             return (await input.inputValue()).trim();
         }
@@ -122,15 +123,33 @@ export class LocationPage {
     }
 
     async selectDistance(label: string) {
-        const radio = this.distanceRadio(label);
+        // Re-renders can reset radios; always wait for the form to be settled first.
+        await expect(this.continueButton()).toBeEnabled({ timeout: 10_000 });
 
         await expect(this.page.locator('input[type="radio"][name="Distance"]').first()).toBeVisible({
             timeout: 10_000,
         });
 
-        await radio.scrollIntoViewIfNeeded();
-        await radio.setChecked(true, { force: true });
-        await expect(radio).toBeChecked();
+        // Retry because the UI can flip the checked state during re-render
+        for (let i = 0; i < 3; i++) {
+            const radio = this.distanceRadio(label);
+
+            await radio.scrollIntoViewIfNeeded();
+            await expect(radio).toBeEnabled({ timeout: 10_000 });
+            await radio.check();
+
+            const stuck = await expect
+                .poll(async () => await radio.isChecked(), { timeout: 1_500 })
+                .toBe(true)
+                .then(() => true)
+                .catch(() => false);
+
+            if (stuck) return;
+
+            await this.page.waitForTimeout(150);
+        }
+
+        throw new Error(`Distance "${label}" would not stay checked after retries`);
     }
 }
 

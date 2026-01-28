@@ -5,13 +5,14 @@ import * as path from 'path';
 dotenv.config();
 
 export default defineConfig({
+    globalSetup: require.resolve('./global-setup'),
     testDir: './src',
     testMatch: '**/*.spec.ts',
     timeout: 30_000,
     expect: { timeout: 10_000 },
-    fullyParallel: true,
+    fullyParallel: false,
     retries: 1,
-    workers: 4,
+    workers: 2,
     reporter: [['list'], ['html', { open: 'never' }]],
     use: {
         trace: 'on-first-retry',
