@@ -11,4 +11,6 @@ public interface ISearchIndexHandler
     IReadOnlyList<float> GetVector(string? text);
     
     Task Delete(IEnumerable<string> idsToDelete, CancellationToken cancellationToken);
+    
+    Task<bool> Update(List<AiSearchEntry> entries, CancellationToken cancellationToken);
 }

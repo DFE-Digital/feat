@@ -1,4 +1,4 @@
-name: Deploy Azure Infrastructure
+name: Deploy - Infrastructure
 
 on:
   workflow_call:
@@ -19,6 +19,7 @@ on:
           - Test
           - Beta
 
+run-name: Deploying Infrastructure to ${{ github.event.inputs.environment }}
 jobs:
   terraform:
     name: "Deploy"
