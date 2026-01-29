@@ -58,7 +58,7 @@ jobs:
             /k:"DFE-Digital_feat" \
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.scanner.skipJreProvisioning=true \
-            /s:${{ github.workspace }}/SonarQube.Analysis.xml
+            /s:SonarQube.Analysis.xml
 
       - name: Build project
         run: |
