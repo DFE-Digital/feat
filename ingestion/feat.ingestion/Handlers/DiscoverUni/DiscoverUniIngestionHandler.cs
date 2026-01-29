@@ -96,7 +96,7 @@ public class DiscoverUniIngestionHandler(
 
         ingestionState = dbContext.DU_IngestionState.First();
 
-        var tempPath = Path.GetTempFileName();
+        var tempPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         
         Console.WriteLine("Checking Discover Uni dataset for changes...");
         
@@ -198,6 +198,8 @@ public class DiscoverUniIngestionHandler(
                 }
             }
 
+            // Clean up our path
+            File.Delete(tempPath);
             ingestionState.Extracted = true;
             await dbContext.SaveChangesAsync(cancellationToken);
             changes = true;
