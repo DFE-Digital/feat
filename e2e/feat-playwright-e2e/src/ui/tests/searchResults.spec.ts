@@ -12,6 +12,38 @@ function escapeRegex(str: string) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+async function startFreshJourney(page: Page) {
+    await page.context().clearCookies();
+
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    await page.evaluate(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+    });
+}
+
+async function checkFacetByLabel(results: SearchResultsPage, label: string) {
+    await results.openFiltersIfCollapsed();
+
+    const checkbox = results.facetCheckboxByLabel(label);
+    await checkbox.scrollIntoViewIfNeeded();
+    await expect(checkbox).toBeVisible({ timeout: 10_000 });
+
+    const already = await checkbox.isChecked().catch(() => false);
+    if (already) return;
+
+    // Prefer clicking the label text (more stable than forcing the input)
+    const labelEl = results.page.getByLabel(label, { exact: true }).first().catch?.(() => null as any);
+    if (labelEl) {
+        await results.page.getByLabel(label, { exact: true }).first().click();
+    } else {
+        await checkbox.click();
+    }
+
+    await expect(checkbox).toBeChecked({ timeout: 10_000 });
+}
+
 async function goToResultsFromCya(
     page: Page,
     opts?: {
@@ -26,6 +58,8 @@ async function goToResultsFromCya(
     const distanceLabel = opts?.distanceLabel ?? 'Up to 10 miles';
     const qualificationSelections = opts?.qualificationSelections ?? ['level3'];
 
+    await startFreshJourney(page);
+
     const index = new IndexPage(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await index.startNow().click();
@@ -34,7 +68,7 @@ async function goToResultsFromCya(
     await expect(page).toHaveURL(/\/location/i);
 
     await loc.enterLocationAndSelectFirst(locationType);
-    await loc.distanceRadio(distanceLabel).check({ force: true });
+    await loc.selectDistance(distanceLabel);
     await expect(loc.distanceRadio(distanceLabel)).toBeChecked();
 
     await loc.continueButton().click();
@@ -83,6 +117,8 @@ async function goToResultsFromCyaNoLocation(
     }
 ): Promise<SearchResultsPage> {
     const qualificationSelections = opts?.qualificationSelections ?? ['level3'];
+
+    await startFreshJourney(page);
 
     const index = new IndexPage(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -259,11 +295,12 @@ test.describe('FEAT – Search results page', () => {
             qualificationSelections: ['level3'],
         });
 
-        const paginationVisible = await results.isPaginationVisible();
-        if (!paginationVisible) {
-            await expect(results.pagination()).toHaveCount(0);
+        const paginationCount = await results.pagination().count();
+        if (paginationCount === 0) {
             return;
         }
+
+        await expect(results.pagination()).toBeVisible({ timeout: 10_000 });
 
         await expect(results.currentPageLink()).toBeVisible();
         await results.nextPageLink().click();
@@ -280,17 +317,18 @@ test.describe('FEAT – Search results page', () => {
             qualificationSelections: ['level3'],
         });
 
-        await results.openFiltersIfCollapsed();
-        await results.facetCheckboxByLabel('Degree').check({ force: true });
+        await checkFacetByLabel(results, 'Degree');
         await results.applyFiltersButton().click();
         await results.expectOnPage();
 
-        const paginationVisible = await results.isPaginationVisible();
-        if (!paginationVisible) {
-            await expect(results.pagination()).toHaveCount(0);
+        const paginationCount = await results.pagination().count();
+        if (paginationCount === 0) {
+            await results.openFiltersIfCollapsed();
             await expect(results.facetCheckboxByLabel('Degree')).toBeChecked();
             return;
         }
+
+        await expect(results.pagination()).toBeVisible({ timeout: 10_000 });
 
         await results.nextPageLink().click();
         await expect(page).toHaveURL(/pagenumber=2/i);
@@ -317,9 +355,7 @@ test.describe('FEAT – Search results page', () => {
             qualificationSelections: ['level3'],
         });
 
-        await results.openFiltersIfCollapsed();
-
-        await results.facetCheckboxByLabel('Degree').check({ force: true });
+        await checkFacetByLabel(results, 'Degree');
         await results.applyFiltersButton().click();
         await results.expectOnPage();
 
@@ -375,7 +411,15 @@ test.describe('FEAT – Search results page', () => {
         const label = 'Degree';
         const checkbox = results.facetCheckboxByLabel(label);
 
-        await checkbox.check({ force: true });
+        await checkbox.scrollIntoViewIfNeeded();
+        await expect(checkbox).toBeVisible({ timeout: 10_000 });
+
+        const already = await checkbox.isChecked().catch(() => false);
+        if (!already) {
+            await results.page.getByLabel(label, { exact: true }).first().click();
+            await expect(checkbox).toBeChecked({ timeout: 10_000 });
+        }
+
         await results.applyFiltersButton().click();
         await results.expectOnPage();
 
@@ -426,11 +470,12 @@ test.describe('FEAT – Search results page', () => {
             qualificationSelections: ['level3'],
         });
 
-        const visible = await results.isPaginationVisible();
-        if (!visible) {
-            await expect(results.pagination()).toHaveCount(0);
+        const paginationCount = await results.pagination().count();
+        if (paginationCount === 0) {
             return;
         }
+
+        await expect(results.pagination()).toBeVisible({ timeout: 10_000 });
 
         await results.nextPageLink().click();
         await expect(page).toHaveURL(/pagenumber=2/i);
@@ -448,6 +493,9 @@ test.describe('FEAT – Search results page', () => {
 
         await results.searchAgainLink().click();
         await expect(page).toHaveURL(/\/location/i);
+
+        await startFreshJourney(page);
+        await page.goto('/location', { waitUntil: 'domcontentloaded' });
 
         const loc = new LocationPage(page);
         await loc.continueButton().click();

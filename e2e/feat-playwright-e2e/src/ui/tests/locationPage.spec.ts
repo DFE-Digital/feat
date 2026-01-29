@@ -30,6 +30,13 @@ test.describe('FEAT – 2.0 Location', () => {
     test.beforeEach(async ({ page, baseURL }) => {
         const index = new IndexPage(page);
 
+        await page.context().clearCookies();
+        await page.goto('/', { waitUntil: 'domcontentloaded' });
+        await page.evaluate(() => {
+            localStorage.clear();
+            sessionStorage.clear();
+        });
+
         await gotoHomeWithRetry(page, baseURL);
 
         await expect(index.startNow()).toBeVisible({ timeout: 30_000 });
@@ -55,8 +62,6 @@ test.describe('FEAT – 2.0 Location', () => {
 
     test('AC2: invalid location shows inline + summary errors (only if interacted)', async ({ page }) => {
         const loc = new LocationPage(page);
-
-        await page.goto('/location', { waitUntil: 'domcontentloaded' });
 
         await expect(page.locator('#Location')).toBeVisible({ timeout: 30_000 });
         await expect(page.locator('#Location')).toBeEnabled({ timeout: 30_000 });
@@ -125,30 +130,33 @@ test.describe('FEAT – 2.0 Location', () => {
         await loc.selectDistance('Up to 10 miles');
     });
 
-    test('AC4: if location entered but no distance, show distance error', async ({ page }) => {
-        const loc = new LocationPage(page);
-
-        await loc.enterLocationAndSelectFirst('Leeds');
-        await loc.continueButton().click();
-
-        await expect(loc.errorSummary()).toBeVisible();
-        await expect(loc.errorSummary()).toContainText(/Select how far you would be able to travel/i);
-        await expect(loc.fieldError('Select how far you would be able to travel')).toBeVisible();
-    });
-
     test('AC4: if distance selected but no location, show location required error', async ({ page }) => {
         const loc = new LocationPage(page);
 
         await loc.selectDistance('Up to 10 miles');
-        await loc.continueButton().click();
+        await loc.expectDistanceChecked('Up to 10 miles');
 
-        await expect(loc.errorSummary()).toBeVisible();
-        await expect(loc.errorSummary()).toContainText(
-            /Enter a town, city or postcode to use the distance filter/i
-        );
-        await expect(
-            loc.fieldError('Enter a town, city or postcode to use the distance filter')
-        ).toBeVisible();
+        const outcome = await loc.clickContinueAndWaitForErrorOrNext(20_000);
+
+        // If we navigated, it means distance was not treated as set OR validation didn’t fire.
+        expect(outcome, 'Expected validation error summary to appear, but page navigated / nothing happened').toBe('error');
+
+        await expect(loc.errorSummary()).toContainText(/Enter a town, city or postcode to use the distance filter/i);
+        await expect(loc.fieldError('Enter a town, city or postcode to use the distance filter')).toBeVisible();
+        await expect(page).toHaveURL(/\/location/i);
+    });
+
+    test('AC4: if location entered but no distance, show distance error', async ({ page }) => {
+        const loc = new LocationPage(page);
+
+        await loc.enterLocationAndSelectFirst('Leeds');
+        await loc.expectLocationCommitted();
+
+        const outcome = await loc.clickContinueAndWaitForErrorOrNext(20_000);
+        expect(outcome, 'Expected validation error summary to appear, but page navigated / nothing happened').toBe('error');
+
+        await expect(loc.errorSummary()).toContainText(/Select how far you would be able to travel/i);
+        await expect(loc.fieldError('Select how far you would be able to travel')).toBeVisible();
         await expect(page).toHaveURL(/\/location/i);
     });
 
@@ -174,7 +182,11 @@ test.describe('FEAT – 2.0 Location', () => {
         await page.goBack();
 
         await expect(loc.locationInput()).not.toHaveValue('');
-        await expect(loc.distanceRadio('Up to 15 miles')).toBeChecked();
+        await expect(
+            page
+                .getByRole('group', { name: /How far are you able to travel/i })
+                .getByRole('radio', { name: /^Up to 15 miles$/i })
+        ).toBeChecked();
     });
 
     test('AC9: Over 30 miles selected -> proceeds (navigation-level check)', async ({ page }) => {
@@ -187,3 +199,4 @@ test.describe('FEAT – 2.0 Location', () => {
         await expect(page).toHaveURL(/\/interests$/i);
     });
 });
+

@@ -5,13 +5,14 @@ import * as path from 'path';
 dotenv.config();
 
 export default defineConfig({
+    globalSetup: require.resolve('./global-setup'),
     testDir: './src',
     testMatch: '**/*.spec.ts',
     timeout: 30_000,
     expect: { timeout: 10_000 },
-    fullyParallel: true,
+    fullyParallel: false,
     retries: 1,
-    workers: 4,
+    workers: 2,
     reporter: [['list'], ['html', { open: 'never' }]],
     use: {
         trace: 'on-first-retry',
@@ -79,7 +80,7 @@ export default defineConfig({
             testDir: './src/api/tests',   // API test files live here
             use: {
                 // No browser needed
-                baseURL: process.env.FEAT_API_BASE_URL || 'https://s265d01-app-api.azurewebsites.net',
+                baseURL: process.env.FEAT_API_BASE_URL || 'https://s265t02-app-api.azurewebsites.net',
                 extraHTTPHeaders: {
                     'Content-Type': 'application/json',
                     Accept: '*/*',

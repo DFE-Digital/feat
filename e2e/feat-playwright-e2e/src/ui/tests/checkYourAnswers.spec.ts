@@ -19,6 +19,21 @@ function escapeRegex(str: string) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function normaliseLocation(s: string) {
+    return s.replace(/\s+/g, ' ').trim().replace(/\s*\(.*?\)\s*/g, '').trim();
+}
+
+async function startFreshJourney(page: Page) {
+    await page.context().clearCookies();
+
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    await page.evaluate(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+    });
+}
+
 //helper class
 async function goToCheckYourAnswers(
     page: Page,
@@ -34,6 +49,8 @@ async function goToCheckYourAnswers(
     const distanceLabel = opts?.distanceLabel ?? 'Up to 10 miles';
     const qualificationSelections = opts?.qualificationSelections ?? ['level3'];
 
+    await startFreshJourney(page);
+
     // Start
     const index = new IndexPage(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -46,9 +63,8 @@ async function goToCheckYourAnswers(
     // IMPORTANT: capture what the autocomplete actually selected
     const selectedLocation = await loc.enterLocationAndSelectFirst(locationType);
 
-    const distance = loc.distanceRadio(distanceLabel);
-    await distance.check({ force: true });
-    await expect(distance).toBeChecked();
+    await loc.selectDistance(distanceLabel);
+    await expect(loc.distanceRadio(distanceLabel)).toBeChecked();
 
     await loc.continueButton().click();
     await expect(page).toHaveURL(/\/interests$/i);
@@ -140,7 +156,6 @@ test.describe('FEAT – Check your answers page', () => {
         await expect(cya.summaryRowByLabel('Interests')).toBeVisible();
     });
 
-
     test('AC3: Age row is NOT shown when Age step is skipped by journey rules', async ({ page }) => {
         const result = await goToCheckYourAnswers(page, {
             interests: { i1: 'Art' },
@@ -169,6 +184,10 @@ test.describe('FEAT – Check your answers page', () => {
         await page.getByRole('button', { name: /^continue$/i }).click();
 
         await expect(page).toHaveURL(/check-your-answers|checkanswers/i);
-        await expect(cya.summaryValue('Location')).toContainText(result.selectedLocation);
+
+        const expected = normaliseLocation(result.selectedLocation);
+        const actual = normaliseLocation(await cya.summaryValue('Location').innerText());
+
+        expect(actual).toContain(expected);
     });
 });

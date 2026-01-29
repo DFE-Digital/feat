@@ -116,7 +116,13 @@ export class SearchResultsPage {
         return count > 0;
     }
 
-    async isPaginationVisible(): Promise<boolean> {
+    async isPaginationVisible(timeoutMs: number = 10_000): Promise<boolean> {
+        await Promise.race([
+            this.courseCards().first().waitFor({ state: 'visible', timeout: timeoutMs }).catch(() => {}),
+            this.page.getByText(/no results/i).first().waitFor({ state: 'visible', timeout: timeoutMs }).catch(() => {}),
+            this.page.waitForTimeout(500),
+        ]);
+
         return await this.pagination().isVisible().catch(() => false);
     }
 }

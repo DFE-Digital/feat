@@ -1,14 +1,20 @@
 import { apiConfig } from '../config/apiConfig';
 
 export interface SearchRequestBody {
-    query: string;
+    query: string[];
     sessionId: string | null;
     page: number;
     pageSize: number;
     location: string | null;
     radius: number;
-    includeOnlineCourses: boolean;
+    includeOnlineCourses?: boolean;
     orderBy: string;
+    //optional
+    courseType?: string[] | null;
+    qualificationLevel?: string[] | null;
+    learningMethod?: string[] | null;
+    courseHours?: string[] | null;
+    studyTime?: string[] | null;
 }
 
 /**
@@ -23,7 +29,7 @@ export class TestDataFactory {
         const { sessionId, location, radius, includeOnlineCourses, orderBy } = apiConfig.defaults;
 
         this.requestBody = {
-            query: 'digital',
+            query: ['digital'],
             sessionId,
             page: apiConfig.pagination.defaultPage,
             pageSize: apiConfig.pagination.defaultPageSize,
@@ -35,7 +41,7 @@ export class TestDataFactory {
     }
 
     withQuery(query: string): this {
-        this.requestBody.query = query;
+        this.requestBody.query = [query];
         return this;
     }
 

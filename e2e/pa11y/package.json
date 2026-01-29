@@ -1,0 +1,11 @@
+{
+  "name": "feat-accessibility",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "pa11y-ci": "pa11y-ci --config pa11y.json"
+  },
+  "devDependencies": {
+    "pa11y-ci": "^7.0.0"
+  }
+}

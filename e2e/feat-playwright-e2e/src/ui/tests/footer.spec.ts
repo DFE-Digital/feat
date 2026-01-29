@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import { Footer } from '../pages/Footer';
+import { Footer } from '../pages/footer';
 
 test.describe('Footer', () => {
     test('renders expected links and destinations', async ({ page }) => {

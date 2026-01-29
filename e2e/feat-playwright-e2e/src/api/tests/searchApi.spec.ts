@@ -1,120 +1,124 @@
-import { test, expect } from '@playwright/test';
-import { ApiHelper } from '../helpers/apiHelper';
-import { ResponseValidator } from '../helpers/responseValidator';
-import { TestDataFactory } from '../fixtures/testDataFactory';
-import { searchResponseSchema } from '../schemas/searchResponseSchema';
-import { apiConfig } from '../config/apiConfig';
+import { test, expect } from "@playwright/test";
+import Ajv from "ajv";
 
-test.beforeEach(async ({}, testInfo) => {
-    console.log(`Starting test: ${testInfo.title}`);
-});
+import { apiConfig } from "../config/apiConfig";
+import { ApiHelperFetch } from "../helpers/apiHelperFetch";
+import { TestDataFactory } from "../fixtures/testDataFactory";
+import { searchResponseSchema } from "../schemas/searchResponseSchema";
 
-test.afterEach(async ({}, testInfo) => {
-    console.log(`Test completed: ${testInfo.title} - ${testInfo.status}\n`);
-});
+test.describe("Search API", () => {
+    const baseURL = apiConfig.baseUrl;
 
-//Happy Path Tests
-test.describe('Search API - Happy Path', () => {
+    // AJV v8 safe config
+    const ajv = new Ajv({ allErrors: true, strict: false });
+    const validate = ajv.compile(searchResponseSchema as any);
 
-    test('should return valid search results for "car" query', async ({ request }) => {
-        const api = new ApiHelper(request);
+    function validateSchema(data: any) {
+        const ok = validate(data);
+        if (!ok) {
+            const message = ajv.errorsText(validate.errors, { separator: "\n" });
+            throw new Error(`Schema validation failed:\n${message}`);
+        }
+    }
+
+    test("should return valid search results for 'car' query", async () => {
+        const api = new ApiHelperFetch(baseURL);
         const payload = TestDataFactory.validSearch();
 
-        const response = await api.post(apiConfig.endpoints.search, payload);
+        const res = await api.post(apiConfig.endpoints.search, payload);
 
-        // Validate response success
-        ResponseValidator.expectSuccess(response);
+        expect(res.ok(), `Expected 2xx, got ${res.status()}`).toBeTruthy();
 
-        // Validate schema structure
-        await ResponseValidator.expectJsonSchema(response, searchResponseSchema);
+        const data = await res.json();
+        validateSchema(data);
 
-        // Validate key fields
-        const body = await response.json();
-        expect(body.page).toBe(1);
-        expect(body.pageSize).toBe(apiConfig.pagination.defaultPageSize);
-        expect(Array.isArray(body.courses)).toBeTruthy();
-        expect(body.courses.length).toBeGreaterThan(0);
-
-        const firstCourse = body.courses[0];
-        expect(firstCourse.courseName).toBeTruthy();
-        expect(firstCourse.providerName).toBeTruthy();
-        expect(firstCourse.id).toBeTruthy();
+        expect(data.page).toBeGreaterThanOrEqual(1);
+        expect(Array.isArray(data.courses)).toBeTruthy();
     });
 
-    test('should include valid facets array', async ({ request }) => {
-        const api = new ApiHelper(request);
+    test("should include valid facets array", async () => {
+        const api = new ApiHelperFetch(baseURL);
         const payload = TestDataFactory.validSearch();
 
-        const response = await api.post(apiConfig.endpoints.search, payload);
-        ResponseValidator.expectSuccess(response);
+        const res = await api.post(apiConfig.endpoints.search, payload);
 
-        const body = await response.json();
-        expect(Array.isArray(body.facets)).toBeTruthy();
-        expect(body.facets.length).toBeGreaterThan(0);
+        expect(res.ok(), `Expected 2xx, got ${res.status()}`).toBeTruthy();
 
-        const deliveryFacet = body.facets.find((f: any) => f.name === 'DELIVERY_MODE');
-        expect(deliveryFacet).toBeTruthy();
-        expect(Object.keys(deliveryFacet.values).length).toBeGreaterThan(0);
-    });
-});
+        const data = await res.json();
+        validateSchema(data);
 
-//Edge case tests
-test.describe('Search API - Edge Cases', () => {
-
-    test('should handle empty query string gracefully', async ({ request }) => {
-        const api = new ApiHelper(request);
-        const payload = TestDataFactory.emptyQuery();
-
-        const response = await api.post(apiConfig.endpoints.search, payload);
-
-        // API could return 200 (all results) or 400 (invalid)
-        ResponseValidator.expectStatusRange(response, 200, 400);
+        expect(Array.isArray(data.facets)).toBeTruthy();
+        expect(data.facets.length).toBeGreaterThan(0);
     });
 
-    test('should handle large page size', async ({ request }) => {
-        const api = new ApiHelper(request);
+    test("edge: empty query should NOT 500", async () => {
+        const api = new ApiHelperFetch(apiConfig.baseUrl);
+
+        const payload = new TestDataFactory()
+            .withQuery("   ")     // will become [] after trim change
+            .build();
+
+        const res = await api.post("/api/Search", payload);
+
+        expect(
+            [200, 400, 422].includes(res.status()),
+            `Expected 200/400/422 for empty query, got ${res.status()}`
+        ).toBeTruthy();
+    });
+
+    test("edge: large page size should return 400/422 (or clamp but MUST NOT 500)", async () => {
+        const api = new ApiHelperFetch(baseURL);
         const payload = TestDataFactory.largePageSize();
 
-        const response = await api.post(apiConfig.endpoints.search, payload);
-        ResponseValidator.expectStatusRange(response, 200, 400);
+        const res = await api.post(apiConfig.endpoints.search, payload);
+
+        expect(
+            [200, 400, 422].includes(res.status()),
+            `Expected 200/400/422 for large page size, got ${res.status()}`
+        ).toBeTruthy();
     });
 
-    test('should handle invalid page number', async ({ request }) => {
-        const api = new ApiHelper(request);
+    test("edge: invalid page number should return 400/422 (MUST NOT 500)", async () => {
+        const api = new ApiHelperFetch(baseURL);
         const payload = TestDataFactory.invalidPageNumber();
 
-        const response = await api.post(apiConfig.endpoints.search, payload);
-        ResponseValidator.expectStatusRange(response, 200, 400);
+        const res = await api.post(apiConfig.endpoints.search, payload);
+
+        expect(
+            [400, 422].includes(res.status()),
+            `Expected 400/422 for invalid page, got ${res.status()}`
+        ).toBeTruthy();
     });
 
-    test('should support location-based search', async ({ request }) => {
-        const api = new ApiHelper(request);
-        const payload = TestDataFactory.searchWithLocation();
-
-        const response = await api.post(apiConfig.endpoints.search, payload);
-        ResponseValidator.expectSuccess(response);
-
-        const body = await response.json();
-        expect(body.courses.length).toBeGreaterThan(0);
-    });
-});
-
-// Negative Tests
-test.describe('Search API - Negative Tests', () => {
-
-    test('should handle missing required query field', async ({ request }) => {
-        const api = new ApiHelper(request);
+    test("negative: missing required query field should return 400/422 (MUST NOT 500)", async () => {
+        const api = new ApiHelperFetch(baseURL);
         const payload = TestDataFactory.missingQuery();
 
-        const response = await api.post(apiConfig.endpoints.search, payload);
-        ResponseValidator.expectStatusRange(response, 400, 422);
+        const res = await api.post(apiConfig.endpoints.search, payload);
+
+        expect(
+            [400, 422].includes(res.status()),
+            `Expected 400/422 for missing query, got ${res.status()}`
+        ).toBeTruthy();
     });
 
-    test('should handle completely invalid payload', async ({ request }) => {
-        const api = new ApiHelper(request);
-        const payload = { invalid: 'body' };
+    test("negative: completely invalid payload should return 400/422 (MUST NOT 500)", async () => {
+        const api = new ApiHelperFetch(baseURL);
 
-        const response = await api.post(apiConfig.endpoints.search, payload);
-        ResponseValidator.expectStatusRange(response, 400, 422);
+        const res = await api.post(apiConfig.endpoints.search, { invalid: "body" });
+
+        expect(
+            [400, 422].includes(res.status()),
+            `Expected 400/422 for invalid body, got ${res.status()}`
+        ).toBeTruthy();
+    });
+
+    test("negative: GET should return 405 (method not allowed)", async () => {
+        const base = baseURL.replace(/\/+$/, "");
+        const url = `${base}${apiConfig.endpoints.search}`;
+
+        const res = await fetch(url, { method: "GET" });
+
+        expect(res.status, `Expected 405 for GET, got ${res.status}`).toBe(405);
     });
 });

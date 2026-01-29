@@ -4,7 +4,20 @@ import { LocationPage } from '../pages/locationPage';
 import { InterestsPage } from '../pages/interestsPage';
 import { QualificationLevelPage } from '../pages/qualificationLevelPage';
 
+async function startFreshJourney(page: Page) {
+    await page.context().clearCookies();
+
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    await page.evaluate(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+    });
+}
+
 async function goToQualificationLevel(page: Page) {
+    await startFreshJourney(page);
+
     const index = new IndexPage(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await index.startNow().click();
@@ -16,9 +29,8 @@ async function goToQualificationLevel(page: Page) {
     await loc.enterLocationAndSelectFirst('Leeds');
 
     // choose a distance that takes you to Interests (adjust if your journey differs)
-    const tenMiles = loc.distanceRadio('Up to 10 miles');
-    await tenMiles.check({ force: true });
-    await expect(tenMiles).toBeChecked();
+    await loc.selectDistance('Up to 10 miles');
+    await expect(loc.distanceRadio('Up to 10 miles')).toBeChecked();
 
     await loc.continueButton().click();
     await expect(page).toHaveURL(/\/interests$/i);
@@ -155,3 +167,4 @@ test.describe('FEAT – Qualification level page', () => {
         await expect(qual.level3Checkbox()).toBeChecked();
     });
 });
+

@@ -6,9 +6,9 @@ export const courseData = {
     },
 
     test: {
-        ncs: null,
-        degree: null,
-        apprenticeship: null,
+        ncs: 'bda91723-b65d-401b-ba0a-08de252620ac',
+        degree: '64fd8867-90d0-42b3-3f71-08de31046717',
+        apprenticeship: '7e197c1a-3cc6-406d-a8f3-08de2796b116',
     },
 
     beta: {
