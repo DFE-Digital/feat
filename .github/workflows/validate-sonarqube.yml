@@ -46,7 +46,7 @@ jobs:
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
       - name: Restore dependencies
-        run: dotnet restore ./src
+        run: dotnet restore .
 
       - name: Start sonar scanner
         env:
