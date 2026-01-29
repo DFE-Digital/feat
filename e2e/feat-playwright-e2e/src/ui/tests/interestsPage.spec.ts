@@ -3,8 +3,21 @@ import { IndexPage } from '../pages/indexPage';
 import { LocationPage } from '../pages/locationPage';
 import { InterestsPage } from '../pages/interestsPage';
 
+async function startFreshJourney(page: Page) {
+    await page.context().clearCookies();
+
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    await page.evaluate(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+    });
+}
+
 // Helper flows to reach Interests in the two states
 async function goToInterestsOptional(page: Page) {
+    await startFreshJourney(page);
+
     const index = new IndexPage(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await index.startNow().click();
@@ -13,16 +26,17 @@ async function goToInterestsOptional(page: Page) {
     await expect(page).toHaveURL(/\/location/i);
 
     await loc.enterLocationAndSelectFirst('Leeds');
-    
-    const tenMiles = loc.distanceRadio('Up to 10 miles');
-    await tenMiles.check({ force: true });
-    await expect(tenMiles).toBeChecked();
+
+    await loc.selectDistance('Up to 10 miles');
+    await expect(loc.distanceRadio('Up to 10 miles')).toBeChecked();
 
     await loc.continueButton().click();
     await expect(page).toHaveURL(/\/interests$/i);
 }
 
 async function goToInterestsMandatory(page: Page) {
+    await startFreshJourney(page);
+
     const index = new IndexPage(page);
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await index.startNow().click();
@@ -34,10 +48,9 @@ async function goToInterestsMandatory(page: Page) {
     // No location or > 30 miles => mandatory
     await loc.enterLocationAndSelectFirst('Leeds');
 
-    const over30 = loc.distanceRadio('Over 30 miles');
-    await over30.check({ force: true });
-    await expect(over30).toBeChecked();
-    
+    await loc.selectDistance('Over 30 miles');
+    await expect(loc.distanceRadio('Over 30 miles')).toBeChecked();
+
     await loc.continueButton().click();
     await expect(page).toHaveURL(/\/interests$/i);
 }

@@ -1,25 +1,30 @@
-export const apiConfig = {
-    // Endpoint paths only (baseURL comes from Playwright config)
-    endpoints: {
-        search: '/api/Search',
-        coursesBase: '/api/Courses', // base path for by-id calls
-        courseById: (id: string) => `/api/Courses/${encodeURIComponent(id)}`,
-    },
+function requireEnv(name: string): string {
+    const v = process.env[name];
+    if (!v) throw new Error(`Missing required env var: ${name}`);
+    return v;
+}
 
-    // Logical defaults for API payloads
+const apiBaseUrl = requireEnv("FEAT_API_BASE_URL").replace(/\/+$/, "");
+
+export const apiConfig = {
+    baseUrl: apiBaseUrl,
+    endpoints: {
+        search: "/api/Search",
+        autocompleteLocations: "/api/AutocompleteLocations",
+
+        coursesBase: '/api/Courses',
+        courseById: (instanceId: string) => `/api/Courses/${encodeURIComponent(instanceId)}`,
+    },
     pagination: {
         defaultPage: 1,
         defaultPageSize: 10,
-        minPageSize: 1,
         maxPageSize: 100,
     },
-
-    // Shared default body parameters
     defaults: {
-        sessionId: null,
-        location: null,
+        sessionId: null as string | null,
+        location: null as string | null,
         radius: 1,
         includeOnlineCourses: true,
-        orderBy: 'Relevance',
+        orderBy: "Relevance" as "Relevance" | "Distance" | "Date",
     },
 };

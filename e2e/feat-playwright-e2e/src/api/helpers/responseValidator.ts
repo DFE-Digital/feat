@@ -1,54 +1,37 @@
-import { APIResponse, expect } from '@playwright/test';
-import Ajv, { ValidateFunction } from 'ajv';
+import { expect } from "@playwright/test";
+import Ajv from "ajv";
 
-// AJV: JSON Schema validator
-const ajv = new Ajv({ allErrors: true, verbose: true });
+type AnyResponseLike = {
+    ok(): boolean;
+    status(): number;
+    json?: () => Promise<any>;
+};
 
-//ResponseValidator:Provides simple, reusable validation methods for API responses (status codes + JSON schema).
- 
 export class ResponseValidator {
-
-    //Validate that response has expected exact status 
-    static expectStatus(response: APIResponse, expectedStatus: number, message?: string) {
-        const actualStatus = response.status();
-        expect(
-            actualStatus,
-            message || `Expected status ${expectedStatus}, got ${actualStatus}`
-        ).toBe(expectedStatus);
-    }
-
-    //Validate that status is within an acceptable range 
-    static expectStatusRange(response: APIResponse, min: number, max: number) {
-        const status = response.status();
-        expect(
-            status,
-            `Expected status between ${min}-${max}, got ${status}`
-        ).toBeGreaterThanOrEqual(min);
-        expect(
-            status,
-            `Expected status between ${min}-${max}, got ${status}`
-        ).toBeLessThanOrEqual(max);
-    }
-
-    //Validate that response indicates success (2xx) 
-    static expectSuccess(response: APIResponse) {
+    static expectSuccess(response: { ok(): boolean; status(): number }) {
         expect(
             response.ok(),
             `Expected successful response (2xx), got ${response.status()}`
         ).toBeTruthy();
     }
 
-    //Validate that response matches the provided JSON schema 
-    static async expectJsonSchema(response: APIResponse, schema: object) {
-        const body = await response.json();
-        const validate: ValidateFunction = ajv.compile(schema);
-        const isValid = validate(body);
+    //Accepts either-already-parsed JSON (object)  or a Playwright APIResponse-like object that has .json()
+     
+    static async expectJsonSchema(dataOrResponse: any, schema: object) {
+        const data =
+            dataOrResponse &&
+            typeof dataOrResponse === "object" &&
+            typeof dataOrResponse.json === "function"
+                ? await dataOrResponse.json()
+                : dataOrResponse;
 
-        if (!isValid) {
-            console.error('Schema validation errors:', JSON.stringify(validate.errors, null, 2));
-            console.error('Response body:', JSON.stringify(body, null, 2));
-        }
+        const ajv = new Ajv({ allErrors: true, strict: false });
+        const validate = ajv.compile(schema);
+        const valid = validate(data);
 
-        expect(isValid, `Schema validation failed: ${JSON.stringify(validate.errors)}`).toBeTruthy();
+        expect(
+            valid,
+            `Schema validation failed: ${JSON.stringify(validate.errors, null, 2)}`
+        ).toBeTruthy();
     }
 }

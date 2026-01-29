@@ -46,12 +46,12 @@ test.describe('GET /api/Courses/{instanceId}', () => {
         );
 
         // Assert successful response (2xx)
-        await ResponseValidator.expectSuccess(response);
-
-        // Contract-level validation against agreed schema
-        await ResponseValidator.expectJsonSchema(response, courseByIdSchema);
+        ResponseValidator.expectSuccess(response);
 
         const body = await response.json();
+
+        // Contract-level validation against agreed schema
+        await ResponseValidator.expectJsonSchema(body, courseByIdSchema);
 
         // Basic structure check
         expect(body && typeof body === 'object').toBe(true);
@@ -106,8 +106,8 @@ test.describe('GET /api/Courses/{instanceId}', () => {
         const contentType = response.headers()['content-type']?.toLowerCase() || '';
         expect(contentType).toMatch(/application\/json|text\/plain/);
     });
-    
-     //Valid UUID that does not exist- API may return 404 and Some environments may return a safe 200 with an empty object
+
+    //Valid UUID that does not exist- API may return 404 and Some environments may return a safe 200 with an empty object
     test('valid but unknown UUID returns 404 OR safe 200', async ({ request }) => {
         const api = new ApiHelper(request);
         const unknownId = randomUUIDv4();
@@ -118,13 +118,13 @@ test.describe('GET /api/Courses/{instanceId}', () => {
 
         const status = response.status();
         expect([200, 404]).toContain(status);
-        
+
         if (status === 200) {
             expect(typeof (await response.json())).toBe('object');
         }
     });
-    
-     //Invalid UUID formats should not be accepted
+
+    //Invalid UUID formats should not be accepted
     test('invalid UUID returns 400 or 404', async ({ request }) => {
         const api = new ApiHelper(request);
         const invalidIds = [
