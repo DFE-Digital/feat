@@ -18,6 +18,24 @@
           <p class="govuk-notification-banner__heading">You’ve saved your cookie settings.</p>
         </div>
       </div>
+      <script asp-add-nonce>
+        async function setCookieConsent() {
+          const marketingCookie = await cookieStore.get("AnalyticsCookie");
+          if (marketingCookie && marketingCookie.value && marketingCookie.value.toLocaleLowerCase() === "yes") {
+            gtag('consent', 'update', {
+              'analytics_storage': 'granted'
+            });
+            window.clarity('consent', true);
+          } else {
+            gtag('consent', 'update', {
+              'analytics_storage': 'denied'
+            });
+            window.clarity('consent', false);
+          }
+        }
+        
+        setCookieConsent();
+      </script>
     }
     
     <h1 class="govuk-heading-l">@ViewBag.PageTitle</h1>
@@ -242,7 +260,7 @@
       </div>
       
       <div class="govuk-button-group">
-        <govuk-button type="submit" >Save cookie settings</govuk-button>
+        <govuk-button type="submit">Save cookie settings</govuk-button>
       </div>
     </form>
 
