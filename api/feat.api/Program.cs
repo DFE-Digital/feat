@@ -163,4 +163,4 @@ app.MapScalarApiReference();
 app.MapControllers();
 app.UseHttpsRedirection();
 
-app.Run();
+await app.RunAsync();
