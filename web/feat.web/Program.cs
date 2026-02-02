@@ -102,7 +102,7 @@ var policyCollection = new HeaderPolicyCollection()
         csp.AddStyleSrc()
             .Self()
             .WithNonce()
-            .From("https://googletagmanager.com")
+            .From("https://*.googletagmanager.com")
             .From("https://tagmanager.google.com")
             .From("https://fonts.googleapis.com")
             .From("https://rsms.me");
@@ -111,8 +111,7 @@ var policyCollection = new HeaderPolicyCollection()
             .Data()
             .From("https://*.googletagmanager.com")
             .From("https://*.google-analytics.com")
-            .From("https://ssl.gstatic.com")
-            .From("https://www.gstatic.com");
+            .From("https://*.gstatic.com");
         csp.AddConnectSrc()
             .Self()
             .From("https://www.google.com")
@@ -126,7 +125,7 @@ var policyCollection = new HeaderPolicyCollection()
             .Data()
             .From("https://res-1.cdn.office.net")
             .From("https://fonts.googleapis.com")
-            .From("https://fonts.gstatic.com")
+            .From("https://*.gstatic.com")
             .From("https://rsms.me");
         
     });
