@@ -9,9 +9,9 @@ namespace feat.ingestion.Data;
 
 public class IngestionDbContext(DbContextOptions<IngestionDbContext> options) : DbContext(options)
 {
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        options.UseSqlServer(b => b.MigrationsAssembly("feat.ingestion"));
+        optionsBuilder.UseSqlServer(b => b.MigrationsAssembly("feat.ingestion"));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
