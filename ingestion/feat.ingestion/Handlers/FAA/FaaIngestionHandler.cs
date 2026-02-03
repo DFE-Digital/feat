@@ -666,6 +666,7 @@ public class FaaIngestionHandler(
             }
             
             var entries = dbContext.Entries
+                .Include(entry => entry.Vacancies)
                 .Include(entry => entry.EntrySectors)
                 .ThenInclude(entrySector => entrySector.Sector)
                 .Include(entry => entry.EntryInstances)
@@ -718,7 +719,9 @@ public class FaaIngestionHandler(
                 
                 foreach (var instance in entry.EntryInstances)
                 {
+                    var vacancy = entry.Vacancies.FirstOrDefault();
                     var location = instance.Location ?? entry.Provider.ProviderLocations.FirstOrDefault()?.Location;
+                    
                     var searchEntry = new AiSearchEntry
                     {
                         Id = entry.Id.ToString(),
@@ -734,7 +737,8 @@ public class FaaIngestionHandler(
                         CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
                         StudyTime = entry.StudyTime?.ToString() ?? string.Empty,
                         Location = location?.GeoLocation.ToGeographyPoint(),
-                        CourseType = entry.CourseType?.ToString() ?? string.Empty
+                        CourseType = entry.CourseType?.ToString() ?? string.Empty,
+                        IsNational = vacancy?.NationalVacancy
                     };
 
                     if (options.IndexDirectly)

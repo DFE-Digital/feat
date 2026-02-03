@@ -98,11 +98,6 @@ public class SearchService(
             course.Score = result.RerankerScore;
             course.CalculateDistance(userLocation);
         }
-        
-        // Remove any apprenticeships without locations from the results unless they are national
-        // TODO: Sort these out by adding the national flag to the search index and filtering there
-        //       this can be done at the same time as ingesting extra info from FAA
-        RemoveApprenticeshipsWithoutLocations(courses);
 
         RemoveDuplicateCourses(courses);
         
@@ -227,27 +222,25 @@ public class SearchService(
         AddFacet(nameof(SearchIndexFields.LearningMethod), request.LearningMethod);
         AddFacet(nameof(SearchIndexFields.CourseHours), request.CourseHours);
         AddFacet(nameof(SearchIndexFields.StudyTime), request.StudyTime);
-        
+
         if (userLocation != null)
         {
             var radius = RadiusInKilometers(request.Radius);
-            
+
             filters.Add(
                 $"""
-                    (
-                        geo.distance(Location, geography'POINT({userLocation.Longitude} {userLocation.Latitude})') le {radius}
-                        or (
-                            Location eq null and
-                            (
-                                LearningMethod eq 'Online' or
-                                CourseType eq 'Apprenticeship'
-                            )
-                        )
-                    )
+                 (
+                     geo.distance(
+                         Location,
+                         geography'POINT({userLocation.Longitude} {userLocation.Latitude})'
+                     ) le {radius}
+                     or LearningMethod eq 'Online'
+                     or IsNational eq true
+                 )
                  """
             );
         }
-        
+
         return filters.Count != 0
             ? string.Join(" and ", filters)
             : null;
@@ -259,7 +252,7 @@ public class SearchService(
             {
                 return;
             }
-            
+
             var ors = valueList.Select(v => $"{field} eq '{v.Replace("'", "''")}'");
             filters.Add("(" + string.Join(" or ", ors) + ")");
         }
@@ -272,12 +265,6 @@ public class SearchService(
         return courses
             .OrderBy(c => searchResults.FindIndex(sr => sr.InstanceId == c.InstanceId))
             .ToList();
-    }
-    
-    private static void RemoveApprenticeshipsWithoutLocations(List<Course> courses)
-    {
-        courses.RemoveAll(c =>
-            c is { CourseType: CourseType.Apprenticeship, Location: null } && !c.IsNational.GetValueOrDefault(false));
     }
 
     private static void RemoveDuplicateCourses(List<Course> courses)
@@ -344,17 +331,17 @@ public class SearchService(
             },
             SearchFields =
             {
-                nameof(SearchIndexFields.Title), 
+                nameof(SearchIndexFields.Title),
                 nameof(SearchIndexFields.Description),
                 nameof(SearchIndexFields.LearningAimTitle),
                 nameof(SearchIndexFields.Sector)
             },
             Facets =
             {
-                nameof(SearchIndexFields.CourseType), 
-                nameof(SearchIndexFields.QualificationLevel), 
-                nameof(SearchIndexFields.LearningMethod), 
-                nameof(SearchIndexFields.CourseHours), 
+                nameof(SearchIndexFields.CourseType),
+                nameof(SearchIndexFields.QualificationLevel),
+                nameof(SearchIndexFields.LearningMethod),
+                nameof(SearchIndexFields.CourseHours),
                 nameof(SearchIndexFields.StudyTime)
             },
             QueryType = 
@@ -362,6 +349,7 @@ public class SearchService(
         };
 
         var embeddings = new Dictionary<string, ReadOnlyMemory<float>>();
+        
         foreach (var query in request.Query)
         {
             var embedding = cache.GetOrSet(
