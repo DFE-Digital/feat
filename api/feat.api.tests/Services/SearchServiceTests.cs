@@ -257,7 +257,7 @@ public class SearchServiceTests
                 "(CourseType eq 'Apprenticeship') and " +
                 "(StudyTime eq 'FullTime') and " +
                 "(geo.distance(Location, geography'POINT(-1 51)') le 16.0934 " +
-                "or LearningMethod eq 'Online' " +
+                "or (LearningMethod eq 'Online' and Location eq null) " +
                 "or IsNational eq true)"
             )
         );

@@ -13,8 +13,8 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    [Migration("20260203123729_update_apprenticeships_staging_description_length")]
-    partial class update_apprenticeships_staging_description_length
+    [Migration("20260206120541_update_apprenticeships_remove_desc_length")]
+    partial class update_apprenticeships_remove_desc_length
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -961,8 +961,7 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double?>("Distance")
                         .HasColumnType("float");

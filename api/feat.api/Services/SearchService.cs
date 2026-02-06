@@ -234,7 +234,7 @@ public class SearchService(
                          Location,
                          geography'POINT({userLocation.Longitude} {userLocation.Latitude})'
                      ) le {radius}
-                     or LearningMethod eq 'Online'
+                     or (LearningMethod eq 'Online' and Location eq null)
                      or IsNational eq true
                  )
                  """

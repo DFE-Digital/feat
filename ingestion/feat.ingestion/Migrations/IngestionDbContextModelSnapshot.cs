@@ -958,8 +958,7 @@ namespace feat.ingestion.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double?>("Distance")
                         .HasColumnType("float");

@@ -15,7 +15,6 @@ public class Apprenticeship
     [StringLength(100)]
     public string? Title { get; set; }
     
-    [StringLength(2000)]
     public string? Description { get; set; }
     
     public long NumberOfPositions { get; set; }
