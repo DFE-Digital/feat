@@ -919,7 +919,8 @@ public class DiscoverUniIngestionHandler(
                         CourseHours = entry.AttendancePattern?.ToString() ?? string.Empty,
                         StudyTime = entry.StudyTime?.ToString() ?? string.Empty,
                         Location = location?.GeoLocation.ToGeographyPoint(),
-                        CourseType = entry.CourseType?.ToString() ?? string.Empty
+                        CourseType = entry.CourseType?.ToString() ?? string.Empty,
+                        IsNational = null
                     };
 
                     if (options.IndexDirectly)

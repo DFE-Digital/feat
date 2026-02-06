@@ -177,6 +177,7 @@ public class SearchIndexHandler(
                 oldEntry.QualificationLevel =  aiSearchEntry.QualificationLevel;
                 oldEntry.Source =  aiSearchEntry.Source;
                 oldEntry.StudyTime = aiSearchEntry.StudyTime;
+                oldEntry.IsNational = aiSearchEntry.IsNational;
                 
                 updatedEntries.Add(oldEntry);
             }

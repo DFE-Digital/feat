@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Azure.Search.Documents;
 using feat.api.Data;
 using feat.api.Models;
@@ -252,7 +253,13 @@ public class SearchServiceTests
 
         Assert.That(
             normalized,
-            Is.EqualTo("(CourseType eq 'Apprenticeship') and (StudyTime eq 'FullTime') and ( geo.distance(Location, geography'POINT(-1 51)') le 16.0934 or ( Location eq null and ( LearningMethod eq 'Online' or CourseType eq 'Apprenticeship' ) ) )")
+            Is.EqualTo(
+                "(CourseType eq 'Apprenticeship') and " +
+                "(StudyTime eq 'FullTime') and " +
+                "(geo.distance(Location, geography'POINT(-1 51)') le 16.0934 " +
+                "or (LearningMethod eq 'Online' and Location eq null) " +
+                "or IsNational eq true)"
+            )
         );
     }
     
@@ -262,6 +269,8 @@ public class SearchServiceTests
         _dbContext.Dispose();
     }
     
-    private static string Normalize(string filter) =>
-        string.Join(" ", filter.ReplaceLineEndings(" ").Split(' ', StringSplitOptions.RemoveEmptyEntries));
+    private static string Normalize(string filter) => Regex
+            .Replace(filter.ReplaceLineEndings(" ").Trim(), @"\s+", " ")
+            .Replace("( ", "(")
+            .Replace(" )", ")");
 }

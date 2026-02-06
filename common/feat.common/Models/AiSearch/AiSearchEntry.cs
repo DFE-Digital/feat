@@ -92,4 +92,7 @@ public class AiSearchEntry
         get => Location.ToPoint();
         set => Location = value.ToGeographyPoint();
     }
+    
+    [SimpleField(IsFacetable = true, IsFilterable = true)]
+    public required bool? IsNational { get; set; }
 }
