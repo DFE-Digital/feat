@@ -14,10 +14,30 @@
         ViewBag.Title = ViewBag.PageTitle + " - " + ViewBag.Title;
     }
     var analyticsOptions = AnalyticsOptions.Value;
+    var hasAnalyticsCookie = Context.Request.Cookies[SharedStrings.AnalyticsCookie];
+    var hasMarketingCookie = Context.Request.Cookies[SharedStrings.MarketingCookie];
+    var hasCookieConsent = !string.IsNullOrEmpty(hasAnalyticsCookie) || !string.IsNullOrEmpty(hasMarketingCookie);
+    var showBanner = !hasCookieConsent;
+    var acceptedAnalytics = hasAnalyticsCookie != null && hasAnalyticsCookie.Equals("yes", StringComparison.InvariantCultureIgnoreCase);
+    ViewBag.ShowCookieBanner = showBanner;
 }
 @* ReSharper disable Razor.SectionNotResolved *@
 @section Head {
     <meta name="nonce" content="@Context.GetNonce()" />
+    <script asp-add-nonce="true">
+        // Define dataLayer and the gtag function.
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+
+        // Set default consent to 'denied' as a placeholder
+        // Determine actual values based on your own requirements
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+        });
+    </script>
     
     <!-- Google Tag Manager -->
     <script asp-add-nonce>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -34,6 +54,10 @@
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "@analyticsOptions.Clarity");
+
+        (function () {
+            window.clarity('consent', @(acceptedAnalytics ? "true" : "false"));
+        }());
     </script>
     
     <link rel="stylesheet" href="~/css/application.css" />
@@ -54,14 +78,6 @@
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=@analyticsOptions.GoogleTagManager" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    
-    @{
-        var hasAnalyticsCookie = Context.Request.Cookies[SharedStrings.AnalyticsCookie];
-        var hasMarketingCookie = Context.Request.Cookies[SharedStrings.MarketingCookie];
-        var hasCookieConsent = !string.IsNullOrEmpty(hasAnalyticsCookie) || !string.IsNullOrEmpty(hasMarketingCookie);
-        var showBanner = !hasCookieConsent;
-        ViewBag.ShowCookieBanner =  showBanner;
-    }
     
     @if (ViewBag.ShowCookieBanner)
     {
@@ -240,9 +256,17 @@
                 if (this.id === "acceptAnalytics") {
                     createCookie("AnalyticsCookie", "yes");
                     createCookie("MarketingCookie", "yes");
+                    gtag('consent', 'update',  {
+                        'analytics_storage': 'granted'
+                    });
+                    window.clarity('consent', true);
                 } else {
                     createCookie("AnalyticsCookie", "no");
                     createCookie("MarketingCookie", "no");
+                    gtag('consent', 'update',  {
+                        'analytics_storage': 'denied'
+                    });
+                    window.clarity('consent', false);
                 }
             }
             function createCookie(cookiname, cookivalue) {
