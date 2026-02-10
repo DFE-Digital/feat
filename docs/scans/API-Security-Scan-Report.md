@@ -19,8 +19,6 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 
 | Level | Reason | Site | Description | Statistic |
 | --- | --- | --- | --- | --- |
-| Low | Warning |  | ZAP errors logged - see the zap.log file for details | 1    |
-| Info | Informational |  | Percentage of network failures | 1 % |
 | Info | Informational | http://s265t01-app-api.azurewebsites.net | Percentage of responses with status code 3xx | 100 % |
 | Info | Informational | http://s265t01-app-api.azurewebsites.net | Percentage of endpoints with method GET | 50 % |
 | Info | Informational | http://s265t01-app-api.azurewebsites.net | Percentage of endpoints with method POST | 50 % |
@@ -255,8 +253,8 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265t01-app-api.azurewebsites.net/2478936037683434164
-  * Node Name: `https://s265t01-app-api.azurewebsites.net/2478936037683434164`
+* URL: https://s265t01-app-api.azurewebsites.net/3818639849362130394
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/3818639849362130394`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -283,8 +281,8 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265t01-app-api.azurewebsites.net/api/1271755193394148780
-  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/1271755193394148780`
+* URL: https://s265t01-app-api.azurewebsites.net/api/7049861372141831312
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/7049861372141831312`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -325,8 +323,8 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265t01-app-api.azurewebsites.net/api/Courses/3782082232337663659
-  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Courses/3782082232337663659`
+* URL: https://s265t01-app-api.azurewebsites.net/api/Courses/8009759498840926885
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/api/Courses/8009759498840926885`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -402,15 +400,15 @@ Raised by the 'Alert on HTTP Response Code Error' script
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
-* URL: https://s265t01-app-api.azurewebsites.net/openapi/8733245847468699568
-  * Node Name: `https://s265t01-app-api.azurewebsites.net/openapi/8733245847468699568`
+* URL: https://s265t01-app-api.azurewebsites.net/openapi/6034742310008275247
+  * Node Name: `https://s265t01-app-api.azurewebsites.net/openapi/6034742310008275247`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: `404`
   * Other Info: ``
 * URL: http://s265t01-app-api.azurewebsites.net/api/Search
-  * Node Name: `http://s265t01-app-api.azurewebsites.net/api/Search ()({"query":ZAP,"sessionId":"John Doe","page":10,"pageSize":10,"location":"John Doe","radius":1.2,"orderBy":"Relevance","courseType":"John Doe","qualificationLevel":"John Doe","learningMethod":"John Doe","courseHours":"John Doe","studyTime":"John Doe"})`
+  * Node Name: `http://s265t01-app-api.azurewebsites.net/api/Search ()({query,sessionId,page,pageSize,location,radius,orderBy,courseType,qualificationLevel,learningMethod,courseHours,studyTime})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
@@ -542,7 +540,7 @@ The response contents are storable by caching components such as proxy servers, 
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
 * URL: http://s265t01-app-api.azurewebsites.net/api/Search
-  * Node Name: `http://s265t01-app-api.azurewebsites.net/api/Search ()({"query":ZAP,"sessionId":"John Doe","page":10,"pageSize":10,"location":"John Doe","radius":1.2,"orderBy":"Relevance","courseType":"John Doe","qualificationLevel":"John Doe","learningMethod":"John Doe","courseHours":"John Doe","studyTime":"John Doe"})`
+  * Node Name: `http://s265t01-app-api.azurewebsites.net/api/Search ()({query,sessionId,page,pageSize,location,radius,orderBy,courseType,qualificationLevel,learningMethod,courseHours,studyTime})`
   * Method: `POST`
   * Parameter: ``
   * Attack: ``
