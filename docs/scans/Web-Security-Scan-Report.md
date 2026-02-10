@@ -8,7 +8,7 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 | Risk Level | Number of Alerts |
 | --- | --- |
 | High | 0 |
-| Medium | 1 |
+| Medium | 2 |
 | Low | 7 |
 | Informational | 7 |
 
@@ -19,20 +19,20 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 
 | Level | Reason | Site | Description | Statistic |
 | --- | --- | --- | --- | --- |
-| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of responses with status code 2xx | 82 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of responses with status code 2xx | 81 % |
 | Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of responses with status code 3xx | 4 % |
 | Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of responses with status code 4xx | 13 % |
-| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type application/json | 4 % |
-| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type image/png | 9 % |
-| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type image/svg+xml | 9 % |
-| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type image/x-icon | 4 % |
-| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type text/css | 14 % |
-| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type text/html | 28 % |
-| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type text/javascript | 19 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type application/json | 5 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type image/png | 10 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type image/svg+xml | 10 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type image/x-icon | 5 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type text/css | 15 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type text/html | 30 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with content type text/javascript | 15 % |
 | Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with method GET | 90 % |
-| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with method POST | 9 % |
-| Info | Informational | https://s265t01-app-web.azurewebsites.net | Count of total endpoints | 21    |
-| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of slow responses | 91 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of endpoints with method POST | 10 % |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Count of total endpoints | 20    |
+| Info | Informational | https://s265t01-app-web.azurewebsites.net | Percentage of slow responses | 100 % |
 
 
 
@@ -42,6 +42,7 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 | Name | Risk Level | Number of Instances |
 | --- | --- | --- |
 | CSP: Failure to Define Directive with No Fallback | Medium | Systemic |
+| CSP: script-src unsafe-inline | Medium | Systemic |
 | Cookie No HttpOnly Flag | Low | 2 |
 | Cookie Without Secure Flag | Low | 4 |
 | Cookie without SameSite Attribute | Low | 2 |
@@ -50,7 +51,7 @@ ZAP by [Checkmarx](https://checkmarx.com/).
 | Private IP Disclosure | Low | 1 |
 | Strict-Transport-Security Header Not Set | Low | Systemic |
 | Cookie Poisoning | Informational | 2 |
-| Information Disclosure - Suspicious Comments | Informational | 2 |
+| Information Disclosure - Suspicious Comments | Informational | 1 |
 | Modern Web Application | Informational | Systemic |
 | Non-Storable Content | Informational | 1 |
 | Re-examine Cache-control Directives | Informational | Systemic |
@@ -79,36 +80,92 @@ The Content Security Policy fails to define one of the directives that has no fa
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-DfQHrZuTQdW9f2dMFRUl0xzmAGLS/4GuOBTpKEsgXDw='; style-src 'self' rsms.me 'nonce-DfQHrZuTQdW9f2dMFRUl0xzmAGLS/4GuOBTpKEsgXDw='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
+  * Evidence: `style-src 'self' https://googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com https://rsms.me 'nonce-ogZZ+op67OR0GoI3N/AjP8wk8BQwgRw/FvZYvkIoEOw='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://tagmanager.google.com https://c.bing.com https://*.clarity.ms; img-src 'self' data: https://*.googletagmanager.com https://*.google-analytics.com https://ssl.gstatic.com https://www.gstatic.com; connect-src 'self' https://www.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://c.bing.com https://*.clarity.ms; font-src 'self' data: https://res-1.cdn.office.net https://fonts.googleapis.com https://fonts.gstatic.com https://rsms.me`
   * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
 * URL: https://s265t01-app-web.azurewebsites.net
   * Node Name: `https://s265t01-app-web.azurewebsites.net`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-EUEunInga6Y8TP3XS9UxuBwn67PCv/xBo5aHVbc8KVA='; style-src 'self' rsms.me 'nonce-EUEunInga6Y8TP3XS9UxuBwn67PCv/xBo5aHVbc8KVA='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
+  * Evidence: `style-src 'self' https://googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com https://rsms.me 'nonce-z37CRMp3CopqbbeOLZ9Bxb4qvRX86zugrRSrzwkxi78='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://tagmanager.google.com https://c.bing.com https://*.clarity.ms; img-src 'self' data: https://*.googletagmanager.com https://*.google-analytics.com https://ssl.gstatic.com https://www.gstatic.com; connect-src 'self' https://www.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://c.bing.com https://*.clarity.ms; font-src 'self' data: https://res-1.cdn.office.net https://fonts.googleapis.com https://fonts.gstatic.com https://rsms.me`
   * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
-* URL: https://s265t01-app-web.azurewebsites.net/location
-  * Node Name: `https://s265t01-app-web.azurewebsites.net/location`
+* URL: https://s265t01-app-web.azurewebsites.net/
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-axi1SIYfG6r60RNR08HFUdQNfjPzT8rHjS6AG8QRccM='; style-src 'self' rsms.me 'nonce-axi1SIYfG6r60RNR08HFUdQNfjPzT8rHjS6AG8QRccM='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
+  * Evidence: `style-src 'self' https://googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com https://rsms.me 'nonce-JLtrtCLGCIhZkv+/sLLPKURFo6c0Yt7uoW6NLbGsmsg='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://tagmanager.google.com https://c.bing.com https://*.clarity.ms; img-src 'self' data: https://*.googletagmanager.com https://*.google-analytics.com https://ssl.gstatic.com https://www.gstatic.com; connect-src 'self' https://www.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://c.bing.com https://*.clarity.ms; font-src 'self' data: https://res-1.cdn.office.net https://fonts.googleapis.com https://fonts.gstatic.com https://rsms.me`
   * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
+
+Instances: Systemic
+
+
+### Solution
+
+Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.
+
+### Reference
+
+
+* [ https://www.w3.org/TR/CSP/ ](https://www.w3.org/TR/CSP/)
+* [ https://caniuse.com/#search=content+security+policy ](https://caniuse.com/#search=content+security+policy)
+* [ https://content-security-policy.com/ ](https://content-security-policy.com/)
+* [ https://github.com/HtmlUnit/htmlunit-csp ](https://github.com/HtmlUnit/htmlunit-csp)
+* [ https://web.dev/articles/csp#resource-options ](https://web.dev/articles/csp#resource-options)
+
+
+#### CWE Id: [ 693 ](https://cwe.mitre.org/data/definitions/693.html)
+
+
+#### WASC Id: 15
+
+#### Source ID: 3
+
+### [ CSP: script-src unsafe-inline ](https://www.zaproxy.org/docs/alerts/10055/)
+
+
+
+##### Medium (High)
+
+### Description
+
+Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks. Including (but not limited to) Cross Site Scripting (XSS), and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.
+
+* URL: https://s265t01-app-web.azurewebsites.net
+  * Node Name: `https://s265t01-app-web.azurewebsites.net`
+  * Method: `GET`
+  * Parameter: `Content-Security-Policy`
+  * Attack: ``
+  * Evidence: `style-src 'self' https://googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com https://rsms.me 'nonce-ogZZ+op67OR0GoI3N/AjP8wk8BQwgRw/FvZYvkIoEOw='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://tagmanager.google.com https://c.bing.com https://*.clarity.ms; img-src 'self' data: https://*.googletagmanager.com https://*.google-analytics.com https://ssl.gstatic.com https://www.gstatic.com; connect-src 'self' https://www.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://c.bing.com https://*.clarity.ms; font-src 'self' data: https://res-1.cdn.office.net https://fonts.googleapis.com https://fonts.gstatic.com https://rsms.me`
+  * Other Info: `script-src includes unsafe-inline.`
+* URL: https://s265t01-app-web.azurewebsites.net
+  * Node Name: `https://s265t01-app-web.azurewebsites.net`
+  * Method: `GET`
+  * Parameter: `Content-Security-Policy`
+  * Attack: ``
+  * Evidence: `style-src 'self' https://googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com https://rsms.me 'nonce-z37CRMp3CopqbbeOLZ9Bxb4qvRX86zugrRSrzwkxi78='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://tagmanager.google.com https://c.bing.com https://*.clarity.ms; img-src 'self' data: https://*.googletagmanager.com https://*.google-analytics.com https://ssl.gstatic.com https://www.gstatic.com; connect-src 'self' https://www.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://c.bing.com https://*.clarity.ms; font-src 'self' data: https://res-1.cdn.office.net https://fonts.googleapis.com https://fonts.gstatic.com https://rsms.me`
+  * Other Info: `script-src includes unsafe-inline.`
+* URL: https://s265t01-app-web.azurewebsites.net/
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/`
+  * Method: `GET`
+  * Parameter: `Content-Security-Policy`
+  * Attack: ``
+  * Evidence: `style-src 'self' https://googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com https://rsms.me 'nonce-JLtrtCLGCIhZkv+/sLLPKURFo6c0Yt7uoW6NLbGsmsg='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://tagmanager.google.com https://c.bing.com https://*.clarity.ms; img-src 'self' data: https://*.googletagmanager.com https://*.google-analytics.com https://ssl.gstatic.com https://www.gstatic.com; connect-src 'self' https://www.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://c.bing.com https://*.clarity.ms; font-src 'self' data: https://res-1.cdn.office.net https://fonts.googleapis.com https://fonts.gstatic.com https://rsms.me`
+  * Other Info: `script-src includes unsafe-inline.`
 * URL: https://s265t01-app-web.azurewebsites.net/robots.txt
   * Node Name: `https://s265t01-app-web.azurewebsites.net/robots.txt`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-PIUPjVGkpsAlp/swtt4MhZ4Bty+obEqz48DpXp9+UJE='; style-src 'self' rsms.me 'nonce-PIUPjVGkpsAlp/swtt4MhZ4Bty+obEqz48DpXp9+UJE='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
-  * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
+  * Evidence: `style-src 'self' https://googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com https://rsms.me 'nonce-NxMycmVtqkQKGN0d5azXrAZ8SEDqSJrK6Wj7sGHaWUM='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://tagmanager.google.com https://c.bing.com https://*.clarity.ms; img-src 'self' data: https://*.googletagmanager.com https://*.google-analytics.com https://ssl.gstatic.com https://www.gstatic.com; connect-src 'self' https://www.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://c.bing.com https://*.clarity.ms; font-src 'self' data: https://res-1.cdn.office.net https://fonts.googleapis.com https://fonts.gstatic.com https://rsms.me`
+  * Other Info: `script-src includes unsafe-inline.`
 * URL: https://s265t01-app-web.azurewebsites.net/sitemap.xml
   * Node Name: `https://s265t01-app-web.azurewebsites.net/sitemap.xml`
   * Method: `GET`
   * Parameter: `Content-Security-Policy`
   * Attack: ``
-  * Evidence: `script-src 'self' *.googletagmanager.com *.google-analytics.com c.bing.com *.clarity.ms 'nonce-P83SXiVBIqV2uCjEBKrfOhUYUesz4qt+SfB8+DfgOMA='; style-src 'self' rsms.me 'nonce-P83SXiVBIqV2uCjEBKrfOhUYUesz4qt+SfB8+DfgOMA='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; font-src 'self' res-1.cdn.office.net rsms.me; connect-src 'self' *.googletagmanager.com *.google-analytics.com *.analytics.google.com c.bing.com *.clarity.ms`
-  * Other Info: `The directive(s): frame-ancestors, form-action is/are among the directives that do not fallback to default-src.`
+  * Evidence: `style-src 'self' https://googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com https://rsms.me 'nonce-6BZjvw4WrFlJ238hoA4jDcXCACZIQc5uDiN3+cdz3B4='; block-all-mixed-content; upgrade-insecure-requests; base-uri 'self'; default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://tagmanager.google.com https://c.bing.com https://*.clarity.ms; img-src 'self' data: https://*.googletagmanager.com https://*.google-analytics.com https://ssl.gstatic.com https://www.gstatic.com; connect-src 'self' https://www.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://c.bing.com https://*.clarity.ms; font-src 'self' data: https://res-1.cdn.office.net https://fonts.googleapis.com https://fonts.gstatic.com https://rsms.me`
+  * Other Info: `script-src includes unsafe-inline.`
 
 Instances: Systemic
 
@@ -300,15 +357,8 @@ Cross-Origin-Resource-Policy header is an opt-in header designed to counter side
   * Attack: ``
   * Evidence: `same-site`
   * Other Info: ``
-* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.ico
-  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.ico`
-  * Method: `GET`
-  * Parameter: `Cross-Origin-Resource-Policy`
-  * Attack: ``
-  * Evidence: `same-site`
-  * Other Info: ``
-* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg
-  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg`
+* URL: https://s265t01-app-web.azurewebsites.net/
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/`
   * Method: `GET`
   * Parameter: `Cross-Origin-Resource-Policy`
   * Attack: ``
@@ -323,6 +373,13 @@ Cross-Origin-Resource-Policy header is an opt-in header designed to counter side
   * Other Info: ``
 * URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg
   * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg`
+  * Method: `GET`
+  * Parameter: `Cross-Origin-Resource-Policy`
+  * Attack: ``
+  * Evidence: `same-site`
+  * Other Info: ``
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/manifest.json
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/manifest.json`
   * Method: `GET`
   * Parameter: `Cross-Origin-Resource-Policy`
   * Attack: ``
@@ -369,15 +426,15 @@ Permissions Policy Header is an added layer of security that helps to restrict f
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265t01-app-web.azurewebsites.net/js/dfefrontend-2.0.0.min.js
-  * Node Name: `https://s265t01-app-web.azurewebsites.net/js/dfefrontend-2.0.0.min.js`
+* URL: https://s265t01-app-web.azurewebsites.net/
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265t01-app-web.azurewebsites.net/location
-  * Node Name: `https://s265t01-app-web.azurewebsites.net/location`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/privacy
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/privacy`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -478,15 +535,15 @@ HTTP Strict Transport Security (HSTS) is a web security policy mechanism whereby
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg
-  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-180.png`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
-* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg
-  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/manifest.json
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/manifest.json`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -554,7 +611,7 @@ This was identified at:
 https://s265t01-app-web.azurewebsites.net/linkpages/cookies
 
 User-input was found in the following cookie:
-AnalyticsCookie=yes; expires=Thu, 14 Jan 2027 16:38:26 GMT; path=/
+AnalyticsCookie=yes; expires=Wed, 10 Feb 2027 10:59:35 GMT; path=/
 
 The user input was:
 AnalyticsCookie=yes`
@@ -571,7 +628,7 @@ This was identified at:
 https://s265t01-app-web.azurewebsites.net/linkpages/cookies
 
 User-input was found in the following cookie:
-AnalyticsCookie=yes; expires=Thu, 14 Jan 2027 16:38:26 GMT; path=/
+AnalyticsCookie=yes; expires=Wed, 10 Feb 2027 10:59:35 GMT; path=/
 
 The user input was:
 MarketingCookie=yes`
@@ -614,16 +671,9 @@ The response appears to contain suspicious comments which may help an attacker.
   * Attack: ``
   * Evidence: `query`
   * Other Info: `The following pattern was used: \bQUERY\b and was detected in likely comment: "//github.com/zloirock/core-js/blob/v3.36.0/LICENSE",source:"https://github.com/zloirock/core-js"})},4696:function(t,e,n){var r=n", see evidence field for the suspicious comment/snippet.`
-* URL: https://s265t01-app-web.azurewebsites.net/js/moj-frontend.min.js
-  * Node Name: `https://s265t01-app-web.azurewebsites.net/js/moj-frontend.min.js`
-  * Method: `GET`
-  * Parameter: ``
-  * Attack: ``
-  * Evidence: `user`
-  * Other Info: `The following pattern was used: \bUSER\b and was detected in likely comment: "//www.w3.org/2000/svg">\n         <path d="M5.5 0L11 5L0 5L5.5 0Z" fill="currentColor"/>\n       </svg>\n      </span>\n    </bu", see evidence field for the suspicious comment/snippet.`
 
 
-Instances: 2
+Instances: 1
 
 ### Solution
 
@@ -664,8 +714,8 @@ The application appears to be a modern web application. If you need to explore i
   * Attack: ``
   * Evidence: `<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KX9ZWC6X" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>`
   * Other Info: `A noScript tag has been found, which is an indication that the application works differently with JavaScript enabled compared to when it is not.`
-* URL: https://s265t01-app-web.azurewebsites.net/location
-  * Node Name: `https://s265t01-app-web.azurewebsites.net/location`
+* URL: https://s265t01-app-web.azurewebsites.net/linkpages/privacy
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/privacy`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
@@ -775,6 +825,13 @@ The cache-control header has not been set properly or is missing, allowing the b
   * Attack: ``
   * Evidence: ``
   * Other Info: ``
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/manifest.json
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/manifest.json`
+  * Method: `GET`
+  * Parameter: `cache-control`
+  * Attack: ``
+  * Evidence: ``
+  * Other Info: ``
 * URL: https://s265t01-app-web.azurewebsites.net/linkpages/cookies
   * Node Name: `https://s265t01-app-web.azurewebsites.net/linkpages/cookies`
   * Method: `GET`
@@ -788,13 +845,6 @@ The cache-control header has not been set properly or is missing, allowing the b
   * Parameter: `cache-control`
   * Attack: ``
   * Evidence: ``
-  * Other Info: ``
-* URL: https://s265t01-app-web.azurewebsites.net/location
-  * Node Name: `https://s265t01-app-web.azurewebsites.net/location`
-  * Method: `GET`
-  * Parameter: `cache-control`
-  * Attack: ``
-  * Evidence: `no-cache, no-store`
   * Other Info: ``
 
 Instances: Systemic
@@ -884,15 +934,15 @@ The response contents are storable by caching components such as proxy servers, 
   * Attack: ``
   * Evidence: ``
   * Other Info: `The response is stale, and stale responses are not configured to be re-validated or blocked, using the 'must-revalidate', 'proxy-revalidate', 's-maxage', or 'max-age' response 'Cache-Control' directives.`
-* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg
-  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/favicon.svg`
+* URL: https://s265t01-app-web.azurewebsites.net/
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
   * Evidence: ``
   * Other Info: `In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.`
-* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg
-  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/images/govuk-icon-mask.svg`
+* URL: https://s265t01-app-web.azurewebsites.net/assets/rebrand/manifest.json
+  * Node Name: `https://s265t01-app-web.azurewebsites.net/assets/rebrand/manifest.json`
   * Method: `GET`
   * Parameter: ``
   * Attack: ``
