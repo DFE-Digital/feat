@@ -103,6 +103,8 @@ public class Apprenticeship
     
     public bool IsNationalVacancy { get; set; }
     
+    public DateTime? DetailsUpdated { get; set; }
+    
     [StringLength(500)]
     public string? IsNationalVacancyDetails { get; set; }
     

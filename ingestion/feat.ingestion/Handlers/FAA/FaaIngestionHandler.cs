@@ -117,10 +117,35 @@ public class FaaIngestionHandler(
             var duplicateCount = allApprenticeships.Count - dedupedApprenticeships.Count;
             Console.WriteLine($"Removed {duplicateCount} duplicate records.");
             
+            var existingVacancyDetails = await dbContext.Set<Apprenticeship>()
+                .WhereBulkContains(dedupedApprenticeships, a => a.VacancyReference)
+                .Select(a => new
+                {
+                    a.VacancyReference,
+                    a.DetailsUpdated,
+                    a.FullDescription,
+                    a.EmployerDescription,
+                    a.QualificationsSummary
+                })
+                .ToListAsync(cancellationToken);
+
+            var vacancyDetailsLookup = existingVacancyDetails.ToDictionary(x => x.VacancyReference!, x => x);
+
+            foreach (var apprenticeship in dedupedApprenticeships)
+            {
+                if (vacancyDetailsLookup.TryGetValue(apprenticeship.VacancyReference!, out var existing))
+                {
+                    apprenticeship.DetailsUpdated = existing.DetailsUpdated;
+                    apprenticeship.FullDescription = existing.FullDescription;
+                    apprenticeship.EmployerDescription = existing.EmployerDescription;
+                    apprenticeship.QualificationsSummary = existing.QualificationsSummary;
+                }
+            }
+            
             Console.WriteLine($"Getting additional details for {dedupedApprenticeships.Count} apprenticeships...");
             await GetAdditionalVacancyDetails(dedupedApprenticeships, cancellationToken);
             
-            Console.WriteLine($"Syncing {dedupedApprenticeships.Count} deduped apprenticeship records to DB...");
+            Console.WriteLine($"Syncing {dedupedApprenticeships.Count} apprenticeship records to DB...");
             await dbContext.BulkSynchronizeAsync(dedupedApprenticeships, options =>
             {
                 options.ColumnPrimaryKeyExpression = apprenticeship => apprenticeship.VacancyReference;
@@ -377,7 +402,7 @@ public class FaaIngestionHandler(
         {
             Created = DateTime.UtcNow,
             Name = a.Key,
-            Description = a.First().EmployerDescription,
+            Description = a.First().EmployerDescription?.CleanHtml(),
             Url = a.First().EmployerWebsiteUrl,
             ContactName = a.First().EmployerContactName,
             ContactEmail = a.First().EmployerContactEmail,
@@ -818,6 +843,51 @@ public class FaaIngestionHandler(
         List<Apprenticeship> apprenticeships,
         CancellationToken cancellationToken)
     {
+        var itemsToUpdate = apprenticeships
+            .Where(a => a.DetailsUpdated == null || a.DetailsUpdated < DateTime.UtcNow.AddDays(-1))
+            .ToList();
+
+        var total = itemsToUpdate.Count;
+        var processedCount = 0;
+        
+        var parallelOptions = new ParallelOptions
+        {
+            MaxDegreeOfParallelism = 5,
+            CancellationToken = cancellationToken
+        };
+
+        await Parallel.ForEachAsync(itemsToUpdate, parallelOptions, async (apprenticeship, ct) =>
+        {
+            try
+            {
+                var url = $"vacancies/vacancy/{apprenticeship.VacancyReference}";
+                
+                var response = await apiClient.GetAsync<External.VacancyDetailsResponse>(
+                    ApiClientNames.FindAnApprenticeship, url, cancellationToken: ct);
+
+                if (response != null)
+                {
+                    apprenticeship.FullDescription = response.FullDescription;
+                    apprenticeship.EmployerDescription = response.EmployerDescription;
+                    apprenticeship.QualificationsSummary = FormatQualifications(response.Qualifications);
+                    apprenticeship.DetailsUpdated = DateTime.UtcNow;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to fetch details for {apprenticeship.VacancyReference}: {ex.Message}");
+            }
+            finally
+            {
+                var current = Interlocked.Increment(ref processedCount);
+                
+                if (current % 50 == 0 || current == total)
+                {
+                    var percentage = (double)current / total * 100;
+                    Console.WriteLine($"{current}/{total} ({percentage:0}%) processed...");
+                }
+            }
+        });
     }
 
     private static CourseHours? MapCourseHours(decimal? hoursPerWeek)
