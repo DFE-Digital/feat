@@ -1,6 +1,6 @@
 namespace feat.ingestion.Models.FAA.External;
 
-public class ApiResponse
+public class VacancyResponse
 {
     public List<Apprenticeship> Vacancies { get; set; } = [];
     

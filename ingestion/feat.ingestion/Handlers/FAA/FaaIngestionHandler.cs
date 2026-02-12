@@ -10,6 +10,7 @@ using feat.ingestion.Configuration;
 using feat.ingestion.Data;
 using feat.ingestion.Enums;
 using feat.ingestion.Models.FAA;
+using feat.ingestion.Models.FAA.External.Enums;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Z.BulkOperations;
@@ -38,11 +39,11 @@ public class FaaIngestionHandler(
         }
 
         const string url = "vacancies/vacancy?PageNumber=1&PageSize=1";
-        External.ApiResponse? response;
+        External.VacancyResponse? response;
 
         try
         {
-            response = await apiClient.GetAsync<External.ApiResponse>(
+            response = await apiClient.GetAsync<External.VacancyResponse>(
                 ApiClientNames.FindAnApprenticeship, url, cancellationToken: cancellationToken);
         }
         catch (Exception ex)
@@ -76,7 +77,7 @@ public class FaaIngestionHandler(
                 
                 var url = $"vacancies/vacancy?PageNumber={pageNumber}&PageSize={apiPageSize}";
                 
-                var response = await apiClient.GetAsync<External.ApiResponse>(
+                var response = await apiClient.GetAsync<External.VacancyResponse>(
                     ApiClientNames.FindAnApprenticeship, url, cancellationToken: cancellationToken);
 
                 var apprenticeships = response?.Vacancies.FromDtoList();
@@ -114,10 +115,12 @@ public class FaaIngestionHandler(
                 .ToList();
             
             var duplicateCount = allApprenticeships.Count - dedupedApprenticeships.Count;
-            
             Console.WriteLine($"Removed {duplicateCount} duplicate records.");
-            Console.WriteLine($"Syncing {dedupedApprenticeships.Count} deduped apprenticeship records to DB...");
             
+            Console.WriteLine($"Getting additional details for {dedupedApprenticeships.Count} apprenticeships...");
+            await GetAdditionalVacancyDetails(dedupedApprenticeships, cancellationToken);
+            
+            Console.WriteLine($"Syncing {dedupedApprenticeships.Count} deduped apprenticeship records to DB...");
             await dbContext.BulkSynchronizeAsync(dedupedApprenticeships, options =>
             {
                 options.ColumnPrimaryKeyExpression = apprenticeship => apprenticeship.VacancyReference;
@@ -268,7 +271,8 @@ public class FaaIngestionHandler(
                 Reference = a.VacancyReference!,
                 Title = a.Title!,
                 AimOrAltTitle = a.CourseTitle!,
-                Description = a.Description.CleanHtml(),
+                Description = (a.FullDescription ?? a.Description)?.CleanHtml(),
+                EntryRequirements = a.QualificationsSummary,
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
                 Url = !string.IsNullOrEmpty(a.ApplicationUrl) ? a.ApplicationUrl :
@@ -373,6 +377,7 @@ public class FaaIngestionHandler(
         {
             Created = DateTime.UtcNow,
             Name = a.Key,
+            Description = a.First().EmployerDescription,
             Url = a.First().EmployerWebsiteUrl,
             ContactName = a.First().EmployerContactName,
             ContactEmail = a.First().EmployerContactEmail,
@@ -808,6 +813,12 @@ public class FaaIngestionHandler(
             dbContext.ChangeTracker.Clear();
         }
     }
+    
+    private async Task GetAdditionalVacancyDetails(
+        List<Apprenticeship> apprenticeships,
+        CancellationToken cancellationToken)
+    {
+    }
 
     private static CourseHours? MapCourseHours(decimal? hoursPerWeek)
     {
@@ -870,5 +881,45 @@ public class FaaIngestionHandler(
         }
 
         return null;
+    }
+    
+    private static string? FormatQualifications(List<External.Qualification>? qualifications)
+    {
+        if (qualifications == null || qualifications.Count == 0)
+        {
+            return null;
+        }
+
+        var groupedQualifications = qualifications
+            .Where(q => !string.IsNullOrWhiteSpace(q.Subject))
+            .GroupBy(q => q.Weighting)
+            .OrderBy(g => g.Key);
+
+        var sections = new List<string>();
+
+        foreach (var weightedGroup in groupedQualifications)
+        {
+            var items = weightedGroup
+                .Select(q => $"{q.QualificationType} {q.Subject} Grade {q.Grade}".Trim())
+                .ToList();
+
+            if (items.Count == 0)
+            {
+                continue;
+            }
+
+            var weight = weightedGroup.Key switch
+            {
+                QualificationWeighting.Essential => "Essential",
+                QualificationWeighting.Desired => "Desired",
+                _ => weightedGroup.Key.ToString()
+            };
+
+            sections.Add($"{weight}: {string.Join(", ", items)}");
+        }
+
+        return sections.Count > 0
+            ? string.Join("; ", sections)
+            : null;
     }
 }
