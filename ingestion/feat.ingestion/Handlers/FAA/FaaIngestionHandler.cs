@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using CliProgressBar;
 using feat.common;
 using feat.common.Extensions;
@@ -576,7 +577,7 @@ public class FaaIngestionHandler(
                         Created = DateTime.UtcNow,
                         EntryId = entryId,
                         StartDate = apprenticeship.StartDate,
-                        Duration = ParseMonthStringToTimeSpan(apprenticeship.ExpectedDuration, apprenticeship.StartDate),
+                        Duration = ParseDurationToTimeSpan(apprenticeship.ExpectedDuration, apprenticeship.StartDate),
                         StudyMode = LearningMethod.Workbased,
                         Reference = $"{apprenticeship.VacancyReference}_{address.Id}",
                         LocationId = locationId,
@@ -593,7 +594,7 @@ public class FaaIngestionHandler(
                     Created = DateTime.UtcNow,
                     EntryId = entryId,
                     StartDate = apprenticeship.StartDate,
-                    Duration = ParseMonthStringToTimeSpan(apprenticeship.ExpectedDuration, apprenticeship.StartDate),
+                    Duration = ParseDurationToTimeSpan(apprenticeship.ExpectedDuration, apprenticeship.StartDate),
                     StudyMode = LearningMethod.Workbased,
                     Reference = $"{apprenticeship.VacancyReference}",
                     SourceSystem = SourceSystem,
@@ -900,25 +901,43 @@ public class FaaIngestionHandler(
         };
     }
     
-    private static TimeSpan? ParseMonthStringToTimeSpan(string? input, DateTime? startDate)
+    private static TimeSpan? ParseDurationToTimeSpan(string? input, DateTime? startDate)
     {
         if (string.IsNullOrWhiteSpace(input) || startDate == null)
         {
             return null;
         }
 
-        input = input.Trim().ToLowerInvariant();
+        var regex = new Regex(@"(?<value>\d+)\s+(?<unit>year|month|day)", RegexOptions.IgnoreCase);
+        var matches = regex.Matches(input);
 
-        var monthParts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-        if (monthParts.Length > 0
-            && int.TryParse(monthParts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var months))
+        if (matches.Count == 0)
         {
-            var endDate = startDate.Value.AddMonths(months);
-            return (endDate - startDate).Value.Duration();
+            return null;
         }
+        
+        var pointerDate = startDate.Value;
 
-        return null;
+        foreach (Match match in matches)
+        {
+            var value = int.Parse(match.Groups["value"].Value);
+            var unit = match.Groups["unit"].Value.ToLower();
+
+            if (unit.StartsWith('y'))
+            {
+                pointerDate = pointerDate.AddYears(value);
+            }
+            else if (unit.StartsWith('m'))
+            {
+                pointerDate = pointerDate.AddMonths(value);
+            }
+            else if (unit.StartsWith('d'))
+            {
+                pointerDate = pointerDate.AddDays(value);
+            }
+        }
+        
+        return pointerDate - startDate.Value;
     }
     
     private static WageUnit? MapWageUnit(string? unit)
