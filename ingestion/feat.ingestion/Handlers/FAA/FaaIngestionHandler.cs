@@ -205,9 +205,9 @@ public class FaaIngestionHandler(
             return true;
         }
         
-        var apprenticeships = dbContext.Set<Apprenticeship>()
+        var apprenticeships = await dbContext.Set<Apprenticeship>()
             .Include(apprenticeship => apprenticeship.Addresses)
-            .ToList();
+            .ToListAsync(cancellationToken: cancellationToken);
 
         if (apprenticeships.Count == 0)
         {
@@ -251,8 +251,8 @@ public class FaaIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
 
-        var providerLookup = dbContext.Set<Provider>()
-            .ToDictionary(p => p.Ukprn!, p => p.Id);
+        var providerLookup = await dbContext.Set<Provider>()
+            .ToDictionaryAsync(p => p.Ukprn!, p => p.Id, cancellationToken: cancellationToken);
 
         // SECTOR
         
@@ -267,23 +267,24 @@ public class FaaIngestionHandler(
                 SourceSystem = SourceSystem
             }).ToList();
 
-        await dbContext.BulkSynchronizeAsync(sectors, options =>
+        await dbContext.BulkSynchronizeAsync(sectors, bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = s => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = s => new
             {
                 s.Id,
             };
-            options.ColumnPrimaryKeyExpression = s => s.Name;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = s => s.SourceSystem;options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
+            bulkOperation.ColumnPrimaryKeyExpression = s => s.Name;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = s => s.SourceSystem;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
 
-        var sectorLookup = dbContext.Set<Sector>()
-            .ToDictionary(s => s.Name.ToLower().Trim(), s => s.Id);
+        var sectorLookup = await dbContext.Set<Sector>()
+            .ToDictionaryAsync(s => s.Name.ToLower().Trim(), s => s.Id, cancellationToken: cancellationToken);
         
         // ENTRY
         
@@ -301,9 +302,7 @@ public class FaaIngestionHandler(
                 EntryRequirements = a.QualificationsSummary,
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
-                Url = !string.IsNullOrEmpty(a.ApplicationUrl) ? a.ApplicationUrl :
-                    !string.IsNullOrEmpty(a.VacancyUrl) ? a.VacancyUrl :
-                    string.Empty,
+                Url = !string.IsNullOrEmpty(a.VacancyUrl) ? a.VacancyUrl : string.Empty,
                 Type = EntryType.Apprenticeship,
                 Level = MapCourseLevel(a.CourseLevel),
                 CourseType = CourseType.Apprenticeship,
@@ -359,9 +358,9 @@ public class FaaIngestionHandler(
         
         await dbContext.BulkSaveChangesAsync(cancellationToken);
         
-        var entryLookup = dbContext.Set<Entry>()
+        var entryLookup = await dbContext.Set<Entry>()
             .Where(e => e.SourceSystem == SourceSystem)
-            .ToDictionary(e => e.SourceReference, e => e.Id);
+            .ToDictionaryAsync(e => e.SourceReference, e => e.Id, cancellationToken: cancellationToken);
         
         // ENTRYSECTOR
         
@@ -427,8 +426,8 @@ public class FaaIngestionHandler(
         Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         resultInfo = new ResultInfo();
 
-        var employerLookup = dbContext.Set<Employer>()
-            .ToDictionary(e => e.Name.ToLower().Trim(), e => e.Id);
+        var employerLookup = await dbContext.Set<Employer>()
+            .ToDictionaryAsync(e => e.Name.ToLower().Trim(), e => e.Id, cancellationToken: cancellationToken);
 
         // VACANCY
         
@@ -532,7 +531,6 @@ public class FaaIngestionHandler(
 
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
-        // Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
         
         resultInfo = new ResultInfo();
         
@@ -696,7 +694,7 @@ public class FaaIngestionHandler(
                 pb.Report(percent);
             }
             
-            var entries = dbContext.Entries
+            var entries = await dbContext.Entries
                 .Include(entry => entry.Vacancies)
                 .Include(entry => entry.EntrySectors)
                 .ThenInclude(entrySector => entrySector.Sector)
@@ -709,7 +707,7 @@ public class FaaIngestionHandler(
                     x.SourceSystem == SourceSystem &&
                     x.IngestionState == IngestionState.Pending)
                 .Take(250)
-                .ToList();
+                .ToListAsync(cancellationToken: cancellationToken);
 
             if (entries.Count == 0)
             {
@@ -807,9 +805,9 @@ public class FaaIngestionHandler(
             await dbContext.BulkSaveChangesAsync(cancellationToken);
 
             // Keep going until we've ingested everything
-            if (!dbContext.Entries.Any(e =>
+            if (! await dbContext.Entries.AnyAsync(e =>
                     e.IngestionState == IngestionState.Pending
-                    && e.SourceSystem == SourceSystem))
+                    && e.SourceSystem == SourceSystem, cancellationToken: cancellationToken))
             {
                 if (options.IndexDirectly)
                 {
