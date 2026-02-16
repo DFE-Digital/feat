@@ -238,15 +238,16 @@ public class FaaIngestionHandler(
                 SourceSystem = SourceSystem
             }).ToList();
 
-        await dbContext.BulkSynchronizeAsync(sectors, options =>
+        await dbContext.BulkSynchronizeAsync(sectors, bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = s => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = s => new
             {
                 s.Id,
             };
-            options.ColumnPrimaryKeyExpression = s => s.Name;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = s => s.SourceSystem;options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
+            bulkOperation.ColumnPrimaryKeyExpression = s => s.Name;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = s => s.SourceSystem;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
