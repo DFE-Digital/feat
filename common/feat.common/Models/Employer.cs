@@ -27,6 +27,9 @@ public class Employer
     
     [StringLength(20)]
     public string? ContactPhone { get; set; }
+    
+    [StringLength(4000)]
+    public string? Description { get; set; }
 
     [InverseProperty("Employer")] 
     public ICollection<EmployerLocation> EmployerLocations { get; set; } = new List<EmployerLocation>();

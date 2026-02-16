@@ -103,7 +103,7 @@ public class CourseService(CourseDbContext dbContext, IFusionCache cache) : ICou
                 courseDetails.EmployerAddresses = employer.EmployerLocations
                     .Select(el => el.Location.ToLocation()).Distinct().ToList();
                 courseDetails.PositionsAvailable = vacancy.Positions;
-                courseDetails.EmployerDescription = null;
+                courseDetails.EmployerDescription = employer.Description;
                 break;
             
             case EntryType.Course:
