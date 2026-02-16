@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using CliProgressBar;
 using feat.common;
 using feat.common.Extensions;
@@ -10,6 +11,7 @@ using feat.ingestion.Configuration;
 using feat.ingestion.Data;
 using feat.ingestion.Enums;
 using feat.ingestion.Models.FAA;
+using feat.ingestion.Models.FAA.External.Enums;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Z.BulkOperations;
@@ -38,11 +40,11 @@ public class FaaIngestionHandler(
         }
 
         const string url = "vacancies/vacancy?PageNumber=1&PageSize=1";
-        External.ApiResponse? response;
+        External.VacancyResponse? response;
 
         try
         {
-            response = await apiClient.GetAsync<External.ApiResponse>(
+            response = await apiClient.GetAsync<External.VacancyResponse>(
                 ApiClientNames.FindAnApprenticeship, url, cancellationToken: cancellationToken);
         }
         catch (Exception ex)
@@ -76,7 +78,7 @@ public class FaaIngestionHandler(
                 
                 var url = $"vacancies/vacancy?PageNumber={pageNumber}&PageSize={apiPageSize}";
                 
-                var response = await apiClient.GetAsync<External.ApiResponse>(
+                var response = await apiClient.GetAsync<External.VacancyResponse>(
                     ApiClientNames.FindAnApprenticeship, url, cancellationToken: cancellationToken);
 
                 var apprenticeships = response?.Vacancies.FromDtoList();
@@ -114,10 +116,37 @@ public class FaaIngestionHandler(
                 .ToList();
             
             var duplicateCount = allApprenticeships.Count - dedupedApprenticeships.Count;
-            
             Console.WriteLine($"Removed {duplicateCount} duplicate records.");
-            Console.WriteLine($"Syncing {dedupedApprenticeships.Count} deduped apprenticeship records to DB...");
             
+            var existingVacancyDetails = await dbContext.Set<Apprenticeship>()
+                .WhereBulkContains(dedupedApprenticeships, a => a.VacancyReference)
+                .Select(a => new
+                {
+                    a.VacancyReference,
+                    a.DetailsUpdated,
+                    a.FullDescription,
+                    a.EmployerDescription,
+                    a.QualificationsSummary
+                })
+                .ToListAsync(cancellationToken);
+
+            var vacancyDetailsLookup = existingVacancyDetails.ToDictionary(x => x.VacancyReference!, x => x);
+
+            foreach (var apprenticeship in dedupedApprenticeships)
+            {
+                if (vacancyDetailsLookup.TryGetValue(apprenticeship.VacancyReference!, out var existing))
+                {
+                    apprenticeship.DetailsUpdated = existing.DetailsUpdated;
+                    apprenticeship.FullDescription = existing.FullDescription;
+                    apprenticeship.EmployerDescription = existing.EmployerDescription;
+                    apprenticeship.QualificationsSummary = existing.QualificationsSummary;
+                }
+            }
+            
+            Console.WriteLine($"Getting additional details for {dedupedApprenticeships.Count} apprenticeships...");
+            await GetAdditionalVacancyDetails(dedupedApprenticeships, cancellationToken);
+            
+            Console.WriteLine($"Syncing {dedupedApprenticeships.Count} apprenticeship records to DB...");
             await dbContext.BulkSynchronizeAsync(dedupedApprenticeships, options =>
             {
                 options.ColumnPrimaryKeyExpression = apprenticeship => apprenticeship.VacancyReference;
@@ -269,7 +298,8 @@ public class FaaIngestionHandler(
                 Reference = a.VacancyReference!,
                 Title = a.Title!,
                 AimOrAltTitle = a.CourseTitle!,
-                Description = a.Description.CleanHtml(),
+                Description = (a.FullDescription ?? a.Description)?.CleanHtml(),
+                EntryRequirements = a.QualificationsSummary,
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
                 Url = !string.IsNullOrEmpty(a.VacancyUrl) ? a.VacancyUrl : string.Empty,
@@ -372,6 +402,7 @@ public class FaaIngestionHandler(
         {
             Created = DateTime.UtcNow,
             Name = a.Key,
+            Description = a.First().EmployerDescription?.CleanHtml(),
             Url = a.First().EmployerWebsiteUrl,
             ContactName = a.First().EmployerContactName,
             ContactEmail = a.First().EmployerContactEmail,
@@ -544,7 +575,7 @@ public class FaaIngestionHandler(
                         Created = DateTime.UtcNow,
                         EntryId = entryId,
                         StartDate = apprenticeship.StartDate,
-                        Duration = ParseMonthStringToTimeSpan(apprenticeship.ExpectedDuration, apprenticeship.StartDate),
+                        Duration = ParseDurationToTimeSpan(apprenticeship.ExpectedDuration, apprenticeship.StartDate),
                         StudyMode = LearningMethod.Workbased,
                         Reference = $"{apprenticeship.VacancyReference}_{address.Id}",
                         LocationId = locationId,
@@ -561,7 +592,7 @@ public class FaaIngestionHandler(
                     Created = DateTime.UtcNow,
                     EntryId = entryId,
                     StartDate = apprenticeship.StartDate,
-                    Duration = ParseMonthStringToTimeSpan(apprenticeship.ExpectedDuration, apprenticeship.StartDate),
+                    Duration = ParseDurationToTimeSpan(apprenticeship.ExpectedDuration, apprenticeship.StartDate),
                     StudyMode = LearningMethod.Workbased,
                     Reference = $"{apprenticeship.VacancyReference}",
                     SourceSystem = SourceSystem,
@@ -806,6 +837,57 @@ public class FaaIngestionHandler(
             dbContext.ChangeTracker.Clear();
         }
     }
+    
+    private async Task GetAdditionalVacancyDetails(
+        List<Apprenticeship> apprenticeships,
+        CancellationToken cancellationToken)
+    {
+        var itemsToUpdate = apprenticeships
+            .Where(a => a.DetailsUpdated == null || a.DetailsUpdated < DateTime.UtcNow.AddDays(-1))
+            .ToList();
+
+        var total = itemsToUpdate.Count;
+        var processedCount = 0;
+        
+        var parallelOptions = new ParallelOptions
+        {
+            MaxDegreeOfParallelism = 5,
+            CancellationToken = cancellationToken
+        };
+
+        await Parallel.ForEachAsync(itemsToUpdate, parallelOptions, async (apprenticeship, ct) =>
+        {
+            try
+            {
+                var url = $"vacancies/vacancy/{apprenticeship.VacancyReference}";
+                
+                var response = await apiClient.GetAsync<External.VacancyDetailsResponse>(
+                    ApiClientNames.FindAnApprenticeship, url, cancellationToken: ct);
+
+                if (response != null)
+                {
+                    apprenticeship.FullDescription = response.FullDescription;
+                    apprenticeship.EmployerDescription = response.EmployerDescription;
+                    apprenticeship.QualificationsSummary = FormatQualifications(response.Qualifications);
+                    apprenticeship.DetailsUpdated = DateTime.UtcNow;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to fetch details for {apprenticeship.VacancyReference}: {ex.Message}");
+            }
+            finally
+            {
+                var current = Interlocked.Increment(ref processedCount);
+                
+                if (current % 50 == 0 || current == total)
+                {
+                    var percentage = (double)current / total * 100;
+                    Console.WriteLine($"{current}/{total} ({percentage:0}%) processed...");
+                }
+            }
+        });
+    }
 
     private static CourseHours? MapCourseHours(decimal? hoursPerWeek)
     {
@@ -817,25 +899,43 @@ public class FaaIngestionHandler(
         };
     }
     
-    private static TimeSpan? ParseMonthStringToTimeSpan(string? input, DateTime? startDate)
+    private static TimeSpan? ParseDurationToTimeSpan(string? input, DateTime? startDate)
     {
         if (string.IsNullOrWhiteSpace(input) || startDate == null)
         {
             return null;
         }
 
-        input = input.Trim().ToLowerInvariant();
+        var regex = new Regex(@"(?<value>\d+)\s+(?<unit>year|month|day)", RegexOptions.IgnoreCase);
+        var matches = regex.Matches(input);
 
-        var monthParts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-        if (monthParts.Length > 0
-            && int.TryParse(monthParts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var months))
+        if (matches.Count == 0)
         {
-            var endDate = startDate.Value.AddMonths(months);
-            return (endDate - startDate).Value.Duration();
+            return null;
         }
+        
+        var pointerDate = startDate.Value;
 
-        return null;
+        foreach (Match match in matches)
+        {
+            var value = int.Parse(match.Groups["value"].Value);
+            var unit = match.Groups["unit"].Value.ToLower();
+
+            if (unit.StartsWith('y'))
+            {
+                pointerDate = pointerDate.AddYears(value);
+            }
+            else if (unit.StartsWith('m'))
+            {
+                pointerDate = pointerDate.AddMonths(value);
+            }
+            else if (unit.StartsWith('d'))
+            {
+                pointerDate = pointerDate.AddDays(value);
+            }
+        }
+        
+        return pointerDate - startDate.Value;
     }
     
     private static WageUnit? MapWageUnit(string? unit)
@@ -868,5 +968,45 @@ public class FaaIngestionHandler(
         }
 
         return null;
+    }
+    
+    private static string? FormatQualifications(List<External.Qualification>? qualifications)
+    {
+        if (qualifications == null || qualifications.Count == 0)
+        {
+            return null;
+        }
+
+        var groupedQualifications = qualifications
+            .Where(q => !string.IsNullOrWhiteSpace(q.Subject))
+            .GroupBy(q => q.Weighting)
+            .OrderBy(g => g.Key);
+
+        var sections = new List<string>();
+
+        foreach (var weightedGroup in groupedQualifications)
+        {
+            var items = weightedGroup
+                .Select(q => $"{q.QualificationType} {q.Subject} Grade {q.Grade}".Trim())
+                .ToList();
+
+            if (items.Count == 0)
+            {
+                continue;
+            }
+
+            var weight = weightedGroup.Key switch
+            {
+                QualificationWeighting.Essential => "Essential",
+                QualificationWeighting.Desired => "Desired",
+                _ => weightedGroup.Key.ToString()
+            };
+
+            sections.Add($"{weight}: {string.Join(", ", items)}");
+        }
+
+        return sections.Count > 0
+            ? string.Join("; ", sections)
+            : null;
     }
 }

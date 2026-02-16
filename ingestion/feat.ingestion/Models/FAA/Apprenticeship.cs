@@ -17,6 +17,11 @@ public class Apprenticeship
     
     public string? Description { get; set; }
     
+    public string? FullDescription { get; set; }
+    
+    [StringLength(1000)]
+    public string? QualificationsSummary { get; set; }
+    
     public long NumberOfPositions { get; set; }
     
     public DateTime PostedDate { get; set; }
@@ -64,6 +69,9 @@ public class Apprenticeship
     [StringLength(254)]
     public string? EmployerContactEmail { get; set; }
     
+    [StringLength(4000)]
+    public string? EmployerDescription { get; set; }
+    
     public int CourseLarsCode { get; set; }
     
     [StringLength(100)]
@@ -94,6 +102,8 @@ public class Apprenticeship
     public string? VacancyReference { get; set; }
     
     public bool IsNationalVacancy { get; set; }
+    
+    public DateTime? DetailsUpdated { get; set; }
     
     [StringLength(500)]
     public string? IsNationalVacancyDetails { get; set; }

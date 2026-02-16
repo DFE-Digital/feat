@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using feat.ingestion.Data;
@@ -12,9 +13,11 @@ using feat.ingestion.Data;
 namespace feat.ingestion.Migrations
 {
     [DbContext(typeof(IngestionDbContext))]
-    partial class IngestionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260212162018_add_employer_description")]
+    partial class add_employer_description
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -964,9 +967,6 @@ namespace feat.ingestion.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("DetailsUpdated")
-                        .HasColumnType("datetime2");
-
                     b.Property<double?>("Distance")
                         .HasColumnType("float");
 
@@ -982,10 +982,6 @@ namespace feat.ingestion.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("EmployerDescription")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
-
                     b.Property<string>("EmployerName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -997,9 +993,6 @@ namespace feat.ingestion.Migrations
                     b.Property<string>("ExpectedDuration")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("FullDescription")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("HoursPerWeek")
                         .HasColumnType("decimal(18,2)");
@@ -1023,10 +1016,6 @@ namespace feat.ingestion.Migrations
                     b.Property<string>("ProviderName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("QualificationsSummary")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
