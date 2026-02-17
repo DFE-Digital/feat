@@ -58,6 +58,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "feat.web.tests", "web\feat.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "feat.api.integrationtests", "api\feat.api.integrationtests\feat.api.integrationtests.csproj", "{04ADD436-50DB-4CB0-A113-36C4AEA05D70}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "performance", "performance", "{1FC6C82D-E529-4744-9280-58FB42200FFE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "k6", "k6", "{791E3141-FB11-4AAA-B4E2-42246E6E22A5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "helpers", "helpers", "{73563785-1CB0-436B-998D-30E1DA862D85}"
+	ProjectSection(SolutionItems) = preProject
+		performance\k6\helpers\headers.js = performance\k6\helpers\headers.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,5 +112,7 @@ Global
 		{29B40F87-DC89-4B4C-887C-92A6BDDDC8CE} = {C456EAA1-9574-4778-912E-1D115569BA35}
 		{D3C36150-E16E-4008-8856-558AE8618A65} = {ED762B9B-8875-45D1-8C94-60967CB86495}
 		{04ADD436-50DB-4CB0-A113-36C4AEA05D70} = {C456EAA1-9574-4778-912E-1D115569BA35}
+		{791E3141-FB11-4AAA-B4E2-42246E6E22A5} = {1FC6C82D-E529-4744-9280-58FB42200FFE}
+		{73563785-1CB0-436B-998D-30E1DA862D85} = {791E3141-FB11-4AAA-B4E2-42246E6E22A5}
 	EndGlobalSection
 EndGlobal

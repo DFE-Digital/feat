@@ -1,0 +1,53 @@
+[
+  {
+    "name": "initial_keyword_only_relevance",
+    "request": {
+      "query": ["maths", "computing"],
+      "sessionId": null,
+      "page": 1,
+      "pageSize": 10,
+      "location": null,
+      "radius": 10,
+      "orderBy": "Relevance",
+      "courseType": null,
+      "qualificationLevel": null,
+      "learningMethod": null,
+      "courseHours": null,
+      "studyTime": null
+    }
+  },
+  {
+    "name": "initial_keyword_with_location_distance",
+    "request": {
+      "query": ["health", "social care"],
+      "sessionId": null,
+      "page": 1,
+      "pageSize": 10,
+      "location": "London (Greater London)",
+      "radius": 10,
+      "orderBy": "Distance",
+      "courseType": null,
+      "qualificationLevel": null,
+      "learningMethod": null,
+      "courseHours": null,
+      "studyTime": null
+    }
+  },
+  {
+    "name": "filter_heavy_example",
+    "request": {
+      "query": ["engineering"],
+      "sessionId": null,
+      "page": 1,
+      "pageSize": 10,
+      "location": "Birch (Essex)",
+      "radius": 15,
+      "orderBy": "Relevance",
+      "courseType": ["EssentialSkills"],
+      "qualificationLevel": ["Entry"],
+      "learningMethod": ["Online"],
+      "courseHours": ["FullTime"],
+      "studyTime": ["Evening"]
+    }
+  }
+]
