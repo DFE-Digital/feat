@@ -155,8 +155,9 @@ test.describe('FEAT – 2.0 Location', () => {
         const outcome = await loc.clickContinueAndWaitForErrorOrNext(20_000);
         expect(outcome, 'Expected validation error summary to appear, but page navigated / nothing happened').toBe('error');
 
-        await expect(loc.errorSummary()).toContainText(/Select how far you would be able to travel/i);
         await expect(loc.fieldError('Select how far you would be able to travel')).toBeVisible();
+        await expect(loc.errorSummary()).toBeVisible({ timeout: 10_000 });
+        await expect(loc.errorSummary()).toContainText(/Select how far you would be able to travel/i);
         await expect(page).toHaveURL(/\/location/i);
     });
 

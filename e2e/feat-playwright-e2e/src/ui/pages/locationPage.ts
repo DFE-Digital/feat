@@ -154,16 +154,38 @@ export class LocationPage {
 
     async clickContinueAndWaitForErrorOrNext(timeoutMs: number = 15_000) {
         const startUrl = this.page.url();
+        await this.continueButton().scrollIntoViewIfNeeded();
+        await expect(this.continueButton()).toBeEnabled({ timeout: 10_000 });
 
         await this.continueButton().click();
 
-        const navigated = await this.page
+        //Navigation outcome
+        const navigatedPromise = this.page
             .waitForURL((url) => url.toString() !== startUrl, { timeout: timeoutMs })
-            .then(() => true)
-            .catch(() => false);
+            .then(() => 'navigated' as const)
+            .catch(() => null);
 
-        return navigated ? ('navigated' as const) : ('error' as const); // 'error' | 'navigated'
+        //Validation outcome
+        const errorPromise = Promise.race([
+            this.errorSummary()
+                .waitFor({ state: 'visible', timeout: timeoutMs })
+                .then(() => 'error' as const)
+                .catch(() => null),
+
+            this.page
+                .locator('.govuk-error-message')
+                .first()
+                .waitFor({ state: 'visible', timeout: timeoutMs })
+                .then(() => 'error' as const)
+                .catch(() => null),
+        ]);
+
+        const result = await Promise.race([navigatedPromise, errorPromise]);
+
+        // If neither happened, treat as error
+        return result ?? ('error' as const);
     }
+
 
     private escapeRegex(value: unknown) {
         const str = String(value ?? '');
