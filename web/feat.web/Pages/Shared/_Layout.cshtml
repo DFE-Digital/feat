@@ -72,10 +72,6 @@
             y = l.getElementsByTagName(r)[0];
             y.parentNode.insertBefore(t, y);
         })(window, document, "clarity", "script", "@analyticsOptions.Clarity");
-
-        (function () {
-            window.clarity('consent', @(acceptedAnalytics ? "true" : "false"));
-        }());
     </script>
     <link rel="stylesheet" href="~/css/application.css"/>
     <link rel="stylesheet" href="~/css/moj-frontend.min.css"/>
