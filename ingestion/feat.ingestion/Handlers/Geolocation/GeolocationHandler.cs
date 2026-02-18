@@ -94,7 +94,7 @@ public class GeolocationHandler(
             Console.WriteLine("Done");
         }
         
-        // Get our latest postcode Data file
+        // Get our latest Place Name Data file
         var onsLocationData = files.Where(blob =>
                 blob.Name.StartsWith("OPNAME_", StringComparison.InvariantCultureIgnoreCase))
             .OrderByDescending(b => b.Properties.CreatedOn).FirstOrDefault();
@@ -290,11 +290,11 @@ public class GeolocationHandler(
                 .Include(ei => ei.Location)
                 .Include(ei => ei.Entry);
 
-        Console.WriteLine($"Updating {locationsToUpdate.Count()} locations...");
+        Console.WriteLine($"Updating {await locationsToUpdate.CountAsync(cancellationToken: cancellationToken)} locations...");
         
         foreach (var entryInstance in locationsToUpdate)
         {
-            var aiSearchEntry = dbContext.AiSearchEntries.Single(aie => aie.InstanceId == entryInstance.Id.ToString());
+            var aiSearchEntry = await dbContext.AiSearchEntries.SingleAsync(aie => aie.InstanceId == entryInstance.Id.ToString(), cancellationToken: cancellationToken);
             aiSearchEntry.Location = entryInstance.Location?.GeoLocation.ToGeographyPoint();
             entryInstance.Entry.IngestionState = IngestionState.ProcessingGeolocation;
         }
@@ -316,7 +316,7 @@ public class GeolocationHandler(
             select new { aiEntry, ei.Location, ei.Entry };
 
         // Set them to processing
-        Console.WriteLine($"Updating AI Entries for {aiDifferences.Count()} entries...");
+        Console.WriteLine($"Updating AI Entries for {await aiDifferences.CountAsync(cancellationToken: cancellationToken)} entries...");
         
         foreach (var locationDifference in aiDifferences)
         {
@@ -341,13 +341,13 @@ public class GeolocationHandler(
             where e.IngestionState == IngestionState.ProcessingGeolocation
             select aiEntry;
         
-        Console.WriteLine($"Updating search index for {aiEntries.Count()} entries...");
+        Console.WriteLine($"Updating search index for {await aiEntries.CountAsync(cancellationToken: cancellationToken)} entries...");
         
-        await searchIndexHandler.Update(aiEntries.ToList(), cancellationToken);
+        await searchIndexHandler.Update(await aiEntries.ToListAsync(cancellationToken: cancellationToken), cancellationToken);
 
         Console.WriteLine($"Marking entries as indexed...");
         
-        await dbContext.Entries.WhereBulkContains(aiEntries.Select(aie => Guid.Parse(aie.Id)).ToList())
+        await dbContext.Entries.WhereBulkContains(await aiEntries.Select(aie => Guid.Parse(aie.Id)).ToListAsync(cancellationToken: cancellationToken))
             .ExecuteUpdateAsync(x => x.SetProperty(e => e.IngestionState, IngestionState.Complete), cancellationToken);
         
         Console.WriteLine($"Done");

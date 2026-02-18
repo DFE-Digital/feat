@@ -20,15 +20,18 @@
     var showBanner = !hasCookieConsent;
     var acceptedAnalytics = hasAnalyticsCookie != null && hasAnalyticsCookie.Equals("yes", StringComparison.InvariantCultureIgnoreCase);
     ViewBag.ShowCookieBanner = showBanner;
-
 }
 @* ReSharper disable Razor.SectionNotResolved *@
+
 @section Head {
-    <meta name="nonce" content="@Context.GetNonce()" />
+    <meta name="nonce" content="@Context.GetNonce()"/>
     <script asp-add-nonce="true">
         // Define dataLayer and the gtag function.
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
 
         // Set default consent to 'denied' as a placeholder
         // Determine actual values based on your own requirements
@@ -39,45 +42,57 @@
             'analytics_storage': 'denied',
         });
     </script>
-    
-    <!-- Google Tag Manager -->
-    <script asp-add-nonce>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;var n=d.querySelector('[nonce]');
-    n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','@analyticsOptions.GoogleTagManager');</script>
-    <!-- End Google Tag Manager -->
-    
-    <script asp-add-nonce type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "@analyticsOptions.Clarity");
 
-        (function () {
-            window.clarity('consent', @(acceptedAnalytics ? "true" : "false"));
-        }());
+    <!-- Google Tag Manager -->
+    <script asp-add-nonce>(function (w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true;
+            j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+            var n = d.querySelector('[nonce]');
+            n && j.setAttribute('nonce', n.nonce || n.getAttribute('nonce'));
+            f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', '@analyticsOptions.GoogleTagManager');</script>
+    <!-- End Google Tag Manager -->
+
+    <script asp-add-nonce type="text/javascript">
+        (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () {
+                (c[a].q = c[a].q || []).push(arguments)
+            };
+            t = l.createElement(r);
+            t.async = 1;
+            t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0];
+            y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "@analyticsOptions.Clarity");
     </script>
-    
-    
-    <link rel="stylesheet" href="~/css/application.css" />
-    <link rel="stylesheet" href="~/css/moj-frontend.min.css" />
+    <link rel="stylesheet" href="~/css/application.css"/>
+    <link rel="stylesheet" href="~/css/moj-frontend.min.css"/>
 }
 
 @await RenderSectionAsync("Head", required: false)
 
 @section BodyStart {
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=@analyticsOptions.GoogleTagManager" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=@analyticsOptions.GoogleTagManager" height="0"
+                width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
     <!-- End Google Tag Manager (noscript) -->
-    
-    
-    
+
+
+
     @if (ViewBag.ShowCookieBanner)
     {
-        <div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Cookies on Find Education and Training" id="cookieConsent">
+        <div class="govuk-cookie-banner" data-nosnippet role="region"
+             aria-label="Cookies on Find Education and Training" id="cookieConsent">
             <div class="govuk-cookie-banner__message govuk-width-container">
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-two-thirds">
@@ -86,7 +101,8 @@
                         </h2>
                         <div class="govuk-cookie-banner__content">
                             <p class="govuk-body">We use some essential cookies to make this service work.</p>
-                            <p class="govuk-body">We’d also like to use analytics cookies so we can understand how you use the service and make improvements.</p>
+                            <p class="govuk-body">We’d also like to use analytics cookies so we can understand how you
+                                use the service and make improvements.</p>
                         </div>
                     </div>
                 </div>
@@ -108,8 +124,10 @@
     <header class="govuk-header" data-module="govuk-header" data-govuk-header-init>
         <div class="govuk-header__container govuk-width-container">
             <div class="govuk-header__logo">
-                <a class="govuk-header__link govuk-header__link--homepage" href="/" aria-label="Find Education and Training homepage">
-                    <img src="~/assets/images/department-for-education_white.png" alt="Find education and training homepage" class="govuk-header__logotype">
+                <a class="govuk-header__link govuk-header__link--homepage" href="/"
+                   aria-label="Find Education and Training homepage">
+                    <img src="~/assets/images/department-for-education_white.png"
+                         alt="Find education and training homepage" class="govuk-header__logotype">
                 </a>
             </div>
         </div>
@@ -120,16 +138,18 @@
 @section BeforeContent {
     <govuk-phase-banner>
         <govuk-phase-banner-tag>Beta</govuk-phase-banner-tag>
-        This is a new service. Help us improve it and <a class="govuk-link" href="https://dferesearch.fra1.qualtrics.com/jfe/form/SV_1BKyB9Vk7tKnGjc" target="_blank">give your feedback (opens in new tab)</a>.
+        This is a new service. Help us improve it and <a class="govuk-link"
+                                                         href="https://dferesearch.fra1.qualtrics.com/jfe/form/SV_1BKyB9Vk7tKnGjc"
+                                                         target="_blank">give your feedback (opens in new tab)</a>.
     </govuk-phase-banner>
-    
+
     @if (!string.IsNullOrEmpty(ViewBag.BackPageUrl))
     {
-        <govuk-back-link href="@ViewBag.BackPageUrl">Back </govuk-back-link>
+        <govuk-back-link href="@ViewBag.BackPageUrl">Back</govuk-back-link>
     }
     else if (!string.IsNullOrEmpty(ViewBag.StaticBackPageUrl))
     {
-        <govuk-back-link href="@ViewBag.StaticBackPageUrl">Back </govuk-back-link>
+        <govuk-back-link href="@ViewBag.StaticBackPageUrl">Back</govuk-back-link>
     }
 }
 
@@ -157,7 +177,8 @@
                     <circle cx="53.2" cy="23.5" r="3.7"/>
                     <circle cx="59.7" cy="33.2" r="3.7"/>
                     <circle cx="31.7" cy="30.6" r="3.7"/>
-                    <path d="M33.1,9.8c.2-.1.3-.3.5-.5l4.6,2.4v-6.8l-4.6,1.5c-.1-.2-.3-.3-.5-.5l1.9-5.9h-6.7l1.9,5.9c-.2.1-.3.3-.5.5l-4.6-1.5v6.8l4.6-2.4c.1.2.3.3.5.5l-2.6,8c-.9,2.8,1.2,5.7,4.1,5.7h0c3,0,5.1-2.9,4.1-5.7l-2.6-8ZM37,37.9s-3.4,3.8-4.1,6.1c2.2,0,4.2-.5,6.4-2.8l-.7,8.5c-2-2.8-4.4-4.1-5.7-3.8.1,3.1.5,6.7,5.8,7.2,3.7.3,6.7-1.5,7-3.8.4-2.6-2-4.3-3.7-1.6-1.4-4.5,2.4-6.1,4.9-3.2-1.9-4.5-1.8-7.7,2.4-10.9,3,4,2.6,7.3-1.2,11.1,2.4-1.3,6.2,0,4,4.6-1.2-2.8-3.7-2.2-4.2.2-.3,1.7.7,3.7,3,4.2,1.9.3,4.7-.9,7-5.9-1.3,0-2.4.7-3.9,1.7l2.4-8c.6,2.3,1.4,3.7,2.2,4.5.6-1.6.5-2.8,0-5.3l5,1.8c-2.6,3.6-5.2,8.7-7.3,17.5-7.4-1.1-15.7-1.7-24.5-1.7h0c-8.8,0-17.1.6-24.5,1.7-2.1-8.9-4.7-13.9-7.3-17.5l5-1.8c-.5,2.5-.6,3.7,0,5.3.8-.8,1.6-2.3,2.2-4.5l2.4,8c-1.5-1-2.6-1.7-3.9-1.7,2.3,5,5.2,6.2,7,5.9,2.3-.4,3.3-2.4,3-4.2-.5-2.4-3-3.1-4.2-.2-2.2-4.6,1.6-6,4-4.6-3.7-3.7-4.2-7.1-1.2-11.1,4.2,3.2,4.3,6.4,2.4,10.9,2.5-2.8,6.3-1.3,4.9,3.2-1.8-2.7-4.1-1-3.7,1.6.3,2.3,3.3,4.1,7,3.8,5.4-.5,5.7-4.2,5.8-7.2-1.3-.2-3.7,1-5.7,3.8l-.7-8.5c2.2,2.3,4.2,2.7,6.4,2.8-.7-2.3-4.1-6.1-4.1-6.1h10.6,0Z"/>
+                    <path
+                        d="M33.1,9.8c.2-.1.3-.3.5-.5l4.6,2.4v-6.8l-4.6,1.5c-.1-.2-.3-.3-.5-.5l1.9-5.9h-6.7l1.9,5.9c-.2.1-.3.3-.5.5l-4.6-1.5v6.8l4.6-2.4c.1.2.3.3.5.5l-2.6,8c-.9,2.8,1.2,5.7,4.1,5.7h0c3,0,5.1-2.9,4.1-5.7l-2.6-8ZM37,37.9s-3.4,3.8-4.1,6.1c2.2,0,4.2-.5,6.4-2.8l-.7,8.5c-2-2.8-4.4-4.1-5.7-3.8.1,3.1.5,6.7,5.8,7.2,3.7.3,6.7-1.5,7-3.8.4-2.6-2-4.3-3.7-1.6-1.4-4.5,2.4-6.1,4.9-3.2-1.9-4.5-1.8-7.7,2.4-10.9,3,4,2.6,7.3-1.2,11.1,2.4-1.3,6.2,0,4,4.6-1.2-2.8-3.7-2.2-4.2.2-.3,1.7.7,3.7,3,4.2,1.9.3,4.7-.9,7-5.9-1.3,0-2.4.7-3.9,1.7l2.4-8c.6,2.3,1.4,3.7,2.2,4.5.6-1.6.5-2.8,0-5.3l5,1.8c-2.6,3.6-5.2,8.7-7.3,17.5-7.4-1.1-15.7-1.7-24.5-1.7h0c-8.8,0-17.1.6-24.5,1.7-2.1-8.9-4.7-13.9-7.3-17.5l5-1.8c-.5,2.5-.6,3.7,0,5.3.8-.8,1.6-2.3,2.2-4.5l2.4,8c-1.5-1-2.6-1.7-3.9-1.7,2.3,5,5.2,6.2,7,5.9,2.3-.4,3.3-2.4,3-4.2-.5-2.4-3-3.1-4.2-.2-2.2-4.6,1.6-6,4-4.6-3.7-3.7-4.2-7.1-1.2-11.1,4.2,3.2,4.3,6.4,2.4,10.9,2.5-2.8,6.3-1.3,4.9,3.2-1.8-2.7-4.1-1-3.7,1.6.3,2.3,3.3,4.1,7,3.8,5.4-.5,5.7-4.2,5.8-7.2-1.3-.2-3.7,1-5.7,3.8l-.7-8.5c2.2,2.3,4.2,2.7,6.4,2.8-.7-2.3-4.1-6.1-4.1-6.1h10.6,0Z"/>
                 </g>
             </svg>
             <div class="govuk-footer__navigation">
@@ -170,14 +191,16 @@
                         <li class="govuk-footer__list-item">
                             <a class="govuk-footer__link" asp-page="/LinkPages/Privacy">Privacy</a>
                         </li>
-                        
+
                         <li class="govuk-footer__list-item">
                             <a class="govuk-footer__link" asp-page="/LinkPages/Cookies">Cookies</a>
                         </li>
                         <li class="govuk-footer__list-item">
-                            <a class="govuk-footer__link" href="https://www.skillsforcareers.education.gov.uk/pages/help/contact-information">Contact information</a>
+                            <a class="govuk-footer__link"
+                               href="https://www.skillsforcareers.education.gov.uk/pages/help/contact-information">Contact
+                                information</a>
                         </li>
-                        
+
                     </ul>
                 </div>
                 <div class="govuk-footer__section govuk-grid-column-one-third">
@@ -190,7 +213,8 @@
                             <a class="govuk-footer__link" href="https://careerswales.gov.wales/">Wales</a>
                         </li>
                         <li class="govuk-footer__list-item">
-                            <a class="govuk-footer__link" href="https://www.nidirect.gov.uk/campaigns/careers">Northern Ireland</a>
+                            <a class="govuk-footer__link" href="https://www.nidirect.gov.uk/campaigns/careers">Northern
+                                Ireland</a>
                         </li>
                     </ul>
                 </div>
@@ -220,7 +244,7 @@
                 </div>
                 <div class="govuk-footer__meta-item">
                     <a class="govuk-footer__link govuk-footer__copyright-logo"
-                        href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/">
+                       href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/">
                         © Crown copyright
                     </a>
                 </div>
@@ -234,7 +258,7 @@
     <script src="~/js/dfefrontend-2.0.0.min.js" type="module"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
-    
+
     @if (ViewBag.ShowCookieBanner)
     {
         <script asp-add-nonce>
@@ -243,19 +267,20 @@
                 if (this.id === "acceptAnalytics") {
                     createCookie("AnalyticsCookie", "yes");
                     createCookie("MarketingCookie", "yes");
-                    gtag('consent', 'update',  {
+                    gtag('consent', 'update', {
                         'analytics_storage': 'granted'
                     });
                     window.clarity('consent', true);
                 } else {
                     createCookie("AnalyticsCookie", "no");
                     createCookie("MarketingCookie", "no");
-                    gtag('consent', 'update',  {
+                    gtag('consent', 'update', {
                         'analytics_storage': 'denied'
                     });
                     window.clarity('consent', false);
                 }
             }
+
             function createCookie(cookiname, cookivalue) {
                 let date = new Date();
                 date.setFullYear(date.getFullYear() + 1);
@@ -268,5 +293,25 @@
             document.getElementById("rejectAnalytics").addEventListener("click", acceptCookies);
         </script>
     }
+
+    <script asp-add-nonce>
+        async function setCookieConsent() {
+            const analyticsCookie = await cookieStore.get("AnalyticsCookie");
+            if (analyticsCookie && analyticsCookie.value && analyticsCookie.value.toLocaleLowerCase() === "yes") {
+                gtag('consent', 'update', {
+                    'analytics_storage': 'granted'
+                });
+                window.clarity('consent', true);
+            } else {
+                gtag('consent', 'update', {
+                    'analytics_storage': 'denied'
+                });
+                window.clarity('consent', false);
+            }
+        }
+
+        setCookieConsent();
+    </script>
 }
+
 @* ReSharper restore Razor.SectionNotResolved *@
