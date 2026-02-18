@@ -20,8 +20,8 @@
       </div>
       <script asp-add-nonce>
         async function setCookieConsent() {
-          const marketingCookie = await cookieStore.get("AnalyticsCookie");
-          if (marketingCookie && marketingCookie.value && marketingCookie.value.toLocaleLowerCase() === "yes") {
+          const analyticsCookie = await cookieStore.get("AnalyticsCookie");
+          if (analyticsCookie && analyticsCookie.value && analyticsCookie.value.toLocaleLowerCase() === "yes") {
             gtag('consent', 'update', {
               'analytics_storage': 'granted'
             });

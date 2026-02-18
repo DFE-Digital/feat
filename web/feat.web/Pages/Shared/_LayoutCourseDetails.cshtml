@@ -281,5 +281,24 @@
             document.getElementById("rejectAnalytics").addEventListener("click", acceptCookies);
         </script>
     }
+    
+    <script asp-add-nonce>
+        async function setCookieConsent() {
+            const analyticsCookie = await cookieStore.get("AnalyticsCookie");
+            if (analyticsCookie && analyticsCookie.value && analyticsCookie.value.toLocaleLowerCase() === "yes") {
+                gtag('consent', 'update', {
+                    'analytics_storage': 'granted'
+                });
+                window.clarity('consent', true);
+            } else {
+                gtag('consent', 'update', {
+                    'analytics_storage': 'denied'
+                });
+                window.clarity('consent', false);
+            }
+        }
+
+        setCookieConsent();
+    </script>
 }
 @* ReSharper restore Razor.SectionNotResolved *@
