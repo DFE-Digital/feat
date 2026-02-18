@@ -4,9 +4,9 @@
 
 The text embedding used in Alpha and early Beta was `text-embedding-ada-002`
 
-As models are only officially supported for 12 months, we made the decision to move to a more recently model.
+As models are only officially supported for 12 months, we made the decision to move to a more recent model.
 
-We were also limited by the models made available to us by the DfE Centre of Excellence OpenAPI endpoint
+We were also limited by the models made available to us by the DfE Centre of Excellence OpenAPI endpoint.
 
 ## Considered Options
 
@@ -30,7 +30,7 @@ We were also limited by the models made available to us by the DfE Centre of Exc
 
 We found the following:
 
-- Whist the small embedding model was performant, relevance and accuracy was such an important factor, that we chose text-embedding-3-large
+- Whist the small embedding model was performant, relevance and accuracy were such important factors, that we chose text-embedding-3-large.
 - The compression of the vectors increased the performance overhead, and also dropped the retrieval scores.
 
 For the reasons above, we decided to move forward with `text-embedding-3-large`
