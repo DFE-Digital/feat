@@ -1,0 +1,3 @@
+This is the location the accessibility and ZAP scan reports are output to.
+
+This file only exists to ensure the directory is created on checkout
