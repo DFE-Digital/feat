@@ -1,0 +1,354 @@
+{
+    "root_group": {
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "Search: status 200": {
+                    "name": "Search: status 200",
+                    "path": "::Search: status 200",
+                    "id": "edc99b2298c158a37c06668db74e9c03",
+                    "passes": 151,
+                    "fails": 0
+                },
+                "Search: JSON body": {
+                    "fails": 0,
+                    "name": "Search: JSON body",
+                    "path": "::Search: JSON body",
+                    "id": "739a2c4a84236ba37be6644436df7df0",
+                    "passes": 151
+                },
+                "Search: has page": {
+                    "passes": 151,
+                    "fails": 0,
+                    "name": "Search: has page",
+                    "path": "::Search: has page",
+                    "id": "82eeac2ddae7d92a1381c7a13acc1941"
+                },
+                "Search: has pageSize": {
+                    "name": "Search: has pageSize",
+                    "path": "::Search: has pageSize",
+                    "id": "5666d0eccb6da130e05db95b6d6631f6",
+                    "passes": 151,
+                    "fails": 0
+                },
+                "Search: has totalCount": {
+                    "path": "::Search: has totalCount",
+                    "id": "ccc397cb3c1420e2f316b69020fbd2ba",
+                    "passes": 151,
+                    "fails": 0,
+                    "name": "Search: has totalCount"
+                },
+                "Search: courses is array": {
+                    "name": "Search: courses is array",
+                    "path": "::Search: courses is array",
+                    "id": "7e37ca00abf0560194b19666db772bfd",
+                    "passes": 151,
+                    "fails": 0
+                },
+                "Search: facets is array": {
+                    "name": "Search: facets is array",
+                    "path": "::Search: facets is array",
+                    "id": "2c6c10f148e8500a2928918451f053ab",
+                    "passes": 151,
+                    "fails": 0
+                },
+                "Search course: has instanceId": {
+                    "fails": 0,
+                    "name": "Search course: has instanceId",
+                    "path": "::Search course: has instanceId",
+                    "id": "276621a324455a207f7db69989ec2c39",
+                    "passes": 81
+                },
+                "Search course: has title": {
+                    "name": "Search course: has title",
+                    "path": "::Search course: has title",
+                    "id": "d83ebeb21539fc5a4d4baefa54b8ee6e",
+                    "passes": 81,
+                    "fails": 0
+                },
+                "Details: status 200": {
+                    "name": "Details: status 200",
+                    "path": "::Details: status 200",
+                    "id": "e0eb49182f09e1d1964cbf0173ae90f5",
+                    "passes": 36,
+                    "fails": 0
+                },
+                "Details: JSON body": {
+                    "path": "::Details: JSON body",
+                    "id": "52ef5c5b3ec7a3f0d5ffc30db1798f1a",
+                    "passes": 36,
+                    "fails": 0,
+                    "name": "Details: JSON body"
+                },
+                "Details: has id": {
+                    "name": "Details: has id",
+                    "path": "::Details: has id",
+                    "id": "8d816893a4dfcb9ab0543100d85ccd9b",
+                    "passes": 36,
+                    "fails": 0
+                },
+                "Details: has entryType": {
+                    "fails": 0,
+                    "name": "Details: has entryType",
+                    "path": "::Details: has entryType",
+                    "id": "eacef4609fb9c5aeb61f5edb5a20b329",
+                    "passes": 36
+                },
+                "Details: has courseType": {
+                    "name": "Details: has courseType",
+                    "path": "::Details: has courseType",
+                    "id": "19f73428d1bac04789f49bdab021ef69",
+                    "passes": 36,
+                    "fails": 0
+                },
+                "Details: has deliveryMode": {
+                    "fails": 0,
+                    "name": "Details: has deliveryMode",
+                    "path": "::Details: has deliveryMode",
+                    "id": "fc0d8a6eec6265c77a874c2da5674dcb",
+                    "passes": 36
+                },
+                "Autocomplete: status 200": {
+                    "name": "Autocomplete: status 200",
+                    "path": "::Autocomplete: status 200",
+                    "id": "7131cf369a64e7181dd6f13cfc855d8e",
+                    "passes": 73,
+                    "fails": 0
+                },
+                "Autocomplete: JSON body": {
+                    "name": "Autocomplete: JSON body",
+                    "path": "::Autocomplete: JSON body",
+                    "id": "f6d8f3e7b1b80bf92ef63c7a3e3fbdb1",
+                    "passes": 73,
+                    "fails": 0
+                },
+                "Autocomplete: returns array": {
+                    "passes": 73,
+                    "fails": 0,
+                    "name": "Autocomplete: returns array",
+                    "path": "::Autocomplete: returns array",
+                    "id": "f83135530dd907d177e26b9d6619e5c9"
+                },
+                "Autocomplete: has name": {
+                    "fails": 0,
+                    "name": "Autocomplete: has name",
+                    "path": "::Autocomplete: has name",
+                    "id": "93e6c1c6143d29549acb4da6304b27e7",
+                    "passes": 73
+                },
+                "Autocomplete: has latitude": {
+                    "passes": 73,
+                    "fails": 0,
+                    "name": "Autocomplete: has latitude",
+                    "path": "::Autocomplete: has latitude",
+                    "id": "96c69223a62eb6884cb5194055b5becb"
+                },
+                "Autocomplete: has longitude": {
+                    "fails": 0,
+                    "name": "Autocomplete: has longitude",
+                    "path": "::Autocomplete: has longitude",
+                    "id": "a9d754524cd4aa0fa0c31f8d5ca1b94b",
+                    "passes": 73
+                }
+            },
+        "name": ""
+    },
+    "metrics": {
+        "http_reqs": {
+            "count": 260,
+            "rate": 0.432294444045893
+        },
+        "http_req_sending": {
+            "avg": 0.06936153846153843,
+            "min": 0.012,
+            "med": 0.053,
+            "max": 2.424,
+            "p(90)": 0.0941,
+            "p(95)": 0.11705
+        },
+        "vus_max": {
+            "min": 10,
+            "max": 10,
+            "value": 10
+        },
+        "data_received": {
+            "count": 1532590,
+            "rate": 2548.192853847289
+        },
+        "http_req_tls_handshaking": {
+            "min": 0,
+            "med": 0,
+            "max": 326.528,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 2.6087000000000007
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 260,
+            "value": 0
+        },
+        "feat_search_duration_ms": {
+            "p(95)": 662.212,
+            "avg": 336.24441721854294,
+            "min": 52.868,
+            "med": 446.314,
+            "max": 806.188,
+            "p(90)": 651.973
+        },
+        "checks": {
+            "passes": 1873,
+            "fails": 0,
+            "value": 1
+        },
+        "feat_search_paginate_duration_ms": {
+            "avg": 486.51770000000005,
+            "min": 53.684,
+            "med": 559.1625,
+            "max": 670.165,
+            "p(90)": 655.9339,
+            "p(95)": 664.7203,
+            "thresholds": {
+                "p(95)<=2000": false
+            }
+        },
+        "http_req_blocked": {
+            "p(90)": 0.021,
+            "p(95)": 0.030199999999999953,
+            "avg": 3.3277846153846116,
+            "min": 0.003,
+            "med": 0.013,
+            "max": 342.734
+        },
+        "http_req_receiving": {
+            "p(95)": 1.8602499999999988,
+            "avg": 0.42756923076923076,
+            "min": 0.077,
+            "med": 0.223,
+            "max": 4.889,
+            "p(90)": 0.5736000000000002
+        },
+        "vus": {
+            "value": 1,
+            "min": 0,
+            "max": 1
+        },
+        "http_req_duration{expected_response:true}": {
+            "avg": 212.22556538461518,
+            "min": 13.052,
+            "med": 63.2275,
+            "max": 806.188,
+            "p(90)": 614.2677,
+            "p(95)": 652.8445
+        },
+        "http_req_waiting": {
+            "avg": 211.72863461538472,
+            "min": 12.898,
+            "med": 63.021,
+            "max": 805.735,
+            "p(90)": 613.995,
+            "p(95)": 652.4466
+        },
+        "feat_autocomplete_error_rate": {
+            "passes": 0,
+            "fails": 73,
+            "thresholds": {
+                "rate<0.02": false
+            },
+            "value": 0
+        },
+        "feat_details_duration_ms": {
+            "avg": 23.203805555555558,
+            "min": 13.052,
+            "med": 17.58,
+            "max": 52.114,
+            "p(90)": 39.30700000000001,
+            "p(95)": 47.859249999999996,
+            "thresholds": {
+                "p(95)<=2000": false
+            }
+        },
+        "http_req_connecting": {
+            "avg": 0.49756923076923076,
+            "min": 0,
+            "med": 0,
+            "max": 16.885,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "iteration_duration": {
+            "avg": 1375.4252444569536,
+            "min": 1055.206458,
+            "med": 1489.069333,
+            "max": 1888.985667,
+            "p(90)": 1689.801917,
+            "p(95)": 1735.7404165
+        },
+        "feat_search_error_rate": {
+            "passes": 0,
+            "fails": 151,
+            "thresholds": {
+                "rate<0.02": false
+            },
+            "value": 0
+        },
+        "feat_search_filtered_duration_ms": {
+            "min": 52.868,
+            "med": 83.2635,
+            "max": 116.432,
+            "p(90)": 108.0091,
+            "p(95)": 109.57535,
+            "avg": 83.56084375,
+            "thresholds": {
+                "p(95)<=3000": false
+            }
+        },
+        "feat_autocomplete_duration_ms": {
+            "avg": 48.90963013698629,
+            "min": 42.352,
+            "med": 45.728,
+            "max": 203.337,
+            "p(90)": 51.147800000000004,
+            "p(95)": 54.465799999999994,
+            "thresholds": {
+                "p(95)<=1500": false
+            }
+        },
+        "feat_details_error_rate": {
+            "passes": 0,
+            "fails": 36,
+            "thresholds": {
+                "rate<0.02": false
+            },
+            "value": 0
+        },
+        "feat_search_initial_duration_ms": {
+            "min": 53.273,
+            "med": 469.939,
+            "max": 806.188,
+            "p(90)": 653.0758,
+            "p(95)": 673.9761999999998,
+            "avg": 376.4430224719101,
+            "thresholds": {
+                "p(95)<=2500": false
+            }
+        },
+        "http_req_duration": {
+            "avg": 212.22556538461518,
+            "min": 13.052,
+            "med": 63.2275,
+            "max": 806.188,
+            "p(90)": 614.2677,
+            "p(95)": 652.8445
+        },
+        "iterations": {
+            "count": 151,
+            "rate": 0.25106331173434554
+        },
+        "data_sent": {
+            "count": 105516,
+            "rate": 175.43838676133248
+        }
+    }
+}
