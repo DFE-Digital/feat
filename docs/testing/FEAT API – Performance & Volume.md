@@ -193,4 +193,3 @@ Where real data is not yet available, volumetric assumptions are documented tran
 All assumptions are subject to Product and Technical review.
 
 As real usage data becomes available during private beta, these figures will be revisited and refined.
-```
