@@ -20,6 +20,7 @@ import { options as baseline } from '../scenarios/baseline.js';
 import { options as peak } from '../scenarios/peak.js';
 import { options as spike } from '../scenarios/spike.js';
 import { options as stress } from '../scenarios/stress.js';
+import { options as spikeControlled } from '../scenarios/spike-controlled.js';
 
 //Custom metrics (per endpoint + journey)
 export const feat_search_duration_ms = new Trend('feat_search_duration_ms', true);
@@ -40,7 +41,9 @@ export const options =
     scenario === 'peak' ? peak :
         scenario === 'spike' ? spike :
             scenario === 'stress' ? stress :
-                baseline;
+                scenario === 'beta' ? beta :
+                    scenario === 'spike_controlled' ? spikeControlled :
+                        baseline;
 
 export default function () {
     const headers = buildHeaders();
