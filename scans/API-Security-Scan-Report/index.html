@@ -1,0 +1,2304 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../developers/release-process/">
+      
+      
+        <link rel="next" href="../Web-Security-Scan-Report/">
+      
+      
+      <link rel="icon" href="../../favicons/favicon.ico">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>API ZAP Scanning Report - Find Education and Training Documentation</title>
+      
+    
+    
+  
+      <link rel="stylesheet" href="../../assets/stylesheets/main.bcfcd587.min.css">
+      
+      
+
+
+    
+  <link rel="stylesheet" href="../../assets/stylesheets/extra.css">
+
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-zap-scanning-report" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Find Education and Training Documentation" class="md-header__button md-logo" aria-label="Find Education and Training Documentation" data-md-component="logo">
+      
+  <img src="../../logos/govuk-icon-512.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Find Education and Training Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API ZAP Scanning Report
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/application-architecture/" class="md-tabs__link">
+          
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../developers/branching-strategy/" class="md-tabs__link">
+          
+  
+  Developers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  Scans
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../testing/Defect%20Summary%20Report%20%E2%80%93%20FEAT%20%28Private%20Beta%29/" class="md-tabs__link">
+          
+  
+  Testing
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Find Education and Training Documentation" class="md-nav__button md-logo" aria-label="Find Education and Training Documentation" data-md-component="logo">
+      
+  <img src="../../logos/govuk-icon-512.png" alt="logo">
+
+    </a>
+    Find Education and Training Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/application-architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Application Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/data-ingestion/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Ingestion
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/deployment-architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Deployment Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/terraform/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Terraform
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/volumetrics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Volumetrics
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Adr
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            Adr
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/adr/001-external-entry-point/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Decision - 001 - External Entry Point
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/adr/002-relational-database/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Decision - 002 - Relational Database
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/adr/003-caching/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Decision - 003 - Caching
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/adr/004-replace-azure-cache-for-redis/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Decision - 004 - Replacing Azure Cache for Redis
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/adr/005-azure-ai-search/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Decision - 005 - Azure AI Search
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/adr/006-replace-ada-with-text-large/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Decision - 006 - Replacing Text Embedding Algorithm
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Developers
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Developers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developers/branching-strategy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Branching strategy and code quality
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developers/definition-of-done/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Definition of Done
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developers/development-process/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Development Process
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developers/project-setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Project Setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developers/release-process/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Release Process
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Scans
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Scans
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    API ZAP Scanning Report
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    API ZAP Scanning Report
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary-of-alerts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary of Alerts
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#insights" class="md-nav__link">
+    <span class="md-ellipsis">
+      Insights
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alerts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alerts
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alert-detail" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alert Detail
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Alert Detail">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#insufficient-site-isolation-against-spectre-vulnerability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Insufficient Site Isolation Against Spectre Vulnerability
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Insufficient Site Isolation Against Spectre Vulnerability">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#low-medium" class="md-nav__link">
+    <span class="md-ellipsis">
+      Low (Medium)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-693" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 693
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 14
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#strict-transport-security-header-not-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      Strict-Transport-Security Header Not Set
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Strict-Transport-Security Header Not Set">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#low-high" class="md-nav__link">
+    <span class="md-ellipsis">
+      Low (High)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-319" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 319
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 15
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unexpected-content-type-was-returned" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unexpected Content-Type was returned
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Unexpected Content-Type was returned">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#low-high_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Low (High)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#source-id-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 4
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-client-error-response-code-was-returned-by-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      A Client Error response code was returned by the server
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A Client Error response code was returned by the server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informational-high" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informational (High)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-388" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 388
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-20" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 20
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-4_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 4
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#re-examine-cache-control-directives" class="md-nav__link">
+    <span class="md-ellipsis">
+      Re-examine Cache-control Directives
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Re-examine Cache-control Directives">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informational-low" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informational (Low)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-525" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 525
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 13
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#storable-and-cacheable-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      Storable and Cacheable Content
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Storable and Cacheable Content">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#informational-medium" class="md-nav__link">
+    <span class="md-ellipsis">
+      Informational (Medium)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#description_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Description
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cwe-id-524" class="md-nav__link">
+    <span class="md-ellipsis">
+      CWE Id: 524
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wasc-id-13_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      WASC Id: 13
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#source-id-3_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Source ID: 3
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Web-Security-Scan-Report/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Web ZAP Scanning Report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Testing
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Testing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/Defect%20Summary%20Report%20%E2%80%93%20FEAT%20%28Private%20Beta%29/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Defect Summary Report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/FEAT%20API%20%E2%80%93%20Performance%20%26%20Volume/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FEAT Search API – Performance & Volumetrics Plan (Private Beta)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/FEAT%20APIs%20%E2%80%93%20Performance%20Test%20Report/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FEAT APIs – Performance Test Report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/Find%20education%20and%20training%20%E2%80%93%20Accessib/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Find education and training – Accessibility Audit
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/Test-Closure-Report%E2%80%93%20FEAT%20%28Private%20Beta%29/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Test Closure Report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/TestPlan/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FEAT Project – QA Test Plan
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="api-zap-scanning-report">API ZAP Scanning Report</h1>
+<p>ZAP by <a href="https://checkmarx.com/">Checkmarx</a>.</p>
+<h2 id="summary-of-alerts">Summary of Alerts</h2>
+<table>
+<thead>
+<tr>
+<th>Risk Level</th>
+<th>Number of Alerts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Medium</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Low</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Informational</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<h2 id="insights">Insights</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Reason</th>
+<th>Site</th>
+<th>Description</th>
+<th>Statistic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>http://s265t01-app-api.azurewebsites.net</td>
+<td>Percentage of responses with status code 3xx</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>http://s265t01-app-api.azurewebsites.net</td>
+<td>Percentage of endpoints with method GET</td>
+<td>50 %</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>http://s265t01-app-api.azurewebsites.net</td>
+<td>Percentage of endpoints with method POST</td>
+<td>50 %</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>http://s265t01-app-api.azurewebsites.net</td>
+<td>Count of total endpoints</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>http://s265t01-app-api.azurewebsites.net</td>
+<td>Percentage of slow responses</td>
+<td>50 %</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>https://s265t01-app-api.azurewebsites.net</td>
+<td>Percentage of responses with status code 2xx</td>
+<td>49 %</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>https://s265t01-app-api.azurewebsites.net</td>
+<td>Percentage of responses with status code 4xx</td>
+<td>50 %</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>https://s265t01-app-api.azurewebsites.net</td>
+<td>Percentage of endpoints with content type application/json</td>
+<td>8 %</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>https://s265t01-app-api.azurewebsites.net</td>
+<td>Percentage of endpoints with content type application/problem+json</td>
+<td>8 %</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>https://s265t01-app-api.azurewebsites.net</td>
+<td>Percentage of endpoints with content type text/html</td>
+<td>16 %</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>https://s265t01-app-api.azurewebsites.net</td>
+<td>Percentage of endpoints with method GET</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>https://s265t01-app-api.azurewebsites.net</td>
+<td>Count of total endpoints</td>
+<td>24</td>
+</tr>
+<tr>
+<td>Info</td>
+<td>Informational</td>
+<td>https://s265t01-app-api.azurewebsites.net</td>
+<td>Percentage of slow responses</td>
+<td>66 %</td>
+</tr>
+</tbody>
+</table>
+<h2 id="alerts">Alerts</h2>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Risk Level</th>
+<th>Number of Instances</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Insufficient Site Isolation Against Spectre Vulnerability</td>
+<td>Low</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Strict-Transport-Security Header Not Set</td>
+<td>Low</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Unexpected Content-Type was returned</td>
+<td>Low</td>
+<td>4</td>
+</tr>
+<tr>
+<td>A Client Error response code was returned by the server</td>
+<td>Informational</td>
+<td>26</td>
+</tr>
+<tr>
+<td>Re-examine Cache-control Directives</td>
+<td>Informational</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Storable and Cacheable Content</td>
+<td>Informational</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+<h2 id="alert-detail">Alert Detail</h2>
+<h3 id="insufficient-site-isolation-against-spectre-vulnerability"><a href="https://www.zaproxy.org/docs/alerts/90004/"> Insufficient Site Isolation Against Spectre Vulnerability </a></h3>
+<h5 id="low-medium">Low (Medium)</h5>
+<h3 id="description">Description</h3>
+<p>Cross-Origin-Resource-Policy header is an opt-in header designed to counter side-channels attacks like Spectre. Resource should be specifically set as shareable amongst different origins.</p>
+<ul>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: <code>Cross-Origin-Resource-Policy</code></li>
+<li>Attack: ``</li>
+<li>Evidence: <code>same-site</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/openapi/v1.json</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/openapi/v1.json</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: <code>Cross-Origin-Resource-Policy</code></li>
+<li>Attack: ``</li>
+<li>Evidence: <code>same-site</code></li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 2</p>
+<h3 id="solution">Solution</h3>
+<p>Ensure that the application/web server sets the Cross-Origin-Resource-Policy header appropriately, and that it sets the Cross-Origin-Resource-Policy header to 'same-origin' for all web pages.
+'same-site' is considered as less secured and should be avoided.
+If resources must be shared, set the header to 'cross-origin'.
+If possible, ensure that the end user uses a standards-compliant and modern web browser that supports the Cross-Origin-Resource-Policy header (https://caniuse.com/mdn-http_headers_cross-origin-resource-policy).</p>
+<h3 id="reference">Reference</h3>
+<ul>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Embedder-Policy"> https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Embedder-Policy </a></li>
+</ul>
+<h4 id="cwe-id-693">CWE Id: <a href="https://cwe.mitre.org/data/definitions/693.html"> 693 </a></h4>
+<h4 id="wasc-id-14">WASC Id: 14</h4>
+<h4 id="source-id-3">Source ID: 3</h4>
+<h3 id="strict-transport-security-header-not-set"><a href="https://www.zaproxy.org/docs/alerts/10035/"> Strict-Transport-Security Header Not Set </a></h3>
+<h5 id="low-high">Low (High)</h5>
+<h3 id="description_1">Description</h3>
+<p>HTTP Strict Transport Security (HSTS) is a web security policy mechanism whereby a web server declares that complying user agents (such as a web browser) are to interact with it using only secure HTTPS connections (i.e. HTTP layered over TLS/SSL). HSTS is an IETF standards track protocol and is specified in RFC 6797.</p>
+<ul>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/Search</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/Search</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/openapi/v1.json</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/openapi/v1.json</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 4</p>
+<h3 id="solution_1">Solution</h3>
+<p>Ensure that your web server, application server, load balancer, etc. is configured to enforce Strict-Transport-Security.</p>
+<h3 id="reference_1">Reference</h3>
+<ul>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html"> https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html </a></li>
+<li><a href="https://owasp.org/www-community/Security_Headers"> https://owasp.org/www-community/Security_Headers </a></li>
+<li><a href="https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security"> https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security </a></li>
+<li><a href="https://caniuse.com/stricttransportsecurity"> https://caniuse.com/stricttransportsecurity </a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc6797"> https://datatracker.ietf.org/doc/html/rfc6797 </a></li>
+</ul>
+<h4 id="cwe-id-319">CWE Id: <a href="https://cwe.mitre.org/data/definitions/319.html"> 319 </a></h4>
+<h4 id="wasc-id-15">WASC Id: 15</h4>
+<h4 id="source-id-3_1">Source ID: 3</h4>
+<h3 id="unexpected-content-type-was-returned"><a href="https://www.zaproxy.org/docs/alerts/100001/"> Unexpected Content-Type was returned </a></h3>
+<h5 id="low-high_1">Low (High)</h5>
+<h3 id="description_2">Description</h3>
+<p>A Content-Type of text/html was returned by the server.
+This is not one of the types expected to be returned by an API.
+Raised by the 'Alert on Unexpected Content Types' script</p>
+<ul>
+<li>URL: https://s265t01-app-api.azurewebsites.net/computeMetadata/v1/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/computeMetadata/v1/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>text/html</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/latest/meta-data/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/latest/meta-data/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>text/html</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/metadata/instance</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/metadata/instance</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>text/html</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/opc/v1/instance/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/opc/v1/instance/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>text/html</code></li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 4</p>
+<h3 id="solution_2">Solution</h3>
+<h3 id="reference_2">Reference</h3>
+<h4 id="source-id-4">Source ID: 4</h4>
+<h3 id="a-client-error-response-code-was-returned-by-the-server"><a href="https://www.zaproxy.org/docs/alerts/100000/"> A Client Error response code was returned by the server </a></h3>
+<h5 id="informational-high">Informational (High)</h5>
+<h3 id="description_3">Description</h3>
+<p>A response code of 404 was returned by the server.
+This may indicate that the application is failing to handle unexpected input correctly.
+Raised by the 'Alert on HTTP Response Code Error' script</p>
+<ul>
+<li>URL: http://s265t01-app-api.azurewebsites.net/api/Courses/instanceId</li>
+<li>Node Name: <code>http://s265t01-app-api.azurewebsites.net/api/Courses/instanceId</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/3818639849362130394</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/3818639849362130394</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/actuator/health</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/actuator/health</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/7049861372141831312</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/7049861372141831312</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3F=</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>400</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=%2527</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>400</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>400</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/Courses</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/Courses</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/Courses/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/Courses/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/Courses/8009759498840926885</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/Courses/8009759498840926885</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/Search</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/Search</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>405</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/Search/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/Search/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>405</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/computeMetadata/v1/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/computeMetadata/v1/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/latest/meta-data/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/latest/meta-data/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/metadata/instance</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/metadata/instance</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/opc/v1/instance/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/opc/v1/instance/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/openapi</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/openapi</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/openapi/</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/openapi/</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/openapi/6034742310008275247</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/openapi/6034742310008275247</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>404</code></li>
+<li>Other Info: ``</li>
+<li>URL: http://s265t01-app-api.azurewebsites.net/api/Search</li>
+<li>Node Name: <code>http://s265t01-app-api.azurewebsites.net/api/Search ()({query,sessionId,page,pageSize,location,radius,orderBy,courseType,qualificationLevel,learningMethod,courseHours,studyTime})</code></li>
+<li>Method: <code>POST</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: <code>405</code></li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 26</p>
+<h3 id="solution_3">Solution</h3>
+<h3 id="reference_3">Reference</h3>
+<h4 id="cwe-id-388">CWE Id: <a href="https://cwe.mitre.org/data/definitions/388.html"> 388 </a></h4>
+<h4 id="wasc-id-20">WASC Id: 20</h4>
+<h4 id="source-id-4_1">Source ID: 4</h4>
+<h3 id="re-examine-cache-control-directives"><a href="https://www.zaproxy.org/docs/alerts/10015/"> Re-examine Cache-control Directives </a></h3>
+<h5 id="informational-low">Informational (Low)</h5>
+<h3 id="description_4">Description</h3>
+<p>The cache-control header has not been set properly or is missing, allowing the browser and proxies to cache content. For static assets like css, js, or image files this might be intended, however, the resources should be reviewed to ensure that no sensitive content will be cached.</p>
+<ul>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: <code>cache-control</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/openapi/v1.json</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/openapi/v1.json</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: <code>cache-control</code></li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: ``</li>
+</ul>
+<p>Instances: 2</p>
+<h3 id="solution_4">Solution</h3>
+<p>For secure content, ensure the cache-control HTTP header is set with "no-cache, no-store, must-revalidate". If an asset should be cached consider setting the directives "public, max-age, immutable".</p>
+<h3 id="reference_4">Reference</h3>
+<ul>
+<li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#web-content-caching"> https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#web-content-caching </a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control"> https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control </a></li>
+<li><a href="https://grayduck.mn/2021/09/13/cache-control-recommendations/"> https://grayduck.mn/2021/09/13/cache-control-recommendations/ </a></li>
+</ul>
+<h4 id="cwe-id-525">CWE Id: <a href="https://cwe.mitre.org/data/definitions/525.html"> 525 </a></h4>
+<h4 id="wasc-id-13">WASC Id: 13</h4>
+<h4 id="source-id-3_2">Source ID: 3</h4>
+<h3 id="storable-and-cacheable-content"><a href="https://www.zaproxy.org/docs/alerts/10049/"> Storable and Cacheable Content </a></h3>
+<h5 id="informational-medium">Informational (Medium)</h5>
+<h3 id="description_5">Description</h3>
+<p>The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where "shared" caching servers such as "proxy" caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.</p>
+<ul>
+<li>URL: http://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP</li>
+<li>Node Name: <code>http://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: <code>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</code></li>
+<li>URL: http://s265t01-app-api.azurewebsites.net/api/Courses/instanceId</li>
+<li>Node Name: <code>http://s265t01-app-api.azurewebsites.net/api/Courses/instanceId</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: <code>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</code></li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: <code>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</code></li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/Courses/instanceId</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: <code>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</code></li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/api/Search</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/api/Search</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: <code>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</code></li>
+<li>URL: https://s265t01-app-api.azurewebsites.net/openapi/v1.json</li>
+<li>Node Name: <code>https://s265t01-app-api.azurewebsites.net/openapi/v1.json</code></li>
+<li>Method: <code>GET</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: <code>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</code></li>
+<li>URL: http://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations%3Fquery=ZAP</li>
+<li>Node Name: <code>http://s265t01-app-api.azurewebsites.net/api/AutocompleteLocations (query)</code></li>
+<li>Method: <code>POST</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: <code>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</code></li>
+<li>URL: http://s265t01-app-api.azurewebsites.net/api/Search</li>
+<li>Node Name: <code>http://s265t01-app-api.azurewebsites.net/api/Search ()({query,sessionId,page,pageSize,location,radius,orderBy,courseType,qualificationLevel,learningMethod,courseHours,studyTime})</code></li>
+<li>Method: <code>POST</code></li>
+<li>Parameter: ``</li>
+<li>Attack: ``</li>
+<li>Evidence: ``</li>
+<li>Other Info: <code>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</code></li>
+</ul>
+<p>Instances: 8</p>
+<h3 id="solution_5">Solution</h3>
+<p>Validate that the response does not contain sensitive, personal or user-specific information. If it does, consider the use of the following HTTP response headers, to limit, or prevent the content being stored and retrieved from the cache by another user:
+Cache-Control: no-cache, no-store, must-revalidate, private
+Pragma: no-cache
+Expires: 0
+This configuration directs both HTTP 1.0 and HTTP 1.1 compliant caching servers to not store the response, and to not retrieve the response (without validation) from the cache, in response to a similar request.</p>
+<h3 id="reference_5">Reference</h3>
+<ul>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc7234"> https://datatracker.ietf.org/doc/html/rfc7234 </a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc7231"> https://datatracker.ietf.org/doc/html/rfc7231 </a></li>
+<li><a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html"> https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html </a></li>
+</ul>
+<h4 id="cwe-id-524">CWE Id: <a href="https://cwe.mitre.org/data/definitions/524.html"> 524 </a></h4>
+<h4 id="wasc-id-13_1">WASC Id: 13</h4>
+<h4 id="source-id-3_3">Source ID: 3</h4>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+  <footer class="md-footer">
+    <div class="md-footer-meta__inner md-grid">
+
+      <div class="md-copyright">
+
+        
+
+        Made with 
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        <br><br>
+        <img src="../../assets/images/ogl.png" >
+        All content is available under the 
+        <a
+            href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+            target="_blank" rel="noopener"
+        >
+            Open Government Licence v3.0</a>
+        , except where otherwise stated
+      </div>
+
+      <div class="md-copyright">
+        <a 
+          href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
+          target="_blank" rel="noopener">
+          <img src="../../assets/images/govuk-crest.svg" width=125px height=102px;>
+          <br>
+          © Crown copyright
+        </a>
+      </div>
+
+    </div>
+  </footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "content.code.copy", "content.action.edit", "content.action.view", "toc.integrate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+    
+  </body>
+</html>
