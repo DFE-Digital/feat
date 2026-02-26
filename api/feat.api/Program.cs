@@ -162,7 +162,7 @@ var policyCollection = new HeaderPolicyCollection()
 
 app.UseSecurityHeaders(policyCollection);
 
-app.MapMcp("/mcp");
+app.MapMcp();
 app.MapOpenApi();
 app.MapScalarApiReference();
 app.MapControllers();
