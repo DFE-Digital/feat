@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using CliProgressBar;
@@ -476,12 +475,12 @@ public class FaaIngestionHandler(
             .UpdateFromQueryAsync(ei => new EntryInstance
             {
                 Reference = ei.Reference,
-                SourceReference = string.Empty,
                 LocationId = null
             }, cancellationToken: cancellationToken);
 
         // Remove employer locations
-        await dbContext.BulkDeleteAsync(dbContext.EmployerLocations, cancellationToken);
+        var deletedEmployerLocations = await dbContext.EmployerLocations
+            .ExecuteDeleteAsync(cancellationToken);
         
         // LOCATION
         
@@ -655,10 +654,10 @@ public class FaaIngestionHandler(
 
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
-        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        Console.WriteLine($"{deletedEmployerLocations} deleted");
         
         Console.WriteLine("Cleaning up unused locations...");
-        await dbContext.Locations
+        var unusedLocationsDeleted = await dbContext.Locations
             .Where(l => 
                 l.SourceSystem == SourceSystem 
                 && l.EntryInstances.Count == 0
@@ -666,6 +665,8 @@ public class FaaIngestionHandler(
                 && l.EmployerLocations.Count == 0
             )
             .ExecuteDeleteAsync(cancellationToken);
+        
+        Console.WriteLine($"{unusedLocationsDeleted} deleted");
         
         await transaction.CommitAsync(cancellationToken);
         
