@@ -38,6 +38,12 @@ public class SearchService(
 
         GeoLocation? userLocation = null;
 
+        if (request.Latitude is not null && request.Longitude is not null)
+        {
+            userLocation = new GeoLocation()
+                { Latitude = request.Latitude.Value, Longitude = request.Longitude.Value };
+        }
+
         if (!string.IsNullOrWhiteSpace(request.Location))
         {
             var locationResult = await GetGeoLocationAsync(request.Location!);
@@ -213,7 +219,7 @@ public class SearchService(
         }).ToArray();
     }
     
-    public static string? BuildFilterExpression(SearchRequest request, GeoLocation? userLocation)
+    public static string? BuildFilterExpression(SearchRequest request, GeoLocation? userLocation, GeoLocation[]? locationPolygon = null)
     {
         var filters = new List<string>();
 
@@ -223,7 +229,22 @@ public class SearchService(
         AddFacet(nameof(SearchIndexFields.CourseHours), request.CourseHours);
         AddFacet(nameof(SearchIndexFields.StudyTime), request.StudyTime);
 
-        if (userLocation != null)
+        if (locationPolygon is { Length: >= 4 })
+        {
+            filters.Add(
+                $"""
+                 (
+                     geo.intersects(
+                         Location,
+                         geography'POLYGON(({string.Join(", ", locationPolygon.Select(l => l.Longitude + " " + l.Latitude))}))'
+                     )
+                     or (LearningMethod eq 'Online' and Location eq null)
+                     or IsNational eq true
+                 )
+                 """
+            );
+        }
+        else if (userLocation != null)
         {
             var radius = RadiusInKilometers(request.Radius);
 
@@ -365,7 +386,7 @@ public class SearchService(
         
         
 
-        var filterExpression = BuildFilterExpression(request, userLocation)?.ReplaceLineEndings("");
+        var filterExpression = BuildFilterExpression(request, userLocation, request.LocationPolygon?.ToArray())?.ReplaceLineEndings("");
         
         if (request.OrderBy == OrderBy.Distance && userLocation != null)
         {

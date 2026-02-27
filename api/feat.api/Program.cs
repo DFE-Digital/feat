@@ -151,6 +151,10 @@ builder.Services.AddOpenTelemetry()
             .AddFusionCacheInstrumentation()
     );
 
+builder.Services.AddMcpServer()
+    .WithHttpTransport()
+    .WithToolsFromAssembly();
+
 var app = builder.Build();
 var policyCollection = new HeaderPolicyCollection()
     .AddDefaultApiSecurityHeaders()
@@ -158,6 +162,7 @@ var policyCollection = new HeaderPolicyCollection()
 
 app.UseSecurityHeaders(policyCollection);
 
+app.MapMcp();
 app.MapOpenApi();
 app.MapScalarApiReference();
 app.MapControllers();
