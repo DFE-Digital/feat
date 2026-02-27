@@ -49,6 +49,7 @@ public class CourseService(CourseDbContext dbContext, IFusionCache cache) : ICou
             Level = entryInstance.Entry.Level,
             EntryRequirements = entryInstance.Entry.EntryRequirements,
             Description = entryInstance.Entry.Description,
+            FullDescription = entryInstance.Entry.FullDescription ?? entryInstance.Entry.Description,
             DeliveryMode = entryInstance.StudyMode,
             Duration = entryInstance.Duration,
             HoursType = entryInstance.Entry.AttendancePattern,

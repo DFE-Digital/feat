@@ -29,6 +29,8 @@ public abstract class CourseDetailsBase
     
     public string? Description { get; init; }
     
+    public string? FullDescription { get; init; }
+    
     public string? WhatYouWillLearn { get; set; }
 
     public DeliveryMode? DeliveryMode { private get; init; }

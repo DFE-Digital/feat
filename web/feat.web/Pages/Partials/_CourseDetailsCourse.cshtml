@@ -40,7 +40,7 @@
               <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Course overview</dt>
                 <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrWhiteSpace(Model.Description) ? "You need to visit the provider website for information about this course." : Model.Description)
+                  @(string.IsNullOrWhiteSpace(Model.FullDescription) ? "You will need to visit the provider’s website for information about this course." : Model.FullDescription)
                 </dd>
               </div>
             </dl>
