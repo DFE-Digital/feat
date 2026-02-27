@@ -298,7 +298,8 @@ public class FaaIngestionHandler(
                 Reference = a.VacancyReference!,
                 Title = a.Title!,
                 AimOrAltTitle = a.CourseTitle!,
-                Description = (a.FullDescription ?? a.Description)?.CleanHtml(),
+                Description = a.Description,
+                FullDescription = a.FullDescription,
                 EntryRequirements = a.QualificationsSummary,
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
@@ -348,7 +349,7 @@ public class FaaIngestionHandler(
         // We're only interested here if any text fields have changed
         var updatedIds = auditEntries.Where(e => e.Action == AuditActionType.Update
                                                  && e.Values.Exists(ae =>
-                                                     ae.ColumnName is "Title" or "AimOrAltTitle" or "Description" &&
+                                                     ae.ColumnName is "Title" or "AimOrAltTitle" or "Description" or "FullDescription" &&
                                                      !Equals(ae.OldValue, ae.NewValue)))
             .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
 
@@ -742,7 +743,7 @@ public class FaaIngestionHandler(
             {
                 // TODO: Split these into their own fields
                 sb.Clear();
-                sb.AppendLine(entry.Description);
+                sb.AppendLine(entry.FullDescription);
                 sb.AppendLine(entry.WhatYouWillLearn);
                 var description = sb.ToString().Scrub();
                 
