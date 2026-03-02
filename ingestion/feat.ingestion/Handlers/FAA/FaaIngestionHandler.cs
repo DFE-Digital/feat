@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using CliProgressBar;
@@ -298,7 +297,8 @@ public class FaaIngestionHandler(
                 Reference = a.VacancyReference!,
                 Title = a.Title!,
                 AimOrAltTitle = a.CourseTitle!,
-                Description = (a.FullDescription ?? a.Description)?.CleanHtml(),
+                Description = a.Description,
+                FullDescription = a.FullDescription,
                 EntryRequirements = a.QualificationsSummary,
                 FlexibleStart = a.StartDate == null,
                 AttendancePattern = MapCourseHours(a.HoursPerWeek),
@@ -348,7 +348,7 @@ public class FaaIngestionHandler(
         // We're only interested here if any text fields have changed
         var updatedIds = auditEntries.Where(e => e.Action == AuditActionType.Update
                                                  && e.Values.Exists(ae =>
-                                                     ae.ColumnName is "Title" or "AimOrAltTitle" or "Description" &&
+                                                     ae.ColumnName is "Title" or "AimOrAltTitle" or "Description" or "FullDescription" &&
                                                      !Equals(ae.OldValue, ae.NewValue)))
             .SelectMany(e => e.Values.Where(ae => ae.ColumnName == "Id").Select(ae => (Guid)ae.NewValue));
 
@@ -475,12 +475,12 @@ public class FaaIngestionHandler(
             .UpdateFromQueryAsync(ei => new EntryInstance
             {
                 Reference = ei.Reference,
-                SourceReference = string.Empty,
                 LocationId = null
             }, cancellationToken: cancellationToken);
 
         // Remove employer locations
-        await dbContext.BulkDeleteAsync(dbContext.EmployerLocations, cancellationToken);
+        var deletedEmployerLocations = await dbContext.EmployerLocations
+            .ExecuteDeleteAsync(cancellationToken);
         
         // LOCATION
         
@@ -654,10 +654,10 @@ public class FaaIngestionHandler(
 
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
-        Console.WriteLine($"{resultInfo.RowsAffectedDeleted} deleted");
+        Console.WriteLine($"{deletedEmployerLocations} deleted");
         
         Console.WriteLine("Cleaning up unused locations...");
-        await dbContext.Locations
+        var unusedLocationsDeleted = await dbContext.Locations
             .Where(l => 
                 l.SourceSystem == SourceSystem 
                 && l.EntryInstances.Count == 0
@@ -665,6 +665,8 @@ public class FaaIngestionHandler(
                 && l.EmployerLocations.Count == 0
             )
             .ExecuteDeleteAsync(cancellationToken);
+        
+        Console.WriteLine($"{unusedLocationsDeleted} deleted");
         
         await transaction.CommitAsync(cancellationToken);
         
@@ -742,7 +744,7 @@ public class FaaIngestionHandler(
             {
                 // TODO: Split these into their own fields
                 sb.Clear();
-                sb.AppendLine(entry.Description);
+                sb.AppendLine(entry.FullDescription);
                 sb.AppendLine(entry.WhatYouWillLearn);
                 var description = sb.ToString().Scrub();
                 

@@ -34,6 +34,8 @@ public class Entry
     public required string AimOrAltTitle { get; set; } = string.Empty;
 
     public string? Description { get; set; }
+    
+    public string? FullDescription { get; set; }
 
     public required bool FlexibleStart { get; set; }
 

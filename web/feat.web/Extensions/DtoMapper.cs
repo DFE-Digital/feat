@@ -42,6 +42,7 @@ public static class DtoMapper
             Level = (int?)response.Level,
             EntryRequirements = response.EntryRequirements,
             Description = response.Description,
+            FullDescription = response.FullDescription,
             WhatYouWillLearn = response.WhatYouWillLearn,
             DeliveryMode = response.DeliveryMode.ToDeliveryMode(),
             Duration = response.Duration,
