@@ -155,15 +155,15 @@ public class FacIngestionHandler(
 
             if (
                 Aim == ProcessMode.Force
-                || dbContext.FAC_AimData.Count() != records.Count
+                || await dbContext.FAC_AimData.CountAsync(cancellationToken: cancellationToken) != records.Count
             )
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
             }
 
@@ -189,15 +189,15 @@ public class FacIngestionHandler(
 
             if (
                 ApprovedQualifications == ProcessMode.Force
-                || dbContext.FAC_ApprovedQualifications.Count() != records.Count
+                || await dbContext.FAC_ApprovedQualifications.CountAsync(cancellationToken: cancellationToken) != records.Count
             )
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
             }
 
@@ -229,17 +229,17 @@ public class FacIngestionHandler(
 
                 if (
                     Courses == ProcessMode.Force
-                    || dbContext.FAC_Courses.Count() != records.Count
-                    || dbContext.FAC_Courses.Max(x => x.UpdatedOn) < lastUpdated
-                    || dbContext.FAC_Courses.Max(x => x.CreatedOn) < lastCreated
+                    || await dbContext.FAC_Courses.CountAsync(cancellationToken: cancellationToken) != records.Count
+                    || await dbContext.FAC_Courses.MaxAsync(x => x.UpdatedOn, cancellationToken: cancellationToken) < lastUpdated
+                    || await dbContext.FAC_Courses.MaxAsync(x => x.CreatedOn, cancellationToken: cancellationToken) < lastCreated
                 )
                 {
                     Console.WriteLine($"Preparing {records.Count} records to DB...");
-                    await dbContext.BulkSynchronizeAsync(records, options =>
+                    await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                     {
-                        options.BatchSize = batchSize;
-                        options.BatchDelayInterval = 1000;
-                        options.UseTableLock = true;
+                        bulkOperation.BatchSize = batchSize;
+                        bulkOperation.BatchDelayInterval = 1000;
+                        bulkOperation.UseTableLock = true;
                     }, cancellationToken);
                 }
             }
@@ -272,17 +272,17 @@ public class FacIngestionHandler(
 
                 if (
                     Courses == ProcessMode.Force
-                    || dbContext.FAC_CourseRuns.Count() != records.Count
-                    || dbContext.FAC_CourseRuns.Max(x => x.UpdatedOn) < lastUpdated
-                    || dbContext.FAC_CourseRuns.Max(x => x.CreatedOn) < lastCreated
+                    || await dbContext.FAC_CourseRuns.CountAsync(cancellationToken: cancellationToken) != records.Count
+                    || await dbContext.FAC_CourseRuns.MaxAsync(x => x.UpdatedOn, cancellationToken: cancellationToken) < lastUpdated
+                    || await dbContext.FAC_CourseRuns.MaxAsync(x => x.CreatedOn, cancellationToken: cancellationToken) < lastCreated
                 )
                 {
                     Console.WriteLine($"Preparing {records.Count} records to DB...");
-                    await dbContext.BulkSynchronizeAsync(records, options =>
+                    await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                     {
-                        options.BatchSize = batchSize;
-                        options.BatchDelayInterval = 1000;
-                        options.UseTableLock = true;
+                        bulkOperation.BatchSize = batchSize;
+                        bulkOperation.BatchDelayInterval = 1000;
+                        bulkOperation.UseTableLock = true;
                     }, cancellationToken);
                 }
             }
@@ -313,18 +313,18 @@ public class FacIngestionHandler(
 
             if (
                 TLevels == ProcessMode.Force
-                || dbContext.FAC_TLevels.Count() != records.Count
-                || dbContext.FAC_TLevels.Max(x => x.UpdatedOn) < lastUpdated
-                || dbContext.FAC_TLevels.Max(x => x.CreatedOn) < lastCreated
-                || dbContext.FAC_TLevels.Max(x => x.DeletedOn) < lastDeleted
+                || await dbContext.FAC_TLevels.CountAsync(cancellationToken: cancellationToken) != records.Count
+                || await dbContext.FAC_TLevels.MaxAsync(x => x.UpdatedOn, cancellationToken: cancellationToken) < lastUpdated
+                || await dbContext.FAC_TLevels.MaxAsync(x => x.CreatedOn, cancellationToken: cancellationToken) < lastCreated
+                || await dbContext.FAC_TLevels.MaxAsync(x => x.DeletedOn, cancellationToken: cancellationToken) < lastDeleted
             )
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
             }
 
@@ -352,15 +352,15 @@ public class FacIngestionHandler(
 
             if (
                 TLevels == ProcessMode.Force
-                || dbContext.FAC_TLevels.Count() != records.Count
+                || await dbContext.FAC_TLevels.CountAsync(cancellationToken: cancellationToken) != records.Count
             )
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
             }
 
@@ -387,15 +387,15 @@ public class FacIngestionHandler(
 
             if (
                 TLevels == ProcessMode.Force
-                || dbContext.FAC_TLevelLocations.Count() != records.Count
+                || await dbContext.FAC_TLevelLocations.CountAsync(cancellationToken: cancellationToken) != records.Count
             )
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
             }
 
@@ -423,16 +423,16 @@ public class FacIngestionHandler(
 
             if (
                 Providers == ProcessMode.Force
-                || dbContext.FAC_Providers.Count() != records.Count
-                || dbContext.FAC_Providers.Max(x => x.UpdatedOn) < lastUpdated
+                || await dbContext.FAC_Providers.CountAsync(cancellationToken: cancellationToken) != records.Count
+                || await dbContext.FAC_Providers.MaxAsync(x => x.UpdatedOn, cancellationToken: cancellationToken) < lastUpdated
             )
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
             }
 
@@ -461,17 +461,17 @@ public class FacIngestionHandler(
 
             if (
                 AllCourses == ProcessMode.Force
-                || dbContext.FAC_AllCourses.Count() != records.Count
-                || dbContext.FAC_AllCourses.Max(x => x.UPDATED_DATE) < lastUpdated
-                || dbContext.FAC_AllCourses.Max(x => x.CREATED_DATE) < lastCreated
+                || await dbContext.FAC_AllCourses.CountAsync(cancellationToken: cancellationToken) != records.Count
+                || await dbContext.FAC_AllCourses.MaxAsync(x => x.UPDATED_DATE, cancellationToken: cancellationToken) < lastUpdated
+                || await dbContext.FAC_AllCourses.MaxAsync(x => x.CREATED_DATE, cancellationToken: cancellationToken) < lastCreated
             )
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
             }
 
@@ -500,17 +500,17 @@ public class FacIngestionHandler(
 
             if (
                 Venues == ProcessMode.Force
-                || dbContext.FAC_Venues.Count() != records.Count
-                || dbContext.FAC_Venues.Max(x => x.UpdatedOn) < lastUpdated
-                || dbContext.FAC_Venues.Max(x => x.CreatedOn) < lastCreated
+                || await dbContext.FAC_Venues.CountAsync(cancellationToken: cancellationToken) != records.Count
+                || await dbContext.FAC_Venues.MaxAsync(x => x.UpdatedOn, cancellationToken: cancellationToken) < lastUpdated
+                || await dbContext.FAC_Venues.MaxAsync(x => x.CreatedOn, cancellationToken: cancellationToken) < lastCreated
             )
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
             }
 
@@ -567,18 +567,18 @@ public class FacIngestionHandler(
 
             };
 
-        await dbContext.BulkSynchronizeAsync(locations, options =>
+        await dbContext.BulkSynchronizeAsync(locations, bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = l => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = l => new
             {
                 l.Id,
                 l.Created,
                 l.Updated
             };
-            options.ColumnPrimaryKeyExpression = l => l.SourceReference;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
-            options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
+            bulkOperation.ColumnPrimaryKeyExpression = l => l.SourceReference;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
@@ -603,18 +603,18 @@ public class FacIngestionHandler(
                 OtherNames = p.Alias
             };
         
-        await dbContext.BulkSynchronizeAsync(providers, options =>
+        await dbContext.BulkSynchronizeAsync(providers, bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = p => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = p => new
             {
                 p.Id,
                 p.Created,
                 p.Updated
             };
-            options.ColumnPrimaryKeyExpression = l => l.Ukprn;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
-            options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
+            bulkOperation.ColumnPrimaryKeyExpression = l => l.Ukprn;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
@@ -639,15 +639,15 @@ public class FacIngestionHandler(
                 SourceSystem = SourceSystem
             };
         
-        await dbContext.BulkSynchronizeAsync(providerLocations.Distinct(), options =>
+        await dbContext.BulkSynchronizeAsync(providerLocations.Distinct(), bulkOperation =>
         {
-            options.ColumnPrimaryKeyExpression = p => new
+            bulkOperation.ColumnPrimaryKeyExpression = p => new
             {
                 p.ProviderId, p.LocationId
             };
-            options.UseRowsAffected = true;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
-            options.ResultInfo = resultInfo;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
@@ -749,9 +749,9 @@ public class FacIngestionHandler(
         
         // ENTRY - Merged List
         
-        await dbContext.BulkSynchronizeAsync(distinctEntries, options =>
+        await dbContext.BulkSynchronizeAsync(distinctEntries, bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = p => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = p => new
             {
                 p.Id,
                 p.Created,
@@ -759,12 +759,12 @@ public class FacIngestionHandler(
                 p.SourceUpdated,
                 p.IngestionState
             };
-            options.UseRowsAffected = true;
-            options.ColumnPrimaryKeyExpression = e => e.SourceReference;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
-            options.UseAudit = true;
-            options.AuditEntries = auditEntries;
-            options.ResultInfo = resultInfo;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ColumnPrimaryKeyExpression = e => e.SourceReference;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            bulkOperation.UseAudit = true;
+            bulkOperation.AuditEntries = auditEntries;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
@@ -862,18 +862,18 @@ public class FacIngestionHandler(
         
         // ENTRY INSTANCE - Merged List
         
-        await dbContext.BulkSynchronizeAsync(distinctInstances, options =>
+        await dbContext.BulkSynchronizeAsync(distinctInstances, bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = p => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = p => new
             {
                 p.Id,
                 p.Created,
                 p.Updated
             };
-            options.UseRowsAffected = true;
-            options.ColumnPrimaryKeyExpression = e => e.SourceReference;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
-            options.ResultInfo = resultInfo;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ColumnPrimaryKeyExpression = e => e.SourceReference;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
@@ -899,16 +899,16 @@ public class FacIngestionHandler(
                 Value = cr.Cost != null && cr.Cost.Value > 0 ? decimal.ToDouble(cr.Cost.Value) : null
             };
         
-        await dbContext.BulkSynchronizeAsync(costs, options =>
+        await dbContext.BulkSynchronizeAsync(costs, bulkOperation =>
         {
-            options.ColumnPrimaryKeyExpression = p => new
+            bulkOperation.ColumnPrimaryKeyExpression = p => new
             {
                 p.EntryId
             };
-            options.AllowDuplicateKeys = true;
-            options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            bulkOperation.AllowDuplicateKeys = true;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
         }, cancellationToken);
         
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
@@ -926,7 +926,7 @@ public class FacIngestionHandler(
             select new Sector()
             {
                 SourceSystem = SourceSystem,
-                Name = c.SECTOR!
+                Name = c.SECTOR ?? string.Empty
             };
         
         var qualificationSectors =
@@ -940,17 +940,17 @@ public class FacIngestionHandler(
         var distinctCourseSectors = sectors.Distinct();
         var distinctQualificationSectors = qualificationSectors.Distinct();
         var distinctSectors = distinctCourseSectors.Union(distinctQualificationSectors);
-        await dbContext.BulkSynchronizeAsync(distinctSectors, options =>
+        await dbContext.BulkSynchronizeAsync(distinctSectors, bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = p => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = p => new
             {
                 p.Id,
                 p.SourceSystem
             };
-            options.ColumnPrimaryKeyExpression = p => p.Name;
-            options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            bulkOperation.ColumnPrimaryKeyExpression = p => p.Name;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
         }, cancellationToken);
         
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
@@ -995,15 +995,15 @@ public class FacIngestionHandler(
         var d2 = courseSectorsByAim.Distinct();
         var entrySectors = d1.Union(d2);
         
-        await dbContext.BulkSynchronizeAsync(entrySectors, options =>
+        await dbContext.BulkSynchronizeAsync(entrySectors, bulkOperation =>
         {
-            options.ColumnPrimaryKeyExpression = es => new
+            bulkOperation.ColumnPrimaryKeyExpression = es => new
             {
                 es.EntryId, es.SectorId
             };
-            options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
         }, cancellationToken);
         
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
@@ -1037,7 +1037,7 @@ public class FacIngestionHandler(
                 pb.Report(percent);
             }
             
-            var entries = dbContext.Entries
+            var entries = await dbContext.Entries
                 .Include(entry => entry.EntrySectors)
                 .ThenInclude(entrySector => entrySector.Sector)
                 .Include(entry => entry.EntryInstances)
@@ -1048,7 +1048,7 @@ public class FacIngestionHandler(
                 .Where(x => x.SourceSystem == SourceSystem && 
                             x.IngestionState == IngestionState.Pending)
                 .Take(100)
-                .ToList();
+                .ToListAsync(cancellationToken: cancellationToken);
 
             if (entries.Count == 0)
             {
@@ -1127,11 +1127,11 @@ public class FacIngestionHandler(
             await dbContext.BulkSaveChangesAsync(cancellationToken);
 
             var resultInfo = new ResultInfo();
-            await dbContext.BulkMergeAsync(searchEntries, options =>
+            await dbContext.BulkMergeAsync(searchEntries, bulkOperation =>
             {
-                options.ColumnPrimaryKeyExpression = ai => ai.InstanceId;
-                options.UseRowsAffected = true;
-                options.ResultInfo = resultInfo;
+                bulkOperation.ColumnPrimaryKeyExpression = ai => ai.InstanceId;
+                bulkOperation.UseRowsAffected = true;
+                bulkOperation.ResultInfo = resultInfo;
             }, cancellationToken);
 
             Console.WriteLine($"{resultInfo.RowsAffectedInserted} created for indexing");
@@ -1149,9 +1149,9 @@ public class FacIngestionHandler(
             await dbContext.BulkSaveChangesAsync(cancellationToken);
 
             // Keep going until we've ingested everything
-            if (!dbContext.Entries.Any(e =>
+            if (! await dbContext.Entries.AnyAsync(e =>
                     e.IngestionState == IngestionState.Pending
-                    && e.SourceSystem == SourceSystem))
+                    && e.SourceSystem == SourceSystem, cancellationToken: cancellationToken))
             {
                 if (options.IndexDirectly)
                 {

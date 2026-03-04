@@ -80,7 +80,7 @@ public class DiscoverUniIngestionHandler(
         // Let's determine when we last fetched data
         DU.IngestionState ingestionState;
 
-        if (!dbContext.DU_IngestionState.Any())
+        if (! await dbContext.DU_IngestionState.AnyAsync(cancellationToken: cancellationToken))
         {
             ingestionState = new DU.IngestionState
             {
@@ -94,7 +94,7 @@ public class DiscoverUniIngestionHandler(
             await dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        ingestionState = dbContext.DU_IngestionState.First();
+        ingestionState = await dbContext.DU_IngestionState.FirstAsync(cancellationToken: cancellationToken);
 
         var tempPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         
@@ -250,11 +250,11 @@ public class DiscoverUniIngestionHandler(
 
                 
                     Console.WriteLine($"Preparing {records.Count} records to DB...");
-                    await dbContext.BulkSynchronizeAsync(records, options =>
+                    await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                     {
-                        options.BatchSize = batchSize;
-                        options.BatchDelayInterval = 1000;
-                        options.UseTableLock = true;
+                        bulkOperation.BatchSize = batchSize;
+                        bulkOperation.BatchDelayInterval = 1000;
+                        bulkOperation.UseTableLock = true;
                     }, cancellationToken);
             }
 
@@ -282,11 +282,11 @@ public class DiscoverUniIngestionHandler(
             if (records.Count != 0)
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
             }
 
@@ -314,11 +314,11 @@ public class DiscoverUniIngestionHandler(
             if (records.Count != 0)
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
             }
 
@@ -346,11 +346,11 @@ public class DiscoverUniIngestionHandler(
             if (records.Count != 0)
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
             }
             
@@ -377,11 +377,11 @@ public class DiscoverUniIngestionHandler(
             if (records.Count != 0)
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
             }
 
@@ -409,11 +409,11 @@ public class DiscoverUniIngestionHandler(
             if (records.Count != 0)
             {
                 Console.WriteLine($"Preparing {records.Count} records to DB...");
-                await dbContext.BulkSynchronizeAsync(records, options =>
+                await dbContext.BulkSynchronizeAsync(records, bulkOperation =>
                 {
-                    options.BatchSize = batchSize;
-                    options.BatchDelayInterval = 1000;
-                    options.UseTableLock = true;
+                    bulkOperation.BatchSize = batchSize;
+                    bulkOperation.BatchDelayInterval = 1000;
+                    bulkOperation.UseTableLock = true;
                 }, cancellationToken);
 
             }
@@ -460,18 +460,18 @@ public class DiscoverUniIngestionHandler(
                 SourceSystem = SourceSystem
             };
         
-        await dbContext.BulkSynchronizeAsync(locations.Distinct(), options =>
+        await dbContext.BulkSynchronizeAsync(locations.Distinct(), bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = l => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = l => new
             {
                 l.Id,
                 l.Created,
                 l.Updated
             };
-            options.ColumnPrimaryKeyExpression = l => l.SourceReference;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
-            options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
+            bulkOperation.ColumnPrimaryKeyExpression = l => l.SourceReference;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
@@ -499,16 +499,16 @@ public class DiscoverUniIngestionHandler(
                 OtherNames = i.OtherNames
             };
         
-        await dbContext.BulkSynchronizeAsync(providers, options =>
+        await dbContext.BulkSynchronizeAsync(providers, bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = p => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = p => new
             {
                 p.Id
             };
-            options.ColumnPrimaryKeyExpression = l => l.Ukprn;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
-            options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
+            bulkOperation.ColumnPrimaryKeyExpression = l => l.Ukprn;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = l => l.SourceSystem;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
@@ -538,17 +538,17 @@ public class DiscoverUniIngestionHandler(
                 SourceSystem = SourceSystem
             };
 
-        var providerLocationList = providerLocations.ToList();
+        var providerLocationList = await providerLocations.ToListAsync(cancellationToken: cancellationToken);
         
-        await dbContext.BulkSynchronizeAsync(providerLocationList.Distinct(), options =>
+        await dbContext.BulkSynchronizeAsync(providerLocationList.Distinct(), bulkOperation =>
         {
-            options.ColumnPrimaryKeyExpression = p => new
+            bulkOperation.ColumnPrimaryKeyExpression = p => new
             {
                 p.ProviderId, p.LocationId
             };
-            options.UseRowsAffected = true;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
-            options.ResultInfo = resultInfo;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
@@ -591,12 +591,12 @@ public class DiscoverUniIngestionHandler(
                 CourseType = CourseType.Degree
             };
 
-        Console.WriteLine($"Generating entries for {courses.LongCount()} courses...");
+        Console.WriteLine($"Generating entries for {await courses.LongCountAsync(cancellationToken: cancellationToken)} courses...");
         var distinctEntries = courses.Distinct();
 
-        await dbContext.BulkSynchronizeAsync(distinctEntries, options =>
+        await dbContext.BulkSynchronizeAsync(distinctEntries, bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = p => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = p => new
             {
                 p.Id,
                 p.Created,
@@ -604,12 +604,12 @@ public class DiscoverUniIngestionHandler(
                 p.SourceUpdated,
                 p.IngestionState
             };
-            options.UseRowsAffected = true;
-            options.ColumnPrimaryKeyExpression = e => e.SourceReference;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
-            options.UseAudit = true;
-            options.AuditEntries = auditEntries;
-            options.ResultInfo = resultInfo;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ColumnPrimaryKeyExpression = e => e.SourceReference;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            bulkOperation.UseAudit = true;
+            bulkOperation.AuditEntries = auditEntries;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
@@ -668,23 +668,23 @@ public class DiscoverUniIngestionHandler(
                     $"{c.UKPRN}_{c.CourseId}_{(int)c.StudyMode}",
                 EntryId = e.Id,
                 LocationId = l != null ? l.Id : null,
-                StudyMode = c.DistanceLearning != null ? c.DistanceLearning!.Value.ToStudyMode() : null
+                StudyMode = c.DistanceLearning != null ? c.DistanceLearning.Value.ToStudyMode() : null
             };
         
         Console.WriteLine($"Generating entry instances ...");
         
-        await dbContext.BulkSynchronizeAsync(instances, options =>
+        await dbContext.BulkSynchronizeAsync(instances, bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = p => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = p => new
             {
                 p.Id,
                 p.Created,
                 p.Updated
             };
-            options.ColumnPrimaryKeyExpression = e => e.SourceReference;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
-            options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
+            bulkOperation.ColumnPrimaryKeyExpression = e => e.SourceReference;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
         Console.WriteLine($"{resultInfo.RowsAffectedUpdated} updated");
@@ -703,17 +703,17 @@ public class DiscoverUniIngestionHandler(
                 Name = h.Label
             };
 
-        await dbContext.BulkSynchronizeAsync(distinctSectors.Distinct(), options =>
+        await dbContext.BulkSynchronizeAsync(distinctSectors.Distinct(), bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = p => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = p => new
             {
                 p.Id,
                 p.SourceSystem
             };
-            options.ColumnPrimaryKeyExpression = p => p.Name;
-            options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            bulkOperation.ColumnPrimaryKeyExpression = p => p.Name;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
         }, cancellationToken);
 
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
@@ -725,7 +725,7 @@ public class DiscoverUniIngestionHandler(
 
         Console.WriteLine("Generating entry sectors...");
 
-        var sectors = (
+        var sectors = await (
             from s in dbContext.Sectors
             join h in dbContext.DU_HECOS on
                 s.Name equals h.Label
@@ -733,9 +733,9 @@ public class DiscoverUniIngestionHandler(
             select new
             {
                 Hecos = h, Sector = s
-            }).ToList();
+            }).ToListAsync(cancellationToken: cancellationToken);
 
-        var sectorCourses = (
+        var sectorCourses = await (
             from c in dbContext.DU_Courses
             join e in dbContext.Entries on
                 Convert.ToString(c.UKPRN) + "_" +
@@ -747,7 +747,7 @@ public class DiscoverUniIngestionHandler(
                 {
                     c.Hecos, c.Hecos2, c.Hecos3, c.Hecos4, c.Hecos5
                 }
-            }).ToList();
+            }).ToListAsync(cancellationToken: cancellationToken);
 
         // Remove empty sectors
         sectorCourses.RemoveAll(s => s.HecosCodes.All(h => h == null));
@@ -772,15 +772,15 @@ public class DiscoverUniIngestionHandler(
             }
         });
         
-        await dbContext.BulkSynchronizeAsync(entrySectors, options =>
+        await dbContext.BulkSynchronizeAsync(entrySectors, bulkOperation =>
         {
-            options.ColumnPrimaryKeyExpression = es => new
+            bulkOperation.ColumnPrimaryKeyExpression = es => new
             {
                 es.EntryId, es.SectorId
             };
-            options.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
-            options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
+            bulkOperation.ColumnSynchronizeDeleteKeySubsetExpression = e => e.SourceSystem;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
 
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
@@ -808,15 +808,15 @@ public class DiscoverUniIngestionHandler(
                 YearAbroad = c.YearAbroad == null ? null : c.YearAbroad.Value != Availability.NotAvailable
             };
         
-        await dbContext.BulkSynchronizeAsync(uniData, options =>
+        await dbContext.BulkSynchronizeAsync(uniData, bulkOperation =>
         {
-            options.IgnoreOnSynchronizeUpdateExpression = p => new
+            bulkOperation.IgnoreOnSynchronizeUpdateExpression = p => new
             {
                 p.Id
             };
-            options.ColumnPrimaryKeyExpression = course => course.EntryId;
-            options.UseRowsAffected = true;
-            options.ResultInfo = resultInfo;
+            bulkOperation.ColumnPrimaryKeyExpression = course => course.EntryId;
+            bulkOperation.UseRowsAffected = true;
+            bulkOperation.ResultInfo = resultInfo;
         }, cancellationToken);
 
         Console.WriteLine($"{resultInfo.RowsAffectedInserted} created");
@@ -850,7 +850,7 @@ public class DiscoverUniIngestionHandler(
                 pb.Report(percent);
             }
             
-            var entries = dbContext.Entries
+            var entries = await dbContext.Entries
                 .Include(entry => entry.EntrySectors)
                 .ThenInclude(entrySector => entrySector.Sector)
                 .Include(entry => entry.EntryInstances)
@@ -862,7 +862,7 @@ public class DiscoverUniIngestionHandler(
                     x.SourceSystem == SourceSystem &&
                     x.IngestionState == IngestionState.Pending)
                 .Take(250)
-                .ToList();
+                .ToListAsync(cancellationToken: cancellationToken);
 
             if (entries.Count == 0)
             {
@@ -938,11 +938,11 @@ public class DiscoverUniIngestionHandler(
             }
 
             var resultInfo = new ResultInfo();
-            await dbContext.BulkMergeAsync(searchEntries, options =>
+            await dbContext.BulkMergeAsync(searchEntries, bulkOperation =>
             {
-                options.ColumnPrimaryKeyExpression = ai => ai.InstanceId;
-                options.UseRowsAffected = true;
-                options.ResultInfo = resultInfo;
+                bulkOperation.ColumnPrimaryKeyExpression = ai => ai.InstanceId;
+                bulkOperation.UseRowsAffected = true;
+                bulkOperation.ResultInfo = resultInfo;
             }, cancellationToken);
 
             Console.WriteLine($"{resultInfo.RowsAffectedInserted} created for indexing");
@@ -958,9 +958,9 @@ public class DiscoverUniIngestionHandler(
             await dbContext.BulkSaveChangesAsync(cancellationToken);
 
             // Keep going until we've ingested everything
-            if (!dbContext.Entries.Any(e =>
+            if (!await dbContext.Entries.AnyAsync(e =>
                     e.IngestionState == IngestionState.Pending
-                    && e.SourceSystem == SourceSystem))
+                    && e.SourceSystem == SourceSystem, cancellationToken: cancellationToken))
             {
                 if (options.IndexDirectly)
                 {
