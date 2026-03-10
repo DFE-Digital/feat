@@ -297,7 +297,7 @@ public class FaaIngestionHandler(
                 Reference = a.VacancyReference!,
                 Title = a.Title!,
                 AimOrAltTitle = a.CourseTitle!,
-                Description = a.Description,
+                Description = a.Description?.CleanHtml(),
                 FullDescription = a.FullDescription,
                 EntryRequirements = a.QualificationsSummary,
                 FlexibleStart = a.StartDate == null,
@@ -402,7 +402,7 @@ public class FaaIngestionHandler(
         {
             Created = DateTime.UtcNow,
             Name = a.Key,
-            Description = a.First().EmployerDescription?.CleanHtml(),
+            Description = a.First().EmployerDescription,
             Url = a.First().EmployerWebsiteUrl,
             ContactName = a.First().EmployerContactName,
             ContactEmail = a.First().EmployerContactEmail,
