@@ -93,7 +93,7 @@
               <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
                 <dt class="govuk-summary-list__key">About this employer</dt>
                 <dd class="govuk-summary-list__value">
-                  @(string.IsNullOrWhiteSpace(Model.EmployerDescription) ? SharedStrings.NotProvided : Model.EmployerDescription)
+                  @(string.IsNullOrWhiteSpace(Model.EmployerDescription) ? SharedStrings.NotProvided : Html.Raw(Model.EmployerDescription))
                 </dd>
               </div>
 
